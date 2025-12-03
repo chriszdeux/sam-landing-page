@@ -3,12 +3,15 @@ import uiReducer from './features/uiSlice';
 import gameReducer from './features/gameSlice';
 import authReducer from './features/authSlice';
 
+import economyReducer from './features/economySlice';
+
 export const makeStore = () => {
   return configureStore({
     reducer: {
       ui: uiReducer,
       game: gameReducer,
       auth: authReducer,
+      economy: economyReducer,
     },
   });
 };

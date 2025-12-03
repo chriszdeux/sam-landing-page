@@ -1,6 +1,6 @@
 'use client';
 
-import { Navbar } from "../components/layout/Navbar";
+
 import { Footer } from "../components/layout/Footer";
 import { Background } from "../components/layout/Background";
 import { HeroSection } from "../components/sections/HeroSection";
@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <main className="min-h-screen relative">
       <Background />
-      <Navbar />
+
 
       <div className="relative z-10">
         <HeroSection />

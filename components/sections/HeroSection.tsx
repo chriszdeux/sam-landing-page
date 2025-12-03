@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { Box, Typography, Stack, Grid } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Rocket, Globe, Zap, Shield } from 'lucide-react';
@@ -6,6 +7,7 @@ import { Button } from '../ui/Button';
 import { Section } from '../ui/Section';
 import { openModal } from '../../lib/features/uiSlice';
 import { useAppDispatch } from '../../lib/hooks';
+import { cyan } from '@mui/material/colors';
 
 export const HeroSection = () => {
   const dispatch = useAppDispatch();
@@ -64,10 +66,10 @@ export const HeroSection = () => {
         <Grid size={{ xs: 12, md: 5 }}>
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 3 }}>
             {[
-              { icon: Globe, label: 'Exploración Infinita', color: '#00f3ff' },
-              { icon: Zap, label: 'Economía Real', color: '#ffb700' },
-              { icon: Shield, label: 'Seguridad Blockchain', color: '#00f3ff' },
-              { icon: Rocket, label: 'Conquista Espacial', color: '#ffb700' },
+              { icon: Globe, label: 'Universo en Expansión', color: cyan[500], href: '/exploracion-infinita' },
+              { icon: Zap, label: 'Economía Real', color: cyan[500], href: '/economia-real' },
+              { icon: Shield, label: 'Seguridad Blockchain', color: cyan[500], href: '#' },
+              { icon: Rocket, label: 'Conquista Espacial', color: cyan[500], href: '#' },
             ].map((item, index) => (
               <motion.div
                 key={index}
@@ -75,25 +77,28 @@ export const HeroSection = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 + index * 0.1 }}
               >
-                <Box sx={{
-                  p: 3,
-                  bgcolor: 'rgba(255,255,255,0.03)',
-                  borderRadius: 4,
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  textAlign: 'center',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.05)',
-                    transform: 'translateY(-5px)',
-                    borderColor: item.color,
-                    boxShadow: `0 0 20px ${item.color}33`
-                  }
-                }}>
-                  <item.icon size={32} color={item.color} style={{ marginBottom: 16 }} />
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    {item.label}
-                  </Typography>
-                </Box>
+                <Link href={item.href} style={{ textDecoration: 'none' }}>
+                  <Box sx={{
+                    p: 3,
+                    bgcolor: 'rgba(255,255,255,0.03)',
+                    borderRadius: 4,
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    textAlign: 'center',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      bgcolor: 'rgba(255,255,255,0.05)',
+                      transform: 'translateY(-5px)',
+                      borderColor: item.color,
+                      boxShadow: `0 0 20px ${item.color}33`
+                    }
+                  }}>
+                    <item.icon size={32} color={item.color} style={{ marginBottom: 16 }} />
+                    <Typography variant="subtitle1" fontWeight="bold" color="white">
+                      {item.label}
+                    </Typography>
+                  </Box>
+                </Link>
               </motion.div>
             ))}
           </Box>

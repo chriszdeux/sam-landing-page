@@ -1,7 +1,11 @@
+'use client';
+
 import React, { useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { AppBar, Toolbar, IconButton, Typography, Box, Menu, MenuItem, Stack, Drawer, List, ListItem, ListItemText } from '@mui/material';
-import { Menu as MenuIcon, Rocket, Person as UserIcon, AccountBalanceWallet } from '@mui/icons-material';
+import { Menu as MenuIcon, Rocket, Person as UserIcon, MonetizationOn } from '@mui/icons-material';
 import { Button } from '../ui/Button';
+import { CountUp } from '../ui/CountUp';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { setCurrentSection, openModal } from '../../lib/features/uiSlice';
 import { logout, connectWallet, disconnectWallet } from '../../lib/features/authSlice';
@@ -27,11 +31,18 @@ export const Navbar = () => {
     }
   };
 
+  const pathname = usePathname();
+  const router = useRouter();
+
   const handleNavClick = (id: string) => {
     dispatch(setCurrentSection(id));
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    if (pathname === '/') {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      router.push('/#' + id);
     }
     setMobileOpen(false);
   };
@@ -57,6 +68,10 @@ export const Navbar = () => {
               <>
                 <Typography variant="body2" sx={{ color: 'primary.main', mb: 1 }}>
                   Hola, {userInfo.name}
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2, display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
+                  <MonetizationOn fontSize="small" sx={{ color: 'gold' }} />
+                  Créditos: <CountUp to={userInfo.balance} />
                 </Typography>
                 <Button variant="outlined" fullWidth onClick={() => dispatch(logout())}>
                   Cerrar Sesión
@@ -98,6 +113,10 @@ export const Navbar = () => {
 
             {userInfo ? (
               <Stack direction="row" spacing={2} alignItems="center">
+                <Typography variant="body2" sx={{ color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 0.5, mr: 1 }}>
+                  <MonetizationOn fontSize="small" sx={{ color: 'gold' }} />
+                  <CountUp to={userInfo.balance} />
+                </Typography>
                 <Typography variant="body2" sx={{ color: 'primary.main', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <UserIcon fontSize="small" />
                   {userInfo.name}
