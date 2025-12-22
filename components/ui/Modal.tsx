@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Modal as MuiModal, Box, IconButton, Fade, Backdrop } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
@@ -8,7 +10,7 @@ import { RegisterForm } from '../auth/RegisterForm';
 import { ValidateAccountForm } from '../auth/ValidateAccountForm';
 
 const style = {
-  position: 'absolute' as 'absolute',
+  position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
@@ -16,9 +18,10 @@ const style = {
   maxWidth: 500,
   maxHeight: '90vh',
   overflowY: 'auto',
-  bgcolor: 'background.paper',
-  border: '1px solid #00f3ff',
-  boxShadow: '0 0 20px #00f3ff',
+  bgcolor: 'rgba(10, 15, 30, 0.95)', // Darker, more opaque for readability but still fitting theme
+  backdropFilter: 'blur(20px)', // Blur logic handled by backdrop usually, but this adds to the modal itself if supported
+  border: '1px solid rgba(0, 243, 255, 0.3)',
+  boxShadow: '0 0 30px rgba(0, 243, 255, 0.2), inset 0 0 20px rgba(0, 243, 255, 0.05)',
   borderRadius: 4,
   p: 4,
   outline: 'none',

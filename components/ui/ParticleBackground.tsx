@@ -67,26 +67,24 @@ export const ParticleBackground = () => {
       ctx.clearRect(0, 0, width, height);
 
       // Update and draw particles
-      particles.forEach((p, i) => {
-        // Mouse Attraction
+      // Update and draw particles
+      particles.forEach((p) => {
+        // Suspended floating movement
+        // Add slight mouse interactions (gentle push)
         const dxMouse = mouse.x - p.x;
         const dyMouse = mouse.y - p.y;
         const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
-
-        if (distMouse < mouseRadius) {
-          const forceDirectionX = dxMouse / distMouse;
-          const forceDirectionY = dyMouse / distMouse;
-          const force = (mouseRadius - distMouse) / mouseRadius;
-          const directionX = forceDirectionX * force * 0.05; // Strength of attraction
-          const directionY = forceDirectionY * force * 0.05;
-
-          p.vx += directionX;
-          p.vy += directionY;
+        
+        if (distMouse < 200) {
+            const force = (200 - distMouse) / 200;
+            // Gentle repulsion to feel "suspended" in fluid
+            p.vx -= (dxMouse / distMouse) * force * 0.05;
+            p.vy -= (dyMouse / distMouse) * force * 0.05;
         }
 
-        // Friction to prevent infinite acceleration
-        p.vx *= 0.99;
-        p.vy *= 0.99;
+        // Friction
+        p.vx *= 0.98;
+        p.vy *= 0.98;
 
         p.x += p.vx;
         p.y += p.vy;
@@ -95,20 +93,26 @@ export const ParticleBackground = () => {
         if (p.x < 0 || p.x > width) p.vx *= -1;
         if (p.y < 0 || p.y > height) p.vy *= -1;
 
-        // Draw particle
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        
         ctx.fillStyle = p.color;
+        ctx.shadowBlur = 0;
+        
         ctx.fill();
+        ctx.shadowBlur = 0; // Reset
 
         // Draw connections
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const dx = p.x - p2.x;
-          const dy = p.y - p2.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+        for (let j = 0; j < particles.length; j++) {
+            // Optimization: only check some particles or use spatial partition (skip for now, just limiting count)
+            const p2 = particles[j];
+            if (p === p2) continue;
 
-          if (distance < connectionDistance) {
+            const dx = p.x - p2.x;
+            const dy = p.y - p2.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < connectionDistance) {
             ctx.beginPath();
             ctx.strokeStyle = p.color;
             ctx.globalAlpha = 1 - distance / connectionDistance;
@@ -117,7 +121,7 @@ export const ParticleBackground = () => {
             ctx.lineTo(p2.x, p2.y);
             ctx.stroke();
             ctx.globalAlpha = 1;
-          }
+            }
         }
       });
 
@@ -209,6 +213,7 @@ export const ParticleBackground = () => {
   }, []);
 
   return (
+    <>
     <Box
       component="canvas"
       ref={canvasRef}
@@ -218,9 +223,22 @@ export const ParticleBackground = () => {
         left: 0,
         width: '100%',
         height: '100%',
-        zIndex: -1,
-        bgcolor: '#0a0a1a', // Dark background matching the theme
+        zIndex: -2, // Moved further back to allow overlay to sit at -1
+        bgcolor: '#0a0a1a', 
       }}
     />
+    <Box
+        sx={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: -1, // On top of canvas
+          backgroundColor: 'rgba(0, 0, 0, 0.7)', // Darkened overlay
+          pointerEvents: 'none',
+        }}
+    />
+    </>
   );
 };
