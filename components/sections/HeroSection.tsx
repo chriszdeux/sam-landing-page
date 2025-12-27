@@ -67,9 +67,9 @@ export const HeroSection = () => {
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 3 }}>
             {[
               { icon: Globe, label: 'Universo en Expansión', color: cyan[500], href: '/exploracion-infinita' },
-              { icon: Zap, label: 'Economía Real', color: cyan[500], href: '/economia-real' },
-              { icon: Shield, label: 'Seguridad Blockchain', color: cyan[500], href: '#' },
-              { icon: Rocket, label: 'Conquista Espacial', color: cyan[500], href: '#' },
+              { icon: Zap, label: 'Economía Real', color: '#ffb700', href: '/market' }, // Updated Link and Color
+              { icon: Shield, label: 'Seguridad Blockchain', color: '#00f3ff', href: '#' },
+              { icon: Rocket, label: 'Conquista Espacial', color: '#ff0055', href: '#' },
             ].map((item, index) => (
               <motion.div
                 key={index}
@@ -80,21 +80,37 @@ export const HeroSection = () => {
                 <Link href={item.href} style={{ textDecoration: 'none' }}>
                   <Box sx={{
                     p: 3,
-                    bgcolor: 'rgba(255,255,255,0.03)',
+                    bgcolor: 'rgba(10,10,10,0.6)', // Darker background with opacity
                     borderRadius: 4,
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    border: '1px solid rgba(255,255,255,0.05)',
                     textAlign: 'center',
-                    transition: 'all 0.3s ease',
+                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                     cursor: 'pointer',
+                    backdropFilter: 'blur(10px)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      background: `linear-gradient(45deg, ${item.color}00, ${item.color}10)`,
+                      opacity: 0,
+                      transition: 'opacity 0.3s ease',
+                    },
                     '&:hover': {
-                      bgcolor: 'rgba(255,255,255,0.05)',
-                      transform: 'translateY(-5px)',
+                      transform: 'translateY(-8px)',
                       borderColor: item.color,
-                      boxShadow: `0 0 20px ${item.color}33`
+                      boxShadow: `0 10px 30px -10px ${item.color}66`,
+                      '&::before': {
+                        opacity: 1
+                      }
                     }
                   }}>
-                    <item.icon size={32} color={item.color} style={{ marginBottom: 16 }} />
-                    <Typography variant="subtitle1" fontWeight="bold" color="white">
+                    <item.icon size={32} color={item.color} style={{ marginBottom: 16, position: 'relative', zIndex: 1 }} />
+                    <Typography variant="subtitle1" fontWeight="bold" color="white" sx={{ position: 'relative', zIndex: 1 }}>
                       {item.label}
                     </Typography>
                   </Box>
