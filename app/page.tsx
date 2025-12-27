@@ -9,11 +9,13 @@ import { MechanicsSection } from "../components/sections/MechanicsSection";
 import { ResourcesSection } from "../components/sections/ResourcesSection";
 import { ArchitectureSection } from "../components/sections/ArchitectureSection";
 import { Modal } from "../components/ui/Modal";
+import { SectionNavigation } from "../components/ui/SectionNavigation";
 
 export default function Home() {
   return (
     <main className="min-h-screen relative">
       <Background />
+      <SectionNavigation />
 
 
       <div className="relative z-10">

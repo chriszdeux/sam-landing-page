@@ -4,6 +4,9 @@ import "./globals.css";
 import StoreProvider from "./StoreProvider";
 import ThemeRegistry from "../components/ThemeRegistry";
 import { Navbar } from "../components/layout/Navbar";
+import { AuthLoader } from "../components/auth/AuthLoader";
+import { Modal } from "../components/ui/Modal";
+import { ToastStack } from "../components/ui/ToastStack";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,8 +36,12 @@ export default function RootLayout({
       >
         <StoreProvider>
           <ThemeRegistry>
-            <Navbar />
-            {children}
+            <AuthLoader>
+                <Navbar />
+                <Modal />
+                <ToastStack />
+                {children}
+            </AuthLoader>
           </ThemeRegistry>
         </StoreProvider>
       </body>

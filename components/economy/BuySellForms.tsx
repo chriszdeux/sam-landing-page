@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Box, TextField, Button, Typography, Stack, Alert, CircularProgress } from '@mui/material';
+import { Box, Button, Typography, Stack, Alert, CircularProgress } from '@mui/material';
+import { Input } from '../ui/Input';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { buyAsset, sellAsset } from '../../lib/features/economySlice';
 
@@ -70,24 +71,20 @@ export const BuySellForms: React.FC<BuySellFormsProps> = ({ assetId, assetSymbol
 
       <form onSubmit={handleSubmit}>
         <Stack spacing={3}>
-          <TextField
+          <Input
             label={`Cantidad de ${assetSymbol}`}
-            variant="outlined"
             type="number"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAmount(e.target.value)}
             fullWidth
-            InputProps={{
-              style: { color: 'white' }
-            }}
-            InputLabelProps={{
-              style: { color: 'rgba(255,255,255,0.7)' }
-            }}
             sx={{
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
-                '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.4)' },
-              }
+              '& .MuiInputBase-input': { color: 'white' },
+              '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' }, // This needs containerSx
+               // But sx passed to Input goes to input container.
+               // Label is rendered by Input component separately.
+            }}
+            containerSx={{
+                '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' }
             }}
           />
 

@@ -122,6 +122,9 @@ const theme = createTheme({
           },
           '& .MuiInputLabel-root': {
             color: '#b3b3b3',
+            backgroundColor: theme.palette.background.default,
+            paddingLeft: '4px',
+            paddingRight: '4px',
             '&.Mui-focused': {
               color: '#ffffff',
             },

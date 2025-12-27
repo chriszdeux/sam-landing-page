@@ -40,7 +40,7 @@ export const MarketTable = () => {
 
   useEffect(() => {
     dispatch(fetchAssets({ page, limit: 10 }));
-  }, [dispatch, page]);
+  }, [page]);
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     dispatch(setPage(value));
