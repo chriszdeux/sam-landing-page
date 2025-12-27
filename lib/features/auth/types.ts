@@ -40,6 +40,7 @@ export interface User {
   isBanned: boolean;
   transactions: unknown[]; 
   wallets: Wallet[];
+  walletsSaved: Wallet[];
   rewards: Reward[];
   balance: number;
   referralCode: string;

@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../lib/store';
 import { fetchCryptos } from '../../lib/features/market/actions';
 
-import { MarketLineChart } from '../../components/market/MarketLineChart';
+import { BlockchainDataDisplay } from '../../components/market/BlockchainDataDisplay';
 
 
 export default function MarketPage() {
@@ -26,7 +26,7 @@ export default function MarketPage() {
     if (selectedNetwork?.id) {
         dispatch(fetchCryptos(selectedNetwork.id));
     }
-  }, [selectedNetwork?.id, dispatch]);
+  }, [selectedNetwork?.id]);
 
   return (
     <Box sx={{ minHeight: '100vh', position: 'relative' }}>
@@ -37,9 +37,8 @@ export default function MarketPage() {
           Mercado Galáctico
         </Typography>
 
-        {/* Chart Section */}
-        {/* Chart Section */}
-        <MarketLineChart />
+        {/* Blockchain Data Terminal */}
+        <BlockchainDataDisplay network={selectedNetwork} />
 
         {/* Assets Grid */}
         <Typography variant="h4" sx={{ mb: 4, color: 'white' }}>Activos Listados</Typography>

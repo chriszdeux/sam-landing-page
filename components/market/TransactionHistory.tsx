@@ -20,7 +20,7 @@ export const TransactionHistory = ({ walletId }: TransactionHistoryProps) => {
   const { byStoreBoxId: transactions } = useAppSelector((state) => state.transactions);
 
   const currentNetwork = networks.find(n => n.id === selectedNetwork?.id);
-  const storeId = selectedNetwork?.transactionStoreID || currentNetwork?.storeTransactions?.transactionStoreID;
+  const storeId = selectedNetwork?.storeTransactions?.transactionStoreID || currentNetwork?.storeTransactions?.transactionStoreID;
 
   React.useEffect(() => {
     if (storeId) {

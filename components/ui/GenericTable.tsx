@@ -7,11 +7,11 @@ import {
   TableHead,
   TableRow,
   Paper,
-  TextField,
-  Box,
   TablePagination,
-  InputAdornment
+  InputAdornment,
+  Box
 } from '@mui/material';
+import { Input } from './Input';
 import { Search, ArrowUpward, ArrowDownward } from '@mui/icons-material';
 
 export interface Column<T> {
@@ -169,25 +169,24 @@ export function GenericTable<T>({
                       )}
                   </Box>
                   {col.filterable && (
-                      <TextField
-                        variant="standard"
-                        size="small"
+                      <Input
                         placeholder={`Filter ${col.Header}`}
                         value={filters[col.Header] || ''}
-                        onChange={(e) => handleFilterChange(col.Header, e.target.value)}
-                        onClick={(e) => e.stopPropagation()} // Prevent sorting when clicking input
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFilterChange(col.Header, e.target.value)}
+                        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                        containerSx={{ mb: 0, mt: 1 }}
+                        startAdornment={
+                            <InputAdornment position="start">
+                                <Search fontSize="inherit" sx={{ color: 'text.secondary' }} />
+                            </InputAdornment>
+                        }
                         sx={{ 
-                            mt: 1, 
-                            input: { color: 'white', fontSize: '0.875rem' },
-                            '& .MuiInput-underline:before': { borderBottomColor: 'rgba(255,255,255,0.3)' },
-                            '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderBottomColor: 'white' },
-                        }}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <Search fontSize="inherit" sx={{ color: 'text.secondary' }} />
-                                </InputAdornment>
-                            )
+                            input: { color: 'white', fontSize: '0.875rem', padding: '6px 8px' }, // Compact
+                            // Remove default border if we want 'standard' look? No, standardizing to box.
+                            // But maybe simpler border?
+                            // Default Input has border. Let's keep it for consistency.
+                            // Adjust adornment alignment if needed.
+                            '& .MuiInputBase-input': { padding: '6px 8px' }
                         }}
                       />
                   )}

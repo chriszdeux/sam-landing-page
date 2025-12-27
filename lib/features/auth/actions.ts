@@ -113,3 +113,16 @@ export const connectWallet = createAsyncThunk(
     }
   }
 );
+
+export const addWallet = createAsyncThunk(
+  'auth/addWallet',
+  async (walletData: { userId: string; label: string; walletAddress: string }, { rejectWithValue }) => {
+    const { userId, ...data } = walletData;
+    try {
+      const response = await api.put(`/users/${userId}/add-wallet`, data);
+      return { ...data, message: response.data?.message || 'Wallet added successfully' };
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to add wallet');
+    }
+  }
+);

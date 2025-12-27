@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Box, Container, Typography, Grid, TextField, InputAdornment } from '@mui/material';
+import { Box, Container, Typography, Grid, InputAdornment } from '@mui/material';
 import { Search } from '@mui/icons-material';
 import { Background } from '../../components/layout/Background';
 import { Card } from '../../components/ui/Card';
+import { Input } from '../../components/ui/Input';
 import { resourcesData } from '../../lib/data/resources';
 import { motion } from 'framer-motion';
 
@@ -31,26 +32,19 @@ export default function ResourcesPage() {
         </motion.div>
 
         <Box sx={{ maxWidth: 600, mx: 'auto', mb: 10 }}>
-            <TextField
+            <Input
                 fullWidth
-                variant="outlined"
                 placeholder="Buscar material por nombre o tipo..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            <Search sx={{ color: 'text.secondary' }} />
-                        </InputAdornment>
-                    ),
-                    sx: {
-                        bgcolor: 'rgba(255,255,255,0.05)',
-                        borderRadius: 4,
-                        color: 'white',
-                        '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
-                        '&:hover fieldset': { borderColor: 'primary.main' },
-                        '&.Mui-focused fieldset': { borderColor: 'primary.main' }
-                    }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                startAdornment={
+                    <InputAdornment position="start">
+                        <Search sx={{ color: 'text.secondary' }} />
+                    </InputAdornment>
+                }
+                sx={{
+                    borderRadius: 4,
+                    '& .MuiInputBase-input': { color: 'white' },
                 }}
             />
         </Box>

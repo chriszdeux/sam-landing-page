@@ -4,11 +4,17 @@ import React from 'react';
 import { Box, Typography, Grid, Container, Paper, Avatar, LinearProgress } from '@mui/material';
 import { Background } from '../../components/layout/Background';
 import { useAppSelector } from '../../lib/hooks';
-import { motion } from 'framer-motion';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { Doughnut } from 'react-chartjs-2';
+import { motion, useAnimation } from 'framer-motion';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, RadialLinearScale, BarElement, CategoryScale, LinearScale, PointElement, LineElement, Filler } from 'chart.js';
+import { Doughnut, Radar, PolarArea, Bar } from 'react-chartjs-2';
+import { ToggleButton, ToggleButtonGroup } from '@mui/material';
+import DonutLargeIcon from '@mui/icons-material/DonutLarge';
+import DataUsageIcon from '@mui/icons-material/DataUsage';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import TrackChangesIcon from '@mui/icons-material/TrackChanges';
+import { WalletManager } from '../../components/portfolio/WalletManager';
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend, RadialLinearScale, BarElement, CategoryScale, LinearScale, PointElement, LineElement, Filler);
 
 // Dummy data for user assets if they are empty
 const defaultAssets = [
@@ -20,6 +26,33 @@ const defaultAssets = [
 export default function PortfolioPage() {
     const { walletsInfo } = useAppSelector((state) => state.auth);
     const { cryptos } = useAppSelector((state) => state.market);
+    const [chartType, setChartType] = React.useState('doughnut');
+    const controls = useAnimation();
+
+    // Trigger animation every 4-7 seconds
+    React.useEffect(() => {
+        let timeoutId: NodeJS.Timeout;
+
+        const animate = async () => {
+            await controls.start({
+                filter: [
+                    'brightness(1) drop-shadow(0 0 0px rgba(0,243,255,0))', 
+                    'brightness(1.3) drop-shadow(0 0 25px rgba(0,243,255,0.6))', 
+                    'brightness(1) drop-shadow(0 0 0px rgba(0,243,255,0))'
+                ],
+                transition: { duration: 2, ease: "easeInOut" }
+            });
+            
+            // Schedule next animation
+            const delay = Math.random() * (7000 - 4000) + 4000;
+            timeoutId = setTimeout(animate, delay);
+        };
+
+        // Start initial loop
+        timeoutId = setTimeout(animate, 2000);
+
+        return () => clearTimeout(timeoutId);
+    }, [controls]);
 
     // If logged in and has wallet details, use them
     let assets = defaultAssets;
@@ -82,6 +115,42 @@ export default function PortfolioPage() {
         maintainAspectRatio: false
     };
 
+    const barChartOptions = {
+        ...chartOptions,
+        cutout: undefined,
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(255,255,255,0.1)' },
+                ticks: { color: 'rgba(255,255,255,0.7)' }
+            },
+            x: {
+                grid: { display: false },
+                ticks: { color: 'rgba(255,255,255,0.7)' }
+            }
+        }
+    };
+
+    const radarChartOptions = {
+        ...chartOptions,
+        cutout: undefined,
+        scales: {
+            r: {
+                angleLines: { color: 'rgba(255,255,255,0.1)' },
+                grid: { color: 'rgba(255,255,255,0.1)' },
+                pointLabels: { color: 'rgba(255,255,255,0.7)', font: { size: 12 } },
+                ticks: { display: false, backdropColor: 'transparent' }
+            }
+        },
+        elements: {
+            line: {
+                borderWidth: 2,
+                borderColor: '#00f3ff',
+                backgroundColor: 'rgba(0, 243, 255, 0.2)'
+            }
+        }
+    };
+
   return (
     <Box sx={{ minHeight: '100vh', position: 'relative' }}>
         <Background />
@@ -96,22 +165,56 @@ export default function PortfolioPage() {
                 </Typography>
             </motion.div>
 
+            <WalletManager />
+
             {assets.length > 0 ? (
                 <Grid container spacing={8} justifyContent="center" alignItems="center">
                     <Grid size={{ xs: 12, md: 5 }}>
-                        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2 }}>
-                        <Box sx={{ position: 'relative', height: 400, width: '100%' }}>
-                            <Doughnut data={chartData} options={chartOptions} />
-                            <Box sx={{ 
-                                position: 'absolute', 
-                                top: '50%', 
-                                left: '50%', 
-                                transform: 'translate(-50%, -50%)', 
-                                textAlign: 'center',
-                                pointerEvents: 'none'
-                             }}>
-                                <Typography variant="h6" color="primary.main">PORTAFOLIO</Typography>
-                                <Typography variant="caption" color="text.secondary">DIVERSIFICACIÓN</Typography>
+                        <motion.div 
+                            animate={controls}
+                        >
+                        <Box sx={{ position: 'relative', height: 400, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <ToggleButtonGroup
+                                value={chartType}
+                                exclusive
+                                onChange={(e, newType) => { if(newType) setChartType(newType) }}
+                                aria-label="chart type"
+                                sx={{ mb: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}
+                                size="small"
+                            >
+                                <ToggleButton value="doughnut" sx={{ color: 'rgba(255,255,255,0.5)', '&.Mui-selected': { color: '#00f3ff', bgcolor: 'rgba(0, 243, 255, 0.1)' } }}>
+                                    <DonutLargeIcon />
+                                </ToggleButton>
+                                <ToggleButton value="radar" sx={{ color: 'rgba(255,255,255,0.5)', '&.Mui-selected': { color: '#00f3ff', bgcolor: 'rgba(0, 243, 255, 0.1)' } }}>
+                                    <TrackChangesIcon />
+                                </ToggleButton>
+                                <ToggleButton value="polar" sx={{ color: 'rgba(255,255,255,0.5)', '&.Mui-selected': { color: '#00f3ff', bgcolor: 'rgba(0, 243, 255, 0.1)' } }}>
+                                    <DataUsageIcon />
+                                </ToggleButton>
+                                <ToggleButton value="bar" sx={{ color: 'rgba(255,255,255,0.5)', '&.Mui-selected': { color: '#00f3ff', bgcolor: 'rgba(0, 243, 255, 0.1)' } }}>
+                                    <BarChartIcon />
+                                </ToggleButton>
+                            </ToggleButtonGroup>
+
+                            <Box sx={{ position: 'relative', height: 350, width: '100%' }}>
+                                {chartType === 'doughnut' && <Doughnut data={chartData} options={chartOptions} />}
+                                {chartType === 'radar' && <Radar data={chartData} options={radarChartOptions} />}
+                                {chartType === 'polar' && <PolarArea data={chartData} options={{ ...chartOptions, scales: { r: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { display: false } } } }} />}
+                                {chartType === 'bar' && <Bar data={chartData} options={barChartOptions} />}
+                                
+                                {chartType === 'doughnut' && (
+                                    <Box sx={{ 
+                                        position: 'absolute', 
+                                        top: '50%', 
+                                        left: '50%', 
+                                        transform: 'translate(-50%, -50%)', 
+                                        textAlign: 'center',
+                                        pointerEvents: 'none'
+                                    }}>
+                                        <Typography variant="h6" color="primary.main">PORTAFOLIO</Typography>
+                                        <Typography variant="caption" color="text.secondary">DIVERSIFICACIÓN</Typography>
+                                    </Box>
+                                )}
                             </Box>
                         </Box>
                         </motion.div>

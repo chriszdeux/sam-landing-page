@@ -19,6 +19,7 @@ interface ConfirmationDialogProps {
     cryptoSymbol?: string;
     amount: number;
     quantity: number;
+    fee?: number | null;
 }
 
 export const ConfirmationDialog = ({
@@ -29,7 +30,8 @@ export const ConfirmationDialog = ({
     cryptoName,
     cryptoSymbol,
     amount,
-    quantity
+    quantity,
+    fee
 }: ConfirmationDialogProps) => {
     return (
         <Dialog 
@@ -77,6 +79,23 @@ export const ConfirmationDialog = ({
                              </Typography>
                             </>
                          )}
+
+                         <Box sx={{ my: 1.5, borderTop: '1px dashed rgba(255,255,255,0.2)' }} />
+                         
+                         <Typography color="text.secondary" variant="caption" sx={{ display: 'block' }}>Tarifa de Red (Estimada)</Typography>
+                         <Typography color="white" variant="body2" sx={{ fontFamily: 'monospace' }}>
+                             {fee} Gwei
+                         </Typography>
+
+                         <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                            <Typography color="primary.main" variant="caption" sx={{ display: 'block', textTransform: 'uppercase', letterSpacing: 1 }}>Total General</Typography>
+                            <Typography color="white" variant="h5" fontWeight="bold">
+                                {transactionType === 'BUY' 
+                                    ? `$${amount.toLocaleString()} + Fees` 
+                                    : `${quantity} ${cryptoSymbol} + Fees`
+                                }
+                            </Typography>
+                         </Box>
                     </Box>
                     <Typography variant="caption" color="text.secondary" align="center">
                         Esta acción es irreversible y será registrada en la blockchain.

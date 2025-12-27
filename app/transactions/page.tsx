@@ -17,7 +17,7 @@ export default function TransactionsPage() {
     const currentNetwork = networks.find(n => n.id === selectedNetwork?.id);
     
     // Get transactions for the current store
-    const storeId = selectedNetwork?.transactionStoreID || currentNetwork?.storeTransactions?.transactionStoreID;
+    const storeId = selectedNetwork?.storeTransactions?.transactionStoreID || currentNetwork?.storeTransactions?.transactionStoreID;
     const rawData = storeId ? byStoreBoxId[storeId] : null;
     let transactionData: TransactionsInterface[] = [];
     
@@ -89,7 +89,7 @@ export default function TransactionsPage() {
                     Historial de Transacciones
                 </Typography>
                 <Typography variant="subtitle1" sx={{ mb: 4, color: 'text.secondary' }}>
-                     Red: <Box component="span" sx={{ color: 'white', fontWeight: 'bold' }}>{currentNetwork?.identification?.name || selectedNetwork.id}</Box> | Store ID: {selectedNetwork.transactionStoreID}
+                     Red: <Box component="span" sx={{ color: 'white', fontWeight: 'bold' }}>{currentNetwork?.identification?.name || selectedNetwork?.identification?.name || selectedNetwork.id}</Box> | Store ID: {selectedNetwork?.storeTransactions?.transactionStoreID}
                 </Typography>
 
                 <Paper sx={{ width: '100%', overflow: 'hidden', bgcolor: 'rgba(10,10,10,0.6)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)' }}>

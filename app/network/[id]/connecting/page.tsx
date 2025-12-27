@@ -18,10 +18,7 @@ export default function NetworkConnectingPage({ params }: { params: Promise<{ id
     React.useEffect(() => {
         if (network) {
             const timer = setTimeout(() => {
-                dispatch(setSelectedNetwork({
-                    id: network.id,
-                    transactionStoreID: network.storeTransactions.transactionStoreID
-                }));
+                dispatch(setSelectedNetwork(network));
                 router.push('/');
             }, 8000); 
 

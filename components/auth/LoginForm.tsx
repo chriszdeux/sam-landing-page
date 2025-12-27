@@ -6,13 +6,14 @@ import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Typography, Alert, Stack, TextField, CircularProgress, InputAdornment, Box } from '@mui/material';
+import { Typography, Alert, Stack, CircularProgress, InputAdornment, Box } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Email, Lock, ErrorOutline } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { login } from '../../lib/features/auth';
 import { closeModal } from '../../lib/features/uiSlice';
 import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -60,26 +61,22 @@ export const LoginForm = () => {
         </Typography>
 
         <Stack spacing={3}>
-            <TextField
+            <Input
             id="email"
             label="Email"
             type="email"
             error={!!errors.email}
             helperText={errors.email?.message}
             fullWidth
-            variant="outlined"
-            InputLabelProps={{ shrink: true }}
-            InputProps={{
-                startAdornment: (
-                    <InputAdornment position="start">
-                        <Email sx={{ color: 'primary.main' }} />
-                    </InputAdornment>
-                ),
-            }}
+            startAdornment={
+                <InputAdornment position="start">
+                    <Email sx={{ color: 'primary.main' }} />
+                </InputAdornment>
+            }
             {...register('email')}
             />
 
-            <TextField
+            <Input
             id="password"
             label="Contraseña"
             type="password"
@@ -87,15 +84,11 @@ export const LoginForm = () => {
             error={!!errors.password}
             helperText={errors.password?.message}
             fullWidth
-            variant="outlined"
-            InputLabelProps={{ shrink: true }}
-            InputProps={{
-                startAdornment: (
-                    <InputAdornment position="start">
-                        <Lock sx={{ color: 'primary.main' }} />
-                    </InputAdornment>
-                ),
-            }}
+            startAdornment={
+                <InputAdornment position="start">
+                    <Lock sx={{ color: 'primary.main' }} />
+                </InputAdornment>
+            }
             {...register('password')}
             />
 

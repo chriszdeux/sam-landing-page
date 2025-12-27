@@ -55,10 +55,7 @@ export interface TransactionBucket {
 
 export interface BlockchainState {
     networks: BlockchainInterface[];
-    selectedNetwork: {
-        id: string;
-        transactionStoreID?: string;
-    } | null;
+    selectedNetwork: BlockchainInterface | null;
 
     isLoading: boolean;
     error: string | null;

@@ -6,7 +6,7 @@ import { Box, Container, Typography, Button, Alert, Stack } from '@mui/material'
 import { motion } from 'framer-motion';
 import { Background } from '../../../components/layout/Background';
 import { useAppSelector, useAppDispatch } from '../../../lib/hooks';
-import { checkAuth, fetchWalletDetails } from '../../../lib/features/auth/actions';
+import { updateBalance, updateWalletAssets } from '../../../lib/features/auth/reducer';
 import api from '../../../lib/api'; // Adjust path if needed
 import { ArrowBack } from '@mui/icons-material';
 import { CubeAnimation } from '../../../components/market/CubeAnimation';
@@ -45,6 +45,26 @@ const TradeContent = () => {
 
   const { cryptos } = useAppSelector((state) => state.market);
   const { userInfo, walletsInfo } = useAppSelector((state) => state.auth);
+  const { selectedNetwork } = useAppSelector((state) => state.blockchain);
+
+  const [networkFee, setNetworkFee] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchFee = async () => {
+        if (selectedNetwork?.id) {
+            try {
+                const { data } = await api.get(`/blockchain/network/${selectedNetwork.id}/fee-base`);
+                // Assuming data is the fee number or an object with value
+                const fee = typeof data === 'number' ? data : (data?.feeBase || 0);
+                setNetworkFee(fee);
+            } catch (error) {
+                console.error("Failed to fetch network fee:", error);
+                setNetworkFee(0); // Fallback to 0 or handle error
+            }
+        }
+    };
+    fetchFee();
+  }, [selectedNetwork?.id]);
 
   useEffect(() => {
     if (cryptoIdParam && form.cryptoId !== cryptoIdParam) {
@@ -130,7 +150,7 @@ const TradeContent = () => {
             cryptoID: form.cryptoId,
             amount: transactionType === 'SELL' ? 0 : form.amount, 
             quantity: transactionType === 'BUY' ? 0 : form.quantity, 
-            fee: 5.6, 
+            fee: networkFee, 
             transactionType: transactionType
         };
 
@@ -140,16 +160,31 @@ const TradeContent = () => {
 
         await api.post(endpoint, payload);
         
-        await api.post(endpoint, payload);
+        // Update User State (Balance) & Portfolio locally
+        const currentBalance = userInfo?.balance || 0;
         
-        // Update User State (Balance) - Only on BUY as per request
         if (transactionType === 'BUY') {
-            dispatch(checkAuth());
-        }
-        
-        // Update Wallet Assets (Portfolio) - Both BUY (get items) and SELL (lose items) change portfolio
-        if (form.walletId) {
-            dispatch(fetchWalletDetails(form.walletId));
+            dispatch(updateBalance(currentBalance - form.amount));
+            if (selectedCrypto) {
+                dispatch(updateWalletAssets({
+                    id: selectedCrypto.id,
+                    name: selectedCrypto.identification.name,
+                    symbol: selectedCrypto.identification.symbol,
+                    quantity: form.quantity 
+                }));
+            }
+        } else if (transactionType === 'SELL') {
+            // For sell, we gain fiat. Ensure amount is calculated if 0.
+            const revenue = form.amount > 0 ? form.amount : (form.quantity * (selectedCrypto?.financial?.price || 0));
+            dispatch(updateBalance(currentBalance + revenue));
+             if (selectedCrypto) {
+                dispatch(updateWalletAssets({
+                    id: selectedCrypto.id,
+                    name: selectedCrypto.identification.name,
+                    symbol: selectedCrypto.identification.symbol,
+                    quantity: -form.quantity // Negative for sell
+                }));
+            }
         }
 
         setStatus('SUCCESS');
@@ -220,6 +255,7 @@ const TradeContent = () => {
                     selectedCrypto={selectedCrypto}
                     onSubmit={handlePreSubmit}
                     isProcessing={false}
+                    fee={networkFee}
                 />
 
             </Stack>
@@ -234,6 +270,7 @@ const TradeContent = () => {
             cryptoSymbol={selectedCrypto?.identification.symbol}
             amount={form.amount}
             quantity={form.quantity}
+            fee={networkFee}
         />
     </Container>
   );

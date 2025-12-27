@@ -4,11 +4,12 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Typography, Alert, Stack, TextField } from '@mui/material';
+import { Typography, Alert, Stack } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { validateAccount } from '../../lib/features/auth';
 import { openModal } from '../../lib/features/uiSlice';
 import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
 
 const validateSchema = z.object({
   code: z.string().min(4, 'El código es requerido'),
@@ -46,15 +47,13 @@ export const ValidateAccountForm = () => {
       </Typography>
 
       <Stack spacing={3}>
-        <TextField
+        <Input
           id="code"
           label="Código de Verificación"
           placeholder="Ej: 123456"
           error={!!errors.code}
           helperText={errors.code?.message}
           fullWidth
-          variant="outlined"
-          InputLabelProps={{ shrink: true }}
           {...register('code')}
         />
 

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, TextField, MenuItem, Paper, Typography, Button, CircularProgress } from '@mui/material';
+import { Box, MenuItem, Paper, Typography, Button, CircularProgress } from '@mui/material';
+import { Input } from '../ui/Input';
 import { Cryptocurrency } from '../../lib/types/crypto';
 
 interface TradeFormData {
@@ -17,6 +18,7 @@ interface TransactionFormProps {
     selectedCrypto?: Cryptocurrency;
     onSubmit: () => void;
     isProcessing: boolean;
+    fee?: number | null;
 }
 
 export const TransactionForm = ({
@@ -26,7 +28,8 @@ export const TransactionForm = ({
     cryptos,
     selectedCrypto,
     onSubmit,
-    isProcessing
+    isProcessing,
+    fee
 }: TransactionFormProps) => {
     return (
         <Box>
@@ -36,17 +39,15 @@ export const TransactionForm = ({
             
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 4 }}>
                 <Box>
-                    <TextField
+                    <Input
                         select
                         label="Activo / Criptomoneda"
                         name="cryptoId"
                         value={form.cryptoId}
-                        onChange={onChange}
+                        onChange={onChange as any} // Select onChange has different signature
                         fullWidth
                         disabled
-                        variant="filled"
-                        sx={{
-                            '& .MuiFilledInput-root': { bgcolor: 'rgba(255,255,255,0.05)', color: 'white' },
+                        containerSx={{
                             '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
                             mb: 3
                         }}
@@ -56,7 +57,7 @@ export const TransactionForm = ({
                                 {crypto.identification.symbol} - {crypto.identification.name}
                             </MenuItem>
                         ))}
-                    </TextField>
+                    </Input>
 
                     <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
                         <Typography variant="caption" color="text.secondary">PRECIO DE MERCADO</Typography>
@@ -71,57 +72,59 @@ export const TransactionForm = ({
 
                 <Box>
                         {transactionType === 'BUY' && (
-                            <TextField
-                            label="Monto a Invertir (Fiat)"
+                            <Input
+                            label="Monto a Invertir (CR)"
                             name="amount"
                             type="number"
                             value={form.amount}
                             onChange={onChange}
                             fullWidth
-                            variant="outlined"
                             autoFocus
                             inputProps={{ min: 0 }}
-                            sx={{
-                                '& .MuiOutlinedInput-root': { 
-                                    color: 'white', 
-                                    fontSize: '1.5rem',
-                                    '& fieldset': { borderColor: 'rgba(0, 243, 255, 0.3)' },
-                                    '&:hover fieldset': { borderColor: '#00f3ff' },
-                                    '&.Mui-focused fieldset': { borderColor: '#00f3ff' }
-                                },
+                            containerSx={{
                                 '& .MuiInputLabel-root': { color: '#00f3ff' },
                                 mb: 2
+                            }}
+                            sx={{
+                                '& .MuiInputBase-input': { 
+                                    color: 'white', 
+                                    fontSize: '1.5rem',
+                                    borderColor: 'rgba(0, 243, 255, 0.3)',
+                                    '&:hover': { borderColor: '#00f3ff' },
+                                    '&:focus': { borderColor: '#00f3ff', boxShadow: '0 0 0 0.2rem rgba(0, 243, 255, 0.25)' }
+                                },
                             }}
                         />
                     )}
 
                     {transactionType === 'SELL' && (
-                            <TextField
+                            <Input
                             label="Cantidad a Vender (Unidades)"
                             name="quantity"
                             type="number"
                             value={form.quantity}
                             onChange={onChange}
                             fullWidth
-                            variant="outlined"
                             autoFocus
                             inputProps={{ min: 0 }}
-                                sx={{
-                                '& .MuiOutlinedInput-root': { 
-                                    color: 'white', 
-                                    fontSize: '1.5rem',
-                                    '& fieldset': { borderColor: 'rgba(255, 23, 68, 0.3)' },
-                                    '&:hover fieldset': { borderColor: '#ff1744' },
-                                    '&.Mui-focused fieldset': { borderColor: '#ff1744' }
-                                },
+                            containerSx={{
                                 '& .MuiInputLabel-root': { color: '#ff1744' },
                                 mb: 2
+                            }}
+                            sx={{
+                                '& .MuiInputBase-input': { 
+                                    color: 'white', 
+                                    fontSize: '1.5rem',
+                                    borderColor: 'rgba(255, 23, 68, 0.3)',
+                                    '&:hover': { borderColor: '#ff1744' },
+                                    '&:focus': { borderColor: '#ff1744', boxShadow: '0 0 0 0.2rem rgba(255, 23, 68, 0.25)' }
+                                },
                             }}
                         />
                     )}
 
                         {transactionType === 'TRANSFER' && (
-                            <TextField
+                            <Input
                             label="Dirección de Destino"
                             name="recipientAddress"
                             fullWidth
@@ -132,7 +135,12 @@ export const TransactionForm = ({
                     
                     {/* Summary / Calculation */}
                     <Box sx={{ p: 2, borderRadius: 2, bgcolor: transactionType === 'BUY' ? 'rgba(0, 230, 118, 0.1)' : 'rgba(255, 23, 68, 0.1)', border: '1px dashed', borderColor: transactionType === 'BUY' ? '#00e676' : '#ff1744' }}>
-                        <Typography variant="subtitle2" sx={{ color: transactionType === 'BUY' ? '#00e676' : '#ff1744' }}>ESTIMADO</Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                            <Typography variant="subtitle2" sx={{ color: transactionType === 'BUY' ? '#00e676' : '#ff1744' }}>ESTIMADO</Typography>
+                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                {fee === null ? 'Calculando tarifa...' : `TARIFA DE RED: ${fee} CR`}
+                            </Typography>
+                        </Box>
                         {transactionType === 'BUY' ? (
                             <Typography variant="h5" color="white">
                                 + {(form.amount / (selectedCrypto?.financial.price || 1)).toFixed(6)} {selectedCrypto?.identification.symbol}
@@ -150,7 +158,7 @@ export const TransactionForm = ({
                 variant="contained"
                 size="large"
                 onClick={onSubmit}
-                disabled={!form.walletId || isProcessing}
+                disabled={!form.walletId || isProcessing || fee === null}
                 startIcon={isProcessing ? <CircularProgress size={20} color="inherit" /> : null}
                 sx={{
                     py: 2,

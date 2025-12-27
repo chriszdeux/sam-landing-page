@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Typography, Alert, Grid, TextField, CircularProgress } from '@mui/material';
+import { Typography, Alert, Grid, CircularProgress } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { register as registerUser } from '../../lib/features/auth';
 import { openModal } from '../../lib/features/uiSlice';
 import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'El nombre es requerido'),
@@ -55,22 +56,22 @@ export const RegisterForm = () => {
 
         <Grid container spacing={2}>
             <Grid size={{ xs: 12, md: 6 }}>
-            <TextField label="Nombre" error={!!errors.name} helperText={errors.name?.message} fullWidth variant="outlined" InputLabelProps={{ shrink: true }} {...register('name')} />
+            <Input label="Nombre" error={!!errors.name} helperText={errors.name?.message} fullWidth {...register('name')} />
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
-            <TextField label="Apellido" error={!!errors.lastName} helperText={errors.lastName?.message} fullWidth variant="outlined" InputLabelProps={{ shrink: true }} {...register('lastName')} />
+            <Input label="Apellido" error={!!errors.lastName} helperText={errors.lastName?.message} fullWidth {...register('lastName')} />
             </Grid>
             <Grid size={{ xs: 12 }}>
-            <TextField label="Usuario" error={!!errors.username} helperText={errors.username?.message} fullWidth variant="outlined" InputLabelProps={{ shrink: true }} {...register('username')} />
+            <Input label="Usuario" error={!!errors.username} helperText={errors.username?.message} fullWidth {...register('username')} />
             </Grid>
             <Grid size={{ xs: 12 }}>
-            <TextField label="Email" type="email" error={!!errors.email} helperText={errors.email?.message} fullWidth variant="outlined" InputLabelProps={{ shrink: true }} {...register('email')} />
+            <Input label="Email" type="email" error={!!errors.email} helperText={errors.email?.message} fullWidth {...register('email')} />
             </Grid>
             <Grid size={{ xs: 12 }}>
-            <TextField label="Contraseña" type="password" error={!!errors.password} helperText={errors.password?.message} fullWidth variant="outlined" InputLabelProps={{ shrink: true }} {...register('password')} />
+            <Input label="Contraseña" type="password" error={!!errors.password} helperText={errors.password?.message} fullWidth {...register('password')} />
             </Grid>
             <Grid size={{ xs: 12 }}>
-            <TextField label="Fecha de Nacimiento" type="date" error={!!errors.birthday} helperText={errors.birthday?.message} fullWidth variant="outlined" InputLabelProps={{ shrink: true }} {...register('birthday')} />
+            <Input label="Fecha de Nacimiento" type="date" error={!!errors.birthday} helperText={errors.birthday?.message} fullWidth {...register('birthday')} />
             </Grid>
         </Grid>
 
