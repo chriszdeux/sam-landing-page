@@ -20,11 +20,12 @@ import {
   Menu as MenuIcon,
   Rocket,
   Person as UserIcon,
-  MonetizationOn,
+//   MonetizationOn, // Removed in favor of TaoIcon
   Settings,
   Logout,
   Bolt,
 } from "@mui/icons-material";
+import { TaoIcon } from "../ui/TaoIcon";
 import { motion } from "framer-motion";
 import { Button } from "../ui/Button";
 import { CountUp } from "../ui/CountUp";
@@ -33,6 +34,7 @@ import { setCurrentSection, openModal } from "../../lib/features/uiSlice";
 import { fetchWalletDetails } from "../../lib/features/auth/actions"; // Import action
 import { navItems } from "./navItems";
 import { NavbarDrawer } from "./NavbarDrawer";
+import { CONFIG } from "../../lib/config";
 
 
 
@@ -107,6 +109,7 @@ export const Navbar = () => {
         }}
       >
         <Toolbar>
+
           <Box
             sx={{
               display: "flex",
@@ -122,7 +125,7 @@ export const Navbar = () => {
               component="div"
               sx={{ fontWeight: "bold", letterSpacing: 1 }}
             >
-              PROYECTO SAM
+              {CONFIG.PROJECT_NAME.toUpperCase()}
             </Typography>
           </Box>
 
@@ -207,7 +210,7 @@ export const Navbar = () => {
                       alignItems: 'center',
                       gap: 1
                   }}>
-                    <MonetizationOn fontSize="small" sx={{ color: "gold" }} />
+                    <TaoIcon size={20} />
                     <CountUp to={userInfo.balance} />
                   </Box>
                 </Typography>

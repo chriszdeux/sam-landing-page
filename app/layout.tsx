@@ -18,8 +18,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+import { CONFIG } from "../lib/config";
+
 export const metadata: Metadata = {
-  title: "Proyecto SAM",
+  title: CONFIG.PROJECT_NAME,
   description: "Simulación de inversiones en criptomonedas y exploración espacial",
 };
 

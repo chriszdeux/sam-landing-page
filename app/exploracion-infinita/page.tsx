@@ -3,6 +3,7 @@
 import React from 'react';
 import { Box, Typography, Container, Stack } from '@mui/material';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 
 export default function InfiniteExplorationPage() {
@@ -36,13 +37,12 @@ export default function InfiniteExplorationPage() {
           >
             <Box sx={{ maxWidth: '800px', mx: 'auto', textAlign: 'center' }}>
               <Typography variant="h4" sx={{ mb: 3, color: 'primary.main' }}>
-                Un Universo Sin Límites
+                Más allá de la Heliosfera
               </Typography>
               <Typography variant="body1" sx={{ fontSize: '1.2rem', color: 'text.secondary', lineHeight: 1.8 }}>
-                El universo de SAM está en constante crecimiento. Cada mes, lanzamos nuevos planetas y mapas detallados,
-                expandiendo las fronteras de lo conocido. Desde nebulosas ricas en recursos hasta sistemas estelares inexplorados,
-                siempre habrá un nuevo horizonte que conquistar. La expansión es constante, y solo los más rápidos podrán
-                reclamar los mejores territorios.
+                Lo que comenzó en Marte no pudo ser contenido. En 2065, la humanidad lanzó la primera sonda tripulada hacia Próxima Centauri. 
+                El reto no era solo la supervivencia física, sino la viabilidad económica a 4 años luz de distancia. 
+                El Protocolo LynCore respondió replicando su arquitectura, creando una red donde el valor viaja más rápido que la materia.
               </Typography>
             </Box>
           </motion.div>
@@ -56,8 +56,8 @@ export default function InfiniteExplorationPage() {
           >
             <Box
               component="img"
-              src="https://placehold.co/1200x600/0a0a1a/00f3ff/png?text=Nave+Explorando+Nebula"
-              alt="Spaceship exploring nebula"
+              src="https://placehold.co/1200x600/0a0a1a/00f3ff/png?text=Acelerador+de+Particulas+Interestelar"
+              alt="Interstellar Particle Accelerator"
               sx={{
                 width: '100%',
                 height: 'auto',
@@ -77,12 +77,15 @@ export default function InfiniteExplorationPage() {
           >
             <Box sx={{ maxWidth: '800px', mx: 'auto', textAlign: 'center' }}>
               <Typography variant="h4" sx={{ mb: 3, color: 'secondary.main' }}>
-                Descubre Nuevos Mundos
+                Los Grandes Aceleradores de Sistemas
               </Typography>
               <Typography variant="body1" sx={{ fontSize: '1.2rem', color: 'text.secondary', lineHeight: 1.8 }}>
-                No estás solo en la oscuridad. Civilizaciones antiguas y facciones rivales compiten por el control de los territorios más valiosos.
-                Descubre planetas habitables con ecosistemas únicos, establece colonias mineras en asteroides ricos en minerales y defiende
-                tus fronteras de los piratas espaciales y las flotas enemigas. Cada planeta cuenta una historia, y tú eres el autor de su destino.
+                Para sostener la economía galáctica, LynCore desplegó estructuras masivas:
+                <ul style={{ listStyleType: 'none', padding: 0, marginTop: '20px' }}>
+                  <li style={{ marginBottom: '15px' }}><strong>Nodos de Forja Solar:</strong> Satélites similares a Helios-Prime en cada estrella colonizada, captando energía pura.</li>
+                  <li style={{ marginBottom: '15px' }}><strong>Aceleradores Quetzalcóatl:</strong> Puentes de entrelazamiento cuántico en los bordes de cada sistema.</li>
+                  <li><strong>Sincronización Galáctica:</strong> Aunque las naves tardan décadas, el valor (<Link href="/mechanics/economy" style={{ color: '#ff0055', textDecoration: 'none', fontWeight: 'bold' }}>$TAO</Link>) y la información viajan instantáneamente.</li>
+                </ul>
               </Typography>
             </Box>
           </motion.div>
@@ -96,8 +99,8 @@ export default function InfiniteExplorationPage() {
           >
             <Box
               component="img"
-              src="https://placehold.co/1200x600/1a0a0a/ffb700/png?text=Paisaje+Alienigena"
-              alt="Alien landscape"
+              src="https://placehold.co/1200x600/1a0a0a/ffb700/png?text=Forja+Solar+Helios-Prime"
+              alt="Helios-Prime Solar Forge"
               sx={{
                 width: '100%',
                 height: 'auto',
@@ -117,12 +120,11 @@ export default function InfiniteExplorationPage() {
           >
             <Box sx={{ maxWidth: '800px', mx: 'auto', textAlign: 'center' }}>
               <Typography variant="h3" sx={{ mb: 3, color: 'white' }}>
-                Tu Legado Comienza Aquí
+                La Soberanía Estelar
               </Typography>
               <Typography variant="body1" sx={{ fontSize: '1.2rem', color: 'text.secondary', lineHeight: 1.8 }}>
-                La exploración es solo el comienzo. Lo que encuentres ahí fuera definirá el futuro de la humanidad.
-                ¿Serás un diplomático pacífico que une sistemas estelares, un comerciante astuto que controla las rutas de suministro,
-                o un conquistador despiadado que impone su voluntad por la fuerza? En SAM, tu legado se escribe en las estrellas.
+                La expansión no es solo territorial, es existencial. Con la Capa de Tránsito conectando sistemas y las Forjas alimentando la independencia energética de cada colonia, 
+                LynCore ha asegurado que la humanidad no dependa de un solo punto de fallo. La Tierra es el origen, pero las estrellas son el destino.
               </Typography>
             </Box>
           </motion.div>

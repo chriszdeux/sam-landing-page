@@ -30,14 +30,14 @@ export const HeroSection = () => {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}>
-              PROYECTO SAM
+              LYNCORE GALACTIC
             </Typography>
             <Typography variant="h4" sx={{ mb: 4, color: 'text.secondary', fontWeight: 300 }}>
-              Domina la Galaxia. Construye tu Legado.
+              El código es nuestro único Dios. La soberanía ya no es planetaria; es galáctica.
             </Typography>
             <Typography variant="body1" sx={{ mb: 6, maxWidth: 600, color: 'text.secondary', fontSize: '1.1rem' }}>
-              Una simulación de cripto-economía inmersiva donde la exploración espacial,
-              la gestión de recursos y la estrategia política definen tu destino.
+              Vive la evolución de LynCore: desde el subsuelo de Guadalajara hasta la colonización de Alfa Centauri. 
+              Una economía viva donde el valor (<Link href="/mechanics/economy" style={{ color: '#ff0055', textDecoration: 'none' }}>$TAO</Link>) y la energía (<Link href="/mechanics/economy" style={{ color: '#ffb700', textDecoration: 'none' }}>$SOLIS</Link>) fluyen a través de una red interestelar soberana.
             </Typography>
 
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
@@ -66,10 +66,10 @@ export const HeroSection = () => {
         <Grid size={{ xs: 12, md: 5 }}>
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 3 }}>
             {[
-              { icon: Globe, label: 'Universo en Expansión', color: cyan[500], href: '/exploracion-infinita' },
-              { icon: Zap, label: 'Economía Real', color: '#ffb700', href: '/market' }, // Updated Link and Color
-              { icon: Shield, label: 'Seguridad Blockchain', color: '#00f3ff', href: '#' },
-              { icon: Rocket, label: 'Conquista Espacial', color: '#ff0055', href: '#' },
+              { icon: Globe, label: 'Expansión Interestelar', color: cyan[500], href: '/exploracion-infinita' },
+              { icon: Zap, label: 'Tríada Económica', color: '#ffb700', href: '/market' }, // Updated Link and Color
+              { icon: Shield, label: 'Protocolo LynCore', color: '#00f3ff', href: '/security' },
+              { icon: Rocket, label: 'Conquista de Sistemas', color: '#ff0055', href: '/conquest' },
             ].map((item, index) => (
               <motion.div
                 key={index}

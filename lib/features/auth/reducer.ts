@@ -47,6 +47,9 @@ const authSlice = createSlice({
                 });
             }
         }
+    },
+    setRegistrationData: (state, action) => {
+        state.registrationData = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -131,5 +134,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, updateBalance, updateWalletAssets } = authSlice.actions;
+export const { logout, updateBalance, updateWalletAssets, setRegistrationData } = authSlice.actions;
 export default authSlice.reducer;

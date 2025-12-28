@@ -2,6 +2,8 @@ import React from 'react';
 import { Box, Container, Grid, Typography, IconButton, Stack } from '@mui/material';
 import { Twitter, GitHub, LinkedIn } from '@mui/icons-material';
 
+import { CONFIG } from '../../lib/config';
+
 export const Footer = () => {
   return (
     <Box component="footer" sx={{ bgcolor: 'background.paper', py: 6, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
@@ -9,7 +11,7 @@ export const Footer = () => {
         <Grid container spacing={4}>
           <Grid size={{ xs: 12, md: 4 }}>
             <Typography variant="h6" color="primary" gutterBottom>
-              PROYECTO SAM
+              {CONFIG.PROJECT_NAME.toUpperCase()}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Explora el universo, recolecta recursos y construye tu imperio en esta simulación de cripto-economía de próxima generación.
@@ -46,7 +48,7 @@ export const Footer = () => {
         </Grid>
         <Box sx={{ mt: 5, pt: 3, borderTop: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
           <Typography variant="body2" color="text.secondary">
-            © {new Date().getFullYear()} Proyecto SAM. Todos los derechos reservados.
+            © {new Date().getFullYear()} {CONFIG.PROJECT_NAME}. Todos los derechos reservados.
           </Typography>
         </Box>
       </Container>

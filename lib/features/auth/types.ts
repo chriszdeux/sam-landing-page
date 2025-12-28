@@ -53,4 +53,5 @@ export interface AuthState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
   walletsInfo: WalletInterface | null;
+  registrationData?: any; // Temporary storage for registration inputs
 }
