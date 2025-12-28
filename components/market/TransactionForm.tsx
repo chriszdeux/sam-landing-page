@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, MenuItem, Paper, Typography, Button, CircularProgress } from '@mui/material';
 import { Input } from '../ui/Input';
 import { Cryptocurrency } from '../../lib/types/crypto';
+import { TaoIcon } from '../ui/TaoIcon';
 
 interface TradeFormData {
   walletId: string;
@@ -61,8 +62,8 @@ export const TransactionForm = ({
 
                     <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
                         <Typography variant="caption" color="text.secondary">PRECIO DE MERCADO</Typography>
-                        <Typography variant="h4" color="white" fontWeight="bold">
-                            ${selectedCrypto?.financial.price.toLocaleString() || '0.00'}
+                        <Typography variant="h4" color="white" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <TaoIcon size={24} /> {selectedCrypto?.financial.price.toLocaleString() || '0.00'}
                         </Typography>
                         <Typography variant="body2" color={(selectedCrypto?.financial.change24h || 0) > 0 ? 'success.main' : 'error.main'}>
                             {selectedCrypto?.financial.change24h || 0}% (24h)
@@ -146,8 +147,8 @@ export const TransactionForm = ({
                                 + {(form.amount / (selectedCrypto?.financial.price || 1)).toFixed(6)} {selectedCrypto?.identification.symbol}
                             </Typography>
                         ) : (
-                            <Typography variant="h5" color="white">
-                                + ${(form.quantity * (selectedCrypto?.financial.price || 0)).toLocaleString()}
+                            <Typography variant="h5" color="white" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                + <TaoIcon size={20} /> {(form.quantity * (selectedCrypto?.financial.price || 0)).toLocaleString()}
                             </Typography>
                         )}
                     </Box>

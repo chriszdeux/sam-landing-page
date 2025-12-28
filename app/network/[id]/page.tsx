@@ -3,8 +3,9 @@
 import React from 'react';
 import { Box, Typography, Container, Stack, Chip, Button, Divider, Grid } from '@mui/material';
 import { ParticleBackground } from '../../../components/ui/ParticleBackground';
-import { ArrowBack, CheckCircle, Warning, VerifiedUser, Speed, Storage, SettingsInputComponent } from '@mui/icons-material';
+import { ArrowBack, VerifiedUser, Speed, Storage, SettingsInputComponent } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
+import { TaoIcon } from '../../../components/ui/TaoIcon';
 import { useAppSelector } from '../../../lib/hooks';
 
 export default function NetworkDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -103,12 +104,14 @@ export default function NetworkDetailPage({ params }: { params: Promise<{ id: st
                                              </Typography>
                                          </Box>
                                      </Stack>
+
+
                                      <Stack direction="row" alignItems="center" spacing={2}>
                                          <Storage sx={{ color: network.additionalInfo.color }} />
                                          <Box>
                                              <Typography variant="caption" color="text.secondary">Market Cap</Typography>
-                                             <Typography variant="body1" color="white">
-                                                ${network.blockchainProps.marketCap.toLocaleString()}
+                                             <Typography variant="body1" color="white" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                <TaoIcon size={16} /> {network.blockchainProps.marketCap.toLocaleString()}
                                             </Typography>
                                          </Box>
                                      </Stack>

@@ -8,11 +8,10 @@ import {
   TableRow,
   Paper,
   TablePagination,
-  InputAdornment,
   Box
 } from '@mui/material';
 import { Input } from './Input';
-import { Search, ArrowUpward, ArrowDownward } from '@mui/icons-material';
+import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 
 export interface Column<T> {
   Header: string;
@@ -175,17 +174,8 @@ export function GenericTable<T>({
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFilterChange(col.Header, e.target.value)}
                         onClick={(e: React.MouseEvent) => e.stopPropagation()}
                         containerSx={{ mb: 0, mt: 1 }}
-                        startAdornment={
-                            <InputAdornment position="start">
-                                <Search fontSize="inherit" sx={{ color: 'text.secondary' }} />
-                            </InputAdornment>
-                        }
                         sx={{ 
-                            input: { color: 'white', fontSize: '0.875rem', padding: '6px 8px' }, // Compact
-                            // Remove default border if we want 'standard' look? No, standardizing to box.
-                            // But maybe simpler border?
-                            // Default Input has border. Let's keep it for consistency.
-                            // Adjust adornment alignment if needed.
+                            input: { color: 'white', fontSize: '0.875rem', padding: '6px 8px' },
                             '& .MuiInputBase-input': { padding: '6px 8px' }
                         }}
                       />

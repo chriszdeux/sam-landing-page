@@ -10,6 +10,7 @@ import { CryptoStats } from './CryptoStats';
 import { CryptoNews } from './CryptoNews';
 import { TransactionHistory } from './TransactionHistory';
 import { Card } from '../ui/Card';
+import { TaoIcon } from '../ui/TaoIcon';
 
 
 // Redux
@@ -103,9 +104,12 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                             </Box>
                         </Stack>
 
+
+
                         <Box sx={{ textAlign: { xs: 'left', md: 'right' } }}>
-                            <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#fff' }}>
-                                ${crypto.financial.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
+                            <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 1 }}>
+                                <TaoIcon size={32} />
+                                {crypto.financial.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
                             </Typography>
                             <Stack direction="row" alignItems="center" spacing={1} justifyContent={{ xs: 'flex-start', md: 'flex-end' }}>
                                 <Chip 

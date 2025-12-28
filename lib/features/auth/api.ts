@@ -11,7 +11,7 @@ export const registerApi = async (userData: any) => {
 };
 
 export const validateAccountApi = async (data: { code: string }) => {
-  const response = await api.put('/auth/validate-account', data);
+  const response = await api.put('/auth/confirm-account', data);
   return response.data;
 };
 

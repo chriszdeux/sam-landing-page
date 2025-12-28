@@ -7,8 +7,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
-import { register as registerUser } from '../../lib/features/auth';
-import { openModal } from '../../lib/features/uiSlice';
+import { useRouter } from 'next/navigation';
+import { setRegistrationData } from '../../lib/features/auth/reducer';
+import { closeModal } from '../../lib/features/uiSlice';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 
@@ -25,6 +26,7 @@ type RegisterFormInputs = z.infer<typeof registerSchema>;
 
 export const RegisterForm = () => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const { status, error } = useAppSelector((state) => state.auth);
 
   const {
@@ -36,15 +38,9 @@ export const RegisterForm = () => {
   });
 
   const onSubmit = async (data: RegisterFormInputs) => {
-    // We send empty/default values for removed fields if the backend strictly expects them, 
-    // or just the data if the backend is flexible. 
-    // Assuming flexibility or that these are optional in backend.
-    const payload = { ...data, profileURL: '' };
-    const resultAction = await dispatch(registerUser(payload));
-    if (registerUser.fulfilled.match(resultAction)) {
-      dispatch(openModal('validate'));
-      alert('Registro exitoso! Por favor revisa tu correo para el código de validación.');
-    }
+    dispatch(setRegistrationData({ ...data, profileURL: '' }));
+    dispatch(closeModal());
+    router.push('/auth/verify');
   };
 
   return (
