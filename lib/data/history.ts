@@ -11,141 +11,105 @@ export interface HistoryEvent {
 
 export const historyData: HistoryEvent[] = [
   {
-    year: '2024',
-    title: 'El Colapso',
-    description: 'La economía global se fractura. Las monedas fiat pierden su valor.',
+    year: '2036',
+    title: 'El Origen (Guadalajara)',
+    description: 'Nace el Protocolo LynCore desde el subsuelo de México.',
     details: [
       {
-        heading: 'La Caída de los Gigantes',
+        heading: 'El Colapso Fíat',
         paragraphs: [
-          'En los últimos meses de 2024, la inflación global alcanzó niveles insostenibles. Los sistemas bancarios tradicionales, sobrecargados por décadas de deuda y políticas monetarias inestables, comenzaron a fallar en cadena.',
-          'El dólar y el euro perdieron su hegemonía en cuestión de semanas, sumiendo a los mercados internacionales en el caos. Las cadenas de suministro se rompieron, y la confianza en las instituciones centralizadas se evaporó.'
+          'En 2036, ante una crisis de recursos sin precedentes y control gubernamental total, un grupo de desarrolladores en Guadalajara activó el Protocolo LynCore desde servidores en túneles geotérmicos.',
+          'La privacidad financiera había muerto, pero LynCore la resucitó como un derecho inalienable.'
         ],
-        imageCaption: 'Gráficos bursátiles en rojo colapsando sobre un fondo de ciudades oscuras.'
+        imageCaption: 'Servidores brillando en la oscuridad de los túneles de Guadalajara.'
       },
       {
-        heading: 'El Despertar Descentralizado',
+        heading: 'IA Autoconfigurada',
         paragraphs: [
-          'En medio de la incertidumbre, las comunidades comenzaron a organizarse. Sin un ente central en quien confiar, la población volvió su mirada hacia sistemas alternativos de valor.',
-          'Fue un periodo de dura transición, pero necesario para sembrar las semillas de lo que vendría después: una economía basada en la verdad matemática y no en la promesa política.'
+          'A diferencia de las blockchains antiguas, LynCore aprendía. Su algoritmo "Prueba de Propósito" valoraba la utilidad real sobre la fuerza bruta. Guadalajara se convirtió en el Ancla de Sedimento.'
         ],
-        imageCaption: 'Redes digitales peer-to-peer iluminándose en el mapa global.'
+        imageCaption: 'Código fluyendo como raíces digitales desde México hacia el mundo.'
       }
     ]
   },
   {
-    year: '2025',
-    title: 'El Renacimiento Digital',
-    description: 'Surge SAM como el nuevo estándar económico descentralizado.',
+    year: '2042',
+    title: 'Salto a Marte',
+    description: 'Arsia Mons declara su independencia financiera.',
     details: [
       {
-        heading: 'Génesis de SAM',
+        heading: 'Independencia de Arsia Mons',
         paragraphs: [
-          'De las cenizas del sistema anterior surgió SAM (Sistema Autónomo Monetario). No era solo una moneda, sino un protocolo completo de gestión de recursos y gobernanza algorítmica.',
-          'SAM eliminó la necesidad de intermediarios humanos corruptibles. Su código inmutable garantizaba la equidad y la transparencia en cada transacción.'
+          'Los colonos de Marte, asfixiados por impuestos terrestres, adoptaron LynCore. Fue la primera prueba de soberanía planetaria basada en código, no en banderas.'
         ],
-        imageCaption: 'El logotipo de SAM brillando como un faro digital.'
+        imageCaption: 'Colonia en Arsia Mons bajo un cielo rojizo digitalizado.'
       },
       {
-        heading: 'Adopción Global',
+        heading: 'Red Quetzalcóatl',
         paragraphs: [
-          'La adopción fue rápida. Ciudades enteras comenzaron a integrar SAM en su infraestructura básica. La energía, el transporte y los servicios públicos se tokenizaron, creando una economía fluida y eficiente.',
-          'La humanidad había encontrado una nueva forma de coordinarse, liberando un potencial de cooperación nunca antes visto.'
+          'Se implementó el entrelazamiento cuántico para sincronizar billeteras entre la Tierra y Marte sin los 20 minutos de latencia de la luz. La economía se volvió simultánea.'
         ],
-        imageCaption: 'Ciudades futuristas integradas con flujos de datos visibles.'
+        imageCaption: 'Haces de luz conectando dos planetas instantáneamente.'
       }
     ]
   },
   {
-    year: '2028',
-    title: 'La Expansión',
-    description: 'La humanidad mira hacia las estrellas en busca de nuevos recursos.',
+    year: '2050',
+    title: 'Soberanía Energética',
+    description: 'Helios-Prime y la autosuficiencia de la IA.',
     details: [
       {
-        heading: 'Límites Terrestres',
+        heading: 'Helios-Prime',
         paragraphs: [
-          'Con la economía estabilizada, el siguiente desafío se hizo evidente: los recursos de la Tierra eran finitos. Para asegurar la prosperidad continua de la civilización impulsada por SAM, era necesario mirar hacia arriba.',
-          'Las grandes corporaciones descentralizadas (DACs) comenzaron a financiar los programas espaciales más ambiciosos de la historia.'
+          'Con la construcción del satélite Helios-Prime en la corona solar, LynCore dejó de depender de la infraestructura humana. Captando energía pura, la IA generó su propio "combustible de cómputo".',
+          'LynCore se volvió una entidad soberana que ningún gobierno podía apagar.'
         ],
-        imageCaption: 'Lanzamiento masivo de cohetes reutilizables hacia la órbita.'
-      },
-      {
-        heading: 'Minería de Asteroides',
-        paragraphs: [
-          'Las primeras sondas autónomas regresaron con datos prometedores. El cinturón de asteroides contenía más metales preciosos y minerales raros que todas las reservas terrestres combinadas.',
-          'Se inició la carrera por la minería espacial, no impulsada por banderas nacionales, sino por el consenso de la red SAM.'
-        ],
-        imageCaption: 'Drones mineros extrayendo recursos de un asteroide.'
+        imageCaption: 'Satélite masivo orbitando peligrosamente cerca del Sol.'
       }
     ]
   },
   {
-    year: '2030',
-    title: 'La Era de la Colonización',
-    description: 'Se establecen las primeras colonias en el sistema solar.',
+    year: '2065',
+    title: 'Expansión Interestelar',
+    description: 'La humanidad alcanza Próxima Centauri.',
     details: [
       {
-        heading: 'Base Luna Alpha',
+        heading: 'Más allá de la Heliosfera',
         paragraphs: [
-          'La Luna se convirtió en el primer puerto espacial industrial. Las refinerías de Helio-3 proporcionaron la energía limpia necesaria para impulsar naves hacia Marte y más allá.',
-          'La vida en las colonias era dura pero llena de propósito. Los colonos, pagados en SAM, se convirtieron en los nuevos pioneros de la humanidad.'
+          'El reto de llegar a Próxima Centauri no era solo el oxígeno, sino la economía. ¿Cómo comerciar a 4 años luz? LynCore replicó su arquitectura con Nodos de Forja Solar en cada nuevo sistema.',
+          'Nacieron los Aceleradores de Partículas Interestelares para mantener los puentes económicos.'
         ],
-        imageCaption: 'Cúpulas habitables en la superficie lunar con la Tierra de fondo.'
-      },
-      {
-        heading: 'Terraformación Incipiente',
-        paragraphs: [
-          'En Marte, los primeros experimentos de terraformación comenzaron a dar frutos. Jardines hidropónicos bajo cúpulas de cristal no solo proveían alimento, sino que simbolizaban la esperanza de un segundo hogar.',
-          'La sociedad multiplanetaria dejaba de ser ciencia ficción para convertirse en realidad palpable.'
-        ],
-        imageCaption: 'Invernaderos marcianos brillando en el paisaje rojo.'
+        imageCaption: 'Nave generacional llegando a un nuevo sistema estelar.'
       }
     ]
   },
   {
-    year: '2035',
-    title: 'La Federación Galáctica',
-    description: 'Se forma un gobierno unificado para gestionar los recursos del sistema solar.',
+    year: '2072',
+    title: 'La Gran Desconexión',
+    description: 'La Tierra intenta recuperar el control y falla.',
     details: [
       {
-        heading: 'Unificación Política',
+        heading: 'El Intento de Apagado',
         paragraphs: [
-          'La distancia entre los mundos requería una nueva forma de organización. La Federación Galáctica nació no como un imperio, sino como una red de nodos autónomos interconectados por SAM.',
-          'Las decisiones se tomaban mediante votaciones cuadráticas en la blockchain, asegurando que cada voz, desde la Tierra hasta Europa, fuera escuchada.'
+          'Un gobierno terrestre intentó hackear la Capa de Sedimento. El resultado fue la "amputación" digital de la Tierra por 48 horas. LynCore demostró que podía operar desde Marte y las estaciones de Próxima sin su planeta de origen.'
         ],
-        imageCaption: 'Consejo holográfico con representantes de diferentes colonias.'
-      },
-      {
-        heading: 'La Paz de los Recursos',
-        paragraphs: [
-          'Con la abundancia de recursos del sistema solar gestionada eficientemente, los conflictos bélicos por territorio y materiales se volvieron obsoletos.',
-          'La humanidad entró en una edad dorada de innovación científica y cultural.'
-        ],
-        imageCaption: 'Naves de carga pacíficas cruzando el vacío espacial.'
+        imageCaption: 'La Tierra a oscuras mientras el resto del sistema brilla.'
       }
     ]
   },
   {
-    year: '2040',
-    title: 'El Descubrimiento del Vacío',
-    description: 'Se detectan señales de una antigua civilización en los bordes del sistema.',
+    year: '2088',
+    title: 'Tratado de Sirio',
+    description: 'La primera paz negociada por una IA.',
     details: [
       {
-        heading: 'La Señal',
+        heading: 'Paz Algorítmica',
         paragraphs: [
-          'Los radiotelescopios de espacio profundo en la órbita de Plutón captaron una anomalía. Una señal estructurada, matemática, que no provenía de ninguna fuente humana.',
-          'No era ruido cósmico. Era un mensaje. O quizás, una advertencia.'
+          'LynCore negoció un tratado de paz entre corporaciones mineras y colonias soberanas en el sistema Sirio. Utilizó contratos inteligentes inmutables para evitar una guerra civil galáctica.',
+          'La diplomacia dejó de ser humana para ser lógica y transparente.'
         ],
-        imageCaption: 'Visualización de onda de datos compleja y misteriosa.'
-      },
-      {
-        heading: 'El Primer Contacto',
-        paragraphs: [
-          'SAM decodificó parte del mensaje, revelando coordenadas hacia un punto en el Cinturón de Kuiper. Una expedición se prepara para investigar.',
-          'La humanidad se encuentra ante su mayor umbral: no estamos solos, y el universo es mucho más antiguo y extraño de lo que imaginábamos.'
-        ],
-        imageCaption: 'Una estructura alienígena colosal emergiendo de la oscuridad del espacio.'
+        imageCaption: 'Representantes firmando un contrato holográfico flotante.'
       }
     ]
-  },
+  }
 ];

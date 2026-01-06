@@ -7,6 +7,7 @@ import { Background } from '../../components/layout/Background';
 import { Card } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
 import { resourcesData } from '../../lib/data/resources';
+import { CONFIG } from '../../lib/config';
 import { motion } from 'framer-motion';
 
 export default function ResourcesPage() {
@@ -27,7 +28,7 @@ export default function ResourcesPage() {
             Base de Datos de Materiales
             </Typography>
             <Typography variant="h5" align="center" color="text.secondary" sx={{ mb: 8, maxWidth: 600, mx: 'auto' }}>
-            Catálogo completo de recursos, minerales y tecnologías exóticas disponibles en el universo SAM.
+            Catálogo completo de recursos, minerales y tecnologías exóticas disponibles en el universo {CONFIG.PROJECT_NAME}.
             </Typography>
         </motion.div>
 

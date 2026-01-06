@@ -7,6 +7,7 @@ import { Background } from '../../components/layout/Background';
 import { Card } from '../../components/ui/Card';
 import { motion } from 'framer-motion';
 import { Send } from '@mui/icons-material';
+import { TaoIcon } from '../../components/ui/TaoIcon';
 
 // Redux
 import { useDispatch, useSelector } from 'react-redux';
@@ -152,10 +153,12 @@ export default function MarketPage() {
                         )}
                     </Box>
                     
-                    {/* Price Section */}
+
+
                     <Box sx={{ textAlign: 'center', mb: 3, zIndex: 1, width: '100%' }}>
-                        <Typography variant="h4" fontWeight="bold" sx={{ color: 'white', mb: 0.5 }}>
-                            ${crypto.financial.price.toLocaleString(undefined, { maximumFractionDigits: 5 })}
+                        <Typography variant="h4" fontWeight="bold" sx={{ color: 'white', mb: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                            <TaoIcon size={28} />
+                            {crypto.financial.price.toLocaleString(undefined, { maximumFractionDigits: 5 })}
                         </Typography>
                         
                         <Box sx={{ 

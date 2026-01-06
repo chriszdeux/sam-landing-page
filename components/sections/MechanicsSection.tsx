@@ -27,13 +27,7 @@ export const MechanicsSection = () => {
                   alignItems: 'center',
                   textAlign: 'center',
                   position: 'relative',
-                  overflow: 'visible', // mechanics card icons might pop out or transform?
-                  // but previously it was 'hidden'. Let's check constraints.
-                  // It was overflow: 'hidden'. Let's keep it 'hidden' if needed, but 'visible' is better for "tech corners" if they exist.
-                  // However, if the content (like icon-box) scales, we might want it clipped?
-                  // The previous code had overflow: 'hidden'.
-                  // The new Card has tech corners that are safely inside.
-                  // Let's use hidden to be safe with the layout as before.
+
                   overflow: 'hidden',
 
                   '&:hover': {
@@ -65,7 +59,12 @@ export const MechanicsSection = () => {
                 </Typography>
                 
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 4, flexGrow: 1, lineHeight: 1.6 }}>
-                  {mechanic.description}
+                  {mechanic.description.split(/(\$TAO|\$SOLIS|\$LYN)/g).map((part, index) => {
+                    if (part === '$TAO') return <Link key={index} href="/mechanics/economy" style={{ color: '#ff0055', textDecoration: 'none', fontWeight: 'bold' }}>$TAO</Link>;
+                    if (part === '$SOLIS') return <Link key={index} href="/mechanics/economy" style={{ color: '#ffb700', textDecoration: 'none', fontWeight: 'bold' }}>$SOLIS</Link>;
+                    if (part === '$LYN') return <Link key={index} href="/mechanics/economy" style={{ color: '#00ff9d', textDecoration: 'none', fontWeight: 'bold' }}>$LYN</Link>;
+                    return part;
+                  })}
                 </Typography>
 
                 <Box className="learn-more" sx={{

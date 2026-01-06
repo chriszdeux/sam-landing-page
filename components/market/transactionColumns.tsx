@@ -1,4 +1,5 @@
 import React from 'react';
+import { TaoIcon } from '../ui/TaoIcon';
 import { Chip, Typography } from '@mui/material';
 import { 
     ArrowUpward, 
@@ -87,7 +88,11 @@ export const transactionColumns: Column<TransactionsInterface>[] = [
     {
         Header: "Precio",
         accessor: (row) => row.financialInfo?.price || 0,
-        Cell: ({ value }) => `$${(value || 0).toLocaleString()}`,
+        Cell: ({ value }) => (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <TaoIcon size={14} /> <span>{(value || 0).toLocaleString()}</span>
+            </div>
+        ),
         sortable: true
     },
     {

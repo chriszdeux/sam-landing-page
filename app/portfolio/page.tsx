@@ -12,6 +12,7 @@ import DonutLargeIcon from '@mui/icons-material/DonutLarge';
 import DataUsageIcon from '@mui/icons-material/DataUsage';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
+import { TaoIcon } from '../../components/ui/TaoIcon';
 import { WalletManager } from '../../components/portfolio/WalletManager';
 
 ChartJS.register(ArcElement, Tooltip, Legend, RadialLinearScale, BarElement, CategoryScale, LinearScale, PointElement, LineElement, Filler);
@@ -160,8 +161,8 @@ export default function PortfolioPage() {
                 <Typography variant="h2" align="center" gutterBottom sx={{ mb: 2, color: 'primary.main', fontWeight: 'bold', textShadow: '0 0 20px rgba(0,243,255,0.5)' }}>
                 INVENTARIO DE ACTIVOS
                 </Typography>
-                <Typography variant="h5" align="center" sx={{ mb: 8, color: 'text.secondary' }}>
-                    Valor Total: <span style={{ color: '#fff', fontWeight: 'bold' }}>${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <Typography variant="h5" align="center" sx={{ mb: 8, color: 'text.secondary', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                    Valor Total: <span style={{ color: '#fff', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}><TaoIcon size={24} /> {totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </Typography>
             </motion.div>
 
@@ -263,8 +264,8 @@ export default function PortfolioPage() {
                                         </Box>
 
                                         <Box sx={{ textAlign: 'right', minWidth: 120 }}>
-                                             <Typography variant="h6" sx={{ color: asset.color, fontWeight: 'bold' }}>
-                                                ${asset.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                             <Typography variant="h6" sx={{ color: asset.color, fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5 }}>
+                                                <TaoIcon size={20} /> {asset.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                              </Typography>
                                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'flex-end', mt: 0.5 }}>
                                                  <LinearProgress 
