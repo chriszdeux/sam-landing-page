@@ -14,7 +14,7 @@ export default function SecurityPage() {
       <Container maxWidth="lg" sx={{ pt: 20, pb: 10, position: 'relative', zIndex: 1, color: 'white' }}>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <Typography variant="h2" align="center" gutterBottom sx={{ color: 'primary.main', mb: 6 }}>
-                Seguridad Blockchain
+                SEGURIDAD DE PROTOCOLO
             </Typography>
             
             <Box sx={{ textAlign: 'center', mb: 8 }}>
@@ -22,22 +22,29 @@ export default function SecurityPage() {
             </Box>
 
             <Typography variant="h5" paragraph sx={{ lineHeight: 1.8, mb: 6, textAlign: 'center' }}>
-                En el universo de SAM, la seguridad no es una opción, es una necesidad de supervivencia. Nuestra infraestructura se basa en contratos inteligentes de grado militar auditados por la Federación Galáctica.
+                En 2036, desde servidores sumergidos en túneles geotérmicos de Guadalajara, nació LynCore. Nos protegemos con algo más fuerte que la criptografía: la soberanía energética y la distribución interestelar.
             </Typography>
 
             <List sx={{ bgcolor: 'rgba(0,0,0,0.5)', p: 4, borderRadius: 4, border: '1px solid rgba(0,243,255,0.2)' }}>
                 <ListItem sx={{ mb: 2 }}>
                     <ListItemIcon><Lock sx={{ color: 'primary.main', fontSize: 40 }} /></ListItemIcon>
                     <ListItemText 
-                        primary={<Typography variant="h5" color="white">Encriptación Cuántica</Typography>}
-                        secondary={<Typography variant="body1" color="text.secondary">Todos los activos y transacciones están protegidos por algoritmos pos-cuánticos resistentes a ataques de fuerza bruta.</Typography>}
+                        primary={<Typography variant="h5" color="white">Prueba de Propósito</Typography>}
+                        secondary={<Typography variant="body1" color="text.secondary">El sistema no crece solo por minería, sino por utilidad real. La Capa de Sedimento en la Tierra es el ancla ética inmutable.</Typography>}
                     />
                 </ListItem>
                 <ListItem sx={{ mb: 2 }}>
                     <ListItemIcon><VpnKey sx={{ color: 'primary.main', fontSize: 40 }} /></ListItemIcon>
                     <ListItemText 
-                        primary={<Typography variant="h5" color="white">Propiedad Inmutable</Typography>}
-                        secondary={<Typography variant="body1" color="text.secondary">Lo que es tuyo, es tuyo. Ni los desarrolladores ni los piratas pueden confiscar tus activos en la blockchain.</Typography>}
+                        primary={<Typography variant="h5" color="white">Red Quetzalcóatl</Typography>}
+                        secondary={<Typography variant="body1" color="text.secondary">Uso de entrelazamiento cuántico para sincronizar billeteras entre sistemas solares instantáneamente, eliminando la latencia luz.</Typography>}
+                    />
+                </ListItem>
+                <ListItem sx={{ mb: 2 }}>
+                    <ListItemIcon><Shield sx={{ color: 'primary.main', fontSize: 40 }} /></ListItemIcon>
+                    <ListItemText 
+                        primary={<Typography variant="h5" color="white">Soberanía Energética</Typography>}
+                        secondary={<Typography variant="body1" color="text.secondary">Gracias a Helios-Prime y las Forjas Solares, LynCore genera su propio combustible de cómputo. Nadie puede apagarla.</Typography>}
                     />
                 </ListItem>
             </List>

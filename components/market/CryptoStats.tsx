@@ -2,13 +2,14 @@ import React from 'react';
 import { Grid, Typography } from '@mui/material';
 import { Financial } from '../../lib/types/crypto';
 import { Card } from '../ui/Card';
+import { TaoIcon } from '../ui/TaoIcon';
 
 interface CryptoStatsProps {
   financial: Financial;
   color?: string;
 }
 
-const StatItem = ({ label, value, subValue, color }: { label: string, value: string, subValue?: string, color?: string }) => (
+const StatItem = ({ label, value, subValue, color }: { label: string, value: React.ReactNode, subValue?: string, color?: string }) => (
     <Card 
         glowColor={color}
         sx={{ 
@@ -19,7 +20,9 @@ const StatItem = ({ label, value, subValue, color }: { label: string, value: str
             justifyContent: 'center'
     }}>
         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>{label}</Typography>
-        <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#fff' }}>{value}</Typography>
+        <Typography variant="body1" component="div" sx={{ fontWeight: 'bold', color: '#fff', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            {value}
+        </Typography>
         {subValue && <Typography variant="caption" sx={{ color: color || 'primary.main' }}>{subValue}</Typography>}
     </Card>
 );
@@ -30,13 +33,13 @@ export const CryptoStats = ({ financial, color }: CryptoStatsProps) => {
         <Grid size={{ xs: 6, md: 6 }}>
             <StatItem 
                 label="Capitalización de Mercado" 
-                value={`$${financial.marketCap.toLocaleString()}`} 
+                value={<><TaoIcon size={16} /> {financial.marketCap.toLocaleString()}</>} 
             />
         </Grid>
         <Grid size={{ xs: 6, md: 6 }}>
             <StatItem 
                 label="Volumen (24h)" 
-                value={`$${financial.volume24h ? financial.volume24h.toLocaleString() : 'N/A'}`} 
+                value={<><TaoIcon size={16} /> {financial.volume24h ? financial.volume24h.toLocaleString() : 'N/A'}</>} 
             />
         </Grid>
         <Grid size={{ xs: 6, md: 6 }}>
@@ -55,14 +58,14 @@ export const CryptoStats = ({ financial, color }: CryptoStatsProps) => {
         <Grid size={{ xs: 6, md: 6 }}>
             <StatItem 
                 label="Máximo Histórico" 
-                value={`$${financial.allTimeHigh.toLocaleString()}`} 
+                value={<><TaoIcon size={16} /> {financial.allTimeHigh.toLocaleString()}</>} 
                 subValue={new Date(financial.allTimeHighDate).toLocaleDateString()}
             />
         </Grid>
-         <Grid size={{ xs: 6, md: 6 }}>
+        <Grid size={{ xs: 6, md: 6 }}>
             <StatItem 
                 label="Mínimo Histórico" 
-                value={`$${financial.allTimeLow.toLocaleString()}`} 
+                value={<><TaoIcon size={16} /> {financial.allTimeLow.toLocaleString()}</>} 
                 subValue={new Date(financial.allTimeLowDate).toLocaleDateString()}
                 color={color}
             />
