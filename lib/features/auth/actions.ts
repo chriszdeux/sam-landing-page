@@ -126,3 +126,16 @@ export const addWallet = createAsyncThunk(
     }
   }
 );
+
+export const removeWallet = createAsyncThunk(
+  'auth/removeWallet',
+  async (walletData: { userId: string; walletAddress: string }, { rejectWithValue }) => {
+    const { userId, walletAddress } = walletData;
+    try {
+      const response = await api.put(`/users/${userId}/remove-wallet`, { walletAddress });
+      return { walletAddress, message: response.data?.message || 'Wallet removed successfully' };
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to remove wallet');
+    }
+  }
+);

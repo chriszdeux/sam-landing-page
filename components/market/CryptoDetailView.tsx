@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { Box, Typography, Stack, Container, Grid, Button, Chip, Avatar, Divider, CircularProgress } from '@mui/material';
 import { ParticleBackground } from '../ui/ParticleBackground';
-import { ArrowBack, TrendingUp, TrendingDown, AccessTime, Code } from '@mui/icons-material';
+import { ArrowBack, TrendingUp, TrendingDown, AccessTime, Code, ShoppingCart, AttachMoney, Send } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { CryptoChart } from './CryptoChart';
 import { CryptoStats } from './CryptoStats';
@@ -166,6 +166,56 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                         {/* Right Column: Stats, Description, News */}
                         <Grid size={{ xs: 12, lg: 4 }}>
                             <Stack spacing={4}>
+                                <Stack direction="row" spacing={2}>
+                                    <Button
+                                        fullWidth
+                                        variant="contained"
+                                        startIcon={<ShoppingCart />}
+                                        onClick={() => router.push(`/market/trade?type=BUY&cryptoId=${id}`)}
+                                        sx={{ 
+                                            bgcolor: '#00ff88', 
+                                            color: '#000',
+                                            fontWeight: 'bold',
+                                            '&:hover': { bgcolor: '#00cc6a' }
+                                        }}
+                                    >
+                                        Comprar
+                                    </Button>
+                                    <Button
+                                        fullWidth
+                                        variant="outlined"
+                                        startIcon={<AttachMoney />}
+                                        onClick={() => router.push(`/market/trade?type=SELL&cryptoId=${id}`)}
+                                        sx={{ 
+                                            color: '#ff0055', 
+                                            borderColor: '#ff0055',
+                                            fontWeight: 'bold',
+                                            '&:hover': { 
+                                                bgcolor: 'rgba(255, 0, 85, 0.1)',
+                                                borderColor: '#ff0055' 
+                                            }
+                                        }}
+                                    >
+                                        Vender
+                                    </Button>
+                                    <Button
+                                        fullWidth
+                                        variant="outlined"
+                                        startIcon={<Send />}
+                                        onClick={() => router.push(`/market/trade?type=TRANSFER&cryptoId=${id}`)}
+                                        sx={{ 
+                                            color: 'primary.main', 
+                                            borderColor: 'primary.main',
+                                            fontWeight: 'bold',
+                                            '&:hover': { 
+                                                bgcolor: 'rgba(0, 243, 255, 0.1)',
+                                                borderColor: 'primary.main' 
+                                            }
+                                        }}
+                                    >
+                                        Enviar
+                                    </Button>
+                                </Stack>
                                 <Box>
                                     <Typography variant="h6" sx={{ color: '#fff', mb: 2, borderBottom: '2px solid', borderColor: 'primary.main', display: 'inline-block', pb: 0.5 }}>
                                         Estadísticas de Mercado

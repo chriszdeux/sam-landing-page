@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { AuthState } from './types';
-import { login, register, validateAccount, checkAuth, fetchWalletDetails, addWallet } from './actions';
+import { login, register, validateAccount, checkAuth, fetchWalletDetails, addWallet, removeWallet } from './actions';
 
 const initialState: AuthState = {
   userInfo: null,
@@ -129,6 +129,14 @@ const authSlice = createSlice({
                   label: action.payload.label,
                   walletAddress: action.payload.walletAddress,
               });
+          }
+      })
+      // Remove Wallet
+      .addCase(removeWallet.fulfilled, (state, action) => {
+          if (state.userInfo && state.userInfo.walletsSaved) {
+              state.userInfo.walletsSaved = state.userInfo.walletsSaved.filter(
+                  w => w.walletAddress !== action.payload.walletAddress
+              );
           }
       });
   },
