@@ -16,8 +16,7 @@ export const MechanicsSection = () => {
       <Grid container spacing={4} justifyContent="center" alignItems="stretch">
         {mechanicsData.map((mechanic, index) => (
           <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index} sx={{ display: 'flex' }}>
-            <Link href={`/mechanics/${mechanic.slug}`} style={{ textDecoration: 'none', width: '100%' }}>
-              <Card
+            <Card
                 glowColor={mechanic.color}
                 sx={{
                   height: '100%',
@@ -42,21 +41,25 @@ export const MechanicsSection = () => {
                   }
                 }}
               >
-                <Box className="icon-box" sx={{
-                  p: 3,
-                  borderRadius: '24px',
-                  bgcolor: 'rgba(255,255,255,0.03)',
-                  mb: 3,
-                  border: `1px solid rgba(255,255,255,0.1)`,
-                  transition: 'all 0.4s ease',
-                  display: 'inline-flex',
-                }}>
-                  <mechanic.icon size={40} color={mechanic.color} />
-                </Box>
+                <Link href={`/mechanics/${mechanic.slug}`} style={{ textDecoration: 'none' }}>
+                  <Box className="icon-box" sx={{
+                    p: 3,
+                    borderRadius: '24px',
+                    bgcolor: 'rgba(255,255,255,0.03)',
+                    mb: 3,
+                    border: `1px solid rgba(255,255,255,0.1)`,
+                    transition: 'all 0.4s ease',
+                    display: 'inline-flex',
+                  }}>
+                    <mechanic.icon size={40} color={mechanic.color} />
+                  </Box>
+                </Link>
                 
-                <Typography variant="h5" gutterBottom fontWeight="bold" sx={{ color: 'white', mb: 2 }}>
-                  {mechanic.title}
-                </Typography>
+                <Link href={`/mechanics/${mechanic.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <Typography variant="h5" gutterBottom fontWeight="bold" sx={{ color: 'white', mb: 2 }}>
+                    {mechanic.title}
+                  </Typography>
+                </Link>
                 
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 4, flexGrow: 1, lineHeight: 1.6 }}>
                   {mechanic.description.split(/(\$TAO|\$SOLIS|\$LYN)/g).map((part, index) => {
@@ -67,21 +70,22 @@ export const MechanicsSection = () => {
                   })}
                 </Typography>
 
-                <Box className="learn-more" sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  color: mechanic.color,
-                  opacity: 0.7,
-                  transform: 'translateY(5px)',
-                  transition: 'all 0.3s ease',
-                  fontWeight: 'bold',
-                  fontSize: '0.9rem'
-                }}>
-                  EXPLORAR <ArrowForward fontSize="small" />
-                </Box>
+                <Link href={`/mechanics/${mechanic.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <Box className="learn-more" sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    color: mechanic.color,
+                    opacity: 0.7,
+                    transform: 'translateY(5px)',
+                    transition: 'all 0.3s ease',
+                    fontWeight: 'bold',
+                    fontSize: '0.9rem'
+                  }}>
+                    EXPLORAR <ArrowForward fontSize="small" />
+                  </Box>
+                </Link>
               </Card>
-            </Link>
           </Grid>
         ))}
       </Grid>

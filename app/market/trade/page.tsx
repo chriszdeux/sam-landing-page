@@ -163,8 +163,10 @@ const TradeContent = () => {
         // Update User State (Balance) & Portfolio locally
         const currentBalance = userInfo?.balance || 0;
         
+        const feeAmount = networkFee || 0;
+
         if (transactionType === 'BUY') {
-            dispatch(updateBalance(currentBalance - form.amount));
+            dispatch(updateBalance(currentBalance - form.amount - feeAmount));
             if (selectedCrypto) {
                 dispatch(updateWalletAssets({
                     id: selectedCrypto.id,
@@ -176,7 +178,7 @@ const TradeContent = () => {
         } else if (transactionType === 'SELL') {
             // For sell, we gain fiat. Ensure amount is calculated if 0.
             const revenue = form.amount > 0 ? form.amount : (form.quantity * (selectedCrypto?.financial?.price || 0));
-            dispatch(updateBalance(currentBalance + revenue));
+            dispatch(updateBalance(currentBalance + revenue - feeAmount));
              if (selectedCrypto) {
                 dispatch(updateWalletAssets({
                     id: selectedCrypto.id,

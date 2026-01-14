@@ -6,8 +6,10 @@ import { Input } from '../ui/Input';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
-import { addWallet } from '../../lib/features/auth/actions';
+import { addWallet, removeWallet } from '../../lib/features/auth/actions';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export const WalletManager = () => {
     const dispatch = useAppDispatch();
@@ -37,6 +39,20 @@ export const WalletManager = () => {
             }
         } catch (error) { // eslint-disable-line @typescript-eslint/no-unused-vars
              setSnackbar({ open: true, message: 'An unexpected error occurred', severity: 'error' });
+        }
+    };
+
+    const handleRemoveWallet = async (walletAddress: string) => {
+        if (!userInfo?.id) return;
+        try {
+           const resultAction = await dispatch(removeWallet({ userId: userInfo.id, walletAddress }));
+           if (removeWallet.fulfilled.match(resultAction)) {
+               setSnackbar({ open: true, message: 'Wallet removed', severity: 'success' });
+           } else {
+               setSnackbar({ open: true, message: 'Failed to remove', severity: 'error' });
+           }
+        } catch (error) {
+            setSnackbar({ open: true, message: 'Error removing wallet', severity: 'error' });
         }
     };
 
@@ -162,56 +178,78 @@ export const WalletManager = () => {
                         </Box>
                         
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                            {userInfo.walletsSaved && userInfo.walletsSaved.length > 0 ? (
-                                userInfo.walletsSaved.map((wallet, index) => (
-                                    <Paper key={index} sx={{ 
-                                        p: 2, 
-                                        bgcolor: 'rgba(255, 255, 255, 0.05)', 
-                                        display: 'flex', 
-                                        alignItems: 'center',
-                                        transition: 'all 0.2s',
-                                        borderLeft: '4px solid transparent',
-                                        '&:hover': {
-                                            bgcolor: 'rgba(255, 255, 255, 0.1)',
-                                            borderLeft: '4px solid #ce93d8', // Highlight color
-                                            pl: 2.5
-                                        }
-                                    }}>
-                                        <Avatar sx={{ 
-                                            width: 40, 
-                                            height: 40, 
-                                            bgcolor: '#2d2d2d', 
-                                            border: '2px solid #ce93d8',
-                                            color: 'white', 
-                                            mr: 2 
-                                        }}>
-                                            {wallet.label.charAt(0).toUpperCase()}
-                                        </Avatar>
-                                        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                                            <Typography variant="body1" sx={{ color: 'white', fontWeight: 'bold', lineHeight: 1.2 }}>
-                                                {wallet.label}
-                                            </Typography>
-                                            
-                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                    {wallet.walletAddress}
-                                                </Typography>
+                            <AnimatePresence>
+                                {userInfo.walletsSaved && userInfo.walletsSaved.length > 0 ? (
+                                    userInfo.walletsSaved.map((wallet, index) => (
+                                        <motion.div
+                                            key={wallet.walletAddress}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, x: -20, height: 0, marginBottom: 0 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <Paper sx={{ 
+                                                p: 2, 
+                                                bgcolor: 'rgba(255, 255, 255, 0.05)', 
+                                                display: 'flex', 
+                                                alignItems: 'center',
+                                                transition: 'all 0.2s',
+                                                borderLeft: '4px solid transparent',
+                                                '&:hover': {
+                                                    bgcolor: 'rgba(255, 255, 255, 0.1)',
+                                                    borderLeft: '4px solid #ce93d8', // Highlight color
+                                                    pl: 2.5
+                                                }
+                                            }}>
+                                                <Avatar sx={{ 
+                                                    width: 40, 
+                                                    height: 40, 
+                                                    bgcolor: '#2d2d2d', 
+                                                    border: '2px solid #ce93d8',
+                                                    color: 'white', 
+                                                    mr: 2 
+                                                }}>
+                                                    {wallet.label.charAt(0).toUpperCase()}
+                                                </Avatar>
+                                                <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                                                    <Typography variant="body1" sx={{ color: 'white', fontWeight: 'bold', lineHeight: 1.2 }}>
+                                                        {wallet.label}
+                                                    </Typography>
+                                                    
+                                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                            {wallet.walletAddress}
+                                                        </Typography>
+                                                        <IconButton 
+                                                            size="small" 
+                                                            onClick={() => handleCopyToClipboard(wallet.walletAddress)}
+                                                            sx={{ ml: 0.5, p: 0.5, color: 'rgba(255,255,255,0.3)', '&:hover': { color: 'white' } }}
+                                                        >
+                                                            <ContentCopyIcon sx={{ fontSize: 12 }} />
+                                                        </IconButton>
+                                                    </Box>
+                                                </Box>
                                                 <IconButton 
-                                                    size="small" 
-                                                    onClick={() => handleCopyToClipboard(wallet.walletAddress)}
-                                                    sx={{ ml: 0.5, p: 0.5, color: 'rgba(255,255,255,0.3)', '&:hover': { color: 'white' } }}
+                                                    onClick={() => handleRemoveWallet(wallet.walletAddress)}
+                                                    sx={{ 
+                                                        color: 'rgba(255,0,0,0.4)', 
+                                                        opacity: 0,
+                                                        transition: 'all 0.2s',
+                                                        '.MuiPaper-root:hover &': { opacity: 1 },
+                                                        '&:hover': { color: '#ff4444', bgcolor: 'rgba(255,0,0,0.1)' } 
+                                                    }}
                                                 >
-                                                    <ContentCopyIcon sx={{ fontSize: 12 }} />
+                                                    <DeleteOutlineIcon fontSize="small" />
                                                 </IconButton>
-                                            </Box>
-                                        </Box>
-                                    </Paper>
-                                ))
-                            ) : (
-                                <Box sx={{ p: 2, color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>
-                                    No hay wallets guardadas
-                                </Box>
-                            )}
+                                            </Paper>
+                                        </motion.div>
+                                    ))
+                                ) : (
+                                    <Box sx={{ p: 2, color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>
+                                        No hay wallets guardadas
+                                    </Box>
+                                )}
+                            </AnimatePresence>
                         </Box>
                     </Grid>
                 </Grid>
