@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Typography, Stack, Alert, CircularProgress } from '@mui/material';
 import { Input } from '../ui/Input';
-import { useAppDispatch, useAppSelector } from '../../lib/hooks';
+import { useAppDispatch } from '../../lib/hooks';
 import { buyAsset, sellAsset } from '../../lib/features/economySlice';
 
 interface BuySellFormsProps {
@@ -40,8 +40,8 @@ export const BuySellForms: React.FC<BuySellFormsProps> = ({ assetId, assetSymbol
       }
       setStatus('success');
       setAmount('');
-    } catch (err: any) {
-      setMessage(err || 'Ocurrió un error en la transacción');
+    } catch (err: unknown) {
+      setMessage((typeof err === 'string' ? err : (err as Error).message) || 'Ocurrió un error en la transacción');
       setStatus('error');
     }
   };

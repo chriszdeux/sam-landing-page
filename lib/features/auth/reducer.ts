@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { AuthState } from './types';
-import { login, register, validateAccount, checkAuth, fetchWalletDetails, addWallet } from './actions';
+import { login, register, validateAccount, checkAuth, fetchWalletDetails, addWallet, removeWallet } from './actions';
 
 const initialState: AuthState = {
   userInfo: null,
@@ -31,7 +31,7 @@ const authSlice = createSlice({
     updateWalletAssets: (state, action) => {
         if (state.walletsInfo && state.walletsInfo.store) {
             const { symbol, quantity, name, id } = action.payload;
-            const existingAsset = state.walletsInfo.store.find((a: any) => a.symbol === symbol || a.id === id);
+            const existingAsset = state.walletsInfo.store.find((a) => a.symbol === symbol || a.id === id);
             
             if (existingAsset) {
                 existingAsset.quantity += quantity;
@@ -50,6 +50,9 @@ const authSlice = createSlice({
     },
     setRegistrationData: (state, action) => {
         state.registrationData = action.payload;
+    },
+    setUserInfo: (state, action) => {
+        state.userInfo = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -130,9 +133,17 @@ const authSlice = createSlice({
                   walletAddress: action.payload.walletAddress,
               });
           }
+      })
+      // Remove Wallet
+      .addCase(removeWallet.fulfilled, (state, action) => {
+          if (state.userInfo && state.userInfo.walletsSaved) {
+              state.userInfo.walletsSaved = state.userInfo.walletsSaved.filter(
+                  w => w.walletAddress !== action.payload.walletAddress
+              );
+          }
       });
   },
 });
 
-export const { logout, updateBalance, updateWalletAssets, setRegistrationData } = authSlice.actions;
+export const { logout, updateBalance, updateWalletAssets, setRegistrationData, setUserInfo } = authSlice.actions;
 export default authSlice.reducer;

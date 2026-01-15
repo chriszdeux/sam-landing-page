@@ -47,11 +47,22 @@ export interface User {
   token: string;
 }
 
+export interface RegistrationData {
+  name: string;
+  lastName: string;
+  username: string;
+  email: string;
+  password?: string;
+  confirmPassword?: string;
+  birthday: string;
+  referralCode?: string;
+}
+
 export interface AuthState {
   userInfo: User | null;
   token: string | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
   walletsInfo: WalletInterface | null;
-  registrationData?: any; // Temporary storage for registration inputs
+  registrationData?: RegistrationData; // Temporary storage for registration inputs
 }

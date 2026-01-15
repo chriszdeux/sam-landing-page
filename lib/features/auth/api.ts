@@ -1,11 +1,13 @@
 import api from '../../api';
 
-export const loginApi = async (credentials: any) => {
+import { RegistrationData } from './types';
+
+export const loginApi = async (credentials: Record<string, string>) => {
   const response = await api.post('/auth/login', credentials);
   return response.data;
 };
 
-export const registerApi = async (userData: any) => {
+export const registerApi = async (userData: RegistrationData) => {
   const response = await api.post('/auth', userData);
   return response.data;
 };

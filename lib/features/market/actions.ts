@@ -7,8 +7,9 @@ export const fetchCryptos = createAsyncThunk(
         try {
             const data = await getCryptosApi(networkId);
             return data;
-        } catch (err: any) {
-            return rejectWithValue(err.response?.data?.message || 'Failed to fetch cryptos');
+        } catch (err: unknown) {
+            const errorObj = err as { response?: { data?: { message?: string } } };
+            return rejectWithValue(errorObj.response?.data?.message || 'Failed to fetch cryptos');
         }
     }
 );
@@ -19,8 +20,9 @@ export const fetchCryptoHistory = createAsyncThunk(
         try {
             const data = await getCryptoHistoryApi(cryptoId, range);
             return { cryptoId, range, data };
-        } catch (err: any) {
-            return rejectWithValue(err.response?.data?.message || 'Failed to fetch history');
+        } catch (err: unknown) {
+            const errorObj = err as { response?: { data?: { message?: string } } };
+            return rejectWithValue(errorObj.response?.data?.message || 'Failed to fetch history');
         }
     }
 );

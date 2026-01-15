@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { loginApi, registerApi, validateAccountApi } from './api';
+import { RegistrationData } from './types';
 import api from '../../api';
 
 // ... (existing code found implicitly, but we are appending)
@@ -10,8 +11,9 @@ export const fetchWalletDetails = createAsyncThunk(
     try {
       const response = await api.get(`/blockchain/wallets/${walletId}`);
       return { walletId, data: response.data };
-    } catch (err: any) {
-      return rejectWithValue(err.message || 'Failed to fetch wallet details');
+    } catch (err: unknown) {
+      const message = (err as { message?: string })?.message || 'Failed to fetch wallet details';
+      return rejectWithValue(message);
     }
   }
 );
@@ -31,7 +33,8 @@ export const login = createAsyncThunk(
       return data;
     } catch (err: unknown) {
       if (typeof err === 'object' && err !== null && 'response' in err) {
-         return rejectWithValue((err as any).response?.data?.message || 'Login failed');
+         const errorObj = err as { response?: { data?: { message?: string } } };
+         return rejectWithValue(errorObj.response?.data?.message || 'Login failed');
       }
       return rejectWithValue('Login failed');
     }
@@ -76,12 +79,14 @@ export const checkAuth = createAsyncThunk(
 
 export const register = createAsyncThunk(
   'auth/register',
-  async (userData: any, { rejectWithValue }) => {
+  async (userData: RegistrationData, { rejectWithValue }) => {
     try {
       const data = await registerApi(userData);
       return data;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Registration failed');
+    } catch (err: unknown) {
+      // detailed error handling could use isAxiosError but simple property check is improved over straight any
+      const errorMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Registration failed';
+      return rejectWithValue(errorMsg);
     }
   }
 );
@@ -92,8 +97,9 @@ export const validateAccount = createAsyncThunk(
     try {
       const result = await validateAccountApi(data);
       return result;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Validation failed');
+    } catch (err: unknown) {
+      const errorMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Validation failed';
+      return rejectWithValue(errorMsg);
     }
   }
 );
@@ -102,14 +108,15 @@ export const connectWallet = createAsyncThunk(
   'auth/connectWallet',
   async (_, { rejectWithValue }) => {
     try {
-      if (typeof (window as any).ethereum !== 'undefined') {
-        const accounts = await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
+      if (typeof window.ethereum !== 'undefined') {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         return accounts[0];
       } else {
         return rejectWithValue('MetaMask is not installed');
       }
-    } catch (err: any) {
-      return rejectWithValue(err.message || 'Failed to connect wallet');
+    } catch (err: unknown) {
+      const message = (err as { message?: string })?.message || 'Failed to connect wallet';
+      return rejectWithValue(message);
     }
   }
 );
@@ -121,8 +128,23 @@ export const addWallet = createAsyncThunk(
     try {
       const response = await api.put(`/users/${userId}/add-wallet`, data);
       return { ...data, message: response.data?.message || 'Wallet added successfully' };
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to add wallet');
+    } catch (err: unknown) {
+      const errorMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to add wallet';
+      return rejectWithValue(errorMsg);
+    }
+  }
+);
+
+export const removeWallet = createAsyncThunk(
+  'auth/removeWallet',
+  async (walletData: { userId: string; walletAddress: string }, { rejectWithValue }) => {
+    const { userId, walletAddress } = walletData;
+    try {
+      const response = await api.put(`/users/${userId}/remove-wallet`, { walletAddress });
+      return { walletAddress, message: response.data?.message || 'Wallet removed successfully' };
+    } catch (err: unknown) {
+      const errorMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to remove wallet';
+      return rejectWithValue(errorMsg);
     }
   }
 );

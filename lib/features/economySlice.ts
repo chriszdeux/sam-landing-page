@@ -54,8 +54,9 @@ export const fetchAssets = createAsyncThunk(
       // Backend route: GET /blockchain/cryptocurrencies (maps to getCryptocurrencies)
       const response = await api.get(`/blockchain/crypto`);
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch assets');
+    } catch (error: unknown) {
+      const errorObj = error as { response?: { data?: { message?: string } } };
+      return rejectWithValue(errorObj.response?.data?.message || 'Failed to fetch assets');
     }
   }
 );
@@ -67,8 +68,9 @@ export const fetchAssetDetails = createAsyncThunk(
       // Backend route: GET /blockchain/cryptocurrencies/:id (maps to getCryptoInfo)
       const response = await api.get(`/blockchain/crypto/${id}`);
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch asset details');
+    } catch (error: unknown) {
+      const errorObj = error as { response?: { data?: { message?: string } } };
+      return rejectWithValue(errorObj.response?.data?.message || 'Failed to fetch asset details');
     }
   }
 );
@@ -83,8 +85,9 @@ export const buyAsset = createAsyncThunk(
         amount
       });
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to buy asset');
+    } catch (error: unknown) {
+      const errorObj = error as { response?: { data?: { message?: string } } };
+      return rejectWithValue(errorObj.response?.data?.message || 'Failed to buy asset');
     }
   }
 );
@@ -99,8 +102,9 @@ export const sellAsset = createAsyncThunk(
         amount
       });
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to sell asset');
+    } catch (error: unknown) {
+      const errorObj = error as { response?: { data?: { message?: string } } };
+      return rejectWithValue(errorObj.response?.data?.message || 'Failed to sell asset');
     }
   }
 );
