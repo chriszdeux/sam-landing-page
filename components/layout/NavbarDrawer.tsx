@@ -6,8 +6,9 @@ import {
   ListItem,
   ListItemText,
 } from "@mui/material";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { CONFIG } from "../../lib/config";
-import { MonetizationOn } from "@mui/icons-material";
+import { MonetizationOn, CardGiftcard } from "@mui/icons-material";
 import { Button } from "../ui/Button";
 import { CountUp } from "../ui/CountUp";
 import { openModal } from "../../lib/features/uiSlice";
@@ -23,7 +24,7 @@ interface NavbarDrawerProps {
   handleNavClick: (item: (typeof navItems)[0]) => void;
   pathname: string;
   userInfo: User | null;
-  router: any;
+  router: AppRouterInstance;
   dispatch: AppDispatch;
 }
 
@@ -108,6 +109,18 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({
                   <MonetizationOn fontSize="small" sx={{ color: "gold" }} />
                   Créditos: <CountUp to={userInfo.balance} />
                 </Typography>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  startIcon={<CardGiftcard />}
+                  onClick={() => {
+                      dispatch(openModal('rewards'));
+                      handleDrawerToggle();
+                  }}
+                  sx={{ mb: 1, borderColor: 'primary.main', color: 'primary.main' }}
+                >
+                  Recompensas
+                </Button>
                 <Button
                   variant="outlined"
                   fullWidth

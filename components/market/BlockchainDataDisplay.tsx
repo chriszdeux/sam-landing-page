@@ -6,11 +6,10 @@ import { BlockchainInterface } from '../../lib/types/blockchain';
 import { AccessTime, Storage, MonetizationOn, People, Memory, Speed, CheckCircle, ErrorOutline } from '@mui/icons-material';
 
 interface BlockchainDataDisplayProps {
-  network: any; // Using any to avoid strict typing issues if partial data is passed, but casting inside
+  network: BlockchainInterface | null | undefined;
 }
 
-export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ network: rawNetwork }) => {
-  const network = rawNetwork as BlockchainInterface;
+export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ network }) => {
 
   if (!network) {
     return (
@@ -136,7 +135,7 @@ export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ ne
             <Grid container spacing={3}>
                 
                 {/* Economics Block */}
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                     <DataBlock title="ECONOMÍA DE RED" icon={<MonetizationOn sx={{ color }} />} color={color}>
                         <MetricRow label="Capitalización de Mercado" value={formatCurrency(blockchainProps?.marketCap)} delay={0.1} />
                         <MetricRow label="Suministro Circulante" value={formatNumber(blockchainProps?.circulatingSupply)} delay={0.2} />
@@ -146,7 +145,7 @@ export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ ne
                 </Grid>
 
                 {/* Technical Block */}
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                     <DataBlock title="MÉTRICAS TÉCNICAS" icon={<Memory sx={{ color }} />} color={color}>
                         <MetricRow label="Tiempo de Bloque" value={`${blockchainProps?.blockInterval || 0} ms`} icon={<AccessTime fontSize="small" />} delay={0.1} />
                         <MetricRow label="Dificultad" value={formatCompact(blockchainProps?.difficulty)} icon={<Speed fontSize="small" />} delay={0.2} />
@@ -156,10 +155,10 @@ export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ ne
                 </Grid>
 
                 {/* Development & Info */}
-                 <Grid item xs={12}>
+                 <Grid size={{ xs: 12 }}>
                     <DataBlock title="INFORMACIÓN ADICIONAL" icon={<People sx={{ color }} />} color={color}>
                         <Grid container spacing={2}>
-                            <Grid item xs={12} md={6}>
+                            <Grid size={{ xs: 12, md: 6 }}>
                                 <Typography variant="caption" color="text.secondary">EQUIPO DE DESARROLLO</Typography>
                                 <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
                                     {additionalInfo?.developers?.map((dev, i) => (
@@ -167,7 +166,7 @@ export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ ne
                                     ))}
                                 </Box>
                             </Grid>
-                            <Grid item xs={12} md={6}>
+                            <Grid size={{ xs: 12, md: 6 }}>
                                  <Typography variant="caption" color="text.secondary">ÚLTIMA ACTUALIZACIÓN</Typography>
                                  <Typography variant="body1" color="white">{additionalInfo?.lastUpdated ? new Date(additionalInfo.lastUpdated).toLocaleDateString() : 'Desconocida'}</Typography>
                                  

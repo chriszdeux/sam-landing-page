@@ -8,6 +8,7 @@ import { closeModal } from '../../lib/features/uiSlice';
 import { LoginForm } from '../auth/LoginForm';
 import { RegisterForm } from '../auth/RegisterForm';
 import { ValidateAccountForm } from '../auth/ValidateAccountForm';
+import { RewardsModal } from '../rewards/RewardsModal';
 
 const style = {
   position: 'absolute',
@@ -39,6 +40,8 @@ export const Modal = ({ children }: { children?: React.ReactNode }) => {
         return <RegisterForm />;
       case 'validate':
         return <ValidateAccountForm />;
+      case 'rewards':
+        return <RewardsModal />;
       default:
         return children;
     }

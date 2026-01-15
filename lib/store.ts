@@ -19,15 +19,17 @@ export const makeStore = () => {
       transactions: transactionsReducer,
     },
     devTools: {
-        actionSanitizer: (action: any) => {
-            return action.type === 'auth/login/fulfilled' && action.payload 
-                ? { ...action, payload: '<<LONG_BLOB>>' } 
-                : action;
+        actionSanitizer: (action) => {
+            const typedAction = action as { type: string; payload?: unknown };
+            return (typedAction.type === 'auth/login/fulfilled' && typedAction.payload 
+                ? { ...typedAction, payload: '<<LONG_BLOB>>' } 
+                : typedAction) as typeof action;
         },
-        stateSanitizer: (state: any) => {
-             return state.auth && state.auth.userInfo && state.auth.userInfo.transactions
-                ? { ...state, auth: { ...state.auth, userInfo: { ...state.auth.userInfo, transactions: '<<LONG_BLOB>>' } } }
-                : state;
+        stateSanitizer: (state) => {
+             const typedState = state as { auth?: { userInfo?: { transactions?: unknown } } };
+             return (typedState.auth && typedState.auth.userInfo && typedState.auth.userInfo.transactions
+                ? { ...typedState, auth: { ...typedState.auth, userInfo: { ...typedState.auth.userInfo, transactions: '<<LONG_BLOB>>' } } }
+                : typedState) as typeof state;
         }
     },
   });

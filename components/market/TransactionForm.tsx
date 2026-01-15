@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, MenuItem, Paper, Typography, Button, CircularProgress } from '@mui/material';
+import { Box, MenuItem, Paper, Typography, Button, CircularProgress, SelectChangeEvent } from '@mui/material';
 import { Input } from '../ui/Input';
 import { Cryptocurrency } from '../../lib/types/crypto';
 import { TaoIcon } from '../ui/TaoIcon';
@@ -14,7 +14,7 @@ interface TradeFormData {
 interface TransactionFormProps {
     transactionType: 'BUY' | 'SELL' | 'TRANSFER';
     form: TradeFormData;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => void;
     cryptos: Cryptocurrency[];
     selectedCrypto?: Cryptocurrency;
     onSubmit: () => void;
@@ -45,7 +45,7 @@ export const TransactionForm = ({
                         label="Activo / Criptomoneda"
                         name="cryptoId"
                         value={form.cryptoId}
-                        onChange={onChange as any} // Select onChange has different signature
+                        onChange={onChange}
                         fullWidth
                         disabled
                         containerSx={{

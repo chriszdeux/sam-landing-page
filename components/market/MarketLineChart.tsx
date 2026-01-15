@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler, Legend } from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler, Legend, ScriptableContext } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
 ChartJS.register(
@@ -33,7 +33,7 @@ export const MarketLineChart = ({ color = '#00f3ff', height = 300, showLabel = t
                 label: 'Tendencia del Mercado',
                 data: dataPoints,
                 borderColor: color,
-                backgroundColor: (context: any) => {
+                backgroundColor: (context: ScriptableContext<"line">) => {
                     const ctx = context.chart.ctx;
                     const gradient = ctx.createLinearGradient(0, 0, 0, height);
                     gradient.addColorStop(0, `${color}40`); // 40 = 25% opacity hex

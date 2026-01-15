@@ -9,7 +9,8 @@ import {
   Title,
   Tooltip,
   Filler,
-  Legend
+  Legend,
+  ScriptableContext
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
@@ -73,7 +74,7 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
                 label: 'Price',
                 data: dataPoints,
                 borderColor: color,
-                backgroundColor: (context: any) => {
+                backgroundColor: (context: ScriptableContext<"line">) => {
                     const ctx = context.chart.ctx;
                     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
                     gradient.addColorStop(0, `${color}40`);
