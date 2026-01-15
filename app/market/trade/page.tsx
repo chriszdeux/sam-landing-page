@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Box, Container, Typography, Button, Alert, Stack } from '@mui/material';
+import { Box, Container, Typography, Button, Alert, Stack, SelectChangeEvent } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Background } from '../../../components/layout/Background';
 import { useAppSelector, useAppDispatch } from '../../../lib/hooks';
@@ -86,7 +86,7 @@ const TradeContent = () => {
   }, [status, router]);
 
   // Handle Input Changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
     const { name, value } = e.target;
     setForm(prev => ({
         ...prev,
