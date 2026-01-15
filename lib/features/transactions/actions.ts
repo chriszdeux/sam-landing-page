@@ -7,8 +7,9 @@ export const fetchTransactions = createAsyncThunk(
         try {
             const data = await getTransactionsApi(storeId, walletId || '', page, limit);
             return { storeId, data, page };
-        } catch (err: any) {
-             return rejectWithValue(err.response?.data?.message || 'Failed to fetch transactions');
+        } catch (err: unknown) {
+             const errorObj = err as { response?: { data?: { message?: string } } };
+             return rejectWithValue(errorObj.response?.data?.message || 'Failed to fetch transactions');
         }
     }
 );

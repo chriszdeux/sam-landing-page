@@ -90,7 +90,7 @@ export const transactionColumns: Column<TransactionsInterface>[] = [
         accessor: (row) => row.financialInfo?.price || 0,
         Cell: ({ value }) => (
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <TaoIcon size={14} /> <span>{(value || 0).toLocaleString()}</span>
+                <TaoIcon size={14} /> <span>{(value as number || 0).toLocaleString()}</span>
             </div>
         ),
         sortable: true
@@ -99,11 +99,11 @@ export const transactionColumns: Column<TransactionsInterface>[] = [
         Header: "Tiempo",
         accessor: "dateCreated",
         sortable: true,
-        Cell: ({ value }) => new Date(value).toLocaleTimeString()
+        Cell: ({ value }) => new Date(value as string | number).toLocaleTimeString()
     },
     {
         Header: "Origen",
         accessor: (row) => row.addresses?.senderWalletAddress || 'N/A',
-        Cell: ({ value }) => <Typography color="primary" variant="caption">{value}</Typography>
+        Cell: ({ value }) => <Typography color="primary" variant="caption">{value as React.ReactNode}</Typography>
     }
 ];

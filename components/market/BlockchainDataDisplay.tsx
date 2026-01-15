@@ -6,11 +6,10 @@ import { BlockchainInterface } from '../../lib/types/blockchain';
 import { AccessTime, Storage, MonetizationOn, People, Memory, Speed, CheckCircle, ErrorOutline } from '@mui/icons-material';
 
 interface BlockchainDataDisplayProps {
-  network: any; // Using any to avoid strict typing issues if partial data is passed, but casting inside
+  network: BlockchainInterface | null | undefined;
 }
 
-export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ network: rawNetwork }) => {
-  const network = rawNetwork as BlockchainInterface;
+export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ network }) => {
 
   if (!network) {
     return (

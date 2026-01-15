@@ -20,10 +20,10 @@ import {
   Menu as MenuIcon,
   Rocket,
   Person as UserIcon,
-//   MonetizationOn, // Removed in favor of TaoIcon
   Settings,
   Logout,
   Bolt,
+  CardGiftcard,
 } from "@mui/icons-material";
 import { TaoIcon } from "../ui/TaoIcon";
 import { motion } from "framer-motion";
@@ -177,6 +177,12 @@ export const Navbar = () => {
 
             {userInfo ? (
               <Stack direction="row" spacing={2} alignItems="center">
+                  <Tooltip title="Centro de Recompensas">
+                    <IconButton onClick={() => dispatch(openModal('rewards'))} sx={{ color: 'primary.main', bgcolor: 'rgba(0, 243, 255, 0.1)', '&:hover': { bgcolor: 'rgba(0, 243, 255, 0.2)' } }}>
+                        <CardGiftcard />
+                    </IconButton>
+                  </Tooltip> 
+                  
                   <Typography
                     variant="body2"
                     sx={{

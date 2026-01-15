@@ -20,9 +20,9 @@ export const transactionsPageColumns: Column<TransactionsInterface>[] = [
         sortable: true,
         Cell: ({ value }) => (
             <Box>
-                {new Date(value).toLocaleDateString()}
+                {new Date(value as string).toLocaleDateString()}
                 <Typography variant="caption" display="block" color="text.secondary">
-                    {new Date(value).toLocaleTimeString()}
+                    {new Date(value as string).toLocaleTimeString()}
                 </Typography>
             </Box>
         )
@@ -116,7 +116,7 @@ export const transactionsPageColumns: Column<TransactionsInterface>[] = [
         sortable: true,
         Cell: ({ value }) => (
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <TaoIcon size={14} /> <span>{value?.toLocaleString()}</span>
+                <TaoIcon size={14} /> <span>{(value as number)?.toLocaleString()}</span>
             </div>
         )
     },
@@ -158,7 +158,7 @@ export const transactionsPageColumns: Column<TransactionsInterface>[] = [
             
             return (
                 <Typography variant="body2" sx={{ color }}>
-                    {label}
+                    {label as React.ReactNode}
                 </Typography>
             );
         }
