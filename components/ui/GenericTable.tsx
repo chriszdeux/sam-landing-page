@@ -15,8 +15,8 @@ import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 
 export interface Column<T> {
   Header: string;
-  accessor?: keyof T | ((row: T) => any);
-  Cell?: (props: { value: any; row: T }) => React.ReactNode;
+  accessor?: keyof T | ((row: T) => unknown);
+  Cell?: (props: { value: unknown; row: T }) => React.ReactNode;
   filterable?: boolean;
   filterMethod?: (filterValue: string, row: T) => boolean;
   sortable?: boolean;
@@ -100,8 +100,13 @@ export function GenericTable<T>({
           const valA = typeof col.accessor === 'function' ? col.accessor(a) : col.accessor ? a[col.accessor] : '';
           const valB = typeof col.accessor === 'function' ? col.accessor(b) : col.accessor ? b[col.accessor] : '';
 
-          if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
-          if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+          if (typeof valA === 'number' && typeof valB === 'number') {
+              return sortConfig.direction === 'asc' ? valA - valB : valB - valA;
+          }
+          const strA = String(valA).toLowerCase();
+          const strB = String(valB).toLowerCase();
+          if (strA < strB) return sortConfig.direction === 'asc' ? -1 : 1;
+          if (strA > strB) return sortConfig.direction === 'asc' ? 1 : -1;
           return 0;
       });
   }, [filteredData, sortConfig, columns]);
@@ -202,7 +207,7 @@ export function GenericTable<T>({
                         {col.Cell ? (
                             <col.Cell value={value} row={row} />
                         ) : (
-                            value
+                            value as React.ReactNode
                         )}
                         </TableCell>
                     );

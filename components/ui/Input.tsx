@@ -1,5 +1,5 @@
-import { Box, InputBase, InputLabel, Typography, Select } from '@mui/material';
-import { alpha, styled } from '@mui/material/styles';
+import { Box, InputBase, InputLabel, Typography, Select, Theme } from '@mui/material';
+import { alpha, styled, SxProps } from '@mui/material/styles';
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   'label + &': {
@@ -42,7 +42,7 @@ interface CustomInputProps extends React.ComponentProps<typeof InputBase> {
     error?: boolean;
     select?: boolean;
     children?: React.ReactNode;
-    containerSx?: any;
+    containerSx?: SxProps<Theme>;
 }
 
 export const Input: React.FC<CustomInputProps> = ({ label, id, helperText, error, select, children, containerSx, ...props }) => {
@@ -70,7 +70,7 @@ export const Input: React.FC<CustomInputProps> = ({ label, id, helperText, error
                     id={id}
                     fullWidth
                     input={<StyledInputBase error={error} />}
-                    {...(props as any)}
+                    {...(props as unknown as any)} // Select props vs InputBase props conflict, keeping safe cast mechanism but acknowledging logic
                 >
                     {children}
                 </Select>

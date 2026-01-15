@@ -53,9 +53,19 @@ export interface TransactionBucket {
   currentTransactionBlock: number;
 }
 
+export interface Reward {
+    id: string;
+    name: string;
+    description: string;
+    amount: number;
+    type: 'DAILY' | 'ONE_TIME' | 'ACHIEVEMENT';
+    isClaimed?: boolean; // Frontend helper
+}
+
 export interface BlockchainState {
     networks: BlockchainInterface[];
     selectedNetwork: BlockchainInterface | null;
+    rewards: Reward[];
 
     isLoading: boolean;
     error: string | null;

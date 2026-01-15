@@ -1,11 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { BlockchainState } from './types';
 import { BlockchainInterface } from '../../types/blockchain';
-import { fetchNetworks } from './actions';
+import { fetchNetworks, fetchRewards, claimReward } from './actions';
 
 const initialState: BlockchainState = {
     networks: [],
     selectedNetwork: null,
+    rewards: [],
     isLoading: false,
     error: null,
 };
@@ -41,6 +42,16 @@ const blockchainSlice = createSlice({
                 state.isLoading = false;
                 state.error = action.payload as string;
             })
+            // Rewards
+            .addCase(fetchRewards.pending, (state) => {
+                // state.isLoading = true; // Maybe don't block whole UI?
+            })
+            .addCase(fetchRewards.fulfilled, (state, action) => {
+                state.rewards = action.payload;
+            })
+            .addCase(fetchRewards.rejected, (state, action) => {
+                 console.error('Failed to load rewards:', action.payload);
+            });
 
     },
 });
