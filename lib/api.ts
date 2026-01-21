@@ -17,6 +17,10 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    console.error("API Error:", error.message);
+    if (error.config) {
+       console.error("Request URL:", (error.config.baseURL || '') + error.config.url);
+    }
     return Promise.reject(error);
   }
 );
