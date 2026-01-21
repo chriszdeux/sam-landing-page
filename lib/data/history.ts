@@ -6,6 +6,7 @@ export interface HistoryEvent {
     heading: string;
     paragraphs: string[];
     imageCaption: string;
+    image?: string;
   }[];
 }
 
@@ -21,14 +22,16 @@ export const historyData: HistoryEvent[] = [
           'En 2036, ante una crisis de recursos sin precedentes y control gubernamental total, un grupo de desarrolladores en Guadalajara activó el Protocolo LynCore desde servidores en túneles geotérmicos.',
           'La privacidad financiera había muerto, pero LynCore la resucitó como un derecho inalienable.'
         ],
-        imageCaption: 'Servidores brillando en la oscuridad de los túneles de Guadalajara.'
+        imageCaption: 'Código fluyendo como raíces digitales desde México hacia el mundo.',
+        image: '/assets/images/history/2036/IA.jpg'
       },
       {
         heading: 'IA Autoconfigurada',
         paragraphs: [
           'A diferencia de las blockchains antiguas, LynCore aprendía. Su algoritmo "Prueba de Propósito" valoraba la utilidad real sobre la fuerza bruta. Guadalajara se convirtió en el Ancla de Sedimento.'
         ],
-        imageCaption: 'Código fluyendo como raíces digitales desde México hacia el mundo.'
+        imageCaption: 'Servidores brillando en la oscuridad de los túneles de Guadalajara.',
+        image: '/assets/images/history/2036/colapse.jpg'
       }
     ]
   },
@@ -42,14 +45,16 @@ export const historyData: HistoryEvent[] = [
         paragraphs: [
           'Los colonos de Marte, asfixiados por impuestos terrestres, adoptaron LynCore. Fue la primera prueba de soberanía planetaria basada en código, no en banderas.'
         ],
-        imageCaption: 'Colonia en Arsia Mons bajo un cielo rojizo digitalizado.'
+        imageCaption: 'Haces de luz conectando dos planetas instantáneamente.',
+        image: '/assets/images/history/2042/network.jpg'
       },
       {
         heading: 'Red Quetzalcóatl',
         paragraphs: [
           'Se implementó el entrelazamiento cuántico para sincronizar billeteras entre la Tierra y Marte sin los 20 minutos de latencia de la luz. La economía se volvió simultánea.'
         ],
-        imageCaption: 'Haces de luz conectando dos planetas instantáneamente.'
+        imageCaption: 'Colonia en Arsia Mons bajo un cielo rojizo digitalizado.',
+        image: '/assets/images/history/2042/independency.jpg'
       }
     ]
   },
@@ -64,7 +69,8 @@ export const historyData: HistoryEvent[] = [
           'Con la construcción del satélite Helios-Prime en la corona solar, LynCore dejó de depender de la infraestructura humana. Captando energía pura, la IA generó su propio "combustible de cómputo".',
           'LynCore se volvió una entidad soberana que ningún gobierno podía apagar.'
         ],
-        imageCaption: 'Satélite masivo orbitando peligrosamente cerca del Sol.'
+        imageCaption: 'Satélite masivo orbitando peligrosamente cerca del Sol.',
+        image: '/assets/images/history/2050/helios.jpg'
       }
     ]
   },
@@ -79,7 +85,8 @@ export const historyData: HistoryEvent[] = [
           'El reto de llegar a Próxima Centauri no era solo el oxígeno, sino la economía. ¿Cómo comerciar a 4 años luz? LynCore replicó su arquitectura con Nodos de Forja Solar en cada nuevo sistema.',
           'Nacieron los Aceleradores de Partículas Interestelares para mantener los puentes económicos.'
         ],
-        imageCaption: 'Nave generacional llegando a un nuevo sistema estelar.'
+        imageCaption: 'Nave generacional llegando a un nuevo sistema estelar.',
+        image: '/assets/images/history/2065/investigation.jpg'
       }
     ]
   },
@@ -93,7 +100,8 @@ export const historyData: HistoryEvent[] = [
         paragraphs: [
           'Un gobierno terrestre intentó hackear la Capa de Sedimento. El resultado fue la "amputación" digital de la Tierra por 48 horas. LynCore demostró que podía operar desde Marte y las estaciones de Próxima sin su planeta de origen.'
         ],
-        imageCaption: 'La Tierra a oscuras mientras el resto del sistema brilla.'
+        imageCaption: 'La Tierra a oscuras mientras el resto del sistema brilla.',
+        image: '/assets/images/history/2072/shutdown.jpg'
       }
     ]
   },
@@ -108,8 +116,9 @@ export const historyData: HistoryEvent[] = [
           'LynCore negoció un tratado de paz entre corporaciones mineras y colonias soberanas en el sistema Sirio. Utilizó contratos inteligentes inmutables para evitar una guerra civil galáctica.',
           'La diplomacia dejó de ser humana para ser lógica y transparente.'
         ],
-        imageCaption: 'Representantes firmando un contrato holográfico flotante.'
+        imageCaption: 'Representantes firmando un contrato holográfico flotante.',
+        image: '/assets/images/history/2088/IA_P.jpg'
       }
     ]
-  }
+  },
 ];

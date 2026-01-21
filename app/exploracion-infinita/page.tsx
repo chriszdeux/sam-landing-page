@@ -73,7 +73,7 @@ const DataLog = ({ title, date, children, align = 'left' }: { title: string; dat
     }}>
       {title}
     </Typography>
-    <Typography variant="body1" sx={{ fontSize: '1.1rem', color: 'gray', lineHeight: 1.8, fontFamily: 'monospace' }}>
+    <Typography component="div" variant="body1" sx={{ fontSize: '1.1rem', color: 'gray', lineHeight: 1.8, fontFamily: 'monospace' }}>
       {children}
     </Typography>
   </Box>

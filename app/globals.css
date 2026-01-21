@@ -5,7 +5,8 @@
 :root {
   --max-width: 1100px;
   --border-radius: 12px;
-  --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
+  --font-mono:
+    ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
     "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
     "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
 
@@ -14,20 +15,24 @@
   --background-end-rgb: 0, 0, 0;
 
   --primary-glow: radial-gradient(rgba(1, 65, 255, 0.4), rgba(1, 65, 255, 0));
-  --secondary-glow: linear-gradient(to bottom right,
-      rgba(1, 65, 255, 0),
-      rgba(1, 65, 255, 0),
-      rgba(1, 65, 255, 0.3));
+  --secondary-glow: linear-gradient(
+    to bottom right,
+    rgba(1, 65, 255, 0),
+    rgba(1, 65, 255, 0),
+    rgba(1, 65, 255, 0.3)
+  );
 
   --tile-start-rgb: 2, 13, 46;
   --tile-end-rgb: 2, 5, 19;
-  --tile-border: conic-gradient(#ffffff80,
-      #ffffff40,
-      #ffffff30,
-      #ffffff20,
-      #ffffff10,
-      #ffffff10,
-      #ffffff80);
+  --tile-border: conic-gradient(
+    #ffffff80,
+    #ffffff40,
+    #ffffff30,
+    #ffffff20,
+    #ffffff10,
+    #ffffff10,
+    #ffffff80
+  );
 
   --callout-rgb: 20, 20, 20;
   --callout-border-rgb: 108, 108, 108;
@@ -56,20 +61,27 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(to bottom,
+  background: linear-gradient(
+      to bottom,
       transparent,
-      rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
   font-family: Arial, Helvetica, sans-serif;
   overflow-x: hidden;
 }
 
 @layer utilities {
   .text-glow {
-    text-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
+    text-shadow:
+      0 0 10px var(--primary),
+      0 0 20px var(--primary);
   }
 
   .box-glow {
-    box-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
+    box-shadow:
+      0 0 10px var(--primary),
+      0 0 20px var(--primary);
   }
 
   .glass-panel {
@@ -77,4 +89,165 @@ body {
     backdrop-filter: blur(10px);
     border: 1px solid var(--glass-border);
   }
+}
+
+/* --- Holographic / Transmission Distortion Effects --- */
+
+@keyframes holo-chromatic {
+  0% {
+    text-shadow:
+      2px 0 #f0f,
+      -2px 0 #0ff;
+    transform: translate(0);
+  }
+  25% {
+    text-shadow:
+      -2px 0 #f0f,
+      2px 0 #0ff;
+    transform: translate(1px, 1px);
+  }
+  50% {
+    text-shadow:
+      2px 0 #f0f,
+      -2px 0 #0ff;
+    transform: translate(-1px, -1px);
+  }
+  75% {
+    text-shadow:
+      -2px 0 #f0f,
+      2px 0 #0ff;
+    transform: translate(0);
+  }
+  100% {
+    text-shadow:
+      2px 0 #f0f,
+      -2px 0 #0ff;
+    transform: translate(0);
+  }
+}
+
+@keyframes holo-scan {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 0% 100%;
+  }
+}
+
+@keyframes holo-flicker {
+  0% {
+    opacity: 0.95;
+    filter: brightness(1.1) contrast(1.1);
+  }
+  5% {
+    opacity: 0.8;
+    filter: brightness(0.9) contrast(1.2);
+  }
+  10% {
+    opacity: 0.95;
+    filter: brightness(1.1) contrast(1.1);
+  }
+  15% {
+    opacity: 1;
+    filter: brightness(1) contrast(1);
+  }
+  50% {
+    opacity: 0.95;
+    filter: brightness(1.1) contrast(1.1);
+  }
+  55% {
+    opacity: 0.8;
+    filter: brightness(1.3) hue-rotate(10deg);
+  }
+  60% {
+    opacity: 0.95;
+    filter: brightness(1.1) contrast(1.1);
+  }
+  100% {
+    opacity: 0.95;
+    filter: brightness(1.1) contrast(1.1);
+  }
+}
+
+/* Applied to the container */
+.holo-container {
+  position: relative;
+  overflow: hidden;
+  /* Scanline base */
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0) 50%,
+    rgba(0, 0, 0, 0.2) 50%,
+    rgba(0, 0, 0, 0.2)
+  );
+  background-size: 100% 4px;
+  animation: holo-scan 10s linear infinite;
+}
+
+@keyframes holo-zoom {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* The image itself or a wrapper directly around it */
+.holo-image {
+  position: relative;
+  /* Transmission tint */
+  filter: sepia(20%) hue-rotate(180deg) saturate(140%) contrast(110%);
+  /* Flicker effect + Slow Zoom */
+  animation: holo-flicker 4s infinite, holo-zoom 20s ease-in-out infinite;
+  mix-blend-mode: luminosity; /* Gives it that processed look, maybe 'normal' if too dark */
+}
+
+/* Add a chromatic aberration pseudo-element */
+.holo-image-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.holo-image-wrapper::before,
+.holo-image-wrapper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: inherit; /* Requires the image to be set as bg on wrapper or duplicated? Easier to use mix-blend on duplicates */
+  opacity: 0.5;
+  mix-blend-mode: overlay; /* or screen */
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Easier Approach: CSS Glitch Filter helper class */
+.glitch-effect {
+  position: relative;
+}
+
+.glitch-effect::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 243, 255, 0.1) 2px,
+    rgba(0, 243, 255, 0.1) 3px
+  );
+  background-size: 100% 100%;
+  z-index: 10;
+  pointer-events: none;
+  animation: holo-scan 5s linear infinite;
+}
+
+.glitch-effect:hover {
+  animation: holo-flicker 0.2s 2;
 }
