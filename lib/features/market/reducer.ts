@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { MarketState } from './types';
+import { MarketState, CandleData } from './types';
 import { fetchCryptos, fetchCryptoHistory } from './actions';
 import { Cryptocurrency } from '../../types/crypto';
 
@@ -42,14 +42,14 @@ const marketSlice = createSlice({
                 state.error = action.payload as string;
             })
             // History
-            .addCase(fetchCryptoHistory.pending, (state) => {
+            .addCase(fetchCryptoHistory.pending, () => {
                 // state.isLoading = true; // Optional: don't block entire UI for chart
             })
             .addCase(fetchCryptoHistory.fulfilled, (state, action) => {
                 const { cryptoId, range, data } = action.payload;
                 
                 // Helper to extract the array from various potential API structures
-                let history: { price: number; timestamp: number }[] = [];
+                let history: CandleData[] = [];
                 
                 if (Array.isArray(data)) {
                     history = data;

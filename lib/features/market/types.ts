@@ -1,8 +1,8 @@
 import { Cryptocurrency } from '../../types/crypto';
 
 export interface CandleData {
-    buy: number;
-    sell: number;
+    buy?: number;
+    sell?: number;
     price: number;
     timestamp: number;
 }
