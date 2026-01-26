@@ -58,14 +58,17 @@ export interface Reward {
     name: string;
     description: string;
     amount: number;
-    type: 'DAILY' | 'ONE_TIME' | 'ACHIEVEMENT';
+    interval: number; // Days between claims
+    rewardType: 'CREDIT';
     isClaimed?: boolean; // Frontend helper
+    nextClaimTime?: number; // Timestamp for next availability
 }
 
 export interface BlockchainState {
     networks: BlockchainInterface[];
     selectedNetwork: BlockchainInterface | null;
     rewards: Reward[];
+    nextBlockTime: number | null;
 
     isLoading: boolean;
     error: string | null;

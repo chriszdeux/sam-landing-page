@@ -4,6 +4,7 @@ import React from 'react';
 import { Box, Typography, Container, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Background } from '../../components/layout/Background';
 import { Shield, Lock, VpnKey } from '@mui/icons-material';
+import { PageHeader } from '../../components/ui/PageHeader';
 import { motion } from 'framer-motion';
 
 export default function SecurityPage() {
@@ -13,9 +14,11 @@ export default function SecurityPage() {
       
       <Container maxWidth="lg" sx={{ pt: 20, pb: 10, position: 'relative', zIndex: 1, color: 'white' }}>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <Typography variant="h2" align="center" gutterBottom sx={{ color: 'primary.main', mb: 6 }}>
-                SEGURIDAD DE PROTOCOLO
-            </Typography>
+            <PageHeader 
+                title="SEGURIDAD DE PROTOCOLO" 
+                subtitle="Infraestructura descentralizada protegida por leyes físicas y criptográficas."
+                color="#00f3ff"
+            />
             
             <Box sx={{ textAlign: 'center', mb: 8 }}>
                  <Shield sx={{ fontSize: 100, color: 'primary.main', filter: 'drop-shadow(0 0 20px #00f3ff)' }} />

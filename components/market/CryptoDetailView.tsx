@@ -9,8 +9,10 @@ import { CryptoChart } from './CryptoChart';
 import { CryptoStats } from './CryptoStats';
 import { CryptoNews } from './CryptoNews';
 import { TransactionHistory } from './TransactionHistory';
+import { MarketSentiment } from './MarketSentiment';
 import { Card } from '../ui/Card';
 import { TaoIcon } from '../ui/TaoIcon';
+import { addNotification } from '../../lib/features/uiSlice';
 
 
 // Redux
@@ -26,6 +28,7 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
     const { cryptos, isLoading } = useSelector((state: RootState) => state.market);
+    const { token } = useSelector((state: RootState) => state.auth);
     // Assuming selectedNetworkId is not available directly, we might default or fix types later. Using hardcoded for now or selecting from store if available.
     // const { selectedNetworkId } = useSelector((state: RootState) => state.blockchain); 
     
@@ -33,6 +36,17 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
     
     // Find the crypto in the store
     const crypto = cryptos.find((c) => c.id === id);
+
+    const handleTransaction = (type: 'BUY' | 'SELL' | 'TRANSFER') => {
+        if (!token) {
+            dispatch(addNotification({
+                type: 'warning',
+                message: 'Operación restringida: Debes iniciar sesión para realizar transacciones.'
+            }));
+            return;
+        }
+        router.push(`/market/trade?type=${type}&cryptoId=${id}`);
+    };
 
 // ... (I'll do single replacement for dependency array)
     useEffect(() => {
@@ -158,6 +172,7 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                                 </Box>
 
                                 <Box>
+                                     <MarketSentiment cryptoId={id} />
                                      <TransactionHistory walletId={crypto.financial.contractAddress} />
                                 </Box>
                             </Stack>
@@ -171,7 +186,7 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                                         fullWidth
                                         variant="contained"
                                         startIcon={<ShoppingCart />}
-                                        onClick={() => router.push(`/market/trade?type=BUY&cryptoId=${id}`)}
+                                        onClick={() => handleTransaction('BUY')}
                                         sx={{ 
                                             bgcolor: '#00ff88', 
                                             color: '#000',
@@ -185,7 +200,7 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                                         fullWidth
                                         variant="outlined"
                                         startIcon={<AttachMoney />}
-                                        onClick={() => router.push(`/market/trade?type=SELL&cryptoId=${id}`)}
+                                        onClick={() => handleTransaction('SELL')}
                                         sx={{ 
                                             color: '#ff0055', 
                                             borderColor: '#ff0055',
@@ -202,7 +217,7 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                                         fullWidth
                                         variant="outlined"
                                         startIcon={<Send />}
-                                        onClick={() => router.push(`/market/trade?type=TRANSFER&cryptoId=${id}`)}
+                                        onClick={() => handleTransaction('TRANSFER')}
                                         sx={{ 
                                             color: 'primary.main', 
                                             borderColor: 'primary.main',

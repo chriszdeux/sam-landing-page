@@ -2,9 +2,11 @@
 
 import React, { useEffect } from 'react';
 import { Box, Typography, Grid, Container, Button, CircularProgress } from '@mui/material';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Background } from '../../components/layout/Background';
-import { Card } from '../../components/ui/Card';
+import { TechFrame } from '../../components/ui/TechFrame';
+import { PageHeader } from '../../components/ui/PageHeader';
 import { motion } from 'framer-motion';
 import { Send } from '@mui/icons-material';
 import { TaoIcon } from '../../components/ui/TaoIcon';
@@ -13,6 +15,7 @@ import { TaoIcon } from '../../components/ui/TaoIcon';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../lib/store';
 import { fetchCryptos } from '../../lib/features/market/actions';
+import { addNotification } from '../../lib/features/uiSlice';
 
 import { BlockchainDataDisplay } from '../../components/market/BlockchainDataDisplay';
 
@@ -22,21 +25,38 @@ export default function MarketPage() {
   const dispatch = useDispatch<AppDispatch>();
   const { cryptos, isLoading, error } = useSelector((state: RootState) => state.market);
   const { selectedNetwork } = useSelector((state: RootState) => state.blockchain);
+  const { token } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     if (selectedNetwork?.id) {
         dispatch(fetchCryptos(selectedNetwork.id));
     }
-  }, [selectedNetwork?.id]);
+  }, [dispatch, selectedNetwork?.id]);
+
+  const handleTransaction = (e: React.MouseEvent, type: 'BUY' | 'SELL' | 'TRANSFER', cryptoId: string) => {
+    e.stopPropagation();
+    
+    if (!token) {
+        dispatch(addNotification({
+            type: 'warning',
+            message: 'Operación restringida: Debes iniciar sesión para realizar transacciones.'
+        }));
+        return;
+    }
+
+    router.push(`/market/trade?type=${type}&cryptoId=${cryptoId}`);
+  };
 
   return (
     <Box sx={{ minHeight: '100vh', position: 'relative' }}>
       <Background />
       
       <Container maxWidth="xl" sx={{ pt: 16, pb: 10, position: 'relative', zIndex: 1 }}>
-        <Typography variant="h2" align="center" gutterBottom sx={{ mb: 6, color: 'primary.main' }}>
-          Mercado Galáctico
-        </Typography>
+        <PageHeader 
+            title="Mercado Galáctico" 
+            subtitle="Intercambia activos digitales en tiempo real a través del sistema multi-cadena."
+            color="#00f3ff"
+        />
 
         {/* Blockchain Data Terminal */}
         <BlockchainDataDisplay network={selectedNetwork} />
@@ -60,22 +80,24 @@ export default function MarketPage() {
                     transition={{ delay: index * 0.1 }}
                     style={{ height: '100%' }}
                 >
-                    <Card
+                    <TechFrame
                     onClick={() => router.push(`/market/${crypto.id}`)}
-                    glowColor={crypto.additionalInfo?.pColor || '#00f3ff'}
+                    color={crypto.additionalInfo?.pColor || '#00f3ff'}
+                    className="h-full w-full"
                     sx={{
-                    height: '100%',
-                    width: '100%',
-                    p: 3,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    cursor: 'pointer',
-                    background: `linear-gradient(180deg, rgba(20, 20, 25, 0.8) 0%, ${(crypto.additionalInfo?.pColor || '#00f3ff')}15 100%)`,
+                        height: '100%',
                     }}
                 >
+                    <Box sx={{
+                        height: '100%',
+                        width: '100%',
+                        p: 3,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'space-between', 
+                        position: 'relative'
+                    }}>
                     {/* Ambient Glow */}
                     <Box sx={{
                         position: 'absolute',
@@ -129,10 +151,11 @@ export default function MarketPage() {
                         }
                     }}>
                         {crypto.identification.image128 ? (
-                             <img 
+                             <Image 
                                 src={crypto.identification.image128} 
                                 alt={crypto.identification.name} 
-                                style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                                fill
+                                style={{ objectFit: 'contain' }} 
                             />
                         ) : (
                             <Box sx={{
@@ -164,7 +187,7 @@ export default function MarketPage() {
                         <Box sx={{ 
                             display: 'inline-flex', 
                             alignItems: 'center', 
-                            justifyContent: 'center',
+                            justifyContent: 'center', 
                             px: 1.5, 
                             py: 0.5, 
                             borderRadius: 10,
@@ -183,10 +206,7 @@ export default function MarketPage() {
                         <Button 
                             variant="outlined" 
                             size="small" 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                router.push(`/market/trade?type=BUY&cryptoId=${crypto.id}`);
-                            }}
+                            onClick={(e) => handleTransaction(e, 'BUY', crypto.id)}
                             sx={{ 
                                 borderColor: 'rgba(0, 230, 118, 0.3)',
                                 color: '#00e676',
@@ -198,10 +218,7 @@ export default function MarketPage() {
                         <Button 
                             variant="outlined" 
                             size="small" 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                router.push(`/market/trade?type=SELL&cryptoId=${crypto.id}`);
-                            }}
+                            onClick={(e) => handleTransaction(e, 'SELL', crypto.id)}
                             sx={{ 
                                 borderColor: 'rgba(255, 23, 68, 0.3)',
                                 color: '#ff1744',
@@ -216,10 +233,7 @@ export default function MarketPage() {
                         variant="text" 
                         size="small" 
                         fullWidth
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            router.push(`/market/trade?type=TRANSFER&cryptoId=${crypto.id}`);
-                        }}
+                        onClick={(e) => handleTransaction(e, 'TRANSFER', crypto.id)}
                         sx={{ 
                             mt: 1,
                             color: 'text.secondary',
@@ -229,7 +243,8 @@ export default function MarketPage() {
                     >
                         <Send sx={{ fontSize: 16, mr: 1 }} /> TRANSFERIR
                     </Button>
-                </Card>
+                    </Box>
+                </TechFrame>
                 </motion.div>
                 </Grid>
             ))}

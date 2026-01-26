@@ -11,5 +11,13 @@ export const fetchTransactions = createAsyncThunk(
              const errorObj = err as { response?: { data?: { message?: string } } };
              return rejectWithValue(errorObj.response?.data?.message || 'Failed to fetch transactions');
         }
+    },
+    {
+        condition: (_, { getState }) => {
+            const { transactions } = getState() as { transactions: { isLoading: boolean } };
+            if (transactions.isLoading) {
+                return false;
+            }
+        },
     }
 );

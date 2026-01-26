@@ -14,21 +14,36 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import { TaoIcon } from '../../components/ui/TaoIcon';
 import { WalletManager } from '../../components/portfolio/WalletManager';
+import { TechFrame } from '../../components/ui/TechFrame';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../lib/store';
+import { fetchCryptos } from '../../lib/features/market/actions';
+import { PageHeader } from '../../components/ui/PageHeader';
 
 ChartJS.register(ArcElement, Tooltip, Legend, RadialLinearScale, BarElement, CategoryScale, LinearScale, PointElement, LineElement, Filler);
 
-// Dummy data for user assets if they are empty
-const defaultAssets = [
-  { name: 'Samium', value: 400, color: '#00f3ff', quantity: 1000, symbol: 'SAM' },
-  { name: 'Bitcoin', value: 300, color: '#ffb700', quantity: 0.5, symbol: 'BTC' },
-  { name: 'Credits', value: 300, color: '#ff0055', quantity: 300, symbol: 'CRED' },
-];
+interface Asset {
+    name: string;
+    value: number;
+    color: string;
+    quantity: number;
+    symbol: string;
+}
 
 export default function PortfolioPage() {
     const { walletsInfo } = useAppSelector((state) => state.auth);
     const { cryptos } = useAppSelector((state) => state.market);
+    const { selectedNetwork } = useAppSelector((state) => state.blockchain);
+    const dispatch = useDispatch<AppDispatch>();
     const [chartType, setChartType] = React.useState('doughnut');
     const controls = useAnimation();
+
+    // Fetch cryptos if they are not loaded
+    React.useEffect(() => {
+        if (selectedNetwork?.id && cryptos.length === 0) {
+            dispatch(fetchCryptos(selectedNetwork.id));
+        }
+    }, [dispatch, selectedNetwork?.id, cryptos.length]);
 
     // Trigger animation every 4-7 seconds
     React.useEffect(() => {
@@ -55,8 +70,12 @@ export default function PortfolioPage() {
         return () => clearTimeout(timeoutId);
     }, [controls]);
 
-    // If logged in and has wallet details, use them
-    let assets = defaultAssets;
+    // Use store data or empty array
+    let assets: Asset[] = [];
+    
+    // Only use default assets if strictly needed for demo (optional, but per request to show user info, we prefer real data)
+    // For now, if no wallet info, we might show empty or defaults only if not logged in.
+    // Let's rely on walletsInfo.
     
     if (walletsInfo?.store) {
         const store = walletsInfo.store;
@@ -64,7 +83,8 @@ export default function PortfolioPage() {
             // Find current price in market cryptos
             const marketCrypto = cryptos.find(c => c.id === item.id || c.identification.symbol === item.symbol); 
             const price = marketCrypto?.financial?.price || 0;
-            const value = item.quantity * price;
+            const quantity = Number(item.quantity) || 0;
+            const value = quantity * price;
 
             // Generate neon colors
             const colors = ['#00f3ff', '#ff0055', '#ffff00', '#00ff00', '#ff00ff', '#00ffff'];
@@ -73,7 +93,7 @@ export default function PortfolioPage() {
                 name: item.name,
                 symbol: item.symbol, 
                 value: value,
-                quantity: item.quantity,
+                quantity: quantity,
                 color: colors[i % colors.length]
             };
         });
@@ -158,12 +178,23 @@ export default function PortfolioPage() {
         
         <Container maxWidth="xl" sx={{ pt: 16, pb: 10, position: 'relative', zIndex: 1 }}>
             <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-                <Typography variant="h2" align="center" gutterBottom sx={{ mb: 2, color: 'primary.main', fontWeight: 'bold', textShadow: '0 0 20px rgba(0,243,255,0.5)' }}>
-                INVENTARIO DE ACTIVOS
-                </Typography>
-                <Typography variant="h5" align="center" sx={{ mb: 8, color: 'text.secondary', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                    Valor Total: <span style={{ color: '#fff', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}><TaoIcon size={24} /> {totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                </Typography>
+                <PageHeader 
+                    title="INVENTARIO DE ACTIVOS" 
+                    subtitle="Gestión y visualización de tu portafolio de activos digitales."
+                    color="#00f3ff"
+                />
+                
+                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 8 }}>
+                    <TechFrame>
+                        <Box sx={{ px: 4, py: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Typography variant="h6" color="text.secondary">Valor Total:</Typography>
+                            <Typography variant="h4" sx={{ color: '#00f3ff', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <TaoIcon size={32} /> 
+                                {totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </Typography>
+                        </Box>
+                    </TechFrame>
+                </Box>
             </motion.div>
 
             <WalletManager />
@@ -230,61 +261,56 @@ export default function PortfolioPage() {
                                     animate={{ x: 0, opacity: 1 }} 
                                     transition={{ delay: 0.3 + i * 0.1 }}
                                 >
-                                    <Paper 
-                                        sx={{ 
-                                            p: 3, 
-                                            bgcolor: 'rgba(10, 10, 25, 0.6)', 
-                                            backdropFilter: 'blur(10px)',
-                                            border: '1px solid rgba(255,255,255,0.05)',
-                                            borderLeft: `4px solid ${asset.color}`,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between',
-                                            transition: 'all 0.3s',
-                                            cursor: 'default',
-                                            '&:hover': {
-                                                transform: 'translateX(10px)',
-                                                bgcolor: 'rgba(10, 10, 25, 0.8)',
-                                                boxShadow: `0 0 20px ${asset.color}20`
-                                            }
-                                        }}
-                                    >
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                                            <Avatar sx={{ bgcolor: `${asset.color}20`, color: asset.color, width: 56, height: 56, fontWeight: 'bold' }}>
-                                                {asset.symbol ? asset.symbol[0] : asset.name[0]}
-                                            </Avatar>
-                                            <Box>
-                                                <Typography variant="h6" color="white" fontWeight="bold">
-                                                    {asset.name}
-                                                </Typography>
-                                                <Typography variant="body2" color="rgba(255,255,255,0.6)">
-                                                    {asset.quantity.toLocaleString()} {asset.symbol}
-                                                </Typography>
+                                    <TechFrame color={asset.color} className="w-full">
+                                        <Box 
+                                            sx={{ 
+                                                p: 3, 
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                transition: 'all 0.3s',
+                                                '&:hover': {
+                                                    bgcolor: 'rgba(255,255,255,0.02)'
+                                                }
+                                            }}
+                                        >
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                                                <Avatar sx={{ bgcolor: `${asset.color}20`, color: asset.color, width: 56, height: 56, fontWeight: 'bold', border: `1px solid ${asset.color}40` }}>
+                                                    {asset.symbol ? asset.symbol[0] : asset.name[0]}
+                                                </Avatar>
+                                                <Box>
+                                                    <Typography variant="h6" color="white" fontWeight="bold">
+                                                        {asset.name}
+                                                    </Typography>
+                                                    <Typography variant="body2" color="rgba(255,255,255,0.6)">
+                                                        {asset.quantity.toLocaleString()} {asset.symbol}
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+
+                                            <Box sx={{ textAlign: 'right', minWidth: 120 }}>
+                                                 <Typography variant="h6" sx={{ color: asset.color, fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5 }}>
+                                                    <TaoIcon size={20} /> {asset.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                 </Typography>
+                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'flex-end', mt: 0.5 }}>
+                                                     <LinearProgress 
+                                                        variant="determinate" 
+                                                        value={totalValue > 0 ? (asset.value / totalValue) * 100 : 0} 
+                                                        sx={{ 
+                                                            width: 80, 
+                                                            height: 4, 
+                                                            borderRadius: 2,
+                                                            bgcolor: 'rgba(255,255,255,0.1)',
+                                                            '& .MuiLinearProgress-bar': { bgcolor: asset.color }
+                                                        }}
+                                                     />
+                                                     <Typography variant="caption" color="text.secondary">
+                                                         {totalValue > 0 ? ((asset.value / totalValue) * 100).toFixed(1) : '0.0'}%
+                                                     </Typography>
+                                                 </Box>
                                             </Box>
                                         </Box>
-
-                                        <Box sx={{ textAlign: 'right', minWidth: 120 }}>
-                                             <Typography variant="h6" sx={{ color: asset.color, fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5 }}>
-                                                <TaoIcon size={20} /> {asset.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                             </Typography>
-                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'flex-end', mt: 0.5 }}>
-                                                 <LinearProgress 
-                                                    variant="determinate" 
-                                                    value={(asset.value / totalValue) * 100} 
-                                                    sx={{ 
-                                                        width: 80, 
-                                                        height: 4, 
-                                                        borderRadius: 2,
-                                                        bgcolor: 'rgba(255,255,255,0.1)',
-                                                        '& .MuiLinearProgress-bar': { bgcolor: asset.color }
-                                                    }}
-                                                 />
-                                                 <Typography variant="caption" color="text.secondary">
-                                                     {((asset.value / totalValue) * 100).toFixed(1)}%
-                                                 </Typography>
-                                             </Box>
-                                        </Box>
-                                    </Paper>
+                                    </TechFrame>
                                 </motion.div>
                             ))}
                         </Box>

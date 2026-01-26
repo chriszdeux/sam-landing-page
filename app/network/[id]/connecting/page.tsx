@@ -1,15 +1,14 @@
 'use client';
 
-import React from 'react';
-import { Box, Typography, Container, Stack, Chip, Button, Divider, Grid } from '@mui/material';
+import React, { use } from 'react';
+import { Box, Typography, Stack } from '@mui/material';
 import { ParticleBackground } from '../../../../components/ui/ParticleBackground';
-import { ArrowBack, CheckCircle, Warning, VerifiedUser, Speed, Storage } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { useAppSelector, useAppDispatch } from '../../../../lib/hooks';
 import { setSelectedNetwork } from '../../../../lib/features/blockchain/reducer';
 
 export default function NetworkConnectingPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = React.use(params);
+    const { id } = use(params);
     const router = useRouter();
     const dispatch = useAppDispatch();
     const { networks } = useAppSelector((state) => state.blockchain);
@@ -20,7 +19,7 @@ export default function NetworkConnectingPage({ params }: { params: Promise<{ id
             const timer = setTimeout(() => {
                 dispatch(setSelectedNetwork(network));
                 router.push('/');
-            }, 8000); 
+            }, 6000); // 6 seconds for the show
 
             return () => clearTimeout(timer);
         }
@@ -28,137 +27,174 @@ export default function NetworkConnectingPage({ params }: { params: Promise<{ id
 
     if (!network) return null;
 
-    const color = network.additionalInfo.color;
+    const color = network.additionalInfo.color || '#00f3ff';
 
     return (
         <Box sx={{ 
             minHeight: '100vh', 
-            bgcolor: '#050505',
+            bgcolor: '#000',
             display: 'flex', 
             flexDirection: 'column',
             alignItems: 'center', 
             justifyContent: 'center',
             overflow: 'hidden',
-            perspective: '1000px'
+            position: 'relative'
         }}>
             <ParticleBackground />
             
-            <Box className="scene" sx={{ mb: 8, position: 'relative', zIndex: 10 }}>
-                <div className="cube-wrapper">
-                    <div className="cube">
-                        <div className="face front"></div>
-                        <div className="face back"></div>
-                        <div className="face right"></div>
-                        <div className="face left"></div>
-                        <div className="face top"></div>
-                        <div className="face bottom"></div>
-                        
-                        {/* Inner generic "core" */}
-                        <div className="core"></div>
-                    </div>
-                </div>
-                {/* Floating transaction cubes */}
-                {[...Array(4)].map((_, i) => (
-                    <div key={i} className={`trans-cube trans-${i}`}></div>
-                ))}
+            {/* Hexagon Grid Overlay */}
+            <Box sx={{
+                position: 'absolute',
+                inset: 0,
+                backgroundImage: `
+                    radial-gradient(circle at center, transparent 0%, #000 90%),
+                    repeating-linear-gradient(0deg, transparent, transparent 19px, ${color}10 20px),
+                    repeating-linear-gradient(90deg, transparent, transparent 19px, ${color}10 20px)
+                `,
+                backgroundSize: '100% 100%, 20px 20px, 20px 20px',
+                zIndex: 1,
+                pointerEvents: 'none'
+            }} />
+
+            <Box sx={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                
+                {/* Advanced Holographic Animation Container */}
+                <Box sx={{ position: 'relative', width: 300, height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 4 }}>
+                    
+                    {/* Outer Rotating Relays */}
+                    <Box sx={{
+                        position: 'absolute',
+                        width: '100%',
+                        height: '100%',
+                        border: `1px dashed ${color}40`,
+                        borderRadius: '50%',
+                        animation: 'spin 20s linear infinite'
+                    }} />
+                    
+                    <Box sx={{
+                        position: 'absolute',
+                        width: '85%',
+                        height: '85%',
+                        borderTop: `4px solid ${color}`,
+                        borderBottom: `4px solid ${color}`,
+                        borderLeft: `1px solid transparent`,
+                        borderRight: `1px solid transparent`,
+                        borderRadius: '50%',
+                        animation: 'spinReverse 8s linear infinite',
+                        boxShadow: `0 0 20px ${color}40`
+                    }} />
+
+                    <Box sx={{
+                        position: 'absolute',
+                        width: '70%',
+                        height: '70%',
+                        border: `2px solid ${color}80`,
+                        borderRadius: '50%',
+                        borderLeftColor: 'transparent',
+                        borderRightColor: 'transparent',
+                        animation: 'spin 4s linear infinite'
+                    }} />
+
+                    {/* Central Data Core */}
+                    <Box sx={{
+                        width: 100,
+                        height: 100,
+                        position: 'relative',
+                        transformStyle: 'preserve-3d',
+                        animation: 'float 3s ease-in-out infinite'
+                    }}>
+                         {/* Glowing Core */}
+                         <Box sx={{
+                             position: 'absolute',
+                             inset: 0,
+                             borderRadius: '50%',
+                             background: `radial-gradient(circle at center, ${color}, transparent)`,
+                             filter: 'blur(10px)',
+                             animation: 'pulse 1.5s ease-in-out infinite alternate'
+                         }} />
+                         {/* Tech Symbol */}
+                         <Typography variant="h2" sx={{ 
+                             position: 'absolute',
+                             top: '50%',
+                             left: '50%',
+                             transform: 'translate(-50%, -50%)',
+                             color: '#fff',
+                             fontWeight: 'bold',
+                             textShadow: `0 0 20px ${color}`,
+                             zIndex: 2
+                         }}>
+                             {network.identification.symbol[0]}
+                         </Typography>
+                    </Box>
+
+                     {/* Scanning Line */}
+                     <Box sx={{
+                         position: 'absolute',
+                         width: '120%',
+                         height: 2,
+                         background: `linear-gradient(90deg, transparent, ${color}, transparent)`,
+                         animation: 'scan 2s linear infinite',
+                         top: 0
+                     }} />
+
+                </Box>
+
+                {/* Status Text with Typing Effect/Decoding */}
+                <Typography variant="h4" sx={{ 
+                    color: '#fff', 
+                    fontWeight: 900, 
+                    mb: 2, 
+                    letterSpacing: 4, 
+                    textTransform: 'uppercase',
+                    textShadow: `0 0 30px ${color}80` 
+                }}>
+                    ESTABLECIENDO ENLACE
+                </Typography>
+
+                <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
+                    <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: color, boxShadow: `0 0 10px ${color}`, animation: 'blink 0.5s infinite' }} />
+                    <Typography variant="h6" sx={{ color: color, fontFamily: 'monospace' }}>
+                         PROTOCOL: {network.identification.name.toUpperCase()}
+                    </Typography>
+                </Stack>
+                
+                <Box sx={{ width: 300, mt: 4 }}>
+                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', mb: 1, fontFamily: 'monospace' }}>
+                        ENCRIPTANDO CANAL... [====================]
+                    </Typography>
+                </Box>
+
             </Box>
 
-            <Typography variant="h4" sx={{ color: '#fff', fontWeight: 'bold', mb: 2, zIndex: 10, letterSpacing: 2 }}>
-                Sincronizando Bloques
-            </Typography>
-            <Typography variant="body1" sx={{ color: color, zIndex: 10, fontFamily: 'monospace' }}>
-                 Validando transacciones en la red {network.identification.name}...
-            </Typography>
-
-            <style jsx>{`
-                .scene {
-                    width: 120px;
-                    height: 120px;
-                    transform-style: preserve-3d;
+            <style jsx global>{`
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
                 }
-                .cube-wrapper {
-                    width: 100%;
-                    height: 100%;
-                    transform-style: preserve-3d;
-                    animation: rotate 8s linear infinite;
-                }
-                .cube {
-                    width: 100%;
-                    height: 100%;
-                    position: relative;
-                    transform-style: preserve-3d;
-                }
-                .face {
-                    position: absolute;
-                    width: 120px;
-                    height: 120px;
-                    border: 2px solid ${color};
-                    background: ${color}10;
-                    box-shadow: 0 0 15px ${color}40 inset;
-                    backdrop-filter: blur(2px);
-                }
-                .front  { transform: rotateY(0deg) translateZ(60px); }
-                .right  { transform: rotateY(90deg) translateZ(60px); }
-                .back   { transform: rotateY(180deg) translateZ(60px); }
-                .left   { transform: rotateY(-90deg) translateZ(60px); }
-                .top    { transform: rotateX(90deg) translateZ(60px); }
-                .bottom { transform: rotateX(-90deg) translateZ(60px); }
-                
-                .core {
-                    position: absolute;
-                    top: 50%; left: 50%;
-                    transform: translate(-50%, -50%);
-                    width: 40px; height: 40px;
-                    background: ${color};
-                    box-shadow: 0 0 30px ${color};
-                    border-radius: 50%;
-                    animation: pulse 2s ease-in-out infinite alternate;
-                }
-
-                .trans-cube {
-                    position: absolute;
-                    width: 20px;
-                    height: 20px;
-                    background: #fff;
-                    border: 1px solid ${color};
-                    opacity: 0.8;
-                    box-shadow: 0 0 10px ${color};
-                }
-                .trans-0 { top: 0; left: -100px; animation: trans1 4s ease-in-out infinite; }
-                .trans-1 { bottom: 0; right: -100px; animation: trans2 5s ease-in-out infinite 0.5s; }
-                .trans-2 { top: -80px; right: 0; animation: trans3 6s ease-in-out infinite 1s; }
-                .trans-3 { bottom: -80px; left: 0; animation: trans4 4.5s ease-in-out infinite 1.5s; }
-
-                @keyframes rotate {
-                    0% { transform: rotateX(0deg) rotateY(0deg); }
-                    100% { transform: rotateX(360deg) rotateY(360deg); }
+                @keyframes spinReverse {
+                    from { transform: rotate(360deg); }
+                    to { transform: rotate(0deg); }
                 }
                 @keyframes pulse {
-                    0% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.8); }
-                    100% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+                    0% { opacity: 0.5; transform: scale(0.8); }
+                    100% { opacity: 1; transform: scale(1.1); }
                 }
-                @keyframes trans1 {
-                    0% { transform: translate(0, 0) scale(0); opacity: 0; }
-                    50% { opacity: 1; }
-                    100% { transform: translate(160px, 60px) scale(1); opacity: 0; }
+                @keyframes float {
+                    0% { transform: translateY(0px); }
+                    50% { transform: translateY(-10px); }
+                    100% { transform: translateY(0px); }
                 }
-                @keyframes trans2 {
-                    0% { transform: translate(0, 0) scale(0); opacity: 0; }
-                    50% { opacity: 1; }
-                    100% { transform: translate(-160px, -60px) scale(1); opacity: 0; }
+                @keyframes scan {
+                    0% { top: 0%; opacity: 0; }
+                    10% { opacity: 1; }
+                    90% { opacity: 1; }
+                    100% { top: 100%; opacity: 0; }
                 }
-                @keyframes trans3 {
-                    0% { transform: translate(0, 0) scale(0); opacity: 0; }
-                    50% { opacity: 1; }
-                    100% { transform: translate(0, 200px) scale(1); opacity: 0; }
-                }
-                @keyframes trans4 {
-                    0% { transform: translate(0, 0) scale(0); opacity: 0; }
-                    50% { opacity: 1; }
-                    100% { transform: translate(0, -200px) scale(1); opacity: 0; }
+                @keyframes blink {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.3; }
                 }
             `}</style>
         </Box>
     );
 }
-

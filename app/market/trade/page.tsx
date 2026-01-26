@@ -13,6 +13,8 @@ import { CubeAnimation } from '../../../components/market/CubeAnimation';
 import { WalletSelector } from '../../../components/market/WalletSelector';
 import { ConfirmationDialog } from '../../../components/market/ConfirmationDialog';
 import { TransactionForm } from '../../../components/market/TransactionForm';
+import { TechFrame } from '../../../components/ui/TechFrame';
+import { PageHeader } from '../../../components/ui/PageHeader';
 
 // --- Types ---
 interface TradeFormData {
@@ -230,36 +232,42 @@ const TradeContent = () => {
     <Container maxWidth="md" sx={{ pt: 15, pb: 10 }}>
         <Box sx={{ width: '100%', maxWidth: 600, mx: 'auto' }}>
             <Stack spacing={4}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <Button startIcon={<ArrowBack />} onClick={() => router.back()} sx={{ mr: 2, color: 'text.secondary' }}>
+                <Box sx={{ mb: 4 }}>
+                    <Button startIcon={<ArrowBack />} onClick={() => router.back()} sx={{ mr: 2, color: 'text.secondary', mb: 2 }}>
                         Atrás
                     </Button>
-                    <Typography variant="h4" color="white" sx={{ fontWeight: 'bold' }}>
-                        {transactionType === 'BUY' ? 'COMPRAR ACTIVO' : transactionType === 'SELL' ? 'VENDER ACTIVO' : 'TRANSFERIR'}
-                    </Typography>
+                    <PageHeader 
+                        title={transactionType === 'BUY' ? 'COMPRAR ACTIVO' : transactionType === 'SELL' ? 'VENDER ACTIVO' : 'TRANSFERIR'}
+                        subtitle={transactionType === 'BUY' ? 'Adquiere nuevos activos para tu cartera.' : transactionType === 'SELL' ? 'Liquida tus activos en el mercado.' : 'Transfiere activos a otra billetera.'}
+                    />
                 </Box>
 
                 {errorMsg && <Alert severity="error" variant="filled" sx={{ borderRadius: 2 }}>{errorMsg}</Alert>}
 
-                {/* Wallet Selection Phase */}
-                <WalletSelector 
-                    userInfo={userInfo}
-                    walletsInfo={walletsInfo}
-                    selectedWalletId={form.walletId}
-                    onSelect={handleWalletSelect}
-                />
+                <TechFrame>
+                    <Box sx={{ p: 4 }}>
+                        {/* Wallet Selection Phase */}
+                        <WalletSelector 
+                            userInfo={userInfo}
+                            walletsInfo={walletsInfo}
+                            selectedWalletId={form.walletId}
+                            onSelect={handleWalletSelect}
+                        />
 
-                <TransactionForm 
-                    transactionType={transactionType}
-                    form={form}
-                    onChange={handleChange}
-                    cryptos={cryptos}
-                    selectedCrypto={selectedCrypto}
-                    onSubmit={handlePreSubmit}
-                    isProcessing={false}
-                    fee={networkFee}
-                />
+                        <Box sx={{ my: 4, height: '1px', bgcolor: 'rgba(255,255,255,0.1)' }} />
 
+                        <TransactionForm 
+                            transactionType={transactionType}
+                            form={form}
+                            onChange={handleChange}
+                            cryptos={cryptos}
+                            selectedCrypto={selectedCrypto}
+                            onSubmit={handlePreSubmit}
+                            isProcessing={false}
+                            fee={networkFee}
+                        />
+                    </Box>
+                </TechFrame>
             </Stack>
         </Box>
         
