@@ -20,6 +20,8 @@ const transactionsSlice = createSlice({
             .addCase(fetchTransactions.fulfilled, (state, action) => {
                 state.isLoading = false;
                 const { storeId, data, page } = action.payload;
+
+                if (data === false) return;
                 
                 // The API returns { data: TransactionsInterface[] }
                 const newTransactions = data.data || [];

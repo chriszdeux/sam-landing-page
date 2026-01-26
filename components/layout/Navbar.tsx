@@ -8,33 +8,23 @@ import {
   IconButton,
   Typography,
   Box,
-  Stack,
   Drawer,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Tooltip,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
   Rocket,
-  Person as UserIcon,
-  Settings,
-  Logout,
-  Bolt,
-  CardGiftcard,
 } from "@mui/icons-material";
-import { TaoIcon } from "../ui/TaoIcon";
 import { motion } from "framer-motion";
 import { Button } from "../ui/Button";
-import { CountUp } from "../ui/CountUp";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
-import { setCurrentSection, openModal } from "../../lib/features/uiSlice";
+import { setCurrentSection } from "../../lib/features/uiSlice";
 import { fetchWalletDetails } from "../../lib/features/auth/actions"; // Import action
 import { navItems } from "./navItems";
 import { NavbarDrawer } from "./NavbarDrawer";
+import { LogoutDialog } from "./LogoutDialog";
+import { NavbarUserMenu } from "./NavbarUserMenu";
 import { CONFIG } from "../../lib/config";
+
 
 
 
@@ -88,7 +78,7 @@ export const Navbar = () => {
     
   const handleNetworkClick = () => {
       if (selectedNetwork) {
-          router.push(`/network/${selectedNetwork.id}`);
+          router.push(`/network`);
           setMobileOpen(false);
       }
   };
@@ -100,15 +90,20 @@ export const Navbar = () => {
       <AppBar
         position="fixed"
         sx={{
-          bgcolor: "rgba(10, 10, 20, 0.6)", // More transparent and darker
-          backdropFilter: "blur(20px)", // Stronger blur
+          bgcolor: "rgba(5, 5, 12, 0.8)", // Darker tech background
+          backdropFilter: "blur(16px)",
           borderBottom: "1px solid rgba(0, 243, 255, 0.1)",
-          boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)", 
-          height: '70px', 
-          justifyContent: 'center'
+          boxShadow: "0 10px 30px -10px rgba(0, 0, 0, 0.8)", 
+          height: '80px', 
+          justifyContent: 'center',
+          backgroundImage: 'linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px)',
+          backgroundSize: '30px 30px',
         }}
       >
-        <Toolbar>
+        {/* Decorative Top Line */}
+        <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent, #00f3ff, transparent)', opacity: 1, boxShadow: '0 0 15px #00f3ff' }} />
+        
+        <Toolbar sx={{ px: { xs: 2, md: 4 } }}>
 
           <Box
             sx={{
@@ -119,22 +114,53 @@ export const Navbar = () => {
             }}
             onClick={() => handleNavClick(navItems[0])}
           >
-            <Rocket sx={{ color: "primary.main", mr: 1 }} />
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{ fontWeight: "bold", letterSpacing: 1 }}
-            >
-              {CONFIG.PROJECT_NAME.toUpperCase()}
-            </Typography>
+            <Box sx={{ 
+                mr: 2, 
+                p: 1, 
+                border: '1px solid rgba(0, 243, 255, 0.3)', 
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 0 15px rgba(0, 243, 255, 0.15)',
+                bgcolor: 'rgba(0, 243, 255, 0.05)'
+            }}>
+                <Rocket sx={{ color: "primary.main", fontSize: 24, filter: 'drop-shadow(0 0 5px #00f3ff)' }} />
+            </Box>
+            <Box>
+                <Typography
+                variant="h6"
+                component="div"
+                sx={{ 
+                    fontWeight: "900", 
+                    letterSpacing: 2, 
+                    lineHeight: 1,
+                    background: 'linear-gradient(90deg, #fff, #00f3ff)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    mb: 0.5
+                }}
+                >
+                {CONFIG.PROJECT_NAME.toUpperCase()}
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'rgba(0, 243, 255, 0.7)', letterSpacing: 3, fontSize: '0.6rem', display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box component="span" sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#00f3ff', boxShadow: '0 0 5px #00f3ff' }} />
+                    SYSTEM ONLINE
+                </Typography>
+            </Box>
           </Box>
 
           <Box
             sx={{
               display: { xs: "none", md: "flex" },
-              gap: 2,
+              gap: 0.5,
               alignItems: "center",
               ml: 2,
+              p: 0.5,
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 3,
+              bgcolor: 'rgba(0,0,0,0.3)',
+              backdropFilter: 'blur(5px)'
             }}
           >
             {navItems.filter(item => userInfo || item.path !== '/portfolio').map((item) => {
@@ -147,13 +173,10 @@ export const Navbar = () => {
                             transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                             style={{
                                 position: 'absolute',
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                height: '2px', 
-                                background: 'linear-gradient(90deg, transparent, #00f3ff, transparent)',
-                                boxShadow: '0 0 15px #00f3ff, 0 0 5px #00f3ff',
-                                borderRadius: '4px',
+                                inset: 0,
+                                background: 'rgba(0, 243, 255, 0.1)',
+                                borderRadius: '8px',
+                                border: '1px solid rgba(0, 243, 255, 0.3)',
                             }}
                         />
                     )}
@@ -161,12 +184,17 @@ export const Navbar = () => {
                     variant="text"
                     onClick={() => handleNavClick(item)}
                     sx={{
-                      color: isActive ? "primary.main" : "text.secondary",
+                      color: isActive ? "primary.main" : "rgba(255,255,255,0.6)",
+                      fontWeight: isActive ? 'bold' : 'normal',
                       "&:hover": { color: "primary.main" },
                       position: 'relative',
                       zIndex: 1,
                       borderBottom: 'none',
-                      borderRadius: 0,
+                      borderRadius: 2,
+                      minWidth: 'auto',
+                      px: 3,
+                      py: 1,
+                      letterSpacing: 1
                     }}
                   >
                     {item.name}
@@ -174,110 +202,26 @@ export const Navbar = () => {
                 </Box>
               );
             })}
-
-            {userInfo ? (
-              <Stack direction="row" spacing={2} alignItems="center">
-                  <Tooltip title="Centro de Recompensas">
-                    <IconButton onClick={() => dispatch(openModal('rewards'))} sx={{ color: 'primary.main', bgcolor: 'rgba(0, 243, 255, 0.1)', '&:hover': { bgcolor: 'rgba(0, 243, 255, 0.2)' } }}>
-                        <CardGiftcard />
-                    </IconButton>
-                  </Tooltip> 
-                  
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: "primary.main",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 0.5,
-                    }}
-                  >
-                    <UserIcon fontSize="small" />
-                    {userInfo.username}
-                  </Typography>
-                <Typography
-                  component="div"
-                  variant="body2"
-                  sx={{
-                    color: "text.secondary",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 0.5,
-                    mr: 1,
-                  }}
-                >
-                  <Box sx={{ 
-                      bgcolor: 'rgba(0, 0, 0, 0.4)', 
-                      px: 2, 
-                      py: 0.5, 
-                      borderRadius: 2, 
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1
-                  }}>
-                    <TaoIcon size={20} />
-                    <CountUp to={userInfo.balance} />
-                  </Box>
-                </Typography>
-                
-                {selectedNetwork && (
-                    <Tooltip title="Cambiar Red">
-                    <Button 
-                        onClick={handleNetworkClick}
-                        startIcon={<Bolt sx={{ color: selectedNetwork.additionalInfo.color }} />}
-                        variant="outlined"
-                        sx={{
-                            borderColor: `${selectedNetwork.additionalInfo.color}80`,
-                            color: 'white',
-                            bgcolor: `${selectedNetwork.additionalInfo.color}10`,
-                            borderRadius: '20px',
-                            textTransform: 'none',
-                            px: 2,
-                            minWidth: 'auto',
-                            '&:hover': {
-                                bgcolor: `${selectedNetwork.additionalInfo.color}30`,
-                                borderColor: selectedNetwork.additionalInfo.color,
-                                boxShadow: `0 0 15px ${selectedNetwork.additionalInfo.color}60`
-                            }
-                        }}
-                    >
-                         {selectedNetwork.identification.symbol}
-                    </Button>
-                    </Tooltip>
-                )}
-
-                <IconButton onClick={() => router.push('/settings')} sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main', transform: 'rotate(90deg)', transition: 'all 0.3s' } }}>
-                    <Settings />
-                </IconButton>
-
-                <IconButton 
-                  onClick={() => setLogoutConfirmOpen(true)}
-                  sx={{ color: 'error.main', '&:hover': { bgcolor: 'rgba(255,0,0,0.1)' } }}
-                >
-                  <Logout />
-                </IconButton>
-              </Stack>
-            ) : (
-              <Stack direction="row" spacing={1}>
-                <Button
-                  variant="text"
-                  size="small"
-                  onClick={() => dispatch(openModal("login"))}
-                >
-                  Entrar
-                </Button>
-                <Button
-                  variant="contained"
-                  size="small"
-                  onClick={() => dispatch(openModal("register"))}
-                >
-                  Registrarse
-                </Button>
-              </Stack>
-            )}
-
           </Box>
+
+            {/* Separator */}
+            <Box sx={{ 
+                height: 30, 
+                width: '1px', 
+                bgcolor: 'rgba(255,255,255,0.1)', 
+                mx: 2,
+                display: { xs: "none", md: "block" }
+            }} />
+
+            {/* User Menu */}
+            <Box sx={{ display: { xs: "none", md: "block" } }}>
+                <NavbarUserMenu 
+                    userInfo={userInfo}
+                    selectedNetwork={selectedNetwork}
+                    handleNetworkClick={handleNetworkClick}
+                    onLogoutClick={() => setLogoutConfirmOpen(true)}
+                />
+            </Box>
 
           <IconButton
             color="inherit"
@@ -321,29 +265,11 @@ export const Navbar = () => {
         </Drawer>
       </Box>
 
-      <Dialog
-        open={logoutConfirmOpen}
-        onClose={() => setLogoutConfirmOpen(false)}
-        PaperProps={{
-            sx: {
-                bgcolor: '#0a0a1a',
-                border: '1px solid rgba(0, 243, 255, 0.3)',
-                boxShadow: '0 0 20px rgba(0, 243, 255, 0.2)',
-                backdropFilter: 'blur(10px)',
-            }
-        }}
-      >
-        <DialogTitle sx={{ color: 'white' }}>¿Confirmar cierre de sesión?</DialogTitle>
-        <DialogContent>
-            <Typography sx={{ color: 'text.secondary' }}>
-                Estás a punto de desconectarte del sistema.
-            </Typography>
-        </DialogContent>
-        <DialogActions>
-            <Button onClick={() => setLogoutConfirmOpen(false)} sx={{ color: 'text.secondary' }}>Cancelar</Button>
-            <Button onClick={() => { setLogoutConfirmOpen(false); router.push('/auth/logging-out'); }} color="error" variant="contained">Cerrar Sesión</Button>
-        </DialogActions>
-      </Dialog>
+      <LogoutDialog 
+        open={logoutConfirmOpen} 
+        onClose={() => setLogoutConfirmOpen(false)} 
+        onConfirm={() => router.push('/auth/logging-out')}
+      />
     </Box>
   );
 };

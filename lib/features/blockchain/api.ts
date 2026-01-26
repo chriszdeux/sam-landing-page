@@ -16,3 +16,8 @@ export const claimRewardApi = async (id: string, userId: string) => {
 };
 
 
+
+export const getNextBlockTimeApi = async (networkId: string) => {
+    const response = await api.get(`/blockchain/network/${networkId}/next-time`);
+    return response.data;
+};

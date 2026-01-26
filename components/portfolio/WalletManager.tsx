@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Box, Typography, Grid, Paper, Avatar, Button, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, IconButton } from '@mui/material';
+import { Box, Typography, Grid, Avatar, Button, Dialog, Snackbar, Alert, IconButton } from '@mui/material';
 import { Input } from '../ui/Input';
+import { TechFrame } from '../ui/TechFrame';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -37,7 +38,7 @@ export const WalletManager = () => {
             } else {
                 setSnackbar({ open: true, message: resultAction.payload as string || 'Failed to add wallet', severity: 'error' });
             }
-        } catch (error) { // eslint-disable-line @typescript-eslint/no-unused-vars
+        } catch {
              setSnackbar({ open: true, message: 'An unexpected error occurred', severity: 'error' });
         }
     };
@@ -51,7 +52,7 @@ export const WalletManager = () => {
            } else {
                setSnackbar({ open: true, message: 'Failed to remove', severity: 'error' });
            }
-        } catch (error) {
+        } catch {
             setSnackbar({ open: true, message: 'Error removing wallet', severity: 'error' });
         }
     };
@@ -68,7 +69,7 @@ export const WalletManager = () => {
             {/* Xbox Dashboard Layout Container */}
             <Box sx={{ overflowX: 'hidden', p: 1 }}>
                 
-                {/* Header "Status Bar" style */}
+                {/* Header Status Bar style */}
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, borderBottom: '2px solid rgba(255,255,255,0.1)', pb: 2 }}>
                     <Typography variant="h3" sx={{ color: 'white', fontWeight: 'bold', letterSpacing: 1, mr: 3 }}>
                         PORTFOLIO
@@ -78,175 +79,153 @@ export const WalletManager = () => {
                     </Typography>
                 </Box>
 
-                <Grid container spacing={2}>
-                    {/* MAIN CONTENT - "ACTIVE APPS" STYLE (Mis Wallets) */}
+                <Grid container spacing={3}>
+                    {/* MAIN CONTENT - ACTIVE APPS STYLE (Mis Wallets) */}
                     <Grid size={{ xs: 12, md: 8, lg: 9 }}>
-                        <Typography variant="subtitle1" sx={{ color: '#00f3ff', fontWeight: 'bold', mb: 2, textTransform: 'uppercase', letterSpacing: 2 }}>
-                            Mis Wallets
+                        <Typography variant="overline" sx={{ color: '#00f3ff', fontWeight: 'bold', mb: 2, display: 'block', letterSpacing: 4 }}>
+                            {'// ACTIVOS_LOCALES'}
                         </Typography>
                         
-                        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 2 }}>
+                        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 3 }}>
                             {userInfo.wallets && userInfo.wallets.map((wallet, index) => (
-                                <Paper key={index} sx={{ 
-                                    height: 180,
-                                    bgcolor: '#1a1b26', // Darker tile background
-                                    color: 'white',
-                                    p: 2,
-                                    position: 'relative',
-                                    overflow: 'hidden',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'space-between',
-                                    border: 'none',
-                                    transition: 'all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                                    '&:hover': {
-                                        outline: '3px solid white', // Xbox focus style
-                                        transform: 'scale(1.02)',
-                                        zIndex: 10,
-                                        boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
-                                    },
-                                    '&::before': { // Gradient Overlay
-                                        content: '""',
-                                        position: 'absolute',
-                                        top: 0, left: 0, right: 0, bottom: 0,
-                                        background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%)',
-                                        zIndex: 1
-                                    }
-                                }}>
-                                    {/* Background Icon/Watermark */}
-                                    <AccountBalanceWalletIcon sx={{ 
-                                        position: 'absolute', 
-                                        top: -20, 
-                                        right: -20, 
-                                        fontSize: 140, 
-                                        opacity: 0.1, 
-                                        transform: 'rotate(-15deg)' 
-                                    }} />
+                                <Box key={index} sx={{ height: 200 }}>
+                                    <TechFrame color="#00f3ff" className="h-full">
+                                        <Box sx={{ 
+                                            p: 3,
+                                            height: '100%',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            justifyContent: 'space-between',
+                                            position: 'relative'
+                                        }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                <Box>
+                                                    <Typography variant="overline" sx={{ color: 'rgba(0, 243, 255, 0.6)', letterSpacing: 2 }}>
+                                                        LOCAL_WALLET_NODES
+                                                    </Typography>
+                                                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'white', mt: 1 }}>
+                                                        {wallet.label}
+                                                    </Typography>
+                                                </Box>
+                                                <AccountBalanceWalletIcon sx={{ color: '#00f3ff', opacity: 0.3, fontSize: 40 }} />
+                                            </Box>
 
-                                    <Box sx={{ zIndex: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                        <Paper sx={{ px: 1, py: 0.5, bgcolor: '#00f3ff', color: 'black', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase' }}>
-                                            Personal
-                                        </Paper>
-                                    </Box>
-
-                                    <Box sx={{ zIndex: 2 }}>
-                                        <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 0.5, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
-                                            {wallet.label}
-                                        </Typography>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', opacity: 0.8 }}>
-                                            <Typography variant="caption" sx={{ fontFamily: 'monospace', mr: 1 }}>
-                                                {wallet.walletAddress.substring(0, 12)}...
-                                            </Typography>
-                                            <IconButton 
-                                                size="small" 
-                                                onClick={(e) => { e.stopPropagation(); handleCopyToClipboard(wallet.walletAddress); }}
-                                                sx={{ p: 0.5, color: 'white', '&:hover': { color: '#00f3ff' } }}
-                                            >
-                                                <ContentCopyIcon sx={{ fontSize: 14 }} />
-                                            </IconButton>
+                                            <Box>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: 'rgba(0,0,0,0.3)', p: 1, borderRadius: 1, mb: 1 }}>
+                                                    <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#00f3ff', flexGrow: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                        {wallet.walletAddress}
+                                                    </Typography>
+                                                    <IconButton 
+                                                        size="small" 
+                                                        onClick={() => handleCopyToClipboard(wallet.walletAddress)}
+                                                        sx={{ color: '#00f3ff', ml: 1 }}
+                                                    >
+                                                        <ContentCopyIcon sx={{ fontSize: 16 }} />
+                                                    </IconButton>
+                                                </Box>
+                                                <Box sx={{ display: 'flex', gap: 1 }}>
+                                                    <Box sx={{ px: 1, py: 0.25, bgcolor: 'rgba(0, 243, 255, 0.1)', border: '1px solid rgba(0, 243, 255, 0.3)', borderRadius: 0.5 }}>
+                                                        <Typography variant="caption" sx={{ color: '#00f3ff', fontSize: '0.6rem', fontWeight: 'bold' }}>SYSTEM_ACTIVE</Typography>
+                                                    </Box>
+                                                    <Box sx={{ px: 1, py: 0.25, bgcolor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 0.5 }}>
+                                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.6rem' }}>GENESIS_01</Typography>
+                                                    </Box>
+                                                </Box>
+                                            </Box>
                                         </Box>
-                                    </Box>
-                                </Paper>
+                                    </TechFrame>
+                                </Box>
                             ))}
                         </Box>
                     </Grid>
 
-                    {/* SIDEBAR - "FRIENDS/ACTIVITY" STYLE (Wallets Guardadas) */}
+                    {/* SIDEBAR - FRIENDS/ACTIVITY STYLE (Wallets Guardadas) */}
                     <Grid size={{ xs: 12, md: 4, lg: 3 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                            <Typography variant="subtitle1" sx={{ color: '#ce93d8', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2 }}>
-                                Guardadas
+                            <Typography variant="overline" sx={{ color: '#ce93d8', fontWeight: 'bold', letterSpacing: 4 }}>
+                                {'// EXTERNAL_LINKS'}
                             </Typography>
                             <Button
-                                variant="outlined"
+                                variant="text"
                                 startIcon={<AddCircleOutlineIcon />}
                                 onClick={() => setOpenDialog(true)}
                                 sx={{
-                                    borderColor: 'rgba(206, 147, 216, 0.5)',
                                     color: '#ce93d8',
                                     fontSize: '0.75rem',
-                                    py: 0.5,
-                                    textTransform: 'none',
-                                    '&:hover': {
-                                        borderColor: '#ce93d8',
-                                        bgcolor: 'rgba(206, 147, 216, 0.1)'
-                                    }
+                                    fontWeight: 'bold',
+                                    textTransform: 'uppercase',
+                                    '&:hover': { bgcolor: 'rgba(206, 147, 216, 0.1)' }
                                 }}
                             >
-                                Nueva
+                                Registrar
                             </Button>
                         </Box>
                         
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                             <AnimatePresence>
                                 {userInfo.walletsSaved && userInfo.walletsSaved.length > 0 ? (
-                                    userInfo.walletsSaved.map((wallet, index) => (
+                                    userInfo.walletsSaved.map((wallet) => (
                                         <motion.div
                                             key={wallet.walletAddress}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, x: -20, height: 0, marginBottom: 0 }}
+                                            initial={{ opacity: 0, x: 20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: -20 }}
                                             transition={{ duration: 0.2 }}
                                         >
-                                            <Paper sx={{ 
-                                                p: 2, 
-                                                bgcolor: 'rgba(255, 255, 255, 0.05)', 
-                                                display: 'flex', 
-                                                alignItems: 'center',
-                                                transition: 'all 0.2s',
-                                                borderLeft: '4px solid transparent',
-                                                '&:hover': {
-                                                    bgcolor: 'rgba(255, 255, 255, 0.1)',
-                                                    borderLeft: '4px solid #ce93d8', // Highlight color
-                                                    pl: 2.5
-                                                }
-                                            }}>
-                                                <Avatar sx={{ 
-                                                    width: 40, 
-                                                    height: 40, 
-                                                    bgcolor: '#2d2d2d', 
-                                                    border: '2px solid #ce93d8',
-                                                    color: 'white', 
-                                                    mr: 2 
-                                                }}>
-                                                    {wallet.label.charAt(0).toUpperCase()}
-                                                </Avatar>
-                                                <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                                                    <Typography variant="body1" sx={{ color: 'white', fontWeight: 'bold', lineHeight: 1.2 }}>
-                                                        {wallet.label}
-                                                    </Typography>
-                                                    
-                                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                            {wallet.walletAddress}
-                                                        </Typography>
-                                                        <IconButton 
-                                                            size="small" 
-                                                            onClick={() => handleCopyToClipboard(wallet.walletAddress)}
-                                                            sx={{ ml: 0.5, p: 0.5, color: 'rgba(255,255,255,0.3)', '&:hover': { color: 'white' } }}
-                                                        >
-                                                            <ContentCopyIcon sx={{ fontSize: 12 }} />
-                                                        </IconButton>
+                                            <Box sx={{ position: 'relative' }}>
+                                                <TechFrame color="#ce93d8">
+                                                    <Box sx={{ 
+                                                        p: 2, 
+                                                        display: 'flex', 
+                                                        alignItems: 'center',
+                                                        position: 'relative'
+                                                    }}>
+                                                        <Avatar sx={{ 
+                                                            width: 36, 
+                                                            height: 36, 
+                                                            bgcolor: 'rgba(206, 147, 216, 0.1)', 
+                                                            border: '1px solid #ce93d8',
+                                                            color: '#ce93d8', 
+                                                            mr: 2,
+                                                            fontSize: '1rem',
+                                                            fontWeight: 'bold'
+                                                        }}>
+                                                            {wallet.label.charAt(0).toUpperCase()}
+                                                        </Avatar>
+                                                        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                                                            <Typography variant="body2" sx={{ color: 'white', fontWeight: 'bold', lineHeight: 1.2 }}>
+                                                                {wallet.label}
+                                                            </Typography>
+                                                            <Typography variant="caption" sx={{ color: 'rgba(206, 147, 216, 0.6)', fontFamily: 'monospace', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                                {wallet.walletAddress.substring(0, 6)}...{wallet.walletAddress.substring(wallet.walletAddress.length - 4)}
+                                                            </Typography>
+                                                        </Box>
+                                                        <Box sx={{ display: 'flex' }}>
+                                                            <IconButton 
+                                                                size="small" 
+                                                                onClick={() => handleCopyToClipboard(wallet.walletAddress)}
+                                                                sx={{ color: 'rgba(255,255,255,0.3)', '&:hover': { color: 'white' } }}
+                                                            >
+                                                                <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                                            </IconButton>
+                                                            <IconButton 
+                                                                size="small"
+                                                                onClick={() => handleRemoveWallet(wallet.walletAddress)}
+                                                                sx={{ color: 'rgba(255,0,0,0.3)', '&:hover': { color: '#ff4444' } }}
+                                                            >
+                                                                <DeleteOutlineIcon sx={{ fontSize: 14 }} />
+                                                            </IconButton>
+                                                        </Box>
                                                     </Box>
-                                                </Box>
-                                                <IconButton 
-                                                    onClick={() => handleRemoveWallet(wallet.walletAddress)}
-                                                    sx={{ 
-                                                        color: 'rgba(255,0,0,0.4)', 
-                                                        opacity: 0,
-                                                        transition: 'all 0.2s',
-                                                        '.MuiPaper-root:hover &': { opacity: 1 },
-                                                        '&:hover': { color: '#ff4444', bgcolor: 'rgba(255,0,0,0.1)' } 
-                                                    }}
-                                                >
-                                                    <DeleteOutlineIcon fontSize="small" />
-                                                </IconButton>
-                                            </Paper>
+                                                </TechFrame>
+                                            </Box>
                                         </motion.div>
                                     ))
                                 ) : (
-                                    <Box sx={{ p: 2, color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>
-                                        No hay wallets guardadas
+                                    <Box sx={{ p: 4, textAlign: 'center', bgcolor: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: 1 }}>
+                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>
+                                            No hay wallets guardadas
+                                        </Typography>
                                     </Box>
                                 )}
                             </AnimatePresence>
@@ -259,56 +238,67 @@ export const WalletManager = () => {
             <Dialog 
                 open={openDialog} 
                 onClose={() => setOpenDialog(false)}
+                maxWidth="sm"
+                fullWidth
                 PaperProps={{
                     sx: {
-                        bgcolor: 'rgba(15, 15, 25, 0.95)',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(0, 243, 255, 0.3)',
-                        borderRadius: 2,
-                        width: '100%',
-                        maxWidth: 500
+                        bgcolor: 'transparent',
+                        boxShadow: 'none',
+                        backgroundImage: 'none',
                     }
                 }}
             >
-                <DialogTitle sx={{ color: '#00f3ff', fontWeight: 'bold' }}>
-                    Registrar Nueva Wallet
-                </DialogTitle>
-                <DialogContent>
-                    <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
-                        <Input
-                            autoFocus
-                            label="Etiqueta (Ej. Principal, Trading)"
-                            fullWidth
-                            value={label}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLabel(e.target.value)}
-                        />
-                        <Input
-                            label="Dirección de la Wallet"
-                            fullWidth
-                            value={walletAddress}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWalletAddress(e.target.value)}
-                        />
+                <TechFrame color="#00f3ff">
+                    <Box sx={{ p: 4, bgcolor: 'rgba(10, 15, 30, 0.95)', backdropFilter: 'blur(10px)' }}>
+                        <Typography variant="h5" sx={{ color: '#00f3ff', fontWeight: 'bold', mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <AddCircleOutlineIcon /> REGISTRAR NUEVA WALLET
+                        </Typography>
+                        
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                            <Box>
+                                <Typography variant="overline" sx={{ color: 'text.secondary', display: 'block', mb: 1 }}>ETIQUETA_SISTEMA</Typography>
+                                <Input
+                                    autoFocus
+                                    placeholder="Ej. Principal, Trading, Reserva"
+                                    fullWidth
+                                    value={label}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLabel(e.target.value)}
+                                />
+                            </Box>
+                            <Box>
+                                <Typography variant="overline" sx={{ color: 'text.secondary', display: 'block', mb: 1 }}>DIRECCION_DE_ENLACE</Typography>
+                                <Input
+                                    placeholder="0x..."
+                                    fullWidth
+                                    value={walletAddress}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWalletAddress(e.target.value)}
+                                />
+                            </Box>
+                        </Box>
+
+                        <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+                            <Button 
+                                onClick={() => setOpenDialog(false)} 
+                                sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: 'white' } }}
+                            >
+                                Abortar
+                            </Button>
+                            <Button 
+                                onClick={handleAddWallet} 
+                                variant="contained"
+                                sx={{
+                                    bgcolor: '#00f3ff',
+                                    color: '#000',
+                                    fontWeight: 'bold',
+                                    px: 4,
+                                    '&:hover': { bgcolor: '#00d0db' }
+                                }}
+                            >
+                                Vincular Portafolio
+                            </Button>
+                        </Box>
                     </Box>
-                </DialogContent>
-                <DialogActions sx={{ p: 3 }}>
-                    <Button onClick={() => setOpenDialog(false)} sx={{ color: 'text.secondary' }}>
-                        Cancelar
-                    </Button>
-                    <Button 
-                        onClick={handleAddWallet} 
-                        variant="contained"
-                        sx={{
-                            bgcolor: '#00f3ff',
-                            color: '#000',
-                            fontWeight: 'bold',
-                            '&:hover': {
-                                bgcolor: '#00d0db'
-                            }
-                        }}
-                    >
-                        Guardar
-                    </Button>
-                </DialogActions>
+                </TechFrame>
             </Dialog>
 
             <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={() => setSnackbar({ ...snackbar, open: false })}>

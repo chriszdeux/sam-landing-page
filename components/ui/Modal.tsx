@@ -32,6 +32,15 @@ export const Modal = ({ children }: { children?: React.ReactNode }) => {
   const dispatch = useAppDispatch();
   const { isModalOpen, activeModalContent } = useAppSelector((state) => state.ui);
 
+  const isWideModal = ['login', 'register'].includes(activeModalContent || '');
+
+  const dynamicStyle = {
+    ...style,
+    maxWidth: isWideModal ? 900 : 500,
+    p: isWideModal ? 0 : 4,
+    // Add specific adjustments for wide modals if needed
+  };
+
   const renderContent = () => {
     switch (activeModalContent) {
       case 'login':
@@ -61,13 +70,14 @@ export const Modal = ({ children }: { children?: React.ReactNode }) => {
       }}
     >
       <Fade in={isModalOpen}>
-        <Box sx={style}>
+        <Box sx={dynamicStyle}>
           <IconButton
             onClick={() => dispatch(closeModal())}
             sx={{
               position: 'absolute',
               right: 8,
               top: 8,
+              zIndex: 10,
               color: 'text.secondary',
               '&:hover': { color: 'primary.main' },
             }}

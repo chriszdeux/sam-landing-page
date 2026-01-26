@@ -7,6 +7,12 @@ export interface CandleData {
     timestamp: number;
 }
 
+export interface TradeState {
+    amount: number;
+    counter: number;
+    _id?: string;
+}
+
 export interface MarketState {
     cryptos: Cryptocurrency[];
     historicalData: {
@@ -14,6 +20,8 @@ export interface MarketState {
             data: CandleData[];
             range: string;
             total: number;
+            currentBuyState?: TradeState;
+            currentSellState?: TradeState;
         };
     };
     isLoading: boolean;

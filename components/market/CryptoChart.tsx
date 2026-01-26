@@ -49,7 +49,7 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
     const isDataLoaded = !!chartData && historicalData[cryptoId || '']?.range === range;
 
     const labels = React.useMemo(() => {
-        if (!isDataLoaded) return Array.from({ length: 24 }, (_, i) => `${i}:00`); // Placeholder
+        if (!isDataLoaded || !Array.isArray(chartData)) return Array.from({ length: 24 }, (_, i) => `${i}:00`); // Placeholder
         return chartData.map(d => new Date(d.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
     }, [chartData, isDataLoaded]);
     

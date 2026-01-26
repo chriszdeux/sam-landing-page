@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'placehold.co',
       },
+      {
+        protocol: 'https',
+        hostname: 'clim-v1.s3.us-east-2.amazonaws.com',
+      },
     ],
   },
 };

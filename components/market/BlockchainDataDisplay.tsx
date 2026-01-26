@@ -113,73 +113,9 @@ export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ ne
                      </Box>
                  </Box>
 
-                 {/* Status Indicator */}
-                 <Box sx={{ ml: 'auto', textAlign: 'right' }}>
-                    <Chip 
-                        icon={isActive ? <CheckCircle /> : <ErrorOutline />}
-                        label={isActive ? "RED OPERATIVA" : "RED INACTIVA"}
-                        sx={{ 
-                            bgcolor: isActive ? 'rgba(0, 255, 157, 0.1)' : 'rgba(255, 51, 51, 0.1)', 
-                            color: isActive ? '#00ff9d' : '#ff3333',
-                            border: `1px solid ${isActive ? '#00ff9d' : '#ff3333'}`,
-                            fontWeight: 'bold'
-                        }}
-                    />
-                 </Box>
-
                  {/* Background decoration */}
                  <Box component="img" src={identification.image} sx={{ position: 'absolute', top: -20, right: -20, opacity: 0.05, width: 300, height: 300 }} alt="" />
             </Paper>
-
-            {/* Metrics Grid */}
-            <Grid container spacing={3}>
-                
-                {/* Economics Block */}
-                <Grid size={{ xs: 12 }}>
-                    <DataBlock title="ECONOMÍA DE RED" icon={<MonetizationOn sx={{ color }} />} color={color}>
-                        <MetricRow label="Capitalización de Mercado" value={formatCurrency(blockchainProps?.marketCap)} delay={0.1} />
-                        <MetricRow label="Suministro Circulante" value={formatNumber(blockchainProps?.circulatingSupply)} delay={0.2} />
-                        <MetricRow label="Suministro Máximo" value={formatNumber(blockchainProps?.maxSupply)} delay={0.3} />
-                        <MetricRow label="Tarifa Base" value={`${blockchainProps?.feeBase || 0} Gwei`} delay={0.4} />
-                    </DataBlock>
-                </Grid>
-
-                {/* Technical Block */}
-                <Grid size={{ xs: 12 }}>
-                    <DataBlock title="MÉTRICAS TÉCNICAS" icon={<Memory sx={{ color }} />} color={color}>
-                        <MetricRow label="Tiempo de Bloque" value={`${blockchainProps?.blockInterval || 0} ms`} icon={<AccessTime fontSize="small" />} delay={0.1} />
-                        <MetricRow label="Dificultad" value={formatCompact(blockchainProps?.difficulty)} icon={<Speed fontSize="small" />} delay={0.2} />
-                        <MetricRow label="Nodos Activos" value={`${blockchainProps?.nodeCount || 0} / ${blockchainProps?.initialNodeCount || 0}`} icon={<Storage fontSize="small" />} delay={0.3} />
-                        <MetricRow label="Protocolo" value={network.chain || 'Unknown'} delay={0.4} />
-                    </DataBlock>
-                </Grid>
-
-                {/* Development & Info */}
-                 <Grid size={{ xs: 12 }}>
-                    <DataBlock title="INFORMACIÓN ADICIONAL" icon={<People sx={{ color }} />} color={color}>
-                        <Grid container spacing={2}>
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                <Typography variant="caption" color="text.secondary">EQUIPO DE DESARROLLO</Typography>
-                                <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
-                                    {additionalInfo?.developers?.map((dev, i) => (
-                                        <Chip key={i} label={dev} size="small" variant="outlined" sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.2)' }} />
-                                    ))}
-                                </Box>
-                            </Grid>
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                 <Typography variant="caption" color="text.secondary">ÚLTIMA ACTUALIZACIÓN</Typography>
-                                 <Typography variant="body1" color="white">{additionalInfo?.lastUpdated ? new Date(additionalInfo.lastUpdated).toLocaleDateString() : 'Desconocida'}</Typography>
-                                 
-                                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 2 }}>DESCRIPCIÓN</Typography>
-                                 <Typography variant="body2" color="rgba(255,255,255,0.7)">
-                                     {additionalInfo?.description && additionalInfo.description[0]}
-                                 </Typography>
-                            </Grid>
-                        </Grid>
-                    </DataBlock>
-                </Grid>
-
-            </Grid>
         </motion.div>
     </Box>
   );
