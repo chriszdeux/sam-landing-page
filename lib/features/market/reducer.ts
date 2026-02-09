@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { MarketState, CandleData } from './types';
+import { MarketState, AnalyticsData } from './types';
 import { fetchCryptos, fetchCryptoHistory } from './actions';
 import { Cryptocurrency } from '../../types/crypto';
 
@@ -49,7 +49,7 @@ const marketSlice = createSlice({
                 const { cryptoId, range, data } = action.payload;
                 
                 // Helper to extract the array from various potential API structures
-                let history: CandleData[] = [];
+                let history: AnalyticsData[] = [];
                 
                 if (Array.isArray(data)) {
                     history = data;

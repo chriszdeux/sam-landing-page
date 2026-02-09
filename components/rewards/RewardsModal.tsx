@@ -16,8 +16,10 @@ export const RewardsModal = () => {
     const [showSuccess, setShowSuccess] = useState<string | null>(null);
 
     useEffect(() => {
-        dispatch(fetchRewards());
-    }, [dispatch]);
+        if (userInfo && rewards.length === 0 && !isLoading && !error) {
+            dispatch(fetchRewards());
+        }
+    }, [dispatch, userInfo, rewards.length, isLoading, error]);
 
     const triggerSuccessConfetti = () => {
         const count = 200;

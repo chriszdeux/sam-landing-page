@@ -4,8 +4,12 @@ import React from 'react';
 import { Box, Typography, Container, Grid, Divider } from '@mui/material';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { ArrowBack } from '@mui/icons-material';
+import { Button } from '../../components/ui/Button';
 import Image from 'next/image';
 import { ParticleBackground } from '../../components/ui/ParticleBackground';
+import { EnvVariables } from '@/lib/constants/variables';
 
 // Custom components for the Sci-Fi aesthetic
 
@@ -80,9 +84,22 @@ const DataLog = ({ title, date, children, align = 'left' }: { title: string; dat
 );
 
 export default function InfiniteExplorationPage() {
+    const { project } = EnvVariables;
+    const router = useRouter();
+
   return (
     <>
       <ParticleBackground />
+      <Box sx={{ position: 'fixed', top: 100, left: { xs: 20, md: 40 }, zIndex: 100 }}>
+        <Button 
+            variant="outlined" 
+            startIcon={<ArrowBack />} 
+            onClick={() => router.back()}
+            sx={{ backdropFilter: 'blur(5px)' }}
+        >
+            Atrás
+        </Button>
+      </Box>
       <Box sx={{ 
         minHeight: '100vh', 
         bgcolor: 'transparent',
@@ -128,7 +145,7 @@ export default function InfiniteExplorationPage() {
                 <DataLog title="Más allá de la Heliosfera" date="2065.04.12">
                   Lo que comenzó en Marte no pudo ser contenido. En 2065, la humanidad lanzó la primera sonda tripulada hacia Próxima Centauri. 
                   El reto no era solo la supervivencia física, sino la viabilidad económica a 4 años luz de distancia. 
-                  El <strong style={{ color: '#00f3ff' }}>Protocolo LynCore</strong> respondió replicando su arquitectura, creando una red donde el valor viaja más rápido que la materia.
+                  El <strong style={{ color: '#00f3ff' }}>Protocolo {EnvVariables.project}</strong> respondió replicando su arquitectura, creando una red donde el valor viaja más rápido que la materia.
                 </DataLog>
               </motion.div>
             </Grid>
@@ -163,16 +180,17 @@ export default function InfiniteExplorationPage() {
             <Grid size={{ xs: 12, md: 6 }} sx={{ order: { xs: 1, md: 2 } }}>
               <motion.div initial={{ x: 100, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
                  <DataLog title="Los Grandes Aceleradores de Sistemas" date="2072.11.08" align="right">
-                   Para sostener la economía galáctica, LynCore desplegó estructuras masivas:
+                   Para sostener la economía galáctica, {project} desplegó estructuras masivas:
                     <ul style={{ listStyleType: 'none', padding: 0, marginTop: '20px' }}>
                       <li style={{ marginBottom: '15px' }}>
                         <span style={{ color: '#ffb700', fontWeight: 'bold' }}>[NODOS]</span> Forja Solar: Captadores de energía pura.
                       </li>
                       <li style={{ marginBottom: '15px' }}>
-                        <span style={{ color: '#ffb700', fontWeight: 'bold' }}>[PUENTES]</span> Aceleradores Quetzalcóatl: Entrelazamiento cuántico.
+                        <span style={{ color: '#ffb700', fontWeight: 'bold' }}>[PUENTES]</span> Aceleradores 
+                        {project}: Entrelazamiento cuántico.
                       </li>
                       <li>
-                        <span style={{ color: '#ffb700', fontWeight: 'bold' }}>[SYNC]</span> Valor <Link href="/mechanics/economy" style={{ color: '#ff0055', textDecoration: 'none', fontWeight: 'bold' }}>($TAO)</Link> instantáneo.
+                        <span style={{ color: '#ffb700', fontWeight: 'bold' }}>[SYNC]</span> Valor <Link href="/mechanics/economy" style={{ color: '#ff0055', textDecoration: 'none', fontWeight: 'bold' }}>(${EnvVariables.coin1})</Link> instantáneo.
                       </li>
                     </ul>
                 </DataLog>
@@ -184,7 +202,7 @@ export default function InfiniteExplorationPage() {
               <motion.div initial={{ x: -100, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
                  <DataLog title="La Soberanía Estelar" date="2088.01.01">
                    La expansión no es solo territorial, es <strong style={{ color: '#00f3ff' }}>existencial</strong>. Con la Capa de Tránsito conectando sistemas y las Forjas alimentando la independencia energética de cada colonia, 
-                   LynCore ha asegurado que la humanidad no dependa de un solo punto de fallo.
+                    {project} ha asegurado que la humanidad no dependa de un solo punto de fallo.
                    <br /><br />
                    <span style={{ color: 'white', backgroundColor: '#00f3ff33', padding: '4px 8px', borderRadius: '4px' }}>ESTADO: INDEPENDIENTE</span>
                 </DataLog>

@@ -49,6 +49,7 @@ const blockchainSlice = createSlice({
                 state.error = null;
             })
             .addCase(fetchRewards.fulfilled, (state, action) => {
+                state.isLoading = false;
                 // Handle response format { message: "...", data: [...] }
                 const payload = action.payload as { data?: Reward[] } | Reward[];
                 
@@ -62,6 +63,7 @@ const blockchainSlice = createSlice({
                 }
             })
             .addCase(fetchRewards.rejected, (state, action) => {
+                state.isLoading = false;
                  console.error('Failed to load rewards:', action.payload);
             })
             // Claim Reward
@@ -70,9 +72,14 @@ const blockchainSlice = createSlice({
                 const rewardIndex = state.rewards.findIndex(r => r.id === rewardId);
                 if (rewardIndex !== -1) {
                     state.rewards[rewardIndex].isClaimed = true;
-                    // Simulate next claim time based on interval (in minutes)
-                    const intervalMinutes = state.rewards[rewardIndex].interval || 1;
-                    state.rewards[rewardIndex].nextClaimTime = Date.now() + (intervalMinutes * 60 * 1000);
+                    // Ensure interval is a number and treat as minutes
+                    const intervalVal = typeof state.rewards[rewardIndex].interval === 'number' 
+                        ? state.rewards[rewardIndex].interval 
+                        : parseInt(state.rewards[rewardIndex].interval || '1', 10);
+                        
+                    // Assuming interval is in minutes as per previous logic
+                    const durationMs = intervalVal * 60 * 1000;
+                    state.rewards[rewardIndex].nextClaimTime = Date.now() + durationMs;
                 }
             })
             // Next Block Time

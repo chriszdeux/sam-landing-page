@@ -7,7 +7,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { CONFIG } from "../../lib/config";
+import { EnvVariables } from "../../lib/constants/variables";
 import { MonetizationOn, CardGiftcard } from "@mui/icons-material";
 import { Button } from "../ui/Button";
 import { CountUp } from "../ui/CountUp";
@@ -41,7 +41,7 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({
   return (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
       <Typography variant="h6" sx={{ my: 2, color: "primary.main" }}>
-        {CONFIG.PROJECT_NAME.toUpperCase()}
+        {EnvVariables.project.toUpperCase()}
       </Typography>
       <List>
         {selectedNetwork && (

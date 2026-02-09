@@ -111,7 +111,7 @@ export default function NetworkDetailPage({ params }: { params: Promise<{ id: st
                                          <Box>
                                              <Typography variant="caption" color="text.secondary">Market Cap</Typography>
                                              <Typography variant="body1" color="white" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                <TaoIcon size={16} /> {network.blockchainProps.marketCap.toLocaleString()}
+                                                {network.blockchainProps.marketCap.toLocaleString()} <TaoIcon size={16} />
                                             </Typography>
                                          </Box>
                                      </Stack>

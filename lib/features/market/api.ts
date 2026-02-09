@@ -29,7 +29,7 @@ export const getCryptosApi = async (networkId: string = 'ETH-SEPOLIA', page: num
     return response.data
 };
 
-export const getCryptoHistoryApi = async (cryptoId: string, range: string) => {
-    const response = await api.get(`/blockchain/candles/${cryptoId}?range=${range}`);
+export const getCryptoHistoryApi = async (cryptoId: string, range: string, signal?: AbortSignal) => {
+    const response = await api.get(`/blockchain/analytics/${cryptoId}?range=${range}`, { signal });
     return response.data;
 };

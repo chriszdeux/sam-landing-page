@@ -5,8 +5,17 @@ import { AutoGraph, CheckCircle, Info } from '@mui/icons-material';
 import { Mechanic } from '../../lib/data/mechanics';
 import { FeatureModal } from './FeatureModal';
 
+import { AnimationRegistry } from './AnimationRegistry';
+
 export const LayoutType2 = ({ mechanic }: { mechanic: Mechanic }) => {
     const [selectedFeature, setSelectedFeature] = useState<{title: string, description: string, modalContent?: string, modalImage?: string} | null>(null);
+
+    const renderAnimation = (animationType?: string) => {
+        if (!animationType) return null;
+        const AnimationComponent = AnimationRegistry[animationType];
+        if (!AnimationComponent) return null;
+        return <AnimationComponent color={mechanic.color} />;
+    };
 
     return (
     <Box>
@@ -24,16 +33,19 @@ export const LayoutType2 = ({ mechanic }: { mechanic: Mechanic }) => {
             position: 'relative', 
             display: 'flex', 
             alignItems: 'center', 
-            justifyContent: 'center',
+            justifyContent: 'center', 
             bgcolor: 'black',
             overflow: 'hidden'
         }}>
+            {renderAnimation(mechanic.backgroundAnimation)}
+            
             <Box sx={{
                 position: 'absolute',
                 top: '50%', left: '50%',
                 transform: 'translate(-50%, -50%)',
                 width: '120%', height: '120%',
-                background: `radial-gradient(circle, ${mechanic.color}20 0%, transparent 70%)`
+                background: `radial-gradient(circle, ${mechanic.color}20 0%, transparent 70%)`,
+                zIndex: 1
             }} />
              <Container maxWidth="md" sx={{ textAlign: 'center', position: 'relative', zIndex: 10 }}>
                 <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>

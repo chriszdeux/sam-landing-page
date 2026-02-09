@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Background } from '../../../components/layout/Background';
 import { useAppSelector, useAppDispatch } from '../../../lib/hooks';
 import { updateBalance, updateWalletAssets } from '../../../lib/features/auth/reducer';
+import { refreshUserInfo } from '../../../lib/features/auth/actions';
 import api from '../../../lib/api'; // Adjust path if needed
 import { ArrowBack } from '@mui/icons-material';
 import { CubeAnimation } from '../../../components/market/CubeAnimation';
@@ -102,6 +103,16 @@ const TradeContent = () => {
 
   const selectedCrypto = cryptos.find(c => c.id === form.cryptoId);
 
+  // Calculate available quantity for SELL
+  const selectedAsset = walletsInfo?.store?.find(a => a.id === form.cryptoId || a.symbol === selectedCrypto?.identification.symbol);
+  const availableQuantity = selectedAsset ? Number(selectedAsset.quantity) : 0;
+
+  const handleSetMax = () => {
+    if (availableQuantity > 0) {
+        setForm(prev => ({ ...prev, quantity: availableQuantity }));
+    }
+  };
+
   // Submit Handler
   const handlePreSubmit = () => {
     if (!form.walletId || !form.cryptoId) {
@@ -124,14 +135,10 @@ const TradeContent = () => {
             return;
         }
     } else if (transactionType === 'SELL') {
-        // Optimistic check if walletsInfo matches
-        if (walletsInfo && form.walletId === userInfo?.wallets[0]?.walletAddress) { 
-             const asset = walletsInfo.store.find(a => a.id === form.cryptoId || a.symbol === selectedCrypto?.identification.symbol);
-             if (!asset || asset.quantity < form.quantity) {
-                 setErrorMsg(`Fondos insuficientes. Tienes ${asset?.quantity || 0} ${selectedCrypto?.identification.symbol} pero intentas vender ${form.quantity}.`);
-                 setStatus('ERROR');
-                 return;
-             }
+        if (form.quantity > availableQuantity) {
+             setErrorMsg(`Fondos insuficientes. Tienes ${availableQuantity} ${selectedCrypto?.identification.symbol} pero intentas vender ${form.quantity}.`);
+             setStatus('ERROR');
+             return;
         }
     }
 
@@ -190,6 +197,9 @@ const TradeContent = () => {
                 }));
             }
         }
+
+        // Sync with server to ensure accuracy
+        dispatch(refreshUserInfo());
 
         setStatus('SUCCESS');
 
@@ -265,6 +275,8 @@ const TradeContent = () => {
                             onSubmit={handlePreSubmit}
                             isProcessing={false}
                             fee={networkFee}
+                            availableQuantity={availableQuantity}
+                            onSetMax={handleSetMax}
                         />
                     </Box>
                 </TechFrame>

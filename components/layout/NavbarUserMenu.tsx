@@ -6,14 +6,12 @@ import {
   Typography,
   Box,
   Stack,
-  Tooltip,
   IconButton,
 } from "@mui/material";
 import {
   Person as UserIcon,
   Settings,
   Logout,
-  Bolt,
 } from "@mui/icons-material";
 import { TaoIcon } from "../ui/TaoIcon";
 import { Button } from "../ui/Button";
@@ -44,8 +42,6 @@ interface NavbarUserMenuProps {
 
 export const NavbarUserMenu = ({
   userInfo,
-  selectedNetwork,
-  handleNetworkClick,
   onLogoutClick,
 }: NavbarUserMenuProps) => {
   const router = useRouter();
@@ -100,8 +96,8 @@ export const NavbarUserMenu = ({
               gap: 1,
             }}
           >
-            <TaoIcon size={20} />
             <CountUp to={userInfo.balance} />
+            <TaoIcon size={12} />
           </Box>
         </Typography>
 

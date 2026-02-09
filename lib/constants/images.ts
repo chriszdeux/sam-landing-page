@@ -1,3 +1,4 @@
+import TAO from "../../public/assets/images/TAO.png"
 export const IMAGES = {
-  TAO: '/assets/images/TAO.png',
+  TAO: TAO.src,
 };

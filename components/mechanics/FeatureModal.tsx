@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography, Modal as MuiModal, IconButton } from '@mui/material';
 import { Close } from '@mui/icons-material';
+import { motion } from 'framer-motion';
 
 export const FeatureModal = ({ open, onClose, title, description, content, image, color }: { open: boolean; onClose: () => void; title: string; description: string; content?: string; image?: string; color: string }) => (
   <MuiModal open={open} onClose={onClose} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -24,8 +25,15 @@ export const FeatureModal = ({ open, onClose, title, description, content, image
       </IconButton>
       
       {image && (
-        <Box sx={{ width: { xs: '100%', md: '40%' }, height: { xs: 200, md: 'auto' }, position: 'relative' }}>
-            <img src={image} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <Box sx={{ width: { xs: '100%', md: '40%' }, height: { xs: 200, md: 'auto' }, position: 'relative', overflow: 'hidden' }}>
+            <motion.img 
+              src={image} 
+              alt={title} 
+              initial={{ scale: 1.1 }}
+              animate={{ scale: 1.2, x: [0, -10, 0], y: [0, -5, 0] }}
+              transition={{ duration: 20, repeat: Infinity, repeatType: "mirror", ease: "linear" }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            />
             <Box sx={{ position: 'absolute', inset: 0, background: `linear-gradient(to right, ${color}20, transparent)` }} />
         </Box>
       )}

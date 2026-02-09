@@ -6,12 +6,14 @@ import { Background } from '../../components/layout/Background';
 import { TechFrame } from '../../components/ui/TechFrame';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
-import { claimReward } from '../../lib/features/blockchain/actions';
+import { claimReward, fetchRewards } from '../../lib/features/blockchain/actions';
 import { motion } from 'framer-motion';
 import { Reward } from '../../lib/features/blockchain/types';
 import { TaoIcon } from '../../components/ui/TaoIcon';
 import { Check } from 'lucide-react';
 import { addNotification } from '../../lib/features/uiSlice';
+import { EnvVariables } from '@/lib/constants/variables';
+
 
 
 const Countdown = ({ targetDate, onComplete }: { targetDate: number; onComplete?: () => void }) => {
@@ -72,6 +74,12 @@ export default function RewardsPage() {
     // though the state update itself triggers re-render.
   }, [tick]);
 
+  React.useEffect(() => {
+    if (rewards.length === 0 && !isLoading && !error) {
+        dispatch(fetchRewards());
+    }
+  }, [dispatch, rewards.length, isLoading, error]);
+
   const [claimingRewardId, setClaimingRewardId] = React.useState<string | null>(null);
 
   const handleClaim = async (reward: Reward) => {
@@ -80,10 +88,14 @@ export default function RewardsPage() {
          return;
     }
 
+    // We allow the claim attempt even if the store says isClaimed, because the local timer (which enables the button) 
+    // indicates the cooldown has passed. The backend is the ultimate source of truth.
+    /*
     if (reward.isClaimed) {
          dispatch(addNotification({ type: 'info', message: 'Esta recompensa ya ha sido reclamada.' }));
          return;
     }
+    */
 
     setClaimingRewardId(reward.id);
     try {
@@ -122,7 +134,8 @@ export default function RewardsPage() {
                     const userReward = userInfo?.rewards?.find((r) => r.id === reward.id);
                     const lastClaimedAt = userReward?.claimedAt;
                     
-                    const intervalMinutes = reward.interval || 1; // Default to 1 minute
+                    const intervalVal = typeof reward.interval === 'number' ? reward.interval : parseInt(reward.interval || '1', 10);
+                    const intervalMinutes = intervalVal; // Default treatment as minutes
                     const nextClaimTime = lastClaimedAt 
                         ? new Date(lastClaimedAt).getTime() + (intervalMinutes * 60 * 1000)
                         : null;
@@ -190,10 +203,11 @@ export default function RewardsPage() {
                                         {reward.description}
                                     </Typography>
 
-                                    <Box sx={{ mb: 3 }}>
+                                    <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
                                         <Typography variant="h6" sx={{ color: isClaimedNow ? '#00ff9d' : '#ffb700', fontWeight: 'bold' }}>
-                                            {reward.amount.toLocaleString()} $TAO
+                                            {reward.amount.toLocaleString()}
                                         </Typography>
+                                        <TaoIcon size={12} />
                                     </Box>
 
                                     <Button

@@ -1,9 +1,22 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { loginApi, registerApi, validateAccountApi } from './api';
+import { loginApi, registerApi, validateAccountApi, getUserInfoApi } from './api';
 import { RegistrationData } from './types';
 import api from '../../api';
 
 // ... (existing code found implicitly, but we are appending)
+
+export const refreshUserInfo = createAsyncThunk(
+  'auth/refreshUserInfo',
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await getUserInfoApi();
+      return data;
+    } catch (err: unknown) {
+      const message = (err as { message?: string })?.message || 'Failed to refresh user info';
+      return rejectWithValue(message);
+    }
+  }
+);
 
 export const fetchWalletDetails = createAsyncThunk(
   'auth/fetchWalletDetails',

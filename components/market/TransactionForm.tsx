@@ -20,6 +20,8 @@ interface TransactionFormProps {
     onSubmit: () => void;
     isProcessing: boolean;
     fee?: number | null;
+    availableQuantity?: number;
+    onSetMax?: () => void;
 }
 
 export const TransactionForm = ({
@@ -30,7 +32,9 @@ export const TransactionForm = ({
     selectedCrypto,
     onSubmit,
     isProcessing,
-    fee
+    fee,
+    availableQuantity,
+    onSetMax
 }: TransactionFormProps) => {
     return (
         <Box>
@@ -63,7 +67,7 @@ export const TransactionForm = ({
                     <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
                         <Typography variant="caption" color="text.secondary">PRECIO DE MERCADO</Typography>
                         <Typography variant="h4" color="white" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <TaoIcon size={24} /> {selectedCrypto?.financial.price.toLocaleString() || '0.00'}
+                            {selectedCrypto?.financial.price.toLocaleString() || '0.00'} <TaoIcon size={24} />
                         </Typography>
                         <Typography variant="body2" color={(selectedCrypto?.financial.change24h || 0) > 0 ? 'success.main' : 'error.main'}>
                             {selectedCrypto?.financial.change24h || 0}% (24h)
@@ -99,29 +103,51 @@ export const TransactionForm = ({
                     )}
 
                     {transactionType === 'SELL' && (
+                        <Box>
                             <Input
-                            label="Cantidad a Vender (Unidades)"
-                            name="quantity"
-                            type="number"
-                            value={form.quantity}
-                            onChange={onChange}
-                            fullWidth
-                            autoFocus
-                            inputProps={{ min: 0 }}
-                            containerSx={{
-                                '& .MuiInputLabel-root': { color: '#ff1744' },
-                                mb: 2
-                            }}
-                            sx={{
-                                '& .MuiInputBase-input': { 
-                                    color: 'white', 
-                                    fontSize: '1.5rem',
-                                    borderColor: 'rgba(255, 23, 68, 0.3)',
-                                    '&:hover': { borderColor: '#ff1744' },
-                                    '&:focus': { borderColor: '#ff1744', boxShadow: '0 0 0 0.2rem rgba(255, 23, 68, 0.25)' }
-                                },
-                            }}
-                        />
+                                label="Cantidad a Vender (Unidades)"
+                                name="quantity"
+                                type="number"
+                                value={form.quantity}
+                                onChange={onChange}
+                                fullWidth
+                                autoFocus
+                                inputProps={{ min: 0, max: availableQuantity }}
+                                containerSx={{
+                                    '& .MuiInputLabel-root': { color: '#ff1744' },
+                                    mb: 1
+                                }}
+                                sx={{
+                                    '& .MuiInputBase-input': { 
+                                        color: 'white', 
+                                        fontSize: '1.5rem',
+                                        borderColor: 'rgba(255, 23, 68, 0.3)',
+                                        '&:hover': { borderColor: '#ff1744' },
+                                        '&:focus': { borderColor: '#ff1744', boxShadow: '0 0 0 0.2rem rgba(255, 23, 68, 0.25)' }
+                                    },
+                                }}
+                            />
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mb: 2, gap: 1 }}>
+                                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                    Disponible: {availableQuantity?.toLocaleString()} {selectedCrypto?.identification.symbol}
+                                </Typography>
+                                {onSetMax && (
+                                    <Button 
+                                        size="small" 
+                                        variant="outlined" 
+                                        color="error"
+                                        onClick={onSetMax}
+                                        sx={{ 
+                                            minWidth: 'auto', 
+                                            padding: '2px 8px', 
+                                            fontSize: '0.7rem' 
+                                        }}
+                                    >
+                                        MAX
+                                    </Button>
+                                )}
+                            </Box>
+                        </Box>
                     )}
 
                         {transactionType === 'TRANSFER' && (
@@ -148,7 +174,7 @@ export const TransactionForm = ({
                             </Typography>
                         ) : (
                             <Typography variant="h5" color="white" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                + <TaoIcon size={20} /> {(form.quantity * (selectedCrypto?.financial.price || 0)).toLocaleString()}
+                                + {(form.quantity * (selectedCrypto?.financial.price || 0)).toLocaleString()} <TaoIcon size={20} />
                             </Typography>
                         )}
                     </Box>

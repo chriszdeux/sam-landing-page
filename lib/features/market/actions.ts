@@ -28,9 +28,9 @@ export const fetchCryptos = createAsyncThunk(
 
 export const fetchCryptoHistory = createAsyncThunk(
     'market/fetchCryptoHistory',
-    async ({ cryptoId, range }: { cryptoId: string; range: string }, { rejectWithValue }) => {
+    async ({ cryptoId, range }: { cryptoId: string; range: string }, { rejectWithValue, signal }) => {
         try {
-            const data = await getCryptoHistoryApi(cryptoId, range);
+            const data = await getCryptoHistoryApi(cryptoId, range, signal);
             return { cryptoId, range, data };
         } catch (err: unknown) {
             const errorObj = err as { response?: { data?: { message?: string } } };

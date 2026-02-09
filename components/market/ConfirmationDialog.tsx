@@ -9,6 +9,7 @@ import {
 } from '@mui/material';
 import { TechFrame } from '../ui/TechFrame';
 import { Shield, AlertTriangle, Zap } from 'lucide-react';
+import { EnvVariables } from '@/lib/constants/variables';
 
 interface ConfirmationDialogProps {
     open: boolean;
@@ -103,7 +104,7 @@ export const ConfirmationDialog = ({
                                 <Grid size={{ xs: 6 }}>
                                     <Typography color="text.secondary" variant="caption" sx={{ display: 'block', mb: 0.5 }}>RED_FEE (EST)</Typography>
                                     <Typography color="white" variant="body1" sx={{ fontFamily: 'monospace' }}>
-                                        {fee || '0'} Gwei
+                                        {fee || '0'} {EnvVariables.coin1}
                                     </Typography>
                                 </Grid>
                             </Grid>

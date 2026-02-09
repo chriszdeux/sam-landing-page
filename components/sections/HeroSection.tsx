@@ -11,13 +11,15 @@ import { Section } from '../ui/Section';
 import { openModal } from '../../lib/features/uiSlice';
 import { useAppDispatch } from '../../lib/hooks';
 import { cyan } from '@mui/material/colors';
+import { EnvVariables } from '@/lib/constants/variables';
+import { TaoIcon } from '../ui/TaoIcon';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export const HeroSection = () => {
   const dispatch = useAppDispatch();
   const container = useRef<HTMLElement | null>(null);
-
+  const { project, coin } = EnvVariables;
   useGSAP(() => {
     // Animate Left Content
     gsap.from('.hero-content', {
@@ -60,14 +62,15 @@ export const HeroSection = () => {
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}>
-                LYNCORE GALACTIC
+                {project}
               </Typography>
               <Typography variant="h4" sx={{ mb: 4, color: 'text.secondary', fontWeight: 300 }}>
-                El código es nuestro único Dios. La soberanía ya no es planetaria; es galáctica.
+                La soberanía ya no es planetaria; es galáctica.
               </Typography>
               <Typography variant="body1" sx={{ mb: 6, maxWidth: 600, color: 'text.secondary', fontSize: '1.1rem' }}>
-                Vive la evolución de LynCore: desde el subsuelo de Guadalajara hasta la colonización de Alfa Centauri. 
-                Una economía viva donde el valor (<Link href="/mechanics/economy" style={{ color: '#ff0055', textDecoration: 'none' }}>$TAO</Link>) y la energía (<Link href="/mechanics/economy" style={{ color: '#ffb700', textDecoration: 'none' }}>$SOLIS</Link>) fluyen a través de una red interestelar soberana.
+                Vive la evolución de {project}: desde el subsuelo de Guadalajara hasta la colonización de Alfa Centauri. 
+                Una economía viva donde el valor (<TaoIcon size={20} />) y la energía 
+                 fluyen a través de una red interestelar soberana.
               </Typography>
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
@@ -97,7 +100,7 @@ export const HeroSection = () => {
             <Box className="hero-grid-container" sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 3 }}>
               {[
                 { icon: Globe, label: 'Expansión Interestelar', color: cyan[500], href: '/exploracion-infinita' },
-                { icon: Shield, label: 'Protocolo LynCore', color: '#00f3ff', href: '/security' },
+                { icon: Shield, label: `Protocolo ${project}`, color: '#00f3ff', href: '/security' },
               ].map((item, index) => (
                 <Box
                   key={index}

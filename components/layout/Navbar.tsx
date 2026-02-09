@@ -23,7 +23,7 @@ import { navItems } from "./navItems";
 import { NavbarDrawer } from "./NavbarDrawer";
 import { LogoutDialog } from "./LogoutDialog";
 import { NavbarUserMenu } from "./NavbarUserMenu";
-import { CONFIG } from "../../lib/config";
+import { EnvVariables } from "@/lib/constants/variables";
 
 
 
@@ -141,7 +141,7 @@ export const Navbar = () => {
                     mb: 0.5
                 }}
                 >
-                {CONFIG.PROJECT_NAME.toUpperCase()}
+                {EnvVariables.project.toUpperCase()}
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'rgba(0, 243, 255, 0.7)', letterSpacing: 3, fontSize: '0.6rem', display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Box component="span" sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#00f3ff', boxShadow: '0 0 5px #00f3ff' }} />

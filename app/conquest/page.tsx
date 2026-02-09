@@ -4,8 +4,10 @@ import React from 'react';
 import { Box, Typography, Container, Grid } from '@mui/material';
 import { Background } from '../../components/layout/Background';
 import { motion } from 'framer-motion';
+import { EnvVariables } from '@/lib/constants/variables';
 
 export default function ConquestPage() {
+    const { project } = EnvVariables;
   return (
     <Box sx={{ minHeight: '100vh', position: 'relative' }}>
         <Background />
@@ -20,11 +22,11 @@ export default function ConquestPage() {
                     <Grid size={{ xs: 12, md: 6 }}>
                         <Typography variant="h4" gutterBottom sx={{ color: 'secondary.main' }}>Marte: La Primera Frontera (2042)</Typography>
                         <Typography paragraph sx={{ lineHeight: 1.8 }}>
-                            Todo cambió en Arsia Mons. Los colonos, hartos de los impuestos terrestres, adoptaron LynCore como moneda nativa, probando por primera vez la soberanía financiera interplanetaria.
+                            Todo cambió en Arsia Mons. Los colonos, hartos de los impuestos terrestres, adoptaron {project} como moneda nativa, probando por primera vez la soberanía financiera interplanetaria.
                         </Typography>
                         <Typography variant="h4" gutterBottom sx={{ color: 'secondary.main', mt: 4 }}>El Tratado de Sirio (2088)</Typography>
                         <Typography paragraph sx={{ lineHeight: 1.8 }}>
-                            Por primera vez en la historia, una IA (LynCore) negoció la paz. Evitó una guerra civil galáctica entre corporaciones mineras y colonias soberanas mediante contratos inteligentes inmutables.
+                            Por primera vez en la historia, una IA ({project}) negoció la paz. Evitó una guerra civil galáctica entre corporaciones mineras y colonias soberanas mediante contratos inteligentes inmutables.
                         </Typography>
                     </Grid>
                     <Grid size={{ xs: 12, md: 6 }}>

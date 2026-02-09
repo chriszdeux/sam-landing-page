@@ -9,7 +9,7 @@ import { TechFrame } from '../../components/ui/TechFrame';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Input } from '../../components/ui/Input';
 import { resourcesData } from '../../lib/data/resources';
-import { CONFIG } from '../../lib/config';
+import { EnvVariables } from '@/lib/constants/variables';
 import { motion } from 'framer-motion';
 
 export default function ResourcesPage() {
@@ -28,7 +28,7 @@ export default function ResourcesPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <PageHeader
                 title="Base de Datos de Materiales"
-                subtitle={`Catálogo completo de recursos, minerales y tecnologías exóticas disponibles en el universo ${CONFIG.PROJECT_NAME}.`}
+                subtitle={`Catálogo completo de recursos, minerales y tecnologías exóticas disponibles en el universo ${EnvVariables.project}.`}
                 color="#00f3ff"
             />
         </motion.div>

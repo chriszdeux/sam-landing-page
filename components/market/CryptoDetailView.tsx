@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Box, Typography, Stack, Container, Grid, Button, Chip, Avatar, Divider, CircularProgress } from '@mui/material';
 import { ParticleBackground } from '../ui/ParticleBackground';
-import { ArrowBack, TrendingUp, TrendingDown, AccessTime, Code, ShoppingCart, AttachMoney, Send } from '@mui/icons-material';
+import { ArrowBack, TrendingUp, TrendingDown, AccessTime, Code, ShoppingCart, AttachMoney } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { CryptoChart } from './CryptoChart';
 import { CryptoStats } from './CryptoStats';
-import { CryptoNews } from './CryptoNews';
+// import { CryptoNews } from './CryptoNews';
 import { TransactionHistory } from './TransactionHistory';
 import { MarketSentiment } from './MarketSentiment';
 import { Card } from '../ui/Card';
@@ -18,7 +18,6 @@ import { addNotification } from '../../lib/features/uiSlice';
 // Redux
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../lib/store';
-import { fetchCryptos } from '../../lib/features/market/actions';
 
 interface CryptoDetailViewProps {
     id: string;
@@ -47,14 +46,6 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
         }
         router.push(`/market/trade?type=${type}&cryptoId=${id}`);
     };
-
-// ... (I'll do single replacement for dependency array)
-    useEffect(() => {
-        // If we don't have the crypto and aren't loading, try fetching
-        if (!crypto && !isLoading && cryptos.length === 0) {
-            dispatch(fetchCryptos('ETH-SEPOLIA'));
-        }
-    }, [crypto, isLoading, cryptos.length, dispatch]);
 
     // Show loading state if we are loading and don't have the crypto yet
     if (isLoading && !crypto) {
@@ -100,7 +91,7 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                     <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'flex-start', md: 'center' }} justifyContent="space-between" spacing={2}>
                         <Stack direction="row" alignItems="center" spacing={2}>
                             <Avatar 
-                                src={crypto.identification.image128}
+                                src={crypto.identification.image256 || crypto.identification.image128}
                                 alt={crypto.identification.name}
                                 sx={{ width: 64, height: 64, bgcolor: crypto.additionalInfo?.pColor || 'primary.main' }}
                             >
@@ -114,6 +105,18 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                                     <Chip label="Rank #N/A" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: '#fff' }} />
                                     <Chip label="Coin" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: '#fff' }} />
                                     <Chip label={crypto.network.name} size="small" sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: '#fff' }} />
+                                    {crypto.isActive !== undefined && (
+                                        <Chip 
+                                            label={crypto.isActive ? 'Activo' : 'Inactivo'} 
+                                            size="small" 
+                                            sx={{ 
+                                                bgcolor: crypto.isActive ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 0, 85, 0.1)', 
+                                                color: crypto.isActive ? '#00ff88' : '#ff0055',
+                                                border: '1px solid',
+                                                borderColor: crypto.isActive ? '#00ff88' : '#ff0055'
+                                            }} 
+                                        />
+                                    )}
                                 </Stack>
                             </Box>
                         </Stack>
@@ -122,8 +125,8 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
 
                         <Box sx={{ textAlign: { xs: 'left', md: 'right' } }}>
                             <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 1 }}>
-                                <TaoIcon size={32} />
                                 {crypto.financial.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
+                                <TaoIcon size={32} />
                             </Typography>
                             <Stack direction="row" alignItems="center" spacing={1} justifyContent={{ xs: 'flex-start', md: 'flex-end' }}>
                                 <Chip 
@@ -213,7 +216,7 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                                     >
                                         Vender
                                     </Button>
-                                    <Button
+                                    {/* <Button
                                         fullWidth
                                         variant="outlined"
                                         startIcon={<Send />}
@@ -228,8 +231,8 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                                             }
                                         }}
                                     >
-                                        Enviar
-                                    </Button>
+                                        Transferir
+                                    </Button> */}
                                 </Stack>
                                 <Box>
                                     <Typography variant="h6" sx={{ color: '#fff', mb: 2, borderBottom: '2px solid', borderColor: 'primary.main', display: 'inline-block', pb: 0.5 }}>
@@ -238,29 +241,72 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                                     <CryptoStats financial={crypto.financial} color={color} />
                                 </Box>
 
-                                <Card glowColor={color} sx={{ p: 3 }}>
-                                    <Typography variant="h6" sx={{ color: '#fff', mb: 2 }}>Sobre {crypto.identification.name}</Typography>
-                                    <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.8, mb: 2 }}>
-                                        {description.join(' ')}
+                                <Card glowColor={crypto.additionalInfo?.pColor || color} sx={{ p: 3, border: `1px solid ${crypto.additionalInfo?.pColor || 'rgba(255,255,255,0.1)'}40` }}>
+                                    <Typography variant="h6" sx={{ color: '#fff', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        Sobre {crypto.identification.name}
+                                        {crypto.additionalInfo?.pColor && (
+                                            <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: crypto.additionalInfo.pColor, boxShadow: `0 0 10px ${crypto.additionalInfo.pColor}` }} />
+                                        )}
                                     </Typography>
                                     
-                                    <Stack spacing={1}>
+                                    <Box sx={{ mb: 3 }}>
+                                        {description.map((desc, i) => (
+                                            <Typography key={i} variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.8, mb: 1.5 }}>
+                                                {desc}
+                                            </Typography>
+                                        ))}
+                                    </Box>
+                                    
+                                    <Divider sx={{ my: 2, borderColor: `${crypto.additionalInfo?.sColor || 'rgba(255,255,255,0.1)'}40` }} />
+
+                                    <Stack spacing={2}>
                                         <Stack direction="row" alignItems="center" spacing={1}>
-                                            <AccessTime fontSize="small" sx={{ color: 'primary.main' }} />
-                                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                                                Creado: {crypto.additionalInfo?.dateCreated ? new Date(crypto.additionalInfo.dateCreated).toLocaleDateString() : 'Desconocido'}
+                                            <AccessTime fontSize="small" sx={{ color: crypto.additionalInfo?.pColor || 'primary.main' }} />
+                                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                                <Box component="span" sx={{ color: 'text.primary', fontWeight: 'bold' }}>Creado:</Box> {crypto.additionalInfo?.dateCreated ? new Date(crypto.additionalInfo.dateCreated).toLocaleDateString() : 'Desconocido'}
                                             </Typography>
                                         </Stack>
-                                        <Stack direction="row" alignItems="center" spacing={1}>
-                                            <Code fontSize="small" sx={{ color: 'primary.main' }} />
-                                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                                                Developers: {crypto.additionalInfo?.developers.join(', ') || 'N/A'}
-                                            </Typography>
-                                        </Stack>
+                                        
+                                        {crypto.updatedAt && (
+                                            <Stack direction="row" alignItems="center" spacing={1}>
+                                                <AccessTime fontSize="small" sx={{ color: crypto.additionalInfo?.sColor || 'text.secondary' }} />
+                                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                                    <Box component="span" sx={{ color: 'text.primary', fontWeight: 'bold' }}>Actualizado:</Box> {new Date(crypto.updatedAt).toLocaleString()}
+                                                </Typography>
+                                            </Stack>
+                                        )}
+                                        
+                                        <Box>
+                                            <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+                                                <Code fontSize="small" sx={{ color: crypto.additionalInfo?.pColor || 'primary.main' }} />
+                                                <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
+                                                    Developers:
+                                                </Typography>
+                                            </Stack>
+                                            <Stack direction="row" flexWrap="wrap" gap={1}>
+                                                {crypto.additionalInfo?.developers && crypto.additionalInfo.developers.length > 0 ? (
+                                                    crypto.additionalInfo.developers.map((dev, index) => (
+                                                        <Chip 
+                                                            key={index} 
+                                                            label={dev} 
+                                                            size="small" 
+                                                            variant="outlined"
+                                                            sx={{ 
+                                                                color: crypto.additionalInfo?.sColor || 'text.secondary',
+                                                                borderColor: `${crypto.additionalInfo?.pColor || 'rgba(255,255,255,0.2)'}60`,
+                                                                bgcolor: `${crypto.additionalInfo?.pColor || '#ffffff'}10`
+                                                            }} 
+                                                        />
+                                                    ))
+                                                ) : (
+                                                    <Typography variant="caption" color="text.secondary">N/A</Typography>
+                                                )}
+                                            </Stack>
+                                        </Box>
                                     </Stack>
                                 </Card>
 
-                                <CryptoNews name={crypto.identification.name} />
+                                {/* <CryptoNews name={crypto.identification.name} /> */}
                             </Stack>
                         </Grid>
                     </Grid>

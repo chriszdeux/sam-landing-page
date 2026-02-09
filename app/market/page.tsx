@@ -180,8 +180,8 @@ export default function MarketPage() {
 
                     <Box sx={{ textAlign: 'center', mb: 3, zIndex: 1, width: '100%' }}>
                         <Typography variant="h4" fontWeight="bold" sx={{ color: 'white', mb: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                            <TaoIcon size={28} />
                             {crypto.financial.price.toLocaleString(undefined, { maximumFractionDigits: 5 })}
+                            <TaoIcon size={28} />
                         </Typography>
                         
                         <Box sx={{ 
@@ -229,7 +229,7 @@ export default function MarketPage() {
                         </Button>
                         {/* Transfer is secondary, can be full width or just hidden if space is tight. Let's make it full width below */}
                     </Box>
-                     <Button 
+                     {/* <Button 
                         variant="text" 
                         size="small" 
                         fullWidth
@@ -242,7 +242,7 @@ export default function MarketPage() {
                         }}
                     >
                         <Send sx={{ fontSize: 16, mr: 1 }} /> TRANSFERIR
-                    </Button>
+                    </Button> */}
                     </Box>
                 </TechFrame>
                 </motion.div>
