@@ -49,8 +49,8 @@ export const MechanicsSection = () => {
         <Box className="mechanics-title">
             <SectionTitle subtitle="// CORE SYSTEMS" align="center">
                 Mecánicas de Juego
-            </SectionTitle><SectionTitle subtitle="// Próximamente //" align="center">
             </SectionTitle>
+
         </Box>
 
         <Grid container spacing={4} justifyContent="center" alignItems="stretch" className="mechanics-grid">
