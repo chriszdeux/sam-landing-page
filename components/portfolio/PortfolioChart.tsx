@@ -6,14 +6,14 @@ import DonutLargeIcon from '@mui/icons-material/DonutLarge';
 import DataUsageIcon from '@mui/icons-material/DataUsage';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
-import { motion, AnimationControls } from 'framer-motion';
+import { motion, LegacyAnimationControls } from 'framer-motion';
 import { Asset } from '../../lib/types/portfolio';
 
 ChartJS.register(ArcElement, Tooltip, Legend, RadialLinearScale, BarElement, CategoryScale, LinearScale, PointElement, LineElement, Filler);
 
 interface PortfolioChartProps {
     assets: Asset[];
-    controls: AnimationControls;
+    controls: LegacyAnimationControls;
 }
 
 export const PortfolioChart: React.FC<PortfolioChartProps> = ({ assets, controls }) => {

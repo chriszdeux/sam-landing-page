@@ -19,7 +19,7 @@ gsap.registerPlugin(ScrollTrigger);
 export const HeroSection = () => {
   const dispatch = useAppDispatch();
   const container = useRef<HTMLElement | null>(null);
-  const { project, coin } = EnvVariables;
+  const { project } = EnvVariables;
   useGSAP(() => {
     // Animate Left Content
     gsap.from('.hero-content', {
