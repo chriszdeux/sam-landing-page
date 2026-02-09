@@ -6,11 +6,12 @@ import { cyan } from '@mui/material/colors';
 
 interface TaoIconProps {
     size?: number;
+    color?: string;
     style?: React.CSSProperties;
 }
 
-export const TaoIcon: React.FC<TaoIconProps> = ({ size = 12, style}) => { 
-    const color = cyan[200];
+export const TaoIcon: React.FC<TaoIconProps> = ({ size = 12, color: customColor, style}) => { 
+    const color = customColor || cyan[200];
     return (
         <Typography 
             component={motion.span}
