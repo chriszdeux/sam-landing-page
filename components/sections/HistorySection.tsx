@@ -8,6 +8,7 @@ import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Section } from '../ui/Section';
 import { historyData } from '../../lib/data/history';
+import { EnvVariables } from '@/lib/constants/variables';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -86,6 +87,7 @@ const DataLog = ({ title, year, children, align = 'left' }: { title: string; yea
 
 export const HistorySection = () => {
   const container = useRef<HTMLElement | null>(null);
+  const { project } = EnvVariables;
 
   useGSAP(() => {
     // Animate Main Title
@@ -159,7 +161,7 @@ export const HistorySection = () => {
               fontWeight: 900,
               textShadow: '0 0 20px rgba(0, 243, 255, 0.8)'    
           }}>
-            Cronología LynCore
+            Cronología {project}
           </Typography>
           <Divider sx={{ my: 4, borderColor: '#00f3ff', opacity: 0.3, maxWidth: '200px', mx: 'auto' }} />
         </Box>

@@ -46,8 +46,10 @@ export const LoginForm = () => {
   const onSubmit = async (data: LoginFormInputs) => {
     const resultAction = await dispatch(login(data));
     if (login.fulfilled.match(resultAction)) {
-      dispatch(closeModal());
-      router.push('/auth/logging-in');
+        router.push('/auth/logging-in');
+        setTimeout(() => {
+            dispatch(closeModal());
+        }, 1000);
     }
   };
 

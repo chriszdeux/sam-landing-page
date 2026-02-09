@@ -6,8 +6,8 @@ import { Background } from "../components/layout/Background";
 import { HeroSection } from "../components/sections/HeroSection";
 import { HistorySection } from "../components/sections/HistorySection";
 import { MechanicsSection } from "../components/sections/MechanicsSection";
-import { ResourcesSection } from "../components/sections/ResourcesSection";
-import { ArchitectureSection } from "../components/sections/ArchitectureSection";
+// import { ResourcesSection } from "../components/sections/ResourcesSection";
+// import { ArchitectureSection } from "../components/sections/ArchitectureSection";
 import { Modal } from "../components/ui/Modal";
 import { SectionNavigation } from "../components/ui/SectionNavigation";
 
@@ -22,8 +22,8 @@ export default function Home() {
         <HeroSection />
         <HistorySection />
         <MechanicsSection />
-        <ResourcesSection />
-        <ArchitectureSection />
+        {/* <ResourcesSection /> */}
+        {/* <ArchitectureSection /> */}
       </div>
 
       <Footer />

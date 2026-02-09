@@ -3,13 +3,28 @@
 import React from 'react';
 import { Box, Typography, Container, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Background } from '../../components/layout/Background';
-import { Shield, Lock, VpnKey } from '@mui/icons-material';
+import { Shield, Lock, VpnKey, ArrowBack } from '@mui/icons-material';
+import { useRouter } from 'next/navigation';
+import { Button } from '../../components/ui/Button';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { motion } from 'framer-motion';
+import { EnvVariables } from '@/lib/constants/variables';
 
 export default function SecurityPage() {
+    const { project } = EnvVariables;
+    const router = useRouter();
   return (
     <Box sx={{ minHeight: '100vh', position: 'relative' }}>
+      <Box sx={{ position: 'fixed', top: 100, left: { xs: 20, md: 40 }, zIndex: 100 }}>
+        <Button 
+            variant="outlined" 
+            startIcon={<ArrowBack />} 
+            onClick={() => router.back()}
+            sx={{ backdropFilter: 'blur(5px)' }}
+        >
+            Atrás
+        </Button>
+      </Box>
       <Background />
       
       <Container maxWidth="lg" sx={{ pt: 20, pb: 10, position: 'relative', zIndex: 1, color: 'white' }}>
@@ -25,7 +40,7 @@ export default function SecurityPage() {
             </Box>
 
             <Typography variant="h5" paragraph sx={{ lineHeight: 1.8, mb: 6, textAlign: 'center' }}>
-                En 2036, desde servidores sumergidos en túneles geotérmicos de Guadalajara, nació LynCore. Nos protegemos con algo más fuerte que la criptografía: la soberanía energética y la distribución interestelar.
+                En 2036, desde servidores sumergidos en túneles geotérmicos de Guadalajara, nació {project}. Nos protegemos con algo más fuerte que la criptografía: la soberanía energética y la distribución interestelar.
             </Typography>
 
             <List sx={{ bgcolor: 'rgba(0,0,0,0.5)', p: 4, borderRadius: 4, border: '1px solid rgba(0,243,255,0.2)' }}>
@@ -39,7 +54,7 @@ export default function SecurityPage() {
                 <ListItem sx={{ mb: 2 }}>
                     <ListItemIcon><VpnKey sx={{ color: 'primary.main', fontSize: 40 }} /></ListItemIcon>
                     <ListItemText 
-                        primary={<Typography variant="h5" color="white">Red Quetzalcóatl</Typography>}
+                        primary={<Typography variant="h5" color="white">Red ${project}</Typography>}
                         secondary={<Typography variant="body1" color="text.secondary">Uso de entrelazamiento cuántico para sincronizar billeteras entre sistemas solares instantáneamente, eliminando la latencia luz.</Typography>}
                     />
                 </ListItem>
@@ -47,7 +62,7 @@ export default function SecurityPage() {
                     <ListItemIcon><Shield sx={{ color: 'primary.main', fontSize: 40 }} /></ListItemIcon>
                     <ListItemText 
                         primary={<Typography variant="h5" color="white">Soberanía Energética</Typography>}
-                        secondary={<Typography variant="body1" color="text.secondary">Gracias a Helios-Prime y las Forjas Solares, LynCore genera su propio combustible de cómputo. Nadie puede apagarla.</Typography>}
+                        secondary={<Typography variant="body1" color="text.secondary">Gracias a Helios-Prime y las Forjas Solares, {project} genera su propio combustible de cómputo. Nadie puede apagarla.</Typography>}
                     />
                 </ListItem>
             </List>

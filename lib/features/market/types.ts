@@ -1,6 +1,6 @@
 import { Cryptocurrency } from '../../types/crypto';
 
-export interface CandleData {
+export interface AnalyticsData {
     buy?: number;
     sell?: number;
     price: number;
@@ -17,7 +17,7 @@ export interface MarketState {
     cryptos: Cryptocurrency[];
     historicalData: {
         [cryptoId: string]: {
-            data: CandleData[];
+            data: AnalyticsData[];
             range: string;
             total: number;
             currentBuyState?: TradeState;

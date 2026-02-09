@@ -9,12 +9,13 @@ import { Section } from '../ui/Section';
 import { TechFrame } from '../ui/TechFrame';
 import { SectionTitle } from '../ui/SectionTitle';
 import { mechanicsData } from '../../lib/data/mechanics';
+import { EnvVariables } from '@/lib/constants/variables';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export const MechanicsSection = () => {
   const container = useRef<HTMLElement | null>(null);
-
+  const { coin1, coin2, coin3 } = EnvVariables
   useGSAP(() => {
     // Animate Title
     gsap.from('.mechanics-title', {
@@ -48,6 +49,7 @@ export const MechanicsSection = () => {
         <Box className="mechanics-title">
             <SectionTitle subtitle="// CORE SYSTEMS" align="center">
                 Mecánicas de Juego
+            </SectionTitle><SectionTitle subtitle="// Próximamente //" align="center">
             </SectionTitle>
         </Box>
 
@@ -91,10 +93,10 @@ export const MechanicsSection = () => {
                         </Link>
                         
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 4, flexGrow: 1, lineHeight: 1.6 }}>
-                        {mechanic.description.split(/(\$TAO|\$SOLIS|\$LYN)/g).map((part, index) => {
-                            if (part === '$TAO') return <Link key={index} href="/mechanics/economy" style={{ color: '#ff0055', textDecoration: 'none', fontWeight: 'bold' }}>$TAO</Link>;
-                            if (part === '$SOLIS') return <Link key={index} href="/mechanics/economy" style={{ color: '#ffb700', textDecoration: 'none', fontWeight: 'bold' }}>$SOLIS</Link>;
-                            if (part === '$LYN') return <Link key={index} href="/mechanics/economy" style={{ color: '#00ff9d', textDecoration: 'none', fontWeight: 'bold' }}>$LYN</Link>;
+                        {mechanic.description.split(/(\${coin1}|\${coin2}|\${coin3})/g).map((part, index) => {
+                            if (part === coin1) return <Link key={index} href="/mechanics/economy" style={{ color: '#ff0055', textDecoration: 'none', fontWeight: 'bold' }}>{coin1}</Link>;
+                            if (part === coin2) return <Link key={index} href="/mechanics/economy" style={{ color: '#ffb700', textDecoration: 'none', fontWeight: 'bold' }}>{coin2}</Link>;
+                            if (part === coin3) return <Link key={index} href="/mechanics/economy" style={{ color: '#00ff9d', textDecoration: 'none', fontWeight: 'bold' }}>{coin3}</Link>;
                             return part;
                         })}
                         </Typography>

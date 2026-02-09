@@ -6,7 +6,7 @@ import { Box, Typography } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import { mechanicsData } from '../../../lib/data/mechanics';
 import { Button } from '../../../components/ui/Button';
-import { LayoutType1, LayoutType2, LayoutType3, LayoutType4 } from '../../../components/mechanics/MechanicLayouts';
+import { LayoutType1, LayoutType2, LayoutType3, LayoutType4, LayoutTypeDefense } from '../../../components/mechanics/MechanicLayouts';
 
 export default function MechanicPage({ params }: { params: Promise<{ slug: string }> }) {
   const router = useRouter();
@@ -28,6 +28,7 @@ export default function MechanicPage({ params }: { params: Promise<{ slug: strin
           case 'type2': return <LayoutType2 mechanic={mechanic} />;
           case 'type3': return <LayoutType3 mechanic={mechanic} />;
           case 'type4': return <LayoutType4 mechanic={mechanic} />;
+          case 'defense': return <LayoutTypeDefense mechanic={mechanic} />;
           default: return <LayoutType1 mechanic={mechanic} />;
       }
   };

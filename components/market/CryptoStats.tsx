@@ -33,13 +33,14 @@ export const CryptoStats = ({ financial, color }: CryptoStatsProps) => {
         <Grid size={{ xs: 6, md: 6 }}>
             <StatItem 
                 label="Capitalización de Mercado" 
-                value={<><TaoIcon size={16} /> {financial.marketCap.toLocaleString()}</>} 
+                value={<>{financial.marketCap.toLocaleString()} <TaoIcon size={16} /></>}
+                subValue={financial.limitMarketCap > 0 ? `Límite: ${financial.limitMarketCap.toLocaleString()}` : undefined}
             />
         </Grid>
         <Grid size={{ xs: 6, md: 6 }}>
             <StatItem 
                 label="Volumen (24h)" 
-                value={<><TaoIcon size={16} /> {financial.volume24h ? financial.volume24h.toLocaleString() : 'N/A'}</>} 
+                value={<>{financial.volume24h ? financial.volume24h.toLocaleString() : '0'} <TaoIcon size={16} /></>} 
             />
         </Grid>
         <Grid size={{ xs: 6, md: 6 }}>
@@ -51,23 +52,36 @@ export const CryptoStats = ({ financial, color }: CryptoStatsProps) => {
         <Grid size={{ xs: 6, md: 6 }}>
             <StatItem 
                 label="Suministro Total" 
-                value={financial.totalSupply.toLocaleString()} 
-                subValue={financial.maxSupply ? `Max: ${financial.maxSupply.toLocaleString()}` : 'Infinito'}
+                value={financial.isInfiniteSupply ? 'Infinito' : financial.totalSupply.toLocaleString()} 
+                subValue={!financial.isInfiniteSupply && financial.maxSupply ? `Max: ${financial.maxSupply.toLocaleString()}` : undefined}
             />
         </Grid>
         <Grid size={{ xs: 6, md: 6 }}>
             <StatItem 
                 label="Máximo Histórico" 
-                value={<><TaoIcon size={16} /> {financial.allTimeHigh.toLocaleString()}</>} 
-                subValue={new Date(financial.allTimeHighDate).toLocaleDateString()}
+                value={<>{financial.allTimeHigh.toLocaleString()} <TaoIcon size={16} /></>} 
+                subValue={financial.allTimeHighDate ? new Date(financial.allTimeHighDate).toLocaleDateString() : 'N/A'}
             />
         </Grid>
         <Grid size={{ xs: 6, md: 6 }}>
             <StatItem 
                 label="Mínimo Histórico" 
-                value={<><TaoIcon size={16} /> {financial.allTimeLow.toLocaleString()}</>} 
-                subValue={new Date(financial.allTimeLowDate).toLocaleDateString()}
+                value={<>{financial.allTimeLow.toLocaleString()} <TaoIcon size={16} /></>} 
+                subValue={financial.allTimeLowDate ? new Date(financial.allTimeLowDate).toLocaleDateString() : 'N/A'}
                 color={color}
+            />
+        </Grid>
+        <Grid size={{ xs: 12, md: 6 }}>
+            <StatItem 
+                label="Decimales" 
+                value={financial.decimals?.toString() || 'N/A'} 
+            />
+        </Grid>
+        <Grid size={{ xs: 12, md: 6 }}>
+            <StatItem 
+                label="Contrato" 
+                value={financial.contractAddress ? `${financial.contractAddress.substring(0, 6)}...${financial.contractAddress.substring(financial.contractAddress.length - 4)}` : 'N/A'} 
+                subValue={financial.contractAddress} // Full address in subvalue for visibility/copy potentially
             />
         </Grid>
     </Grid>

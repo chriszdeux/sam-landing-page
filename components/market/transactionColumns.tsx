@@ -90,7 +90,7 @@ export const transactionColumns: Column<TransactionsInterface>[] = [
         accessor: (row) => row.financialInfo?.price || 0,
         Cell: ({ value }) => (
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <TaoIcon size={14} /> <span>{(value as number || 0).toLocaleString()}</span>
+                <span>{(value as number || 0).toLocaleString()}</span> <TaoIcon size={14} />
             </div>
         ),
         sortable: true

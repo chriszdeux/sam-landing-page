@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { AuthState } from './types';
-import { login, register, validateAccount, checkAuth, fetchWalletDetails, addWallet, removeWallet } from './actions';
+import { login, register, validateAccount, checkAuth, fetchWalletDetails, addWallet, removeWallet, refreshUserInfo } from './actions';
 
 const initialState: AuthState = {
   userInfo: null,
@@ -140,6 +140,15 @@ const authSlice = createSlice({
               state.userInfo.walletsSaved = state.userInfo.walletsSaved.filter(
                   w => w.walletAddress !== action.payload.walletAddress
               );
+          }
+      })
+      // Refresh User Info
+      .addCase(refreshUserInfo.fulfilled, (state, action) => {
+          if (state.userInfo) {
+              // Merge existing info with new info to preserve client-side only state if any, or just replace
+              state.userInfo = { ...state.userInfo, ...action.payload };
+          } else {
+              state.userInfo = action.payload; // Fallback if somehow null
           }
       });
   },

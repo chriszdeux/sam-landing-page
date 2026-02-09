@@ -11,7 +11,7 @@ import {
     Layers 
 } from '@mui/icons-material';
 import { Column } from '../ui/GenericTable';
-import { TransactionsInterface, TransactionType, TransactionStatus } from '../../lib/features/transactions/types';
+import { TransactionsInterface, TransactionType } from '../../lib/features/transactions/types';
 
 export const transactionsPageColumns: Column<TransactionsInterface>[] = [
     {
@@ -33,8 +33,8 @@ export const transactionsPageColumns: Column<TransactionsInterface>[] = [
         filterable: true,
         sortable: true,
         Cell: ({ value }) => {
-           const isBuy = value === TransactionType.BUY;
-           const isSell = value === TransactionType.SELL;
+           // const isBuy = value === TransactionType.BUY;
+           // const isSell = value === TransactionType.SELL;
            
            let label = value as string;
            let color = '#00f3ff'; // Default cyan
@@ -116,7 +116,7 @@ export const transactionsPageColumns: Column<TransactionsInterface>[] = [
         sortable: true,
         Cell: ({ value }) => (
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <TaoIcon size={14} /> <span>{(value as number)?.toLocaleString()}</span>
+                <span>{(value as number)?.toLocaleString()}</span> <TaoIcon size={14} />
             </div>
         )
     },

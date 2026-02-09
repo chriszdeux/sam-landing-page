@@ -18,10 +18,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-import { CONFIG } from "../lib/config";
+import { EnvVariables } from "@/lib/constants/variables";
 
 export const metadata: Metadata = {
-  title: CONFIG.PROJECT_NAME,
+  title: EnvVariables.project,
   description: "Simulación de inversiones en criptomonedas y exploración espacial",
 };
 

@@ -1,26 +1,48 @@
 import React from 'react';
-import { Box } from '@mui/material';
-import { IMAGES } from '../../lib/constants/images';
+import { Typography } from '@mui/material';
+import { motion } from 'framer-motion';
+import { EnvVariables } from '@/lib/constants/variables';
+import { cyan } from '@mui/material/colors';
 
 interface TaoIconProps {
     size?: number;
     style?: React.CSSProperties;
 }
 
-export const TaoIcon: React.FC<TaoIconProps> = ({ size = 20, style }) => {
+export const TaoIcon: React.FC<TaoIconProps> = ({ size = 12, style}) => { 
+    const color = cyan[200];
     return (
-        <Box 
-            component="img" 
-            src={IMAGES.TAO} 
-            alt="TAO" 
+        <Typography 
+            component={motion.span}
+            initial={{ opacity: 0.8 }}
+            animate={{ 
+                opacity: [0.8, 1, 0.8],
+                textShadow: [
+                    `0 0 0px ${color}00`,
+                    `0 0 10px ${color}80`,
+                    `0 0 0px ${color}00`
+                ]
+            }}
+            transition={{ 
+                duration: 2, 
+                repeat: Infinity,
+                ease: "easeInOut"
+            }}
             sx={{ 
-                width: size, 
-                height: size, 
-                objectFit: 'contain', 
+                color: color,
+                fontWeight: 900, 
+                fontSize: size,
+                fontFamily: 'monospace',
+                lineHeight: 1,
+                display: 'inline-flex',
+                alignItems: 'baseline', // Align with text baseline
+                letterSpacing: 1,
+                ml: 0.5, // Small margin left for spacing after numbers
                 verticalAlign: 'middle',
-                display: 'inline-block',
                 ...style 
-            }} 
-        />
+            }}
+        >
+            {EnvVariables.coin1}
+        </Typography>
     );
 };

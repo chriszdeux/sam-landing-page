@@ -15,7 +15,7 @@ export interface Financial {
   decimals?: number;
   contractAddress?: string;
   tokenType?: string;
-  candlesID: string;
+  analyticsID: string;
 }
 
 export interface Cryptocurrency {
@@ -37,9 +37,11 @@ export interface Cryptocurrency {
     description: string[];
     dateCreated: string; // string for frontend
     lastModified?: string; // string for frontend
+    descriptionLastUpdated?: string;
     developers: string[];
   };
   isActive: boolean;
+  updatedAt?: string;
 }
 
 export interface RandomCryptocurrency {

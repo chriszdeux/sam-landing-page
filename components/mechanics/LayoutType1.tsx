@@ -2,9 +2,77 @@ import React from 'react';
 import { Box, Typography, Container, Grid, Stack } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Mechanic } from '../../lib/data/mechanics';
+import { useSelector } from 'react-redux';
+import { BlockchainState } from '@/lib/features/blockchain/types';
 
-export const LayoutType1 = ({ mechanic }: { mechanic: Mechanic }) => (
-  <Container maxWidth="xl" sx={{ pt: 20 }}>
+
+export const ProbePulse = ({ color }: { color: string }) => {
+  return (
+    <Box sx={{ position: 'relative', width: 300, height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      {/* Core */}
+      <Box sx={{ width: 16, height: 16, borderRadius: '50%', bgcolor: color, zIndex: 10, boxShadow: `0 0 20px ${color}` }} />
+      
+      {/* Expanding Pulses */}
+      {[0, 1, 2].map((i) => (
+        <motion.div
+            key={i}
+            style={{
+                position: 'absolute',
+                border: `1px solid ${color}`,
+                borderRadius: '50%',
+                top: '50%',
+                left: '50%',
+                x: '-50%',
+                y: '-50%',
+            }}
+            initial={{ opacity: 0, width: 0, height: 0 }}
+            animate={{
+                width: [0, 500],
+                height: [0, 500],
+                opacity: [0, 0.5, 0],
+                borderWidth: [2, 0]
+            }}
+            transition={{
+                duration: 6,
+                repeat: Infinity,
+                delay: i * 2,
+                ease: "linear",
+                times: [0, 0.2, 1]
+            }}
+        />
+      ))}
+      
+      {/* Rotating Orbit/Galaxy ring */}
+       <motion.div
+            style={{
+                position: 'absolute',
+                width: 250,
+                height: 250,
+                border: `1px dashed ${color}30`,
+                borderRadius: '50%'
+            }}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+       />
+       <motion.div
+            style={{
+                position: 'absolute',
+                width: 180,
+                height: 180,
+                border: `1px dashed ${color}50`,
+                borderRadius: '50%'
+            }}
+            animate={{ rotate: -360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+       />
+    </Box>
+  )
+}
+
+export const LayoutType1 = ({ mechanic }: { mechanic: Mechanic }) => {
+  const { networks } = useSelector((state: { blockchain: BlockchainState }) => state.blockchain);
+   return (
+     <Container maxWidth="xl" sx={{ pt: 20 }}>
     <Grid container spacing={8} alignItems="center">
       <Grid size={{ xs: 12, md: 6 }}>
         <motion.div initial={{ x: -50, opacity: 0 }} animate={{ x: 0, opacity: 1 }}>
@@ -36,12 +104,33 @@ export const LayoutType1 = ({ mechanic }: { mechanic: Mechanic }) => (
                 border: `1px solid ${mechanic.color}40`,
                 boxShadow: `0 0 50px ${mechanic.color}20`
             }}>
-                <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                     <mechanic.icon size={120} color={mechanic.color} opacity={0.5} />
+                <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                     {/* Background Stars Effect */}
+                     {[...Array(20)].map((_, i) => {
+                        // Use a deterministic pseudo-random approach based on index
+                        const top = ((i * 17) % 100);
+                        const left = ((i * 23) % 100);
+                        const delay = (i % 5);
+                        return (
+                        <motion.div 
+                            key={i}
+                            style={{
+                                position: 'absolute',
+                                top: `${top}%`,
+                                left: `${left}%`,
+                                width: 2,
+                                height: 2,
+                                backgroundColor: 'white',
+                            }}
+                            animate={{ opacity: [0.3, 1, 0.3] }}
+                            transition={{ duration: 2 + delay, repeat: Infinity, ease: "easeInOut" }}
+                        />
+                     )})}
+                     <ProbePulse color={mechanic.color} />
                 </Box>
                 {/* Simulated UI Overlay */}
                 <Box sx={{ position: 'absolute', bottom: 30, left: 30, right: 30, p: 3, bgcolor: 'rgba(0,0,0,0.8)', borderRadius: 4, backdropFilter: 'blur(10px)' }}>
-                    <Typography variant="subtitle2" color={mechanic.color}>Estado del Sistema</Typography>
+                    <Typography variant="subtitle2" color={mechanic.color}>Estado del Sistema - {networks[0]?.isActive ? "Operativo" : "No operativo"}</Typography>
                     <Box sx={{ height: 4, bgcolor: 'rgba(255,255,255,0.1)', mt: 1, borderRadius: 2 }}>
                         <Box sx={{ width: '70%', height: '100%', bgcolor: mechanic.color, borderRadius: 2 }} />
                     </Box>
@@ -75,4 +164,5 @@ export const LayoutType1 = ({ mechanic }: { mechanic: Mechanic }) => (
         </Grid>
     </Box>
   </Container>
-);
+   )
+}
