@@ -1,3 +1,9 @@
+/**
+ * Fondo de Partículas Interactivo
+ * Renderizado en HTML5 Canvas con 2D Context
+ * Simulación física (movimiento, repulsión, fricción)
+ * Efectos visuales de conexión y electricidad
+ */
 'use client';
 
 import React, { useEffect, useRef } from 'react';
@@ -23,17 +29,14 @@ export const ParticleBackground = () => {
     if (!ctx) return;
 
     let particles: Particle[] = [];
-    let electricPaths: { path: Particle[]; life: number }[] = [];
+    const electricPaths: { path: Particle[]; life: number }[] = [];
     let animationFrameId: number;
     let width = window.innerWidth;
     let height = window.innerHeight;
-    let mouse = { x: -1000, y: -1000 }; // Start off-screen
+    const mouse = { x: -1000, y: -1000 };
 
-    // Configuration
-    const particleCount = Math.min(200, Math.floor((width * height) / 8000)); // Increased density
     const connectionDistance = 150;
-    const mouseRadius = 300; // Radius of influence
-    const colors = ['#00f3ff', '#ff0055']; // Cyan and Pink
+    const colors = ['#00f3ff', '#ff0055'];
 
     const handleMouseMove = (e: MouseEvent) => {
       mouse.x = e.clientX;
@@ -66,30 +69,23 @@ export const ParticleBackground = () => {
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Update and draw particles
-      // Update and draw particles
       particles.forEach((p) => {
-        // Suspended floating movement
-        // Add slight mouse interactions (gentle push)
         const dxMouse = mouse.x - p.x;
         const dyMouse = mouse.y - p.y;
         const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
         
         if (distMouse < 200) {
             const force = (200 - distMouse) / 200;
-            // Gentle repulsion to feel "suspended" in fluid
             p.vx -= (dxMouse / distMouse) * force * 0.05;
             p.vy -= (dyMouse / distMouse) * force * 0.05;
         }
 
-        // Friction
         p.vx *= 0.98;
         p.vy *= 0.98;
 
         p.x += p.vx;
         p.y += p.vy;
 
-        // Bounce off edges
         if (p.x < 0 || p.x > width) p.vx *= -1;
         if (p.y < 0 || p.y > height) p.vy *= -1;
 
@@ -100,11 +96,8 @@ export const ParticleBackground = () => {
         ctx.shadowBlur = 0;
         
         ctx.fill();
-        ctx.shadowBlur = 0; // Reset
 
-        // Draw connections
         for (let j = 0; j < particles.length; j++) {
-            // Optimization: only check some particles or use spatial partition (skip for now, just limiting count)
             const p2 = particles[j];
             if (p === p2) continue;
 
@@ -113,30 +106,26 @@ export const ParticleBackground = () => {
             const distance = Math.sqrt(dx * dx + dy * dy);
 
             if (distance < connectionDistance) {
-            ctx.beginPath();
-            ctx.strokeStyle = p.color;
-            ctx.globalAlpha = 1 - distance / connectionDistance;
-            ctx.lineWidth = 0.5;
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.stroke();
-            ctx.globalAlpha = 1;
+                ctx.beginPath();
+                ctx.strokeStyle = p.color;
+                ctx.globalAlpha = 1 - distance / connectionDistance;
+                ctx.lineWidth = 0.5;
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.stroke();
+                ctx.globalAlpha = 1;
             }
         }
       });
 
-      // Electric Effects Logic
-      // Spawn new bolt occasionally
-      if (Math.random() < 0.05) { // 5% chance per frame
+      if (Math.random() < 0.05) {
         const startIdx = Math.floor(Math.random() * particles.length);
         const startParticle = particles[startIdx];
         const path: Particle[] = [startParticle];
         let current = startParticle;
 
-        // Chain 2-4 particles
         const chainLength = Math.floor(Math.random() * 3) + 2;
         for (let k = 0; k < chainLength; k++) {
-          // Find closest neighbor not in path
           let closest = null;
           let minDst = connectionDistance;
 
@@ -164,13 +153,12 @@ export const ParticleBackground = () => {
         }
       }
 
-      // Draw and update electric paths
       ctx.shadowBlur = 15;
       ctx.shadowColor = 'white';
 
       for (let i = electricPaths.length - 1; i >= 0; i--) {
         const bolt = electricPaths[i];
-        bolt.life -= 0.1; // Fade out speed
+        bolt.life -= 0.1;
 
         if (bolt.life <= 0) {
           electricPaths.splice(i, 1);
@@ -183,7 +171,6 @@ export const ParticleBackground = () => {
 
         ctx.moveTo(bolt.path[0].x, bolt.path[0].y);
         for (let k = 1; k < bolt.path.length; k++) {
-          // Add a little jitter for "electric" look
           const p1 = bolt.path[k - 1];
           const p2 = bolt.path[k];
           const midX = (p1.x + p2.x) / 2 + (Math.random() - 0.5) * 10;
@@ -195,7 +182,7 @@ export const ParticleBackground = () => {
         ctx.stroke();
       }
 
-      ctx.shadowBlur = 0; // Reset shadow
+      ctx.shadowBlur = 0;
 
       animationFrameId = requestAnimationFrame(draw);
     };
@@ -223,7 +210,8 @@ export const ParticleBackground = () => {
         left: 0,
         width: '100%',
         height: '100%',
-        zIndex: -2, // Moved further back to allow overlay to sit at -1
+
+        zIndex: -2,
         bgcolor: '#0a0a1a', 
       }}
     />
@@ -234,8 +222,9 @@ export const ParticleBackground = () => {
           left: 0,
           width: '100%',
           height: '100%',
-          zIndex: -1, // On top of canvas
-          backgroundColor: 'rgba(0, 0, 0, 0.7)', // Darkened overlay
+
+          zIndex: -1,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
           pointerEvents: 'none',
         }}
     />

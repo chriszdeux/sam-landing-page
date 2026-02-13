@@ -1,3 +1,8 @@
+/**
+ * Sección de Mecánicas de Juego
+ * Grid de tarjetas interactivas con navegación a detalles
+ * Implementa animaciones de entrada con GSAP
+ */
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import { Typography, Grid, Box } from '@mui/material';
@@ -17,7 +22,6 @@ export const MechanicsSection = () => {
   const container = useRef<HTMLElement | null>(null);
   const { coin1, coin2, coin3 } = EnvVariables
   useGSAP(() => {
-    // Animate Title
     gsap.from('.mechanics-title', {
       scrollTrigger: {
         trigger: '.mechanics-title',
@@ -29,7 +33,6 @@ export const MechanicsSection = () => {
       ease: 'power3.out'
     });
 
-    // Animate Cards
     gsap.from('.mechanic-card-item', {
       scrollTrigger: {
         trigger: '.mechanics-grid',

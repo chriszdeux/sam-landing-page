@@ -1,3 +1,14 @@
+/**
+ * Importación de hooks, componentes y utilidades.
+ * Definición de tipos para datos del formulario.
+ * Componente principal con lógica de negocio y estado.
+ * Efectos para cargar tarifas y manejar redirección.
+ * Manejadores de cambios en inputs y selección de wallet.
+ * Validación previa y ejecución de transacciones.
+ * Renderizado de estados de éxito o carga.
+ * Estructura visual del formulario de comercio.
+ */
+
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
@@ -8,7 +19,7 @@ import { Background } from '../../../components/layout/Background';
 import { useAppSelector, useAppDispatch } from '../../../lib/hooks';
 import { updateBalance, updateWalletAssets } from '../../../lib/features/auth/reducer';
 import { refreshUserInfo } from '../../../lib/features/auth/actions';
-import api from '../../../lib/api'; // Adjust path if needed
+import api from '../../../lib/api'; 
 import { ArrowBack } from '@mui/icons-material';
 import { CubeAnimation } from '../../../components/market/CubeAnimation';
 import { WalletSelector } from '../../../components/market/WalletSelector';
@@ -17,17 +28,13 @@ import { TransactionForm } from '../../../components/market/TransactionForm';
 import { TechFrame } from '../../../components/ui/TechFrame';
 import { PageHeader } from '../../../components/ui/PageHeader';
 
-// --- Types ---
 interface TradeFormData {
   walletId: string;
   cryptoId: string;
-  amount: number; // For Fiat
-  quantity: number; // For Crypto units
+  amount: number; 
+  quantity: number; 
 }
 
-
-
-// --- Main Page Component ---
 const TradeContent = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -57,12 +64,11 @@ const TradeContent = () => {
         if (selectedNetwork?.id) {
             try {
                 const { data } = await api.get(`/blockchain/network/${selectedNetwork.id}/fee-base`);
-                // Assuming data is the fee number or an object with value
                 const fee = typeof data === 'number' ? data : (data?.feeBase || 0);
                 setNetworkFee(fee);
             } catch (error) {
                 console.error("Failed to fetch network fee:", error);
-                setNetworkFee(0); // Fallback to 0 or handle error
+                setNetworkFee(0); 
             }
         }
     };
@@ -78,17 +84,22 @@ const TradeContent = () => {
     }
   }, [cryptoIdParam, form.cryptoId]);
 
-  // Auto-redirect on Success
   useEffect(() => {
     if (status === 'SUCCESS') {
         const timer = setTimeout(() => {
-            router.push('/market');
-        }, 3000); // Wait 3 seconds for animation
+            const redirectParam = searchParams.get('redirect');
+            if (redirectParam === 'detail' && form.cryptoId) {
+                router.push(`/market/${form.cryptoId}`);
+            } else if (redirectParam === 'market') {
+                router.push('/market');
+            } else {
+                router.push('/market');
+            }
+        }, 3000); 
         return () => clearTimeout(timer);
     }
-  }, [status, router]);
+  }, [status, router, searchParams, form.cryptoId]);
 
-  // Handle Input Changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
     const { name, value } = e.target;
     setForm(prev => ({
@@ -103,7 +114,6 @@ const TradeContent = () => {
 
   const selectedCrypto = cryptos.find(c => c.id === form.cryptoId);
 
-  // Calculate available quantity for SELL
   const selectedAsset = walletsInfo?.store?.find(a => a.id === form.cryptoId || a.symbol === selectedCrypto?.identification.symbol);
   const availableQuantity = selectedAsset ? Number(selectedAsset.quantity) : 0;
 
@@ -113,7 +123,6 @@ const TradeContent = () => {
     }
   };
 
-  // Submit Handler
   const handlePreSubmit = () => {
     if (!form.walletId || !form.cryptoId) {
         setErrorMsg('Por favor selecciona una wallet y una criptomoneda.');
@@ -126,7 +135,6 @@ const TradeContent = () => {
          return;
     }
 
-    // Validation
     if (transactionType === 'BUY') {
         const userBalance = userInfo?.balance || 0;
         if (form.amount > userBalance) {
@@ -169,7 +177,6 @@ const TradeContent = () => {
 
         await api.post(endpoint, payload);
         
-        // Update User State (Balance) & Portfolio locally
         const currentBalance = userInfo?.balance || 0;
         
         const feeAmount = networkFee || 0;
@@ -185,7 +192,6 @@ const TradeContent = () => {
                 }));
             }
         } else if (transactionType === 'SELL') {
-            // For sell, we gain fiat. Ensure amount is calculated if 0.
             const revenue = form.amount > 0 ? form.amount : (form.quantity * (selectedCrypto?.financial?.price || 0));
             dispatch(updateBalance(currentBalance + revenue - feeAmount));
              if (selectedCrypto) {
@@ -193,12 +199,11 @@ const TradeContent = () => {
                     id: selectedCrypto.id,
                     name: selectedCrypto.identification.name,
                     symbol: selectedCrypto.identification.symbol,
-                    quantity: -form.quantity // Negative for sell
+                    quantity: -form.quantity 
                 }));
             }
         }
 
-        // Sync with server to ensure accuracy
         dispatch(refreshUserInfo());
 
         setStatus('SUCCESS');
@@ -227,9 +232,16 @@ const TradeContent = () => {
                         <Button 
                             variant="outlined" 
                             sx={{ mt: 4 }} 
-                            onClick={() => router.push('/market')}
+                            onClick={() => {
+                                const redirectParam = searchParams.get('redirect');
+                                if (redirectParam === 'detail' && form.cryptoId) {
+                                    router.push(`/market/${form.cryptoId}`);
+                                } else {
+                                    router.push('/market');
+                                }
+                            }}
                         >
-                            Volver al Mercado
+                            {searchParams.get('redirect') === 'detail' ? 'Volver al Detalle' : 'Volver al Mercado'}
                         </Button>
                     </motion.div>
                   )}
@@ -256,7 +268,6 @@ const TradeContent = () => {
 
                 <TechFrame>
                     <Box sx={{ p: 4 }}>
-                        {/* Wallet Selection Phase */}
                         <WalletSelector 
                             userInfo={userInfo}
                             walletsInfo={walletsInfo}

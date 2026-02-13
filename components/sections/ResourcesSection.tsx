@@ -1,3 +1,8 @@
+/**
+ * Sección de Recursos
+ * Visualización de recursos galácticos disponibles
+ * Animaciones coordinadas para elementos de la UI
+ */
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -15,11 +20,9 @@ gsap.registerPlugin(ScrollTrigger);
 
 export const ResourcesSection = () => {
   const container = useRef<HTMLElement | null>(null);
-  // Taking first 4 items for the preview
   const previewResources = resourcesData.slice(0, 4);
 
   useGSAP(() => {
-    // Title Animation
     gsap.from('.resources-title', {
       scrollTrigger: {
         trigger: '.resources-title',
@@ -31,7 +34,6 @@ export const ResourcesSection = () => {
       ease: 'power3.out'
     });
 
-    // Cards Animation
     gsap.from('.resource-card', {
       scrollTrigger: {
         trigger: '.resources-grid',
@@ -44,7 +46,6 @@ export const ResourcesSection = () => {
       ease: 'power2.out'
     });
 
-    // Button Animation
     gsap.from('.view-more-btn', {
       scrollTrigger: {
         trigger: '.view-more-btn',
@@ -63,12 +64,12 @@ export const ResourcesSection = () => {
     <Section id="resources">
       <Box ref={container}>
         <Box className="resources-title">
-        <Box className="resources-title">
             <SectionTitle subtitle="// DATABASE" align="center">
                 Recursos Galácticos
             </SectionTitle>
         </Box>
-        </Box>
+
+
 
         <Grid container spacing={4} justifyContent="center" alignItems="stretch" className="resources-grid">
             {previewResources.map((resource, index) => (

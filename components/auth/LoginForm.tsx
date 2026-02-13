@@ -1,3 +1,8 @@
+/**
+ * Formulario de Inicio de Sesión
+ * Gestiona la autenticación del usuario mediante email y contraseña
+ * Utiliza react-hook-form y zod para validación
+ */
 'use client';
 
 import React from 'react';
@@ -61,7 +66,7 @@ export const LoginForm = () => {
 
         <Box sx={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
             
-            {/* Content Frame */}
+
             <Box sx={{ position: 'relative', zIndex: 1, flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <TechFrame color="#00f3ff">
                     <Box sx={{ p: 4, bgcolor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)' }}>

@@ -1,3 +1,8 @@
+/**
+ * Sección de Arquitectura
+ * Muestra las estructuras destacadas del juego
+ * Animaciones GSAP para título, tarjetas y botones
+ */
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -18,7 +23,6 @@ export const ArchitectureSection = () => {
   const previewBuildings = architectureData.slice(0, 4);
 
   useGSAP(() => {
-    // Title Animation
     gsap.from('.arch-title', {
       scrollTrigger: {
         trigger: '.arch-title',
@@ -30,7 +34,6 @@ export const ArchitectureSection = () => {
       ease: 'power3.out'
     });
 
-    // Cards Animation
     gsap.from('.arch-card', {
       scrollTrigger: {
         trigger: '.arch-grid',
@@ -43,7 +46,6 @@ export const ArchitectureSection = () => {
       ease: 'power2.out'
     });
 
-    // Button Animation
     gsap.from('.arch-btn', {
       scrollTrigger: {
         trigger: '.arch-btn',

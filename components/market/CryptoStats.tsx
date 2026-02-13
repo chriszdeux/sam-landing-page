@@ -1,3 +1,8 @@
+/**
+ * Componente de Estadísticas de Criptomonedas
+ * Grid de tarjetas mostrando métricas financieras clave
+ * (Capitalización, Volumen, Suministro, Máximos/Mínimos)
+ */
 import React from 'react';
 import { Grid, Typography } from '@mui/material';
 import { Financial } from '../../lib/types/crypto';
@@ -80,7 +85,7 @@ export const CryptoStats = ({ financial, color }: CryptoStatsProps) => {
                 <StatItem
                     label="Contrato"
                     value={financial.contractAddress ? `${financial.contractAddress.substring(0, 6)}...${financial.contractAddress.substring(financial.contractAddress.length - 4)}` : 'N/A'}
-                    subValue={financial.contractAddress} // Full address in subvalue for visibility/copy potentially
+                    subValue={financial.contractAddress}
                 />
             </Grid>
         </Grid>

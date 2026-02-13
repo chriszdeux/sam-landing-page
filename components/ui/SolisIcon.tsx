@@ -1,3 +1,8 @@
+/**
+ * Componente Icono Solis
+ * Icono SVG personalizado utilizando Lucide React
+ * Variante solar con props configurables
+ */
 import React from 'react';
 import { Box } from '@mui/material';
 import { Sun } from 'lucide-react';

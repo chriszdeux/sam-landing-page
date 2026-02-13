@@ -1,3 +1,9 @@
+/**
+ * Sección Hero (Principal)
+ * Animaciones de entrada con GSAP
+ * Títulos principales y llamadas a la acción
+ * Grid de características destacadas
+ */
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import { Box, Typography, Stack, Grid } from '@mui/material';
@@ -21,7 +27,6 @@ export const HeroSection = () => {
   const container = useRef<HTMLElement | null>(null);
   const { project } = EnvVariables;
   useGSAP(() => {
-    // Animate Left Content
     gsap.from('.hero-content', {
       scrollTrigger: {
         trigger: '.hero-content',
@@ -33,7 +38,6 @@ export const HeroSection = () => {
       ease: 'power3.out'
     });
 
-    // Animate Right Grid Items with Stagger
     gsap.from('.hero-grid-item', {
       scrollTrigger: {
         trigger: '.hero-grid-container',

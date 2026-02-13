@@ -1,3 +1,8 @@
+/**
+ * Animación de Cubo
+ * Visualización 3D para estados de transacción (Procesando/Éxito)
+ * Muestra flujos de entrada/salida y explosión de partículas
+ */
 import React from 'react';
 import { Box } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -23,9 +28,9 @@ export const CubeAnimation = ({ type, status = 'PROCESSING' }: CubeAnimationProp
   return (
     <Box sx={{ position: 'relative', width: '100%', height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
       
-      {/* Center Cube / Success Indicator */}
+
       <motion.div
-  // ... (rest is same until burst part)
+
         animate={{ 
           rotateX: isSuccess ? 0 : [0, 360], 
           rotateY: isSuccess ? 0 : [0, 360],
@@ -71,7 +76,7 @@ export const CubeAnimation = ({ type, status = 'PROCESSING' }: CubeAnimationProp
          )}
       </motion.div>
 
-      {/* Input Stream (Left) - Stops on success */}
+
       {!isSuccess && (
       <Box sx={{ position: 'absolute', left: 0, width: '50%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', pl: 5 }}>
           {[...Array(8)].map((_, i) => (
@@ -93,9 +98,8 @@ export const CubeAnimation = ({ type, status = 'PROCESSING' }: CubeAnimationProp
       </Box>
       )}
 
-      {/* Output Stream (Right) - Bursts on success */}
+
       <Box sx={{ position: 'absolute', right: 0, width: '50%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          {/* Normal flow */}
           {!isSuccess && [...Array(8)].map((_, i) => (
              <motion.div
                 key={`out-${i}`}
@@ -114,7 +118,6 @@ export const CubeAnimation = ({ type, status = 'PROCESSING' }: CubeAnimationProp
              />
           ))}
           
-          {/* Success Burst */}
           {isSuccess && burstPositions.map((pos, i) => (
              <motion.div
                 key={`burst-${i}`}
