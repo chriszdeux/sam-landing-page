@@ -1,3 +1,8 @@
+/**
+ * Historial de Transacciones
+ * Tabla genérica que lista las últimas operaciones de la billetera/store
+ * Integra con Redux para obtener datos en tiempo real
+ */
 'use client';
 
 import React from 'react';
@@ -26,7 +31,7 @@ export const TransactionHistory = ({ walletId }: TransactionHistoryProps) => {
     if (storeId) {
         dispatch(fetchTransactions({ storeId, walletId }));
     }
-  }, [storeId, walletId]);
+  }, [storeId, walletId, dispatch]);
 
   const rawData = storeId ? transactions[storeId] : null;
   let transactionData: TransactionsInterface[] = [];

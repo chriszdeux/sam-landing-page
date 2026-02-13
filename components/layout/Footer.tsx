@@ -1,3 +1,10 @@
+/**
+ * Pie de Página de la Aplicación
+ * Enlaces de navegación rápida
+ * Iconos de redes sociales
+ * Información de copyright
+ * Descripción breve del proyecto
+ */
 import React from 'react';
 import { Box, Container, Grid, Typography, IconButton, Stack } from '@mui/material';
 import { Twitter, GitHub, LinkedIn } from '@mui/icons-material';

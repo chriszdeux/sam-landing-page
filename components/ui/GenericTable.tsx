@@ -1,3 +1,8 @@
+/**
+ * Componente de Tabla Genérica
+ * Soporta ordenamiento, filtrado y paginación (manual o automática)
+ * Renderizado dinámico de columnas
+ */
 import React, { useState, useMemo } from 'react';
 import {
   Table,
@@ -50,7 +55,8 @@ export function GenericTable<T>({
 
   const page = manualPagination && propPage !== undefined ? propPage : internalPage;
 
-  // Handle filtering
+
+
   const handleFilterChange = (header: string, value: string) => {
     setFilters((prev) => ({ ...prev, [header]: value }));
     if (manualPagination && onPageChange) {
@@ -60,7 +66,8 @@ export function GenericTable<T>({
     }
   };
 
-  // Handle Sorting
+
+
   const handleSort = (header: string) => {
       let direction: 'asc' | 'desc' = 'asc';
       if (sortConfig && sortConfig.key === header && sortConfig.direction === 'asc') {
@@ -80,7 +87,8 @@ export function GenericTable<T>({
           return col.filterMethod(filterValue, row);
         }
 
-        // Default string includes check
+
+
         const cellValue = typeof col.accessor === 'function' 
             ? col.accessor(row) 
             : col.accessor ? row[col.accessor] : '';
@@ -112,17 +120,12 @@ export function GenericTable<T>({
   }, [filteredData, sortConfig, columns]);
 
 
-  // Pagination logic
-  // Pagination logic
-  // If manualPagination is true, we assume the parent slices the data or provides the correct page data.
-  // HOWEVER, if the parent appends data (like the current reducer implementation), we still need to slice it here 
-  // OR the parent passes ONLY the current page data.
-  // Based on the user flow (reducer appends), we should slice here if data.length > rowsPerPage
   const paginatedData = enablePagination && !manualPagination
+
     ? sortedData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-    : manualPagination && data.length > rowsPerPage // If manual but huge dataset passed (like appended list)
+    : manualPagination && data.length > rowsPerPage
         ? sortedData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-        : sortedData; // If manual and data is small (just this page), show all.
+        : sortedData;
 
   const handleChangePage = (event: unknown, newPage: number) => {
     if (manualPagination && onPageChange) {

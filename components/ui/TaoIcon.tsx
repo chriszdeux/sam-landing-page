@@ -1,3 +1,8 @@
+/**
+ * Componente Icono Tao
+ * Icono animado con efectos de brillo
+ * Utiliza Framer Motion para pulsaciones
+ */
 import React from 'react';
 import { Typography } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -36,9 +41,9 @@ export const TaoIcon: React.FC<TaoIconProps> = ({ size = 12, color: customColor,
                 fontFamily: 'monospace',
                 lineHeight: 1,
                 display: 'inline-flex',
-                alignItems: 'baseline', // Align with text baseline
+                alignItems: 'baseline',
                 letterSpacing: 1,
-                ml: 0.5, // Small margin left for spacing after numbers
+                ml: 0.5,
                 verticalAlign: 'middle',
                 ...style 
             }}

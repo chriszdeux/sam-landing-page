@@ -1,9 +1,13 @@
 
+/**
+ * Componente para Visualización de Datos Blockchain
+ * Muestra métricas detalladas y estado de la red seleccionada
+ * Incluye animaciones de escaneo y visualización de identidad
+ */
 import React from 'react';
-import { Box, Typography, Paper, Grid, Avatar, Chip } from '@mui/material';
+import { Box, Typography, Paper, Avatar } from '@mui/material';
 import { motion } from 'framer-motion';
 import { BlockchainInterface } from '../../lib/types/blockchain';
-import { AccessTime, Storage, MonetizationOn, People, Memory, Speed, CheckCircle, ErrorOutline } from '@mui/icons-material';
 
 interface BlockchainDataDisplayProps {
   network: BlockchainInterface | null | undefined;
@@ -19,7 +23,7 @@ export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ ne
     );
   }
 
-  const { identification, blockchainProps, additionalInfo, isActive } = network;
+  const { identification, additionalInfo } = network;
   const color = additionalInfo?.color || '#00f3ff';
 
   const containerVariants = {
@@ -39,7 +43,7 @@ export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ ne
             initial="hidden"
             animate="visible"
         >
-            {/* Header / Identity Section */}
+
             <Paper 
                 elevation={0}
                 sx={{ 
@@ -55,7 +59,7 @@ export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ ne
                     overflow: 'hidden'
                 }}
             >
-                {/* Scanning Animation */}
+
                 <motion.div
                     style={{
                         position: 'absolute',
@@ -113,7 +117,7 @@ export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ ne
                      </Box>
                  </Box>
 
-                 {/* Background decoration */}
+
                  <Box component="img" src={identification.image} sx={{ position: 'absolute', top: -20, right: -20, opacity: 0.05, width: 300, height: 300 }} alt="" />
             </Paper>
         </motion.div>
@@ -121,67 +125,9 @@ export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ ne
   );
 };
 
-// --- Sub-Components & Helpers ---
 
-const DataBlock = ({ title, icon, color, children }: { title: string, icon: React.ReactNode, color: string, children: React.ReactNode }) => (
-    <motion.div 
-        variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1 } }}
-        style={{ height: '100%' }}
-    >
-        <Paper sx={{ 
-            p: 3, 
-            height: '100%', 
-            bgcolor: 'rgba(15, 17, 22, 0.6)', 
-            border: '1px solid rgba(255,255,255,0.05)',
-            backdropFilter: 'blur(10px)',
-            transition: 'all 0.3s ease',
-            '&:hover': {
-                borderColor: `${color}60`,
-                boxShadow: `0 0 30px ${color}10`
-            }
-        }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, borderBottom: '1px solid rgba(255,255,255,0.05)', pb: 2 }}>
-                {icon}
-                <Typography variant="subtitle2" sx={{ ml: 1, fontWeight: 'bold', color: 'rgba(255,255,255,0.7)', letterSpacing: 1.5 }}>
-                    {title}
-                </Typography>
-            </Box>
-            <Box>
-                {children}
-            </Box>
-        </Paper>
-    </motion.div>
-);
 
-const MetricRow = ({ label, value, icon, delay }: { label: string, value: string | number, icon?: React.ReactNode, delay: number }) => (
-    <motion.div 
-        initial={{ x: -20, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ delay }}
-        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}
-    >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {icon && <Box sx={{ color: 'text.secondary', display: 'flex' }}>{icon}</Box>}
-            <Typography variant="body2" color="text.secondary">{label}</Typography>
-        </Box>
-        <Typography variant="body1" color="white" fontWeight="500" sx={{ fontFamily: 'monospace' }}>
-            {value}
-        </Typography>
-    </motion.div>
-);
 
-// Formatting Utilities
-const formatCurrency = (value?: number) => {
-    if (value === undefined || value === null) return '$0.00';
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
-};
 
-const formatNumber = (value?: number) => {
-    if (value === undefined || value === null) return '0';
-    return new Intl.NumberFormat('en-US').format(value);
-};
 
-const formatCompact = (value?: number) => {
-    if (value === undefined || value === null) return '0';
-    return new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(value);
-};
+

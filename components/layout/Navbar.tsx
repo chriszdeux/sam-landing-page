@@ -1,3 +1,10 @@
+/**
+ * Barra de Navegación Principal
+ * Gestión de estado de navegación
+ * Muestra información del usuario
+ * Manejo de menú móvil
+ * Integración de billetera y red
+ */
 "use client";
 
 import React, { useState } from "react";
@@ -18,7 +25,7 @@ import { motion } from "framer-motion";
 import { Button } from "../ui/Button";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { setCurrentSection } from "../../lib/features/uiSlice";
-import { fetchWalletDetails } from "../../lib/features/auth/actions"; // Import action
+import { fetchWalletDetails } from "../../lib/features/auth/actions";
 import { navItems } from "./navItems";
 import { NavbarDrawer } from "./NavbarDrawer";
 import { LogoutDialog } from "./LogoutDialog";
@@ -33,7 +40,6 @@ export const Navbar = () => {
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
   const dispatch = useAppDispatch();
   const { userInfo, walletsInfo } = useAppSelector((state) => state.auth);
-  // const currentSection = useAppSelector((state) => state.ui.currentSection);
   const { networks, selectedNetwork: selectedNetworkState } = useAppSelector((state) => state.blockchain);
 
   const pathname = usePathname();
@@ -41,18 +47,15 @@ export const Navbar = () => {
 
   const selectedNetwork = networks.find(n => n.id === selectedNetworkState?.id) || networks[0];
 
-  // Fetch Wallet Details if logged in
   React.useEffect(() => {
       if (userInfo && userInfo.wallets && userInfo.wallets.length > 0) {
           const primaryWallet = userInfo.wallets[0];
-          // If details are missing, fetch them.
           if (!walletsInfo) {
                dispatch(fetchWalletDetails(primaryWallet.walletAddress));
           }
       }
   }, [userInfo, dispatch, walletsInfo]);
 
-  // Hide Navbar on auth transition pages
   if (pathname === '/auth/logging-in' || pathname === '/auth/logging-out' || pathname.includes('/connecting')) {
     return null;
   }
@@ -204,7 +207,6 @@ export const Navbar = () => {
             })}
           </Box>
 
-            {/* Separator */}
             <Box sx={{ 
                 height: 30, 
                 width: '1px', 
@@ -213,12 +215,9 @@ export const Navbar = () => {
                 display: { xs: "none", md: "block" }
             }} />
 
-            {/* User Menu */}
             <Box sx={{ display: { xs: "none", md: "block" } }}>
                 <NavbarUserMenu 
                     userInfo={userInfo}
-                    selectedNetwork={selectedNetwork}
-                    handleNetworkClick={handleNetworkClick}
                     onLogoutClick={() => setLogoutConfirmOpen(true)}
                 />
             </Box>
@@ -240,7 +239,7 @@ export const Navbar = () => {
           open={mobileOpen}
           onClose={handleDrawerToggle}
           ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
+            keepMounted: true,
           }}
           sx={{
             display: { xs: "block", md: "none" },

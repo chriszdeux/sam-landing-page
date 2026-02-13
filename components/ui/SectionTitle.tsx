@@ -1,3 +1,8 @@
+/**
+ * Componente Título de Sección
+ * Renderiza título y subtítulo con estilos tipográficos
+ * Incluye divisor decorativo
+ */
 import React from 'react';
 import { Typography, Divider, Box } from '@mui/material';
 

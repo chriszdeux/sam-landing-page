@@ -1,3 +1,8 @@
+/**
+ * Formulario de Registro
+ * Recopila datos del nuevo usuario y gestiona el proceso de registro
+ * Almacena credenciales temporales para inicio de sesión automático
+ */
 'use client';
 
 import React from 'react';
@@ -15,7 +20,7 @@ import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { TechFrame } from '../ui/TechFrame';
 
-// --- Custom Components based on Cronología LynCore ---
+
 
 
 
@@ -45,7 +50,6 @@ export const RegisterForm = () => {
   });
 
   const onSubmit = async (data: RegisterFormInputs) => {
-    // Save minimal credentials for auto-login later
     localStorage.setItem('pending_email', data.email);
     localStorage.setItem('pending_password', data.password);
 
@@ -62,7 +66,7 @@ export const RegisterForm = () => {
 
         <Box sx={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
             
-            {/* Content Frame */}
+
             <Box sx={{ position: 'relative', zIndex: 1, flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <TechFrame color="#ff0055">
                      <Box sx={{ p: 4, bgcolor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)' }}>

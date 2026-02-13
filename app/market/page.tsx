@@ -1,3 +1,13 @@
+/**
+ * Importación de componentes UI y librerías.
+ * Configuración de Redux para estado global.
+ * Efecto para cargar listado de criptomonedas.
+ * Manejo de navegación a formularios transaccionales.
+ * Estructura de página con encabezado y mallas.
+ * Renderizado de terminal de datos Blockchain.
+ * Malla de tarjetas de activos digitales.
+ */
+
 'use client';
 
 import React, { useEffect } from 'react';
@@ -8,15 +18,11 @@ import { Background } from '../../components/layout/Background';
 import { TechFrame } from '../../components/ui/TechFrame';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { motion } from 'framer-motion';
-import { Send } from '@mui/icons-material';
 import { TaoIcon } from '../../components/ui/TaoIcon';
-
-// Redux
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../lib/store';
 import { fetchCryptos } from '../../lib/features/market/actions';
 import { addNotification } from '../../lib/features/uiSlice';
-
 import { BlockchainDataDisplay } from '../../components/market/BlockchainDataDisplay';
 
 
@@ -44,7 +50,7 @@ export default function MarketPage() {
         return;
     }
 
-    router.push(`/market/trade?type=${type}&cryptoId=${cryptoId}`);
+    router.push(`/market/trade?type=${type}&cryptoId=${cryptoId}&redirect=market`);
   };
 
   return (
@@ -58,10 +64,8 @@ export default function MarketPage() {
             color="#00f3ff"
         />
 
-        {/* Blockchain Data Terminal */}
         <BlockchainDataDisplay network={selectedNetwork} />
 
-        {/* Assets Grid */}
         <Typography variant="h4" sx={{ mb: 4, color: 'white' }}>Activos Listados</Typography>
         
         {isLoading ? (
@@ -98,7 +102,6 @@ export default function MarketPage() {
                         justifyContent: 'space-between', 
                         position: 'relative'
                     }}>
-                    {/* Ambient Glow */}
                     <Box sx={{
                         position: 'absolute',
                         top: '30%',
@@ -114,7 +117,6 @@ export default function MarketPage() {
                         pointerEvents: 'none'
                     }} />
 
-                    {/* Header: Symbol & Name */}
                     <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1, zIndex: 1 }}>
                         <Box sx={{ textAlign: 'left' }}>
                              <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold', lineHeight: 1.1 }}>{crypto.identification.symbol}</Typography>
@@ -134,7 +136,6 @@ export default function MarketPage() {
                         </Box>
                     </Box>
 
-                    {/* Main Image - Dominant */}
                     <Box sx={{ 
                         width: 160, 
                         height: 160, 
@@ -177,7 +178,6 @@ export default function MarketPage() {
                     </Box>
                     
 
-
                     <Box sx={{ textAlign: 'center', mb: 3, zIndex: 1, width: '100%' }}>
                         <Typography variant="h4" fontWeight="bold" sx={{ color: 'white', mb: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
                             {crypto.financial.price.toLocaleString(undefined, { maximumFractionDigits: 5 })}
@@ -201,7 +201,6 @@ export default function MarketPage() {
                         </Box>
                     </Box>
 
-                    {/* Actions Grid */}
                     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, width: '100%', mt: 'auto', zIndex: 1 }}>
                         <Button 
                             variant="outlined" 
@@ -227,22 +226,7 @@ export default function MarketPage() {
                         >
                             VENDER
                         </Button>
-                        {/* Transfer is secondary, can be full width or just hidden if space is tight. Let's make it full width below */}
                     </Box>
-                     {/* <Button 
-                        variant="text" 
-                        size="small" 
-                        fullWidth
-                        onClick={(e) => handleTransaction(e, 'TRANSFER', crypto.id)}
-                        sx={{ 
-                            mt: 1,
-                            color: 'text.secondary',
-                            zIndex: 1,
-                            '&:hover': { color: 'white' }
-                        }}
-                    >
-                        <Send sx={{ fontSize: 16, mr: 1 }} /> TRANSFERIR
-                    </Button> */}
                     </Box>
                 </TechFrame>
                 </motion.div>

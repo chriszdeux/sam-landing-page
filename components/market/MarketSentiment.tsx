@@ -1,3 +1,8 @@
+/**
+ * Componente de Sentimiento de Mercado
+ * Visualiza la relación Compra vs Venta (Codicia vs Miedo)
+ * Barra de progreso animada y estadísticas de transacciones
+ */
 import React from 'react';
 import { Box, Typography, Stack, Tooltip } from '@mui/material';
 import { useAppSelector } from '../../lib/hooks';
@@ -19,23 +24,19 @@ export const MarketSentiment = ({ cryptoId }: MarketSentimentProps) => {
     const sellCount = data.currentSellState.counter;
     const totalCount = buyCount + sellCount;
 
-    // Avoid division by zero
+
     const buyPercentage = totalCount > 0 ? (buyCount / totalCount) * 100 : 50;
     const sellPercentage = totalCount > 0 ? (sellCount / totalCount) * 100 : 50;
 
-    // Determine Sentiment
-    // > 55% Buy = Greeds
-    // > 55% Sell = Fear
-    // Else Neutral
     let sentiment = 'NEUTRAL';
     let sentimentColor = '#cccccc';
     
     if (buyPercentage > 55) {
         sentiment = 'CODICIA (GREED)';
-        sentimentColor = '#00ff9d'; // Green
+        sentimentColor = '#00ff9d';
     } else if (sellPercentage > 55) {
         sentiment = 'MIEDO (FEAR)';
-        sentimentColor = '#ff0055'; // Red
+        sentimentColor = '#ff0055';
     }
 
     return (
@@ -58,9 +59,9 @@ export const MarketSentiment = ({ cryptoId }: MarketSentimentProps) => {
                 </Typography>
             </Stack>
 
-            {/* Gauge / Bar */}
+
             <Box sx={{ position: 'relative', height: 12, bgcolor: '#333', borderRadius: 6, overflow: 'hidden', mb: 2 }}>
-                {/* Buy Bar */}
+
                 <Box sx={{ 
                     position: 'absolute', 
                     left: 0, 
@@ -72,9 +73,7 @@ export const MarketSentiment = ({ cryptoId }: MarketSentimentProps) => {
                     boxShadow: '0 0 10px rgba(0, 255, 157, 0.5)'
                 }} />
                 
-                {/* Sell Bar (Background is effectively the rest, but let's make it explicit if needed or just use bg) */}
-                {/* Because we want Red on the right, we can just set the container bg to red and let green cover it from left? 
-                    Better for animation: Two divs.*/}
+
                  <Box sx={{ 
                     position: 'absolute', 
                     right: 0, 
@@ -87,7 +86,7 @@ export const MarketSentiment = ({ cryptoId }: MarketSentimentProps) => {
                 }} />
             </Box>
 
-            {/* Stats */}
+
             <Stack direction="row" justifyContent="space-between" sx={{ fontSize: '0.875rem' }}>
                 <Box sx={{ textAlign: 'left' }}>
                     <Typography sx={{ color: '#00ff9d', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 0.5 }}>

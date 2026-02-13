@@ -1,3 +1,8 @@
+/**
+ * Formulario de Validación de Cuenta
+ * Verifica el código enviado al correo electrónico del usuario
+ * Completa el proceso de registro y permite el inicio de sesión
+ */
 'use client';
 
 import React from 'react';

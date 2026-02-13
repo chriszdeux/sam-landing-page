@@ -1,3 +1,8 @@
+/**
+ * Navegación Flotante entre Secciones
+ * Detección de sección activa al hacer scroll
+ * Botones para navegar arriba/abajo
+ */
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -15,7 +20,6 @@ export const SectionNavigation = () => {
     if (pathname !== '/') return;
 
     const handleScroll = () => {
-      // Find the section that is currently most visible
       const sectionElements = sections.map(id => document.getElementById(id));
       
       let maxVisibleHeight = 0;
@@ -25,7 +29,8 @@ export const SectionNavigation = () => {
         if (!el) return;
         const rect = el.getBoundingClientRect();
         
-        // Calculate visible height
+
+        
         const visibleTop = Math.max(0, rect.top);
         const visibleBottom = Math.min(window.innerHeight, rect.bottom);
         const visibleHeight = Math.max(0, visibleBottom - visibleTop);
@@ -42,10 +47,12 @@ export const SectionNavigation = () => {
     };
 
     window.addEventListener('scroll', handleScroll);
-    // Call once to set initial state
+
     handleScroll();
     
     return () => window.removeEventListener('scroll', handleScroll);
+    
+
   }, [pathname]);
 
   if (pathname !== '/') return null;

@@ -1,3 +1,7 @@
+/**
+ * Componente Botón Personalizado
+ * Extiende MUI Button con props de brillo (glow)
+ */
 import React from 'react';
 import { Button as MuiButton, ButtonProps as MuiButtonProps } from '@mui/material';
 

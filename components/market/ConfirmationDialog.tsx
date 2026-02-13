@@ -1,3 +1,8 @@
+/**
+ * Diálogo de Confirmación de Transacción
+ * Muestra detalles críticos de la operación antes de ejecutar
+ * Soporta tipos: Compra, Venta y Transferencia
+ */
 import React from 'react';
 import {
     Stack,
