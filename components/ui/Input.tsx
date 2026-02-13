@@ -1,3 +1,9 @@
+/**
+ * Componente de Entrada (Input) Personalizado
+ * Estilizado con MUI styled()
+ * Soporta variantes de Select y Text
+ * Gestión de estados de error y foco
+ */
 import { Box, InputBase, InputLabel, Typography, Select, Theme } from '@mui/material';
 import { alpha, styled, SxProps } from '@mui/material/styles';
 
@@ -70,7 +76,8 @@ export const Input: React.FC<CustomInputProps> = ({ label, id, helperText, error
                     id={id}
                     fullWidth
                     input={<StyledInputBase error={error} />}
-                    {...(props as unknown as any)} // Select props vs InputBase props conflict, keeping safe cast mechanism but acknowledging logic
+
+                    {...(props as unknown as any)}
                 >
                     {children}
                 </Select>

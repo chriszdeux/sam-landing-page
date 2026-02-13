@@ -1,3 +1,14 @@
+/**
+ * Importación de UI, gráficos y herramientas de Redux.
+ * Definición de props para el componente de detalle.
+ * Inicialización de router y selección de datos del store.
+ * Manejo de selección de rango de tiempo para gráficos.
+ * Lógica de carga y redirección si no hay datos.
+ * Renderizado de encabezado con estadísticas y estado.
+ * Visualización de gráfico, historial y sentimiento de mercado.
+ * Panel lateral con acciones de compra/venta y detalles info.
+ */
+
 'use client';
 
 import React from 'react';
@@ -7,17 +18,12 @@ import { ArrowBack, TrendingUp, TrendingDown, AccessTime, Code, ShoppingCart, At
 import { useRouter } from 'next/navigation';
 import { CryptoChart } from './CryptoChart';
 import { CryptoStats } from './CryptoStats';
-// import { CryptoNews } from './CryptoNews';
 import { TransactionHistory } from './TransactionHistory';
 import { MarketSentiment } from './MarketSentiment';
 import { Card } from '../ui/Card';
 import { TaoIcon } from '../ui/TaoIcon';
+import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { addNotification } from '../../lib/features/uiSlice';
-
-
-// Redux
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../lib/store';
 
 interface CryptoDetailViewProps {
     id: string;
@@ -25,15 +31,12 @@ interface CryptoDetailViewProps {
 
 export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
     const router = useRouter();
-    const dispatch = useDispatch<AppDispatch>();
-    const { cryptos, isLoading } = useSelector((state: RootState) => state.market);
-    const { token } = useSelector((state: RootState) => state.auth);
-    // Assuming selectedNetworkId is not available directly, we might default or fix types later. Using hardcoded for now or selecting from store if available.
-    // const { selectedNetworkId } = useSelector((state: RootState) => state.blockchain); 
+    const dispatch = useAppDispatch();
+    const { cryptos, isLoading } = useAppSelector((state) => state.market);
+    const { token } = useAppSelector((state) => state.auth);
     
     const [selectedRange, setSelectedRange] = React.useState('1d');
     
-    // Find the crypto in the store
     const crypto = cryptos.find((c) => c.id === id);
 
     const handleTransaction = (type: 'BUY' | 'SELL' | 'TRANSFER') => {
@@ -44,10 +47,9 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
             }));
             return;
         }
-        router.push(`/market/trade?type=${type}&cryptoId=${id}`);
+        router.push(`/market/trade?type=${type}&cryptoId=${id}&redirect=detail`);
     };
 
-    // Show loading state if we are loading and don't have the crypto yet
     if (isLoading && !crypto) {
         return (
             <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#000' }}>
@@ -56,7 +58,6 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
         );
     }
 
-    // Show error or not found if still no crypto
     if (!crypto) {
         return (
             <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#000', flexDirection: 'column', gap: 2 }}>
@@ -68,7 +69,6 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
 
     const isPositive = (crypto.financial.change24h || 0) >= 0;
     const color = isPositive ? '#00ff88' : '#ff0055';
-    // Fallback description if missing
     const description = crypto.additionalInfo?.description || [
         `${crypto.identification.name} is a cryptocurrency on the ${crypto.network.name} network.`
     ];
@@ -78,7 +78,6 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
             <ParticleBackground />
             
             <Container maxWidth="xl">
-                {/* Header Section */}
                 <Stack spacing={4}>
                     <Button 
                         startIcon={<ArrowBack />} 
@@ -144,9 +143,7 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
 
                     <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
 
-                    {/* Main Content Grid */}
                     <Grid container spacing={4}>
-                        {/* Left Column: Chart & Transactions */}
                         <Grid size={{ xs: 12, lg: 8 }}>
                             <Stack spacing={4}>
                                 <Box>
@@ -181,7 +178,6 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                             </Stack>
                         </Grid>
 
-                        {/* Right Column: Stats, Description, News */}
                         <Grid size={{ xs: 12, lg: 4 }}>
                             <Stack spacing={4}>
                                 <Stack direction="row" spacing={2}>
@@ -216,23 +212,6 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                                     >
                                         Vender
                                     </Button>
-                                    {/* <Button
-                                        fullWidth
-                                        variant="outlined"
-                                        startIcon={<Send />}
-                                        onClick={() => handleTransaction('TRANSFER')}
-                                        sx={{ 
-                                            color: 'primary.main', 
-                                            borderColor: 'primary.main',
-                                            fontWeight: 'bold',
-                                            '&:hover': { 
-                                                bgcolor: 'rgba(0, 243, 255, 0.1)',
-                                                borderColor: 'primary.main' 
-                                            }
-                                        }}
-                                    >
-                                        Transferir
-                                    </Button> */}
                                 </Stack>
                                 <Box>
                                     <Typography variant="h6" sx={{ color: '#fff', mb: 2, borderBottom: '2px solid', borderColor: 'primary.main', display: 'inline-block', pb: 0.5 }}>
@@ -305,8 +284,6 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                                         </Box>
                                     </Stack>
                                 </Card>
-
-                                {/* <CryptoNews name={crypto.identification.name} /> */}
                             </Stack>
                         </Grid>
                     </Grid>

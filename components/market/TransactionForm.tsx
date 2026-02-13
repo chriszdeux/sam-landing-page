@@ -1,3 +1,8 @@
+/**
+ * Formulario de Transacciones
+ * Maneja la entrada de datos para comprar, vender y transferir
+ * Muestra cálculos estimados y tarifas de red
+ */
 import React from 'react';
 import { Box, MenuItem, Paper, Typography, Button, CircularProgress, SelectChangeEvent } from '@mui/material';
 import { Input } from '../ui/Input';
@@ -160,7 +165,7 @@ export const TransactionForm = ({
                         />
                         )}
                     
-                    {/* Summary / Calculation */}
+
                     <Box sx={{ p: 2, borderRadius: 2, bgcolor: transactionType === 'BUY' ? 'rgba(0, 230, 118, 0.1)' : 'rgba(255, 23, 68, 0.1)', border: '1px dashed', borderColor: transactionType === 'BUY' ? '#00e676' : '#ff1744' }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                             <Typography variant="subtitle2" sx={{ color: transactionType === 'BUY' ? '#00e676' : '#ff1744' }}>ESTIMADO</Typography>

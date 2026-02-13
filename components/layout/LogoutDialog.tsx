@@ -1,3 +1,8 @@
+/**
+ * Diálogo de Confirmación de Cierre de Sesión
+ * Muestra advertencia al usuario
+ * Acciones de cancelar o confirmar
+ */
 import React from "react";
 import {
   Dialog,

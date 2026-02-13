@@ -1,3 +1,9 @@
+/**
+ * Componente de Fondo de Orbe IA
+ * Animaciones complejas con Framer Motion (rotación, escala)
+ * Efectos de nebulosa y grid tecnológico
+ * Personalizable por props (color, intensidad)
+ */
 'use client';
 
 import React from 'react';
@@ -11,15 +17,15 @@ interface AIOrbBackgroundProps {
 }
 
 export const AIOrbBackground = ({ 
-    color = '#00f3ff', // default Cyan
+    color = '#00f3ff',
     secondaryColor = '#7b00ff',
-    intensity = 1 
+ 
 }: AIOrbBackgroundProps) => {
 
     return (
         <Box sx={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0, bgcolor: '#050a14' }}>
             
-            {/* Core Orb */}
+
             <motion.div
                 animate={{
                     scale: [1, 1.2, 1],
@@ -44,7 +50,7 @@ export const AIOrbBackground = ({
                 }}
             />
 
-            {/* Orbiting Glow 1 */}
+
             <motion.div
                  animate={{
                     rotate: 360,
@@ -69,7 +75,7 @@ export const AIOrbBackground = ({
                 }}
             />
 
-             {/* Orbiting Glow 2 (Counter rotating) */}
+
              <motion.div
                  animate={{
                     rotate: -360,
@@ -93,7 +99,7 @@ export const AIOrbBackground = ({
                 }}
             />
 
-            {/* Drifting Particles/Nebula effect */}
+
             <motion.div
                 animate={{
                     opacity: [0.2, 0.4, 0.2],
@@ -115,7 +121,7 @@ export const AIOrbBackground = ({
                 }}
             />
             
-            {/* Grid Overlay for Tech Feel */}
+
             <Box sx={{ 
                 position: 'absolute', 
                 inset: 0, 

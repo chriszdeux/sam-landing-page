@@ -1,3 +1,9 @@
+/**
+ * Encabezado de Página Estilizado
+ * Título y subtítulo con efectos visuales
+ * Animación de entrada
+ * Elementos decorativos (líneas, brackets)
+ */
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -17,7 +23,6 @@ export const PageHeader = ({ title, subtitle, color = '#00f3ff' }: PageHeaderPro
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Decorative Top Line */}
         <Box sx={{ 
             display: 'flex', 
             justifyContent: 'center', 
@@ -30,8 +35,9 @@ export const PageHeader = ({ title, subtitle, color = '#00f3ff' }: PageHeaderPro
             <Box sx={{ width: 60, height: 2, background: `linear-gradient(-90deg, transparent, ${color})` }} />
         </Box>
 
-        {/* Title with Glow */}
-        <Typography 
+
+
+        <Typography  
             variant="h2" 
             component="h1"
             sx={{ 
@@ -49,14 +55,15 @@ export const PageHeader = ({ title, subtitle, color = '#00f3ff' }: PageHeaderPro
           {title}
         </Typography>
 
-        {/* Subtitle Container */}
+
+
         <Box sx={{ 
             display: 'inline-block',
             position: 'relative',
             px: 4,
             py: 1,
         }}>
-            {/* Brackets */}
+
             <Box sx={{
                 position: 'absolute',
                 top: 0,

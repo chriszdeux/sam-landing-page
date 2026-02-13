@@ -1,3 +1,8 @@
+/**
+ * Animación de Minería (Cubos de Red)
+ * Visualización 3D de nodos (cubos) y transmisión de energía (haces)
+ * Utiliza Framer Motion para rotaciones y pulsos
+ */
 import React from 'react';
 import { Box } from '@mui/material';
 import { motion } from 'framer-motion';

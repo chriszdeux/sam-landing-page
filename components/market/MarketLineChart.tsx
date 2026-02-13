@@ -1,3 +1,8 @@
+/**
+ * Gráfico de Línea de Mercado
+ * Visualización simplificada de tendencias de mercado
+ * Utiliza Chart.js con degradados personalizados
+ */
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler, Legend, ScriptableContext } from 'chart.js';
@@ -22,7 +27,7 @@ interface MarketLineChartProps {
 
 export const MarketLineChart = ({ color = '#00f3ff', height = 300, showLabel = true }: MarketLineChartProps) => {
     
-    // Generate simulated data
+
     const labels = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00', '24:00'];
     const dataPoints = [80, 75, 78, 90, 60, 95, 85, 30, 60];
 
@@ -36,12 +41,12 @@ export const MarketLineChart = ({ color = '#00f3ff', height = 300, showLabel = t
                 backgroundColor: (context: ScriptableContext<"line">) => {
                     const ctx = context.chart.ctx;
                     const gradient = ctx.createLinearGradient(0, 0, 0, height);
-                    gradient.addColorStop(0, `${color}40`); // 40 = 25% opacity hex
-                    gradient.addColorStop(1, `${color}00`); // 00 = 0% opacity hex
+                    gradient.addColorStop(0, `${color}40`);
+                    gradient.addColorStop(1, `${color}00`);
                     return gradient;
                 },
                 borderWidth: 3,
-                tension: 0.4, // Smooth curve
+                tension: 0.4,
                 fill: true,
                 pointBackgroundColor: '#fff',
                 pointBorderColor: color,
@@ -58,7 +63,7 @@ export const MarketLineChart = ({ color = '#00f3ff', height = 300, showLabel = t
             legend: {
                 display: false,
             },
-            tooltip: { // Typed as any to avoid complex type errors if strict
+            tooltip: {
                 backgroundColor: 'rgba(10, 10, 25, 0.9)',
                 titleColor: '#fff',
                 bodyColor: '#fff',
@@ -82,7 +87,7 @@ export const MarketLineChart = ({ color = '#00f3ff', height = 300, showLabel = t
                     color: 'rgba(255, 255, 255, 0.05)',
                 },
                 ticks: {
-                    display: false // Hide Y axis labels for cleaner look or keep them? User said "visual styling". Cleaner is usually better for "Trend".
+                    display: false
                 },
                 border: {
                     display: false

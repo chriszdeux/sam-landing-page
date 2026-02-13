@@ -1,3 +1,9 @@
+/**
+ * Menú de Usuario en Navbar
+ * Muestra saldo y nombre de usuario
+ * Acceso a configuración y cierre de sesión
+ * Botones de login/registro si no hay sesión
+ */
 "use client";
 
 import React from "react";
@@ -24,19 +30,11 @@ interface UserInfo {
   balance: number;
 }
 
-interface Network {
-  identification: {
-    symbol: string;
-  };
-  additionalInfo: {
-    color: string;
-  };
-}
+
 
 interface NavbarUserMenuProps {
   userInfo: UserInfo | null;
-  selectedNetwork: Network | null;
-  handleNetworkClick: () => void;
+
   onLogoutClick: () => void;
 }
 
@@ -101,35 +99,7 @@ export const NavbarUserMenu = ({
           </Box>
         </Typography>
 
-        {/* {selectedNetwork && (
-          <>
-            <Tooltip title="Cambiar Red">
-              <Button
-                onClick={handleNetworkClick}
-                startIcon={
-                  <Bolt sx={{ color: selectedNetwork.additionalInfo.color }} />
-                }
-                variant="outlined"
-                sx={{
-                  borderColor: `${selectedNetwork.additionalInfo.color}80`,
-                  color: "white",
-                  bgcolor: `${selectedNetwork.additionalInfo.color}10`,
-                  borderRadius: "20px",
-                  textTransform: "none",
-                  px: 2,
-                  minWidth: "auto",
-                  "&:hover": {
-                    bgcolor: `${selectedNetwork.additionalInfo.color}30`,
-                    borderColor: selectedNetwork.additionalInfo.color,
-                    boxShadow: `0 0 15px ${selectedNetwork.additionalInfo.color}60`,
-                  },
-                }}
-              >
-                {selectedNetwork.identification.symbol}
-              </Button>
-            </Tooltip>
-          </>
-        )} */}
+
 
         <IconButton
           onClick={() => router.push("/settings")}

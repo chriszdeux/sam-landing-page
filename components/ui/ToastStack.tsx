@@ -1,7 +1,12 @@
+/**
+ * Gestor de Notificaciones (Stack de Toasts)
+ * Muestra alertas temporales superpuestas
+ * Gestionado via Redux (uiSlice)
+ */
 'use client';
 
 import React, { useEffect } from 'react';
-import { Box, Typography, Stack, IconButton } from '@mui/material';
+import { Box, Typography, IconButton } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Close, CheckCircle, Error, Info, Warning } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
@@ -76,7 +81,7 @@ const ToastItem = ({ notification }: { notification: Notification }) => {
                     <Close fontSize="small" />
                 </IconButton>
                 
-                {/* Progress bar animation could go here if needed, simple timeout is fine for now */}
+
             </Box>
         </motion.div>
     );
@@ -94,8 +99,8 @@ export const ToastStack = () => {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'flex-end',
-            pointerEvents: 'none', // Allow clicks through container
-            '& > div': { pointerEvents: 'auto' } // Re-enable clicks on toasts
+            pointerEvents: 'none',
+            '& > div': { pointerEvents: 'auto' }
         }}>
             <AnimatePresence>
                 {notifications.map(notification => (

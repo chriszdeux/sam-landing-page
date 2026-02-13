@@ -1,3 +1,8 @@
+/**
+ * Componente Marco Tecnológico
+ * Contenedor con bordes y efectos de sci-fi
+ * Incluye efectos de scanline y hover
+ */
 import { Box, BoxProps } from '@mui/material';
 
 interface TechFrameProps extends BoxProps {
@@ -29,7 +34,7 @@ export const TechFrame = ({ children, color = '#ff0055', className, sx, ...props
         width: '100%',
         height: '100%',
         border: `1px solid ${color}40`,
-        clipPath: 'polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%)',
+
         pointerEvents: 'none',
         transition: 'all 0.3s ease',
       },
@@ -42,13 +47,13 @@ export const TechFrame = ({ children, color = '#ff0055', className, sx, ...props
   >
     <Box sx={{ 
       position: 'relative', 
-      clipPath: 'polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%)',
+
       bgcolor: 'rgba(10,10,10,0.8)',
       backdropFilter: 'blur(10px)',
       height: '100%',
     }}>
       {children}
-      {/* Scanline effect */}
+
       <Box sx={{
         position: 'absolute',
         top: 0,

@@ -1,3 +1,9 @@
+/**
+ * Sección de Historia/Cronología
+ * Componentes visuales personalizados (TechFrame, DataLog)
+ * Animaciones complejas con GSAP (ScrollTrigger)
+ * Renderizado de eventos históricos
+ */
 'use client';
 
 import React, { useRef } from 'react';
@@ -11,8 +17,6 @@ import { historyData } from '../../lib/data/history';
 import { EnvVariables } from '@/lib/constants/variables';
 
 gsap.registerPlugin(ScrollTrigger);
-
-// --- Custom Components for Sci-Fi Aesthetic ---
 
 const TechFrame = ({ children, color = '#ff0055' }: { children: React.ReactNode; color?: string }) => (
   <Box
@@ -40,7 +44,6 @@ const TechFrame = ({ children, color = '#ff0055' }: { children: React.ReactNode;
       bgcolor: 'rgba(0,0,0,0.7)',
     }}>
       {children}
-      {/* Scanline effect */}
       <Box sx={{
         position: 'absolute',
         top: 0,
@@ -90,7 +93,6 @@ export const HistorySection = () => {
   const { project } = EnvVariables;
 
   useGSAP(() => {
-    // Animate Main Title
     gsap.from('.history-main-title', {
       scrollTrigger: {
         trigger: '.history-main-title',
@@ -102,7 +104,6 @@ export const HistorySection = () => {
       ease: 'power3.out'
     });
 
-    // Animate Year Headers
     const headers = gsap.utils.toArray<HTMLElement>('.history-year-header');
     headers.forEach((header) => {
       gsap.from(header, {
@@ -117,10 +118,8 @@ export const HistorySection = () => {
       });
     });
 
-    // Animate Text Blocks
     const textBlocks = gsap.utils.toArray<HTMLElement>('.history-text-block');
     textBlocks.forEach((block) => {
-      // Determine direction based on class or just generic slide in
       gsap.from(block, {
         scrollTrigger: {
           trigger: block,
@@ -133,7 +132,6 @@ export const HistorySection = () => {
       });
     });
 
-    // Animate Image Blocks
     const imageBlocks = gsap.utils.toArray<HTMLElement>('.history-image-block');
     imageBlocks.forEach((block) => {
       gsap.from(block, {
@@ -169,7 +167,7 @@ export const HistorySection = () => {
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {historyData.map((eventData, yearIndex) => (
             <Box key={eventData.year}>
-              {/* Year Header */}
+
               <Box className="history-year-header" sx={{ textAlign: 'center', mb: 10 }}>
                   <Typography variant="overline" sx={{ color: '#ffb700', letterSpacing: 8, fontSize: '1.2rem', display: 'block', mb: 2 }}>
                       AÑO // {eventData.year}
@@ -188,14 +186,13 @@ export const HistorySection = () => {
                   </Typography>
               </Box>
 
-              {/* Details Grid */}
               <Grid container spacing={8} alignItems="center">
                   {eventData.details.map((detail, index) => {
                       const isEven = index % 2 === 0;
                       
                       return (
                           <React.Fragment key={`${eventData.year}-${index}`}>
-                              {/* Text Block */}
+
                               <Grid 
                                 size={{ xs: 12, md: 6 }} 
                                 sx={{ order: isEven ? { xs: 2, md: 1 } : { xs: 2, md: 2 } }}
@@ -214,7 +211,8 @@ export const HistorySection = () => {
                                   </DataLog>
                               </Grid>
 
-                              {/* Image Block */}
+
+
                               <Grid 
                                 size={{ xs: 12, md: 6 }} 
                                 sx={{ order: isEven ? { xs: 1, md: 2 } : { xs: 1, md: 1 } }}
@@ -252,7 +250,7 @@ export const HistorySection = () => {
                                                   </Typography>
                                               </Box>
                                           )}
-                                          {/* Overlay Caption on Hover */}
+
                                           <Box sx={{
                                               position: 'absolute',
                                               bottom: 0,
@@ -275,7 +273,6 @@ export const HistorySection = () => {
                   })}
               </Grid>
 
-              {/* Separator between years (except last) */}
               {yearIndex < historyData.length - 1 && (
                    <Divider sx={{ mt: 16, borderColor: 'rgba(255, 255, 255, 0.1)' }} />
               )}
