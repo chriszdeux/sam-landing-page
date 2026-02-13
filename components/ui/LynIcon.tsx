@@ -1,3 +1,8 @@
+/**
+ * Componente Icono Lyn
+ * Icono SVG personalizado utilizando Lucide React
+ * Props par tamaño y color
+ */
 import React from 'react';
 import { Box } from '@mui/material';
 import { Zap } from 'lucide-react';

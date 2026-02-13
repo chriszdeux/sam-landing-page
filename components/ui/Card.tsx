@@ -1,3 +1,8 @@
+/**
+ * Componente Tarjeta (Card) Estilizada
+ * Efectos de borde y esquinas futuristas
+ * Estilos de hover y backdrop filter
+ */
 import React from 'react';
 import { Card as MuiCard, CardProps as MuiCardProps } from '@mui/material';
 
@@ -15,9 +20,9 @@ export const Card = ({ hoverEffect = true, glowColor = '#00f3ff', sx, children, 
         background: 'rgba(10, 10, 15, 0.6)',
         backdropFilter: 'blur(10px)',
         border: '1px solid rgba(255, 255, 255, 0.05)',
-        overflow: 'visible', // Allow corners to stick out if needed, or hidden if using inside
+
+        overflow: 'visible',
         
-        // Corner accents
         '&::before': {
             content: '""',
             position: 'absolute',
@@ -30,7 +35,7 @@ export const Card = ({ hoverEffect = true, glowColor = '#00f3ff', sx, children, 
             transition: 'all 0.3s ease',
             zIndex: 1,
             borderTopLeftRadius: '4px',
-            pointerEvents: 'none', // Prevent blocking clicks
+            pointerEvents: 'none',
         },
         '&::after': {
             content: '""',
@@ -44,7 +49,7 @@ export const Card = ({ hoverEffect = true, glowColor = '#00f3ff', sx, children, 
             transition: 'all 0.3s ease',
             zIndex: 1,
             borderBottomRightRadius: '4px',
-            pointerEvents: 'none', // Prevent blocking clicks
+            pointerEvents: 'none',
         },
 
         ...(hoverEffect && {
@@ -68,9 +73,6 @@ export const Card = ({ hoverEffect = true, glowColor = '#00f3ff', sx, children, 
       }}
       {...props}
     >
-      {/* Scanline effect container - hidden by default unless manually enabled, 
-          but adding a subtle inner glow or grid could be cool. 
-          For now, keeping it clean to avoid interference. */}
       {children}
     </MuiCard>
   );

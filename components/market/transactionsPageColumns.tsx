@@ -1,3 +1,8 @@
+/**
+ * Definición de Columnas para Página de Transacciones (Detallado)
+ * Configuración extendida para la tabla principal de transacciones
+ * Renderizado condicional de estados y tipos de operación
+ */
 import React from 'react';
 import { TaoIcon } from '../ui/TaoIcon';
 import { Chip, Typography, Box } from '@mui/material';
@@ -33,11 +38,8 @@ export const transactionsPageColumns: Column<TransactionsInterface>[] = [
         filterable: true,
         sortable: true,
         Cell: ({ value }) => {
-           // const isBuy = value === TransactionType.BUY;
-           // const isSell = value === TransactionType.SELL;
-           
            let label = value as string;
-           let color = '#00f3ff'; // Default cyan
+           let color = '#00f3ff';
            let bgcolor = 'rgba(0, 243, 255, 0.1)';
            let icon = <SwapHoriz sx={{ '&&': { fontSize: 14 } }} />;
 

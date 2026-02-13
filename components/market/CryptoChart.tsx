@@ -1,3 +1,8 @@
+/**
+ * Componente de Gráfico de Criptomonedas
+ * Visualización interactiva de precios históricos usando Chart.js
+ * Incluye tooltips personalizados y efectos visuales
+ */
 import React from 'react';
 import { Box } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -39,7 +44,7 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
     const dispatch = useAppDispatch();
     const { historicalData } = useAppSelector((state) => state.market);
     
-    // Fetch Data on Change
+
     React.useEffect(() => {
         if (cryptoId) {
             const promise = dispatch(fetchCryptoHistory({ cryptoId, range }));
@@ -53,16 +58,14 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
     const isDataLoaded = !!chartData && historicalData[cryptoId || '']?.range === range;
 
     const labels = React.useMemo(() => {
-        if (!isDataLoaded || !Array.isArray(chartData)) return Array.from({ length: 24 }, (_, i) => `${i}:00`); // Placeholder
+        if (!isDataLoaded || !Array.isArray(chartData)) return Array.from({ length: 24 }, (_, i) => `${i}:00`);
         return chartData.map(d => new Date(d.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
     }, [chartData, isDataLoaded]);
     
     const dataPoints = React.useMemo(() => {
         if (!isDataLoaded) {
-             // Fallback Simulation logic if no data - using deterministic sine wave
             return Array.from({ length: 24 }).map((_, i) => {
                 const base = 100;
-                // Create a deterministic pattern based on index
                 const change = Math.sin(i * 0.5) * 10 + (i % 2 === 0 ? 5 : -5);
                 return base + change;
             });
@@ -112,23 +115,21 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
             },
             tooltip: {
                 enabled: false,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 external: (context: any) => {
-                    // Tooltip Element
                     const { chart, tooltip } = context;
                     const tooltipEl = tooltipRef.current;
 
                     if (!tooltipEl) return;
-
-                    // Hide if no tooltip
                     if (tooltip.opacity === 0) {
                         tooltipEl.style.opacity = '0';
                         tooltipEl.style.transform = 'translate(-50%, -100%) scale(0.9)';
                         return;
                     }
 
-                    // Set Text
                     if (tooltip.body) {
                         const titleLines = tooltip.title || [];
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const bodyLines = tooltip.body.map((b: any) => b.lines);
 
                         let innerHtml = '<div style="margin-bottom: 8px;">';
@@ -148,8 +149,6 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
                     }
 
                     const { offsetLeft: positionX, offsetTop: positionY } = chart.canvas;
-
-                    // Display, position, and set styles for font
                     tooltipEl.style.opacity = '1';
                     tooltipEl.style.left = positionX + tooltip.caretX + 'px';
                     tooltipEl.style.top = positionY + tooltip.caretY + 'px';
@@ -198,7 +197,7 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
                 <Line options={options} data={data} key={range} />
             </motion.div>
             
-            {/* Subtle Scanline Animation */}
+
             <motion.div
                 animate={{ x: ['-100%', '200%'] }}
                 transition={{ 
@@ -213,13 +212,13 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
                     left: 0,
                     width: '40%',
                     height: '100%',
-                    background: `linear-gradient(90deg, transparent 0%, ${color}10 50%, transparent 100%)`, // Very subtle
+                    background: `linear-gradient(90deg, transparent 0%, ${color}10 50%, transparent 100%)`,
                     pointerEvents: 'none',
                     filter: 'blur(20px)',
                     zIndex: 1
                 }}
             />
-            {/* Custom Tooltip */}
+
             <div
                 ref={tooltipRef}
                 style={{

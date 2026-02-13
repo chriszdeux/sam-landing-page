@@ -1,3 +1,10 @@
+/**
+ * Layout Principal de la Aplicación
+ * Configuración de fuentes (Geist)
+ * Proveedores globales (Store, Theme)
+ * Componentes de interfaz global (Navbar, Modales)
+ * Definición de metadatos básicos
+ */
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";

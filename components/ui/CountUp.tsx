@@ -1,3 +1,8 @@
+/**
+ * Componente Contador Animado
+ * Anima números incrementales
+ * Utiliza Framer Motion y requestAnimationFrame
+ */
 'use client';
 
 import { useEffect, useRef } from 'react';

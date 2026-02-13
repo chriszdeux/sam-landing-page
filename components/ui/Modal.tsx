@@ -1,3 +1,9 @@
+/**
+ * Componente Modal Reutilizable
+ * Gestión de estados globales de UI
+ * Renderizado condicional de contenido (Login, Register, etc.)
+ * Estilos personalizados con backdrop
+ */
 'use client';
 
 import React from 'react';
@@ -19,8 +25,8 @@ const style = {
   maxWidth: 500,
   maxHeight: '90vh',
   overflowY: 'auto',
-  bgcolor: 'rgba(10, 15, 30, 0.95)', // Darker, more opaque for readability but still fitting theme
-  backdropFilter: 'blur(20px)', // Blur logic handled by backdrop usually, but this adds to the modal itself if supported
+  bgcolor: 'rgba(10, 15, 30, 0.95)',
+  backdropFilter: 'blur(20px)',
   border: '1px solid rgba(0, 243, 255, 0.3)',
   boxShadow: '0 0 30px rgba(0, 243, 255, 0.2), inset 0 0 20px rgba(0, 243, 255, 0.05)',
   borderRadius: 4,
@@ -38,7 +44,7 @@ export const Modal = ({ children }: { children?: React.ReactNode }) => {
     ...style,
     maxWidth: isWideModal ? 900 : 500,
     p: isWideModal ? 0 : 4,
-    // Add specific adjustments for wide modals if needed
+
   };
 
   const renderContent = () => {

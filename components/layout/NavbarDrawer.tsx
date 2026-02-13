@@ -1,3 +1,9 @@
+/**
+ * Menú Lateral (Drawer) para Móviles
+ * Navegación responsiva
+ * Información de usuario y saldo
+ * Selección de red y acciones de autenticación
+ */
 import React from "react";
 import {
   Box,
@@ -136,7 +142,7 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({
                   fullWidth
                   onClick={() => {
                     dispatch(openModal("login"));
-                    handleDrawerToggle(); // Using handleDrawerToggle as setMobileOpen(false)
+                    handleDrawerToggle();
                   }}
                 >
                   Entrar

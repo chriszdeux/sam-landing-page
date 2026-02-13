@@ -1,3 +1,8 @@
+/**
+ * Componente AuthLoader
+ * Gestiona la carga inicial de autenticación y datos del usuario
+ * Verifica el estado de la sesión y carga detalles de la billetera
+ */
 'use client';
 
 import { useEffect } from 'react';
@@ -9,15 +14,15 @@ export const AuthLoader = ({ children }: { children: React.ReactNode }) => {
     const dispatch = useAppDispatch();
     const { userInfo } = useAppSelector((state) => state.auth);
 
-    // Initial Load
+
     useEffect(() => {
         dispatch(checkAuth());
         dispatch(fetchNetworks());
-    }, []);
+    }, [dispatch]);
 
     useEffect(() => {
         if (userInfo) {
-            // dispatch(fetchRewards()); // Optimized: Fetch only on rewards page
+
             
             if (userInfo.wallets && userInfo.wallets.length > 0) {
                const primaryWallet = userInfo.wallets[0];
@@ -26,7 +31,7 @@ export const AuthLoader = ({ children }: { children: React.ReactNode }) => {
                }
            }
         }
-    }, [userInfo]);
+    }, [userInfo, dispatch]);
 
     return <>{children}</>;
 };

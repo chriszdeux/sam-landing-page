@@ -1,3 +1,8 @@
+/**
+ * Definición de Columnas para Tabla de Transacciones (Resumen)
+ * Configuración de cabeceras, ordenamiento y renderizado de celdas
+ * Incluye lógica de visualización para tipos de transacción y activos
+ */
 import React from 'react';
 import { TaoIcon } from '../ui/TaoIcon';
 import { Chip, Typography } from '@mui/material';
@@ -21,7 +26,7 @@ export const transactionColumns: Column<TransactionsInterface>[] = [
         sortable: true,
         Cell: ({ value }) => {
            let label = value as string;
-           let color = '#00f3ff'; // Default cyan
+           let color = '#00f3ff';
            let bgcolor = 'rgba(0, 243, 255, 0.1)';
            let icon = <SwapHoriz sx={{ '&&': { fontSize: 14 } }} />;
 

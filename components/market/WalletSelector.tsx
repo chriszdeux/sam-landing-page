@@ -1,3 +1,8 @@
+/**
+ * Selector de Billetera
+ * Muestra las billeteras disponibles del usuario en formato de tarjeta
+ * Permite seleccionar la billetera activa para operaciones
+ */
 import React from 'react';
 import { Box, Typography, Stack } from '@mui/material';
 import { Card } from '../ui/Card';
@@ -20,7 +25,6 @@ export const WalletSelector = ({ userInfo, walletsInfo, selectedWalletId, onSele
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} useFlexGap sx={{ flexWrap: 'wrap' }}>
                 {userInfo?.wallets.map((wallet, index) => {
                     const isSelected = selectedWalletId === wallet.walletAddress;
-                    // Try to get asset count if this is the active wallet
                     const walletAssetsCount = (walletsInfo && userInfo.wallets[0]?.walletAddress === wallet.walletAddress) 
                     ? walletsInfo.store.length 
                     : '?';
@@ -36,12 +40,7 @@ export const WalletSelector = ({ userInfo, walletsInfo, selectedWalletId, onSele
                                 width: { xs: '100%', md: 300 },
                                 cursor: 'pointer',
                                 border: isSelected ? '2px solid #00f3ff' : undefined, 
-                                // Card has its own border logic but we can override or let glowColor handle it partially.
-                                // Actually, Card handles hover glow. For selected state, we might want a permanent glow or border.
-                                bgcolor: isSelected ? 'rgba(0, 243, 255, 0.05)' : undefined, // Let Card default handle non-selected bg
-                                '&:hover': {
-                                     // Card handles this via glowColor
-                                }
+                                bgcolor: isSelected ? 'rgba(0, 243, 255, 0.05)' : undefined,
                             }}
                         >
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>

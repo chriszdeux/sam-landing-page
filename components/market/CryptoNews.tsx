@@ -1,3 +1,8 @@
+/**
+ * Componente de Noticias Cripto
+ * Muestra las últimas novedades relacionadas con el activo
+ * Diseño de tarjetas con resumen y fecha
+ */
 'use client';
 
 import React from 'react';
