@@ -58,7 +58,7 @@ export const HeroSection = () => {
           <Grid size={{ xs: 12, md: 7 }}>
             <Box className="hero-content">
               <Typography variant="h1" sx={{
-                fontSize: { xs: '3rem', md: '5rem' },
+                fontSize: { xs: '2.5rem', md: '5rem' },
                 mb: 2,
                 background: 'linear-gradient(45deg, #00f3ff, #ffb700)',
                 backgroundClip: 'text',

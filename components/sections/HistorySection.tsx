@@ -63,7 +63,7 @@ const DataLog = ({ title, year, children, align = 'left' }: { title: string; yea
   <Box sx={{ 
     textAlign: align, 
     position: 'relative',
-    p: 4,
+    p: { xs: 2, md: 4 },
     borderLeft: align === 'left' ? '2px solid #ff0055' : 'none',
     borderRight: align === 'right' ? '2px solid #00f3ff' : 'none',
     background: 'linear-gradient(90deg, rgba(255, 0, 85, 0.05) 0%, rgba(0,0,0,0) 100%)',
@@ -150,7 +150,7 @@ export const HistorySection = () => {
   }, { scope: container });
 
   return (
-    <Section id="history">
+    <Section id="history" className="overflow-hidden">
       <Box ref={container}>
         <Box sx={{ mb: 12 }} className="history-main-title">
           <Typography variant="h2" align="center" gutterBottom sx={{ 
@@ -173,11 +173,13 @@ export const HistorySection = () => {
                       AÑO // {eventData.year}
                   </Typography>
                   <Typography variant="h3" sx={{ 
-                      fontSize: { xs: '2.5rem', md: '4rem' }, 
+                      fontSize: { xs: '1.8rem', md: '4rem' }, 
                       fontWeight: 'bold', 
                       mb: 3,
                       color: 'white',
                       textTransform: 'uppercase',
+                      hyphens: 'auto',
+                      wordBreak: 'break-word',
                   }}>
                       {eventData.title}
                   </Typography>
@@ -186,7 +188,7 @@ export const HistorySection = () => {
                   </Typography>
               </Box>
 
-              <Grid container spacing={8} alignItems="center">
+                  <Grid container spacing={{ xs: 2, md: 8 }} alignItems="center">
                   {eventData.details.map((detail, index) => {
                       const isEven = index % 2 === 0;
                       
