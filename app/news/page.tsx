@@ -117,6 +117,8 @@ export default function NewsPage() {
                                     background: 'linear-gradient(45deg, #fff, #aaa)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
+                                    wordBreak: 'break-word',
+                                    hyphens: 'auto',
                                 }}
                             >
                                 {news.title}

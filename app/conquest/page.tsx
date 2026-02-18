@@ -14,7 +14,13 @@ export default function ConquestPage() {
         
         <Container maxWidth="lg" sx={{ pt: 20, pb: 10, position: 'relative', zIndex: 1, color: 'white' }}>
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1 }}>
-                <Typography variant="h2" align="center" gutterBottom sx={{ color: '#ffb700', mb: 8, textTransform: 'uppercase', letterSpacing: 8 }}>
+                <Typography variant="h2" align="center" gutterBottom sx={{ 
+                    color: '#ffb700', 
+                    mb: 8, 
+                    textTransform: 'uppercase', 
+                    letterSpacing: { xs: 2, md: 8 },
+                    fontSize: { xs: '2rem', md: '3.75rem' }
+                }}>
                     CONQUISTA DE SISTEMAS
                 </Typography>
 

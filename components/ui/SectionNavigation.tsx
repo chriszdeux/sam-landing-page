@@ -68,7 +68,7 @@ export const SectionNavigation = () => {
       position: 'fixed',
       bottom: 32,
       right: 32,
-      display: 'flex',
+      display: { xs: 'none', md: 'flex' },
       flexDirection: 'column',
       gap: 1,
       zIndex: 50,

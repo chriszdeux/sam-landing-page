@@ -6,9 +6,9 @@ import { Backpack, TrendingUp, LocalAtm } from '@mui/icons-material';
 export const PortfolioAnimation = ({ color, variant = 'balance' }: { color: string, variant?: 'balance' | 'inventory' | 'stats' }) => {
     const [balance, setBalance] = useState(1000);
     const [assets, setAssets] = useState<{name: string, value: number, percentage: number}[]>([
-        { name: 'SOL', value: 80, percentage: 80 },
-        { name: 'ETH', value: 15, percentage: 15 },
-        { name: 'BTC', value: 5, percentage: 5 }
+        { name: 'LYN', value: 80, percentage: 80 },
+        { name: 'SOL', value: 15, percentage: 15 },
+        { name: 'IXNN', value: 5, percentage: 5 }
     ]);
 
     useEffect(() => {

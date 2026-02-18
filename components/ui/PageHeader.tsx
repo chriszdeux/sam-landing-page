@@ -49,7 +49,7 @@ export const PageHeader = ({ title, subtitle, color = '#00f3ff' }: PageHeaderPro
                 WebkitTextFillColor: 'transparent',
                 filter: `drop-shadow(0 0 20px ${color}40)`,
                 mb: 3,
-                fontSize: { xs: '2.5rem', md: '3.5rem' }
+                fontSize: { xs: '2rem', md: '3.5rem' }
             }}
         >
           {title}

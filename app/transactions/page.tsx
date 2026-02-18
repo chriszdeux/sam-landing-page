@@ -83,7 +83,7 @@ export default function TransactionsPage() {
                 />
 
                 <TechFrame color="#00f3ff">
-                    <div className="w-full overflow-hidden p-4">
+                    <div className="w-full overflow-x-auto p-4">
                         {loading && transactionData.length === 0 ? (
                              <div className="flex justify-center p-10">
                                  <CircularProgress color="primary" />
