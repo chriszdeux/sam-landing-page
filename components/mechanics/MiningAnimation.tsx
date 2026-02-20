@@ -1,8 +1,7 @@
-/**
- * Animación de Minería (Cubos de Red)
- * Visualización 3D de nodos (cubos) y transmisión de energía (haces)
- * Utiliza Framer Motion para rotaciones y pulsos
- */
+// 1-Estructuración y renderizado visual del componente UI
+// 2-Estructuración y renderizado visual del componente UI
+// 3-Estructuración y renderizado visual del componente UI
+
 import React from 'react';
 import { Box } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -31,13 +30,16 @@ const Cube = ({ size = 100, color = '#fff', duration = 10, delay = 0, x = 0, y =
         backfaceVisibility: 'visible' as const,
     };
 
+    
+    
+    //# 1-Estructuración y renderizado visual del componente UI
     return (
         <motion.div
             style={{
                 width: size,
                 height: size,
                 position: 'absolute',
-                left: `calc(50% + ${x - size/2}px)`, // Center the cube on coordinates
+                left: `calc(50% + ${x - size/2}px)`, 
                 top: `calc(50% + ${y - size/2}px)`,
                 transformStyle: 'preserve-3d',
             }}
@@ -45,7 +47,7 @@ const Cube = ({ size = 100, color = '#fff', duration = 10, delay = 0, x = 0, y =
                 rotateX: [0, 360],
                 rotateY: [0, 360],
                 rotateZ: [0, 180],
-                scale: [1, 1.05, 1], // Subtle pulse
+                scale: [1, 1.05, 1], 
             }}
             transition={{
                 rotateX: { duration: duration, ease: "linear", repeat: Infinity, delay: delay },
@@ -54,7 +56,7 @@ const Cube = ({ size = 100, color = '#fff', duration = 10, delay = 0, x = 0, y =
                 scale: { duration: 4, ease: "easeInOut", repeat: Infinity, delay: delay } 
             }}
         >
-             {/* Glowing Core */}
+             {}
              <motion.div 
                 style={{ 
                     position: 'absolute', inset: 0, 
@@ -82,16 +84,19 @@ const EnergyBeam = ({ start, end, color, delay = 0 }: { start: {x: number, y: nu
     const distance = Math.sqrt(dx*dx + dy*dy);
     const angle = Math.atan2(dy, dx) * 180 / Math.PI;
 
-    const TRAVEL_DURATION = 2; // Time to travel
-    const PAUSE_DURATION = 1;  // Time to wait before next packet
-    const PULSE_DURATION = 0.6; // Explosion effect time
+    const TRAVEL_DURATION = 2; 
+    const PAUSE_DURATION = 1;  
+    const PULSE_DURATION = 0.6; 
 
-    // Cycle math for synchronization
-    // Total Cycle = TRAVEL + PAUSE = 3s
-    // Particle runs for TRAVEL, then waits PAUSE.
-    // Pulse runs for PULSE. Starts at T=TRAVEL. Needs to repeat every CYCLE.
-    // Pulse Repeat Delay = CYCLE - PULSE = (2 + 1) - 0.6 = 2.4s
+    
+    
+    
+    
+    
 
+    
+    
+    //# 2-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{
             position: 'absolute',
@@ -104,7 +109,7 @@ const EnergyBeam = ({ start, end, color, delay = 0 }: { start: {x: number, y: nu
             pointerEvents: 'none',
             zIndex: 10
         }}>
-            {/* Faint Guide Line */}
+            {}
             <motion.div
                 style={{
                     width: '100%',
@@ -113,7 +118,7 @@ const EnergyBeam = ({ start, end, color, delay = 0 }: { start: {x: number, y: nu
                 }}
             />
 
-             {/* Traveling Energy Packet */}
+             {}
              <motion.div
                 style={{
                     position: 'absolute',
@@ -128,7 +133,7 @@ const EnergyBeam = ({ start, end, color, delay = 0 }: { start: {x: number, y: nu
                 }}
                 animate={{
                     left: ['0%', '100%'],
-                    opacity: [0, 1, 1, 0] // Fade out right at the end
+                    opacity: [0, 1, 1, 0] 
                 }}
                 transition={{
                     duration: TRAVEL_DURATION,
@@ -139,12 +144,12 @@ const EnergyBeam = ({ start, end, color, delay = 0 }: { start: {x: number, y: nu
                 }}
              />
 
-             {/* Impact Pulse (at the destination) */}
+             {}
              <motion.div
                 style={{
                     position: 'absolute',
                     top: '50%',
-                    right: -20, // Centered on the end tip (approx)
+                    right: -20, 
                     width: 40,
                     height: 40,
                     borderRadius: '50%',
@@ -163,7 +168,7 @@ const EnergyBeam = ({ start, end, color, delay = 0 }: { start: {x: number, y: nu
                     duration: PULSE_DURATION,
                     repeat: Infinity,
                     ease: "easeOut",
-                    delay: delay + TRAVEL_DURATION, // Start exactly when packet arrives
+                    delay: delay + TRAVEL_DURATION, 
                     repeatDelay: (TRAVEL_DURATION + PAUSE_DURATION) - PULSE_DURATION
                 }}
             />
@@ -172,24 +177,27 @@ const EnergyBeam = ({ start, end, color, delay = 0 }: { start: {x: number, y: nu
 };
 
 export const MiningAnimation = ({ color = '#00E5FF' }: MiningAnimationProps) => {
-    // Define cubes with coordinates relative to center
+    
     const cubes = [
-        { id: 1, size: 120, x: -200, y: -50, duration: 25 },     // Main Left
-        { id: 2, size: 80, x: 250, y: 80, duration: 20 },      // Main Right
-        { id: 3, size: 60, x: 50, y: -180, duration: 15 },     // Top Center
-        { id: 4, size: 50, x: -100, y: 150, duration: 18 },    // Bottom Left
-        { id: 5, size: 40, x: 300, y: -150, duration: 12 },    // Top Right
+        { id: 1, size: 120, x: -200, y: -50, duration: 25 },     
+        { id: 2, size: 80, x: 250, y: 80, duration: 20 },      
+        { id: 3, size: 60, x: 50, y: -180, duration: 15 },     
+        { id: 4, size: 50, x: -100, y: 150, duration: 18 },    
+        { id: 5, size: 40, x: 300, y: -150, duration: 12 },    
     ];
 
-    // Define connections between cubes
+    
     const connections = [
         { from: cubes[0], to: cubes[2], delay: 0 }, 
-        { from: cubes[2], to: cubes[1], delay: 1.5 }, // Staggered 
+        { from: cubes[2], to: cubes[1], delay: 1.5 }, 
         { from: cubes[0], to: cubes[3], delay: 0.5 }, 
         { from: cubes[3], to: cubes[1], delay: 2 }, 
         { from: cubes[1], to: cubes[4], delay: 1 }, 
     ];
 
+    
+    
+    //# 3-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{ 
             position: 'absolute', 
@@ -202,7 +210,7 @@ export const MiningAnimation = ({ color = '#00E5FF' }: MiningAnimationProps) => 
             zIndex: 0
         }}>
            
-            {/* Render Beams first */}
+            {}
             {connections.map((conn, i) => (
                 <EnergyBeam 
                     key={i} 
@@ -213,7 +221,7 @@ export const MiningAnimation = ({ color = '#00E5FF' }: MiningAnimationProps) => 
                 />
             ))}
 
-            {/* Render Cubes */}
+            {}
             {cubes.map((cube, i) => (
                 <Cube 
                     key={cube.id}
@@ -223,7 +231,7 @@ export const MiningAnimation = ({ color = '#00E5FF' }: MiningAnimationProps) => 
                 />
             ))}
 
-             {/* Background Grid */}
+             {}
              <motion.div 
                 animate={{ opacity: [0.1, 0.2, 0.1] }}
                 transition={{ duration: 5, repeat: Infinity }}

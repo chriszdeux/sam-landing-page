@@ -1,8 +1,7 @@
-/**
- * Diálogo de Confirmación de Transacción
- * Muestra detalles críticos de la operación antes de ejecutar
- * Soporta tipos: Compra, Venta y Transferencia
- */
+// 1-Definir componente de diálogo de confirmación
+// 2-Renderizar diálogo modal
+
+//# 1-Definir componente de diálogo de confirmación
 import React from 'react';
 import {
     Stack,
@@ -39,6 +38,8 @@ export const ConfirmationDialog = ({
     quantity,
     fee
 }: ConfirmationDialogProps) => {
+    
+    //# 2-Renderizar diálogo modal
     return (
         <Dialog 
             open={open} 

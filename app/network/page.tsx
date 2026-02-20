@@ -1,8 +1,16 @@
+// 1-Selección de datos desde el estado global de Redux
+// 2-Selección de datos desde el estado global de Redux
+// 3-Selección de ítem y actualización de network
+// 4-Estructuración y renderizado visual del componente UI
+// 5-Estructuración y renderizado visual del componente UI
+
 'use client';
 
 import React from 'react';
 import { Box, Container, Typography, Grid, Button, IconButton } from '@mui/material';
 import { Background } from '../../components/layout/Background';
+
+//# 1-Selección de datos desde el estado global de Redux
 import { useAppSelector } from '../../lib/hooks';
 import { TechFrame } from '../../components/ui/TechFrame';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -12,13 +20,21 @@ import { motion } from 'framer-motion';
 
 export default function NetworkSelectionPage() {
   const router = useRouter();
+  
+  //# 2-Selección de datos desde el estado global de Redux
   const { networks, selectedNetwork } = useAppSelector((state) => state.blockchain);
 
+  
+  
+  //# 3-Selección de ítem y actualización de network
   const handleNetworkSelect = (networkId: string) => {
-    // Navigate to connecting animation page
+    
     router.push(`/network/${networkId}/connecting`);
   };
 
+  
+  
+  //# 4-Estructuración y renderizado visual del componente UI
   return (
     <Box sx={{ minHeight: '100vh', position: 'relative' }}>
         <Background />
@@ -35,6 +51,9 @@ export default function NetworkSelectionPage() {
                     const isSelected = selectedNetwork?.id === network.id;
                     const color = network.additionalInfo?.color || '#00f3ff';
                     
+                    
+                    
+                    //# 5-Estructuración y renderizado visual del componente UI
                     return (
                         <Grid size={{ xs: 12, md: 6, lg: 4 }} key={network.id}>
                             <motion.div
@@ -57,7 +76,7 @@ export default function NetworkSelectionPage() {
                                     }}
                                 >
                                     <Box sx={{ p: 4, height: '100%', display: 'flex', flexDirection: 'column', gap: 3 }}>
-                                        {/* Header */}
+                                        {}
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                             <Box>
                                                 <Typography variant="overline" sx={{ color: color, letterSpacing: 2, display: 'block' }}>
@@ -90,7 +109,7 @@ export default function NetworkSelectionPage() {
                                             </IconButton>
                                         </Box>
                                         
-                                        {/* Visual Element (Planet/Holo) */}
+                                        {}
                                         <Box sx={{ 
                                             height: 150, 
                                             width: '100%', 
@@ -109,7 +128,7 @@ export default function NetworkSelectionPage() {
                                                  position: 'relative',
                                                  zIndex: 2
                                              }}>
-                                                 {/* Atmosphere Ring */}
+                                                 {}
                                                  <Box sx={{
                                                      position: 'absolute',
                                                      inset: -10,
@@ -118,7 +137,7 @@ export default function NetworkSelectionPage() {
                                                      animation: 'spin 10s linear infinite'
                                                  }} />
                                              </Box>
-                                             {/* Grid Background behind planet */}
+                                             {}
                                              <Box sx={{
                                                  position: 'absolute',
                                                  inset: 0,
@@ -130,7 +149,7 @@ export default function NetworkSelectionPage() {
                                              }} />
                                         </Box>
 
-                                        {/* Stats Grid */}
+                                        {}
                                         <Grid container spacing={2} sx={{ mt: 'auto' }}>
                                             <Grid size={{ xs: 4 }}>
                                                 <Box sx={{ textAlign: 'center', p: 1, bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 1 }}>
@@ -158,7 +177,7 @@ export default function NetworkSelectionPage() {
                                             </Grid>
                                         </Grid>
 
-                                        {/* Action Button */}
+                                        {}
                                         <Button 
                                             fullWidth 
                                             variant="outlined" 

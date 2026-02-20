@@ -1,13 +1,21 @@
+// 1-Importar tipos y acciones
+// 2-Definir estado inicial de transacciones
+// 3-Crear slice con reducers para manejo de datos
+// 4-Exportar reducer por defecto
+
+//# 1-Importar tipos y acciones
 import { createSlice } from '@reduxjs/toolkit';
 import { TransactionsState } from './types';
 import { fetchTransactions } from './actions';
 
+//# 2-Definir estado inicial de transacciones
 const initialState: TransactionsState = {
     byStoreBoxId: {},
     isLoading: false,
     error: null,
 };
 
+//# 3-Crear slice con reducers para manejo de datos
 const transactionsSlice = createSlice({
     name: 'transactions',
     initialState,
@@ -19,14 +27,16 @@ const transactionsSlice = createSlice({
             })
             .addCase(fetchTransactions.fulfilled, (state, action) => {
                 state.isLoading = false;
+                state.lastFetch = Date.now();
+                state.lastArgs = JSON.stringify(action.meta.arg);
                 const { storeId, data, page } = action.payload;
 
                 if (data === false) return;
                 
-                // The API returns { data: TransactionsInterface[] }
+                
                 const newTransactions = data.data || [];
                 
-                // Ensure we have a bucket structure
+                
                 if (!state.byStoreBoxId[storeId]) {
                     state.byStoreBoxId[storeId] = {
                         id: storeId,
@@ -45,7 +55,7 @@ const transactionsSlice = createSlice({
                 if (page === 1) {
                     state.byStoreBoxId[storeId].transactions = newTransactions;
                 } else {
-                    // Verify if we already have transactions to append to
+                    
                     const existing = state.byStoreBoxId[storeId].transactions;
                     state.byStoreBoxId[storeId].transactions = [...existing, ...newTransactions];
                 }
@@ -57,4 +67,5 @@ const transactionsSlice = createSlice({
     },
 });
 
+//# 4-Exportar reducer por defecto
 export default transactionsSlice.reducer;

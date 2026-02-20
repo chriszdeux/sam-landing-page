@@ -1,8 +1,5 @@
-/**
- * Sección de Arquitectura
- * Muestra las estructuras destacadas del juego
- * Animaciones GSAP para título, tarjetas y botones
- */
+// 1-Estructuración y renderizado visual del componente UI
+
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -60,6 +57,9 @@ export const ArchitectureSection = () => {
 
   }, { scope: container });
 
+  
+  
+  //# 1-Estructuración y renderizado visual del componente UI
   return (
     <Section id="architecture">
       <Box ref={container}>

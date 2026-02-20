@@ -1,5 +1,12 @@
+// 1-Importar dependencias y slices de economía
+// 2-Obtener estado y despachador de Redux
+// 3-Sincronizar lista de activos del mercado
+// 4-Manejar interacción y paginación
+// 5-Renderizar tabla de activos del mercado
+
 'use client';
 
+//# 1-Importar dependencias y slices de economía
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -19,38 +26,49 @@ import {
   CircularProgress,
   Alert
 } from '@mui/material';
-import { TrendingUp, TrendingDown, Rocket, Zap, Shield, Box as BoxIcon, Activity } from 'lucide-react';
+import { TrendingUp, TrendingDown, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
+
+
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { fetchAssets, setPage } from '../../lib/features/economySlice';
 
-// Map symbols to icons (fallback to Activity if not found)
-const iconMap: Record<string, any> = {
-  'SAM': Rocket,
-  'D2': Zap,
-  'IR': Shield,
-  'RAT': BoxIcon,
-  'AMMO': Activity
-};
+
 
 export const MarketTable = () => {
   const router = useRouter();
+  
+  //# 2-Obtener estado y despachador de Redux
   const dispatch = useAppDispatch();
+  
+
   const { assets, loading, error, page, totalPages } = useAppSelector((state) => state.economy);
 
+  
+  
+  //# 3-Sincronizar lista de activos del mercado
   useEffect(() => {
     dispatch(fetchAssets({ page, limit: 10 }));
-  }, [page]);
+  }, [page, dispatch]);
 
+  
+  
+  //# 4-Manejar interacción y paginación
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     dispatch(setPage(value));
   };
+
+  
+  
 
   const handleRowClick = (id: string) => {
     router.push(`/economia-real/${id}`);
   };
 
   if (loading && assets.length === 0) {
+    
+    
+    //# 5-Renderizar tabla de activos del mercado
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
         <CircularProgress color="secondary" />
@@ -59,6 +77,9 @@ export const MarketTable = () => {
   }
 
   if (error) {
+    
+    
+    //# 9-Estructuración y renderizado visual del componente UI
     return (
       <Alert severity="error" sx={{ mb: 2 }}>
         {error}
@@ -66,6 +87,9 @@ export const MarketTable = () => {
     );
   }
 
+  
+  
+  //# 10-Estructuración y renderizado visual del componente UI
   return (
     <Box>
       <TableContainer component={Paper} sx={{
@@ -90,7 +114,10 @@ export const MarketTable = () => {
           </TableHead>
           <TableBody>
             {assets?.map((row, index) => {
-              // const Icon = iconMap[row.symbol] || Activity; // Deprecated in favor of dynamic image
+              
+              
+              
+              //# 11-Estructuración y renderizado visual del componente UI
               return (
                 <TableRow
                   key={row.id}

@@ -1,18 +1,25 @@
-/**
- * Importación de dependencias y componentes UI.
- * Inicialización de hooks de Redux.
- * Lógica para obtener transacciones por tienda.
- * Manejo de paginación y carga de datos.
- * Efecto para cargar transacciones iniciales.
- * Vista alternativa si no hay red seleccionada.
- * Renderizado principal con tabla de transacciones.
- */
+// 1-Efecto secundario para sincronización del ciclo de vida
+// 2-Obtención del despachador para emitir acciones al store
+// 3-Obtención del despachador para emitir acciones al store
+// 4-Selección de datos desde el estado global de Redux
+// 5-Selección de datos desde el estado global de Redux
+// 6-Gestión de estado local para page
+// 7-Manejo de cambios en el input page
+// 8-Efecto secundario para sincronización del ciclo de vida
+// 9-Estructuración y renderizado visual del componente UI
+// 10-Estructuración y renderizado visual del componente UI
 
 'use client';
 
+//# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useEffect } from 'react';
-import { Container, CircularProgress } from '@mui/material';
+import { Container, CircularProgress, Box } from '@mui/material';
 import { Background } from '../../components/layout/Background';
+import { Input } from '../../components/ui/Input';
+import { Button } from '../../components/ui/Button';
+import SearchIcon from '@mui/icons-material/Search';
+
+//# 2-Obtención del despachador para emitir acciones al store
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { fetchTransactions } from '../../lib/features/transactions/actions';
 import { GenericTable } from '../../components/ui/GenericTable';
@@ -22,8 +29,14 @@ import { TechFrame } from '../../components/ui/TechFrame';
 import { PageHeader } from '../../components/ui/PageHeader';
 
 export default function TransactionsPage() {
+    
+    //# 3-Obtención del despachador para emitir acciones al store
     const dispatch = useAppDispatch();
+    
+    //# 4-Selección de datos desde el estado global de Redux
     const { selectedNetwork, networks } = useAppSelector((state) => state.blockchain);
+    
+    //# 5-Selección de datos desde el estado global de Redux
     const { byStoreBoxId, isLoading: loading, error } = useAppSelector((state) => state.transactions);
 
     const currentNetwork = networks.find(n => n.id === selectedNetwork?.id);
@@ -40,27 +53,49 @@ export default function TransactionsPage() {
         }
     }
 
+    
+    //# 6-Gestión de estado local para page
     const [page, setPage] = React.useState(0);
-    const pageSize = 20;
+    const [walletSearch, setWalletSearch] = React.useState('');
+    const [appliedWalletFilter, setAppliedWalletFilter] = React.useState('');
+    const pageSize = 10;
 
+    const handleSearch = () => {
+        setAppliedWalletFilter(walletSearch);
+        setPage(0);
+        if (storeId) {
+            dispatch(fetchTransactions({ storeId, walletId: walletSearch, page: 1, limit: pageSize }));
+        }
+    };
+
+    
+    
+    //# 7-Manejo de cambios en el input page
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         
         if (storeId && transactionData.length < (newPage + 1) * pageSize) {
-            dispatch(fetchTransactions({ storeId, page: newPage + 1, limit: pageSize }));
+            dispatch(fetchTransactions({ storeId, walletId: appliedWalletFilter, page: newPage + 1, limit: pageSize }));
         }
     };
     
     const hasMoreStats = transactionData.length >= (page + 1) * pageSize;
     const totalRows = hasMoreStats ? transactionData.length + pageSize : transactionData.length;
 
+    
+    
+    //# 8-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         if (storeId) {
-            dispatch(fetchTransactions({ storeId, page: 1, limit: pageSize }));
+            dispatch(fetchTransactions({ storeId, walletId: appliedWalletFilter, page: 1, limit: pageSize }));
         }
-    }, [storeId, dispatch]);
+    }, [storeId, dispatch, appliedWalletFilter, pageSize]);
 
     if (!selectedNetwork) {
+         
+         
+         //# 9-Estructuración y renderizado visual del componente UI
          return (
             <main className="min-h-screen relative w-full overflow-hidden flex items-center justify-center">
                 <Background />
@@ -71,6 +106,9 @@ export default function TransactionsPage() {
         );
     }
 
+    
+    
+    //# 10-Estructuración y renderizado visual del componente UI
     return (
         <main className="min-h-screen relative w-full overflow-hidden">
             <Background />
@@ -83,7 +121,24 @@ export default function TransactionsPage() {
                 />
 
                 <TechFrame color="#00f3ff">
-                    <div className="w-full overflow-hidden p-4">
+                    <Box sx={{ p: 2, display: 'flex', gap: 2, alignItems: 'center', borderBottom: '1px solid rgba(0, 243, 255, 0.1)' }}>
+                        <Input 
+                            placeholder="Buscar por Wallet Address..." 
+                            value={walletSearch}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWalletSearch(e.target.value)}
+                            fullWidth
+                            sx={{ mb: 0 }}
+                        />
+                        <Button 
+                            variant="contained" 
+                            onClick={handleSearch}
+                            startIcon={<SearchIcon />}
+                            sx={{ height: 48, minWidth: 120 }}
+                        >
+                            BUSCAR
+                        </Button>
+                    </Box>
+                    <div className="w-full overflow-x-auto p-4">
                         {loading && transactionData.length === 0 ? (
                              <div className="flex justify-center p-10">
                                  <CircularProgress color="primary" />

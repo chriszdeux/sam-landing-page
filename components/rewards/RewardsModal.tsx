@@ -1,5 +1,21 @@
+// 1-Efecto secundario para sincronización del ciclo de vida
+// 2-Obtención del despachador para emitir acciones al store
+// 3-Obtención del despachador para emitir acciones al store
+// 4-Selección de datos desde el estado global de Redux
+// 5-Selección de datos desde el estado global de Redux
+// 6-Gestión de estado local para claiming id
+// 7-Control de visibilidad para interface de show success
+// 8-Efecto secundario para sincronización del ciclo de vida
+// 9-Manejo de lógica de usuario para handleClaim
+// 10-Estructuración y renderizado visual del componente UI
+// 11-Estructuración y renderizado visual del componente UI
+// 12-Estructuración y renderizado visual del componente UI
+
+//# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button, CircularProgress } from '@mui/material';
+
+//# 2-Obtención del despachador para emitir acciones al store
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { fetchRewards, claimReward } from '../../lib/features/blockchain/actions';
 import { Reward } from '../../lib/features/blockchain/types';
@@ -9,12 +25,27 @@ import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 
 export const RewardsModal = () => {
+    
+    //# 3-Obtención del despachador para emitir acciones al store
     const dispatch = useAppDispatch();
+    
+    //# 4-Selección de datos desde el estado global de Redux
     const { rewards, isLoading, error } = useAppSelector((state) => state.blockchain);
+    
+    //# 5-Selección de datos desde el estado global de Redux
     const { userInfo } = useAppSelector((state) => state.auth);
+    
+    
+    //# 6-Gestión de estado local para claiming id
     const [claimingId, setClaimingId] = useState<string | null>(null);
+    
+    
+    //# 7-Control de visibilidad para interface de show success
     const [showSuccess, setShowSuccess] = useState<string | null>(null);
 
+    
+    
+    //# 8-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         if (userInfo && rewards.length === 0 && !isLoading && !error) {
             dispatch(fetchRewards());
@@ -43,6 +74,9 @@ export const RewardsModal = () => {
         fire(0.1, { spread: 120, startVelocity: 45, colors: ['#00f3ff', '#ffffff'] });
     };
 
+    
+    
+    //# 9-Manejo de lógica de usuario para handleClaim
     const handleClaim = async (reward: Reward) => {
         if (!userInfo?.id) return;
         setClaimingId(reward.id);
@@ -64,6 +98,9 @@ export const RewardsModal = () => {
     };
 
     if (isLoading && rewards.length === 0) {
+        
+        
+        //# 10-Estructuración y renderizado visual del componente UI
         return (
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 5, gap: 2 }}>
                 <CircularProgress sx={{ color: '#00f3ff' }} />
@@ -73,6 +110,9 @@ export const RewardsModal = () => {
     }
 
     if (error) {
+        
+        
+        //# 11-Estructuración y renderizado visual del componente UI
         return (
             <Box sx={{ p: 4, textAlign: 'center' }}>
                 <Typography color="error" sx={{ mb: 2 }}>ERROR_DE_ENLACE: {error}</Typography>
@@ -87,6 +127,9 @@ export const RewardsModal = () => {
         );
     }
 
+    
+    
+    //# 12-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{ position: 'relative' }}>
             <AnimatePresence>

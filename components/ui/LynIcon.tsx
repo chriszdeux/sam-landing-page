@@ -1,8 +1,7 @@
-/**
- * Componente Icono Lyn
- * Icono SVG personalizado utilizando Lucide React
- * Props par tamaño y color
- */
+// 1-Definir componente de icono Lyn
+// 2-Renderizar icono SVG personalizado
+
+//# 1-Definir componente de icono Lyn
 import React from 'react';
 import { Box } from '@mui/material';
 import { Zap } from 'lucide-react';
@@ -14,6 +13,8 @@ interface LynIconProps {
 }
 
 export const LynIcon: React.FC<LynIconProps> = ({ size = 20, color = '#00f3ff', style }) => {
+    
+    //# 2-Renderizar icono SVG personalizado
     return (
         <Box sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', ...style }}>
             <Zap size={size} color={color} fill={color} style={{ opacity: 0.8 }} />

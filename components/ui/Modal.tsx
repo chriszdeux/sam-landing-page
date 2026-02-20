@@ -1,14 +1,15 @@
-/**
- * Componente Modal Reutilizable
- * Gestión de estados globales de UI
- * Renderizado condicional de contenido (Login, Register, etc.)
- * Estilos personalizados con backdrop
- */
+// 1-Definir componente modal y sus estilos
+// 2-Obtener estado y despachador del modal
+// 3-Renderizar contenido dinámico según tipo
+// 4-Renderizar estructura del modal con transición
+
+//# 1-Definir componente modal y sus estilos
 'use client';
 
 import React from 'react';
 import { Modal as MuiModal, Box, IconButton, Fade, Backdrop } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
+
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { closeModal } from '../../lib/features/uiSlice';
 import { LoginForm } from '../auth/LoginForm';
@@ -35,6 +36,8 @@ const style = {
 };
 
 export const Modal = ({ children }: { children?: React.ReactNode }) => {
+  
+  //# 2-Obtener estado y despachador del modal
   const dispatch = useAppDispatch();
   const { isModalOpen, activeModalContent } = useAppSelector((state) => state.ui);
 
@@ -44,9 +47,9 @@ export const Modal = ({ children }: { children?: React.ReactNode }) => {
     ...style,
     maxWidth: isWideModal ? 900 : 500,
     p: isWideModal ? 0 : 4,
-
   };
 
+  //# 3-Renderizar contenido dinámico según tipo
   const renderContent = () => {
     switch (activeModalContent) {
       case 'login':
@@ -61,7 +64,8 @@ export const Modal = ({ children }: { children?: React.ReactNode }) => {
         return children;
     }
   };
-
+  
+  //# 4-Renderizar estructura del modal con transición
   return (
     <MuiModal
       open={isModalOpen}

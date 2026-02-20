@@ -1,9 +1,7 @@
-/**
- * Sección Hero (Principal)
- * Animaciones de entrada con GSAP
- * Títulos principales y llamadas a la acción
- * Grid de características destacadas
- */
+// 1-Obtención del despachador para emitir acciones al store
+// 2-Obtención del despachador para emitir acciones al store
+// 3-Estructuración y renderizado visual del componente UI
+
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import { Box, Typography, Stack, Grid } from '@mui/material';
@@ -15,6 +13,8 @@ import { Button } from '../ui/Button';
 import { TechFrame } from '../ui/TechFrame';
 import { Section } from '../ui/Section';
 import { openModal } from '../../lib/features/uiSlice';
+
+//# 1-Obtención del despachador para emitir acciones al store
 import { useAppDispatch } from '../../lib/hooks';
 import { cyan } from '@mui/material/colors';
 import { EnvVariables } from '@/lib/constants/variables';
@@ -23,6 +23,8 @@ import { TaoIcon } from '../ui/TaoIcon';
 gsap.registerPlugin(ScrollTrigger);
 
 export const HeroSection = () => {
+  
+  //# 2-Obtención del despachador para emitir acciones al store
   const dispatch = useAppDispatch();
   const container = useRef<HTMLElement | null>(null);
   const { project } = EnvVariables;
@@ -51,6 +53,9 @@ export const HeroSection = () => {
     });
   }, { scope: container });
 
+  
+  
+  //# 3-Estructuración y renderizado visual del componente UI
   return (
     <Section id="home" className="relative overflow-hidden">
       <Box ref={container}>
@@ -58,7 +63,7 @@ export const HeroSection = () => {
           <Grid size={{ xs: 12, md: 7 }}>
             <Box className="hero-content">
               <Typography variant="h1" sx={{
-                fontSize: { xs: '3rem', md: '5rem' },
+                fontSize: { xs: '2.5rem', md: '5rem' },
                 mb: 2,
                 background: 'linear-gradient(45deg, #00f3ff, #ffb700)',
                 backgroundClip: 'text',

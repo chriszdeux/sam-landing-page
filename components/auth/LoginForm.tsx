@@ -1,8 +1,11 @@
-/**
- * Formulario de Inicio de Sesión
- * Gestiona la autenticación del usuario mediante email y contraseña
- * Utiliza react-hook-form y zod para validación
- */
+// 1-Importar dependencias y componentes de UI
+// 2-Definir esquema de validación y tipos
+// 3-Definir componente y hooks de formulario
+// 4-Función para manejar el envío del formulario
+// 5-Renderizar formulario de inicio de sesión
+
+
+//# 1-Importar dependencias y componentes de UI
 'use client';
 
 import React from 'react';
@@ -15,6 +18,7 @@ import { Typography, Alert, Stack, CircularProgress, InputAdornment, Box } from 
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { Email, Lock, ErrorOutline } from '@mui/icons-material';
+
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { login } from '../../lib/features/auth';
 import { closeModal } from '../../lib/features/uiSlice';
@@ -22,11 +26,7 @@ import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { TechFrame } from '../ui/TechFrame';
 
-
-
-
-
-
+//# 2-Definir esquema de validación y tipos
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -36,6 +36,7 @@ const loginSchema = z.object({
 type LoginFormInputs = z.infer<typeof loginSchema>;
 
 export const LoginForm = () => {
+  //# 3-Definir componente y hooks de formulario
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { status, error } = useAppSelector((state) => state.auth);
@@ -48,6 +49,7 @@ export const LoginForm = () => {
     resolver: zodResolver(loginSchema),
   });
 
+  //# 4-Función para manejar el envío del formulario
   const onSubmit = async (data: LoginFormInputs) => {
     const resultAction = await dispatch(login(data));
     if (login.fulfilled.match(resultAction)) {
@@ -58,11 +60,13 @@ export const LoginForm = () => {
     }
   };
 
+  
+  
+  //# 5-Renderizar formulario de inicio de sesión
   return (
     <form onSubmit={handleSubmit(onSubmit)} style={{ height: '100%' }}>
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} style={{ height: '100%' }}>
         
-
 
         <Box sx={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
             

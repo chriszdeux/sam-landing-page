@@ -1,3 +1,5 @@
+// 1-Lógica principal y renderizado del módulo
+
 export { FeatureModal } from './FeatureModal';
 export { LayoutType1 } from './LayoutType1';
 export { LayoutType2 } from './LayoutType2';

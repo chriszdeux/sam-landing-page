@@ -1,3 +1,6 @@
+// 1-Estructuración y renderizado visual del componente UI
+// 2-Estructuración y renderizado visual del componente UI
+
 import React from 'react';
 import { Box, Typography, Container, Grid, Stack } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -11,20 +14,25 @@ export const LayoutType3 = ({ mechanic }: { mechanic: Mechanic }) => {
         if (!animationType) return null;
         const AnimationComponent = AnimationRegistry[animationType];
         if (!AnimationComponent) return null;
+        
+        //# 1-Estructuración y renderizado visual del componente UI
         return <AnimationComponent color={mechanic.color} />;
     };
 
+    
+    
+    //# 2-Estructuración y renderizado visual del componente UI
     return (
     <Box sx={{ 
         width: '100%',
         minHeight: '100vh',
         position: 'relative'
     }}>
-        {/* Cinematic Background Layer */}
+        {}
         {mechanic.backgroundImage && (
             <Box sx={{ 
-                position: 'fixed', // Use fixed to cover screen even on scroll
-                inset: -20, // Negative margin to avoid blur edges
+                position: 'fixed', 
+                inset: -20, 
                 backgroundImage: `url(${mechanic.backgroundImage})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
@@ -33,10 +41,10 @@ export const LayoutType3 = ({ mechanic }: { mechanic: Mechanic }) => {
             }} />
         )}
 
-        {/* Dark Overlay Gradient */}
+        {}
         {mechanic.backgroundImage && (
             <Box sx={{ 
-                position: 'fixed', // Matches the background layer
+                position: 'fixed', 
                 inset: 0, 
                 background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%)',
                 zIndex: 0 
@@ -45,7 +53,7 @@ export const LayoutType3 = ({ mechanic }: { mechanic: Mechanic }) => {
 
     <Container maxWidth="xl" sx={{ pt: 25, pb: 10, position: 'relative', zIndex: 1 }}>
         
-        {/* Header Section */}
+        {}
         <Box sx={{ textAlign: 'center', mb: 15 }}>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
                 <Typography variant="h6" color={mechanic.color} gutterBottom sx={{ letterSpacing: 4 }}>MÓDULO DE GESTIÓN</Typography>
@@ -60,7 +68,7 @@ export const LayoutType3 = ({ mechanic }: { mechanic: Mechanic }) => {
             </motion.div>
         </Box>
 
-        {/* Intro Paragraphs */}
+        {}
         <Grid container spacing={4} sx={{ mb: 20 }}>
             {mechanic.content.paragraphs.map((p: string, i: number) => (
                 <Grid size={{ xs: 12, md: 4 }} key={i}>
@@ -83,11 +91,11 @@ export const LayoutType3 = ({ mechanic }: { mechanic: Mechanic }) => {
             ))}
         </Grid>
 
-        {/* Features List - "Visualizing Everything" */}
+        {}
         <Stack spacing={20}>
             {mechanic.content.features.map((f, i) => (
                 <Grid container spacing={8} alignItems="center" direction={i % 2 === 0 ? 'row' : 'row-reverse'} key={i}>
-                    {/* Visual Side */}
+                    {}
                     <Grid size={{ xs: 12, md: 6 }}>
                         <motion.div 
                             initial={{ opacity: 0, x: i % 2 === 0 ? -50 : 50 }} 
@@ -102,7 +110,7 @@ export const LayoutType3 = ({ mechanic }: { mechanic: Mechanic }) => {
                                 border: `1px solid ${mechanic.color}30`,
                                 boxShadow: `0 20px 50px ${mechanic.color}10`
                             }}>
-                                {/* Animated Image or Component */}
+                                {}
                                 {f.modalImage ? (
                                     <Box sx={{ height: 500, width: '100%', overflow: 'hidden' }}>
                                         <motion.img 
@@ -125,7 +133,7 @@ export const LayoutType3 = ({ mechanic }: { mechanic: Mechanic }) => {
                                     </Box>
                                 ))}
                                 
-                                {/* Overlay Number */}
+                                {}
                                 <Typography sx={{ 
                                     position: 'absolute', 
                                     top: 20, 
@@ -142,7 +150,7 @@ export const LayoutType3 = ({ mechanic }: { mechanic: Mechanic }) => {
                         </motion.div>
                     </Grid>
 
-                    {/* Content Side */}
+                    {}
                     <Grid size={{ xs: 12, md: 6 }}>
                         <motion.div 
                              initial={{ opacity: 0, x: i % 2 === 0 ? 50 : -50 }} 

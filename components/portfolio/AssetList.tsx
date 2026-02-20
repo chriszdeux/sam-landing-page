@@ -1,3 +1,6 @@
+// 1-Manejo de lógica de usuario para handleTransaction
+// 2-Estructuración y renderizado visual del componente UI
+
 import React from 'react';
 import { Box, Avatar, Typography, LinearProgress, Button } from '@mui/material';
 import { useRouter } from 'next/navigation';
@@ -14,10 +17,16 @@ interface AssetListProps {
 export const AssetList: React.FC<AssetListProps> = ({ assets, totalValue }) => {
     const router = useRouter();
 
+    
+    
+    //# 1-Manejo de lógica de usuario para handleTransaction
     const handleTransaction = (assetId: string, type: 'BUY' | 'SELL') => {
         router.push(`/market/trade?type=${type}&cryptoId=${assetId}`);
     };
 
+    
+    
+    //# 2-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             {assets.map((asset, i) => (

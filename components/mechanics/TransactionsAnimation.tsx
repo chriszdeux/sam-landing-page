@@ -1,3 +1,10 @@
+// 1-Efecto secundario para sincronización del ciclo de vida
+// 2-Gestión de estado local para blocks
+// 3-Efecto secundario para sincronización del ciclo de vida
+// 4-Estructuración y renderizado visual del componente UI
+// 5-Estructuración y renderizado visual del componente UI
+
+//# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,8 +17,14 @@ interface Block {
 }
 
 export const TransactionsAnimation = ({ color }: { color: string }) => {
+    
+    
+    //# 2-Gestión de estado local para blocks
     const [blocks, setBlocks] = useState<Block[]>([]);
     
+    
+    
+    //# 3-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         const interval = setInterval(() => {
             setBlocks(prev => {
@@ -24,9 +37,15 @@ export const TransactionsAnimation = ({ color }: { color: string }) => {
                 return [newBlock, ...prev].slice(0, 10);
             });
         }, 800);
+        
+        
+        //# 4-Estructuración y renderizado visual del componente UI
         return () => clearInterval(interval);
     }, []);
 
+    
+    
+    //# 5-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{ 
             width: '100%', 
@@ -65,7 +84,7 @@ export const TransactionsAnimation = ({ color }: { color: string }) => {
                 ))}
             </AnimatePresence>
             
-            {/* Background Lines */}
+            {}
             <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: -1 }}>
                 <line x1="10%" y1="0" x2="10%" y2="100%" stroke={color} strokeOpacity="0.1" strokeDasharray="5,5" />
                 <line x1="90%" y1="0" x2="90%" y2="100%" stroke={color} strokeOpacity="0.1" strokeDasharray="5,5" />

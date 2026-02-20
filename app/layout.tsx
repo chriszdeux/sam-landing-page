@@ -1,10 +1,5 @@
-/**
- * Layout Principal de la Aplicación
- * Configuración de fuentes (Geist)
- * Proveedores globales (Store, Theme)
- * Componentes de interfaz global (Navbar, Modales)
- * Definición de metadatos básicos
- */
+// 1-Estructuración y renderizado visual del componente UI
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -37,6 +32,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
+  
+  //# 1-Estructuración y renderizado visual del componente UI
   return (
     <html lang="es">
       <body

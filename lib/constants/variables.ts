@@ -1,3 +1,5 @@
+// 1-Lógica principal y renderizado del módulo
+
 interface EnvVariables {
   project: string;
   coin1: string;

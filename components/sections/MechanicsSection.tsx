@@ -1,8 +1,5 @@
-/**
- * Sección de Mecánicas de Juego
- * Grid de tarjetas interactivas con navegación a detalles
- * Implementa animaciones de entrada con GSAP
- */
+// 1-Estructuración y renderizado visual del componente UI
+
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import { Typography, Grid, Box } from '@mui/material';
@@ -46,6 +43,9 @@ export const MechanicsSection = () => {
     });
   }, { scope: container });
 
+  
+  
+  //# 1-Estructuración y renderizado visual del componente UI
   return (
     <Section id="mechanics">
       <Box ref={container}>

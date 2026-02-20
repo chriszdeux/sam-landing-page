@@ -1,21 +1,32 @@
+// 1-Selección de datos desde el estado global de Redux
+// 2-Selección de datos desde el estado global de Redux
+// 3-Estructuración y renderizado visual del componente UI
+
 'use client';
 
 import React from 'react';
 import { Box, Container, Typography, Button, Avatar, Grid, Chip } from '@mui/material';
 import { Background } from '../../components/layout/Background';
+
+//# 1-Selección de datos desde el estado global de Redux
 import { useAppSelector } from '../../lib/hooks';
 import { TechFrame } from '../../components/ui/TechFrame';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { ContentCopy, Verified, GppBad } from '@mui/icons-material';
 
 export default function SettingsPage() {
+  
+  //# 2-Selección de datos desde el estado global de Redux
   const { userInfo } = useAppSelector((state) => state.auth);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    // Could add a toast notification here
+    
   };
 
+  
+  
+  //# 3-Estructuración y renderizado visual del componente UI
   return (
     <Box sx={{ minHeight: '100vh', position: 'relative' }}>
       <Background />
@@ -27,7 +38,7 @@ export default function SettingsPage() {
         />
 
         <Grid container spacing={4}>
-            {/* Left Column: Profile Card */}
+            {}
             <Grid size={{ xs: 12, md: 4 }}>
                 <TechFrame>
                     <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
@@ -81,11 +92,11 @@ export default function SettingsPage() {
                 </TechFrame>
             </Grid>
 
-            {/* Right Column: Details & Settings */}
+            {}
             <Grid size={{ xs: 12, md: 8 }}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     
-                    {/* Basic Info */}
+                    {}
                     <TechFrame color="#ff0055">
                         <Box sx={{ p: 4 }}>
                             <Typography variant="h6" sx={{ color: '#ff0055', mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -143,36 +154,10 @@ export default function SettingsPage() {
                         </Box>
                     </TechFrame>
 
-                    {/* Preferences */}
-                    {/* Preferences - Commented out as info is not available yet
-                    <TechFrame color="#00f3ff">
-                        <Box sx={{ p: 4 }}>
-                            <Typography variant="h6" sx={{ color: '#00f3ff', mb: 3 }}>
-                                // PREFERENCIAS DEL SISTEMA
-                            </Typography>
-                            
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                <FormControlLabel 
-                                    control={<Switch defaultChecked sx={{ '& .MuiSwitch-track': { bgcolor: 'grey.800' } }} />} 
-                                    label="Notificaciones de transacciones" 
-                                    sx={{ color: 'white' }} 
-                                />
-                                <FormControlLabel 
-                                    control={<Switch sx={{ '& .MuiSwitch-track': { bgcolor: 'grey.800' } }} />} 
-                                    label="Modo Privacidad (Ocultar balances)" 
-                                    sx={{ color: 'white' }} 
-                                />
-                                <FormControlLabel 
-                                    control={<Switch defaultChecked sx={{ '& .MuiSwitch-track': { bgcolor: 'grey.800' } }} />} 
-                                    label="2FA (Doble Factor de Autenticación)" 
-                                    sx={{ color: 'white' }} 
-                                />
-                            </Box>
-                        </Box>
-                    </TechFrame>
-                    */}
+                    {}
+                    {}
 
-                     {/* Security Actions */}
+                     {}
                      <TechFrame color="#ffb700">
                         <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
                             <Typography variant="h6" sx={{ color: '#ffb700', mb: 1 }}>

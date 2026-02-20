@@ -1,8 +1,7 @@
-/**
- * Componente Icono Tao
- * Icono animado con efectos de brillo
- * Utiliza Framer Motion para pulsaciones
- */
+// 1-Definir componente de icono Tao animado
+// 2-Renderizar icono con animación Framer Motion
+
+//# 1-Definir componente de icono Tao animado
 import React from 'react';
 import { Typography } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -17,6 +16,8 @@ interface TaoIconProps {
 
 export const TaoIcon: React.FC<TaoIconProps> = ({ size = 12, color: customColor, style}) => { 
     const color = customColor || cyan[200];
+    
+    //# 2-Renderizar icono con animación Framer Motion
     return (
         <Typography 
             component={motion.span}

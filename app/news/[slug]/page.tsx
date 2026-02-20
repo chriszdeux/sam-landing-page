@@ -1,3 +1,6 @@
+// 1-Estructuración y renderizado visual del componente UI
+// 2-Estructuración y renderizado visual del componente UI
+
 'use client';
 
 import React from 'react';
@@ -14,9 +17,14 @@ export default function NewsArticlePage() {
     const article = newsData.find(n => n.slug === slug);
 
     if (!article) {
+        
+        //# 1-Estructuración y renderizado visual del componente UI
         return <Box sx={{ color: 'white', pt: 20, textAlign: 'center' }}>Articulo no encontrado</Box>;
     }
 
+  
+  
+  //# 2-Estructuración y renderizado visual del componente UI
   return (
     <Box sx={{ minHeight: '100vh', position: 'relative' }}>
         <Background />

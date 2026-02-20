@@ -1,9 +1,8 @@
-/**
- * Menú Lateral (Drawer) para Móviles
- * Navegación responsiva
- * Información de usuario y saldo
- * Selección de red y acciones de autenticación
- */
+// 1-Definir componente de menú lateral (Drawer)
+// 2-Renderizar lista de redes y navegación
+// 3-Renderizar opciones de usuario o acceso
+
+//# 1-Definir componente de menú lateral (Drawer)
 import React from "react";
 import {
   Box,
@@ -14,11 +13,12 @@ import {
 } from "@mui/material";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { EnvVariables } from "../../lib/constants/variables";
-import { MonetizationOn, CardGiftcard } from "@mui/icons-material";
+import { CardGiftcard } from "@mui/icons-material";
 import { Button } from "../ui/Button";
 import { CountUp } from "../ui/CountUp";
 import { openModal } from "../../lib/features/uiSlice";
 import { navItems } from "./navItems";
+import { TaoIcon } from "../ui/TaoIcon";
 import { User } from "../../lib/features/auth/types";
 import { BlockchainInterface } from "../../lib/types/blockchain";
 import { AppDispatch } from "../../lib/store";
@@ -44,6 +44,8 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({
   router,
   dispatch,
 }) => {
+  
+  //# 2-Renderizar lista de redes y navegación
   return (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
       <Typography variant="h6" sx={{ my: 2, color: "primary.main" }}>
@@ -87,6 +89,7 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({
           </ListItem>
         ))}
         <ListItem disablePadding>
+          {/* //# 3-Renderizar opciones de usuario o acceso */}
           <Box
             sx={{
               p: 2,
@@ -98,11 +101,10 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({
           >
             {userInfo ? (
               <>
-                <Typography variant="body2" sx={{ color: "primary.main", mb: 1 }}>
-                  Hola, {userInfo.username}
+                  <Typography variant="body2" sx={{ color: "primary.main", mb: 1, fontWeight: 'bold' }}>
+                  {'// USUARIO:'} {userInfo.username}
                 </Typography>
-                <Typography
-                  variant="body2"
+                <Box
                   sx={{
                     color: "text.secondary",
                     mb: 2,
@@ -110,11 +112,17 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({
                     alignItems: "center",
                     gap: 1,
                     justifyContent: "center",
+                    bgcolor: 'rgba(0, 243, 255, 0.05)',
+                    p: 1,
+                    borderRadius: 1,
+                    border: '1px solid rgba(0, 243, 255, 0.1)'
                   }}
                 >
-                  <MonetizationOn fontSize="small" sx={{ color: "gold" }} />
-                  Créditos: <CountUp to={userInfo.balance} />
-                </Typography>
+                  <TaoIcon size={20} />
+                  <Typography variant="body2" sx={{ color: '#00f3ff', fontWeight: 'bold' }}>
+                     TAO: <CountUp to={userInfo.balance} />
+                  </Typography>
+                </Box>
                 <Button
                   variant="outlined"
                   fullWidth
@@ -123,7 +131,7 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({
                       dispatch(openModal('rewards'));
                       handleDrawerToggle();
                   }}
-                  sx={{ mb: 1, borderColor: 'primary.main', color: 'primary.main' }}
+                  sx={{ mb: 1, borderColor: 'primary.main', color: 'primary.main', bgcolor: 'rgba(0, 243, 255, 0.05)' }}
                 >
                   Recompensas
                 </Button>
@@ -131,6 +139,7 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({
                   variant="outlined"
                   fullWidth
                   onClick={() => router.push("/auth/logging-out")}
+                  sx={{ color: 'rgba(255,255,255,0.7)', borderColor: 'rgba(255,255,255,0.3)', '&:hover': { borderColor: 'white', color: 'white' } }}
                 >
                   Cerrar Sesión
                 </Button>

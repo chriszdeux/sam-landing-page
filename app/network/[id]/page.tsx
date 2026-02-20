@@ -1,3 +1,9 @@
+// 1-Selección de datos desde el estado global de Redux
+// 2-Selección de datos desde el estado global de Redux
+// 3-Estructuración y renderizado visual del componente UI
+// 4-Estructuración y renderizado visual del componente UI
+// 5-Estructuración y renderizado visual del componente UI
+
 'use client';
 
 import React from 'react';
@@ -6,24 +12,33 @@ import { ParticleBackground } from '../../../components/ui/ParticleBackground';
 import { ArrowBack, VerifiedUser, Speed, Storage, SettingsInputComponent } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { TaoIcon } from '../../../components/ui/TaoIcon';
+
+//# 1-Selección de datos desde el estado global de Redux
 import { useAppSelector } from '../../../lib/hooks';
 
 export default function NetworkDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = React.use(params);
     const router = useRouter();
+    
+    //# 2-Selección de datos desde el estado global de Redux
     const { networks } = useAppSelector((state) => state.blockchain);
     
-    // Find network details
+    
     const network = networks.find(n => n.id === id);
 
-    // If undefined (e.g., direct access before load), handle gracefully
-    // But typically AuthLoader handles fetch. 
+    
+    
     if (!network && networks.length === 0) {
-         // Show loading or empty state
+         
+         
+         //# 3-Estructuración y renderizado visual del componente UI
          return <Box sx={{ minHeight: '100vh', bgcolor: '#000' }} />;
     }
 
     if (!network) {
+         
+         
+         //# 4-Estructuración y renderizado visual del componente UI
          return (
              <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#000' }}>
                  <Typography color="error">Red no encontrada</Typography>
@@ -32,6 +47,9 @@ export default function NetworkDetailPage({ params }: { params: Promise<{ id: st
          );
     }
 
+    
+    
+    //# 5-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{ minHeight: '100vh', position: 'relative', overflow: 'hidden', pt: 12, pb: 10 }}>
             <ParticleBackground />
@@ -46,7 +64,7 @@ export default function NetworkDetailPage({ params }: { params: Promise<{ id: st
                 </Button>
 
                 <Grid container spacing={6}>
-                    {/* Left Column: Card Info */}
+                    {}
                     <Grid size={{ xs: 12, md: 5 }}>
                         <Box sx={{ 
                             p: 4, 
@@ -59,7 +77,7 @@ export default function NetworkDetailPage({ params }: { params: Promise<{ id: st
                             position: 'relative',
                             overflow: 'hidden'
                         }}>
-                             {/* Decorative circle */}
+                             {}
                              <Box sx={{ 
                                  position: 'absolute', 
                                  top: -50, 
@@ -104,7 +122,6 @@ export default function NetworkDetailPage({ params }: { params: Promise<{ id: st
                                              </Typography>
                                          </Box>
                                      </Stack>
-
 
                                      <Stack direction="row" alignItems="center" spacing={2}>
                                          <Storage sx={{ color: network.additionalInfo.color }} />
@@ -151,7 +168,7 @@ export default function NetworkDetailPage({ params }: { params: Promise<{ id: st
                         </Box>
                     </Grid>
 
-                    {/* Right Column: Other Networks */}
+                    {}
                     <Grid size={{ xs: 12, md: 7 }}>
                         <Typography variant="h5" sx={{ color: '#fff', mb: 3 }}>Otras Redes Disponibles</Typography>
                          <Grid container spacing={2}>

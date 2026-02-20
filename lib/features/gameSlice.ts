@@ -1,3 +1,9 @@
+// 1-Definir tipos para recursos y estado del juego
+// 2-Establecer inventario inicial y planetas disponibles
+// 3-Crear slice para lógica de juego y recolección
+// 4-Exportar acciones y reducer principal del juego
+
+//# 1-Definir tipos para recursos y estado del juego
 import { createSlice } from '@reduxjs/toolkit';
 
 interface Resource {
@@ -10,10 +16,11 @@ interface Resource {
 
 interface GameState {
   resources: Resource[];
-  planets: string[]; // Placeholder for planet data
+  planets: string[]; 
   collectedResources: number;
 }
 
+//# 2-Establecer inventario inicial y planetas disponibles
 const initialState: GameState = {
   resources: [
     { id: 'iron', name: 'Iron', type: 'Mineral', rarity: 'Common', description: 'Basic building material.' },
@@ -25,6 +32,7 @@ const initialState: GameState = {
   collectedResources: 0,
 };
 
+//# 3-Crear slice para lógica de juego y recolección
 const gameSlice = createSlice({
   name: 'game',
   initialState,
@@ -35,5 +43,7 @@ const gameSlice = createSlice({
   },
 });
 
+//# 4-Exportar acciones y reducer principal del juego
 export const { collectResource } = gameSlice.actions;
+
 export default gameSlice.reducer;

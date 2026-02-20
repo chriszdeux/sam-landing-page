@@ -1,7 +1,15 @@
+// 1-Importar dependencias y tipos de estado
+// 2-Definir estado inicial para el slice de autenticación
+// 3-Crear slice de Redux con reducers síncronos
+// 4-Manejar acciones asíncronas con extraReducers
+// 5-Exportar acciones y reducer por defecto
+
+//# 1-Importar dependencias y tipos de estado
 import { createSlice } from '@reduxjs/toolkit';
 import { AuthState } from './types';
 import { login, register, validateAccount, checkAuth, fetchWalletDetails, addWallet, removeWallet, refreshUserInfo } from './actions';
 
+//# 2-Definir estado inicial para el slice de autenticación
 const initialState: AuthState = {
   userInfo: null,
   token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
@@ -10,6 +18,7 @@ const initialState: AuthState = {
   walletsInfo: null,
 };
 
+//# 3-Crear slice de Redux con reducers síncronos
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -21,7 +30,7 @@ const authSlice = createSlice({
       state.error = null;
       state.walletsInfo = null;
       localStorage.removeItem('token');
-      localStorage.removeItem('_c'); // Clear credentials on logout
+      localStorage.removeItem('_c'); 
     },
     updateBalance: (state, action) => {
         if (state.userInfo) {
@@ -35,15 +44,15 @@ const authSlice = createSlice({
             
             if (existingAsset) {
                 existingAsset.quantity += quantity;
-                // Remove if quantity <= 0? Maybe keep it as 0.
+                
             } else if (quantity > 0) {
-                // Add new asset
+                
                 state.walletsInfo.store.push({
                     id: id || 'temp-id',
                     name: name || symbol,
                     symbol: symbol,
                     quantity: quantity,
-                    // Add other required fields if necessary with defaults
+                    
                 });
             }
         }
@@ -55,9 +64,10 @@ const authSlice = createSlice({
         state.userInfo = action.payload;
     }
   },
+  //# 4-Manejar acciones asíncronas con extraReducers
   extraReducers: (builder) => {
     builder
-      // Login
+      
       .addCase(login.pending, (state) => {
         state.status = 'loading';
         state.error = null;
@@ -71,19 +81,19 @@ const authSlice = createSlice({
         state.status = 'failed';
         state.error = action.payload as string;
       })
-      // Register
+      
       .addCase(register.pending, (state) => {
         state.status = 'loading';
         state.error = null;
       })
-      .addCase(register.fulfilled, (state, action) => {
+      .addCase(register.fulfilled, (state) => {
         state.status = 'succeeded';
       })
       .addCase(register.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
       })
-      // Validate Account
+      
       .addCase(validateAccount.pending, (state) => {
         state.status = 'loading';
         state.error = null;
@@ -95,7 +105,7 @@ const authSlice = createSlice({
         state.status = 'failed';
         state.error = action.payload as string;
       })
-      // Check Auth
+      
       .addCase(checkAuth.pending, (state) => {
          state.status = 'loading';
       })
@@ -106,23 +116,23 @@ const authSlice = createSlice({
             state.token = action.payload.token;
          }
       })
-      .addCase(checkAuth.rejected, (state, action) => {
+      .addCase(checkAuth.rejected, (state) => {
          state.status = 'idle'; 
          state.token = null;
          state.userInfo = null;
          state.walletsInfo = null;
       })
-      // Fetch Wallet Details
+      
       .addCase(fetchWalletDetails.fulfilled, (state, action) => {
          state.walletsInfo = action.payload.data;
          if (state.userInfo && state.userInfo.wallets) {
-             const walletIndex = state.userInfo.wallets.findIndex(w => w.walletAddress === action.payload.walletId); // Assuming walletId is address
+             const walletIndex = state.userInfo.wallets.findIndex(w => w.walletAddress === action.payload.walletId); 
              if (walletIndex !== -1) {
                  state.userInfo.wallets[walletIndex].details = action.payload.data;
              }
          }
       })
-      // Add Wallet
+      
       .addCase(addWallet.fulfilled, (state, action) => {
           if (state.userInfo) {
               if (!state.userInfo.walletsSaved) {
@@ -134,7 +144,7 @@ const authSlice = createSlice({
               });
           }
       })
-      // Remove Wallet
+      
       .addCase(removeWallet.fulfilled, (state, action) => {
           if (state.userInfo && state.userInfo.walletsSaved) {
               state.userInfo.walletsSaved = state.userInfo.walletsSaved.filter(
@@ -142,17 +152,20 @@ const authSlice = createSlice({
               );
           }
       })
-      // Refresh User Info
+      
       .addCase(refreshUserInfo.fulfilled, (state, action) => {
           if (state.userInfo) {
-              // Merge existing info with new info to preserve client-side only state if any, or just replace
+              
               state.userInfo = { ...state.userInfo, ...action.payload };
           } else {
-              state.userInfo = action.payload; // Fallback if somehow null
+              state.userInfo = action.payload; 
           }
+          state.lastRefresh = Date.now();
       });
   },
 });
 
+//# 5-Exportar acciones y reducer por defecto
 export const { logout, updateBalance, updateWalletAssets, setRegistrationData, setUserInfo } = authSlice.actions;
+
 export default authSlice.reducer;

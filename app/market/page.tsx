@@ -1,15 +1,16 @@
-/**
- * Importación de componentes UI y librerías.
- * Configuración de Redux para estado global.
- * Efecto para cargar listado de criptomonedas.
- * Manejo de navegación a formularios transaccionales.
- * Estructura de página con encabezado y mallas.
- * Renderizado de terminal de datos Blockchain.
- * Malla de tarjetas de activos digitales.
- */
+// 1-Efecto secundario para sincronización del ciclo de vida
+// 2-Obtención del despachador para emitir acciones al store
+// 3-Obtención del despachador para emitir acciones al store
+// 4-Selección de datos desde el estado global de Redux
+// 5-Selección de datos desde el estado global de Redux
+// 6-Selección de datos desde el estado global de Redux
+// 7-Efecto secundario para sincronización del ciclo de vida
+// 8-Manejo de lógica de usuario para handleTransaction
+// 9-Estructuración y renderizado visual del componente UI
 
 'use client';
 
+//# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useEffect } from 'react';
 import { Box, Typography, Grid, Container, Button, CircularProgress } from '@mui/material';
 import Image from 'next/image';
@@ -19,26 +20,44 @@ import { TechFrame } from '../../components/ui/TechFrame';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { motion } from 'framer-motion';
 import { TaoIcon } from '../../components/ui/TaoIcon';
+
+//# 2-Obtención del despachador para emitir acciones al store
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../lib/store';
 import { fetchCryptos } from '../../lib/features/market/actions';
 import { addNotification } from '../../lib/features/uiSlice';
 import { BlockchainDataDisplay } from '../../components/market/BlockchainDataDisplay';
 
-
 export default function MarketPage() {
   const router = useRouter();
+  
+  //# 3-Obtención del despachador para emitir acciones al store
   const dispatch = useDispatch<AppDispatch>();
+  
+  
+  //# 4-Selección de datos desde el estado global de Redux
   const { cryptos, isLoading, error } = useSelector((state: RootState) => state.market);
+  
+  
+  //# 5-Selección de datos desde el estado global de Redux
   const { selectedNetwork } = useSelector((state: RootState) => state.blockchain);
+  
+  
+  //# 6-Selección de datos desde el estado global de Redux
   const { token } = useSelector((state: RootState) => state.auth);
 
+  
+  
+  //# 7-Efecto secundario para sincronización del ciclo de vida
   useEffect(() => {
     if (selectedNetwork?.id) {
         dispatch(fetchCryptos(selectedNetwork.id));
     }
   }, [dispatch, selectedNetwork?.id]);
 
+  
+  
+  //# 8-Manejo de lógica de usuario para handleTransaction
   const handleTransaction = (e: React.MouseEvent, type: 'BUY' | 'SELL' | 'TRANSFER', cryptoId: string) => {
     e.stopPropagation();
     
@@ -53,6 +72,9 @@ export default function MarketPage() {
     router.push(`/market/trade?type=${type}&cryptoId=${cryptoId}&redirect=market`);
   };
 
+  
+  
+  //# 9-Estructuración y renderizado visual del componente UI
   return (
     <Box sx={{ minHeight: '100vh', position: 'relative' }}>
       <Background />

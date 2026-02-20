@@ -1,8 +1,7 @@
-/**
- * Diálogo de Confirmación de Cierre de Sesión
- * Muestra advertencia al usuario
- * Acciones de cancelar o confirmar
- */
+// 1-Definir componente de diálogo de cierre de sesión
+// 2-Renderizar contenido y acciones del diálogo
+
+//# 1-Definir componente de diálogo de cierre de sesión
 import React from "react";
 import {
   Dialog,
@@ -24,6 +23,8 @@ export const LogoutDialog: React.FC<LogoutDialogProps> = ({
   onClose,
   onConfirm,
 }) => {
+  
+  //# 2-Renderizar contenido y acciones del diálogo
   return (
     <Dialog
       open={open}
