@@ -1,10 +1,9 @@
-/**
- * Componente de Entrada (Input) Personalizado
- * Estilizado con MUI styled()
- * Soporta variantes de Select y Text
- * Gestión de estados de error y foco
- */
-import { Box, InputBase, InputLabel, Typography, Select, Theme } from '@mui/material';
+// 1-Definir estilos base para inputs personalizados
+// 2-Definir componente Input con soporte para Select
+// 3-Renderizar campo de entrada o selector
+
+//# 1-Definir estilos base para inputs personalizados
+import { Box, InputBase, InputLabel, Typography, Select, Theme, SelectProps } from '@mui/material';
 import { alpha, styled, SxProps } from '@mui/material/styles';
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
@@ -41,6 +40,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+//# 2-Definir componente Input con soporte para Select
 interface CustomInputProps extends React.ComponentProps<typeof InputBase> {
     label?: string;
     id?: string;
@@ -52,6 +52,8 @@ interface CustomInputProps extends React.ComponentProps<typeof InputBase> {
 }
 
 export const Input: React.FC<CustomInputProps> = ({ label, id, helperText, error, select, children, containerSx, ...props }) => {
+    
+    //# 3-Renderizar campo de entrada o selector
     return (
         <Box sx={{ width: '100%', mb: 2, ...containerSx }}>
             {label && (
@@ -77,7 +79,7 @@ export const Input: React.FC<CustomInputProps> = ({ label, id, helperText, error
                     fullWidth
                     input={<StyledInputBase error={error} />}
 
-                    {...(props as unknown as any)}
+                    {...(props as unknown as SelectProps)}
                 >
                     {children}
                 </Select>

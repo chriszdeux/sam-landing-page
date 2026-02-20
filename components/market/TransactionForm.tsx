@@ -1,8 +1,7 @@
-/**
- * Formulario de Transacciones
- * Maneja la entrada de datos para comprar, vender y transferir
- * Muestra cálculos estimados y tarifas de red
- */
+// 1-Definir componente de formulario de transacción
+// 2-Renderizar formulario con validación y costos
+
+//# 1-Definir componente de formulario de transacción
 import React from 'react';
 import { Box, MenuItem, Paper, Typography, Button, CircularProgress, SelectChangeEvent } from '@mui/material';
 import { Input } from '../ui/Input';
@@ -41,6 +40,8 @@ export const TransactionForm = ({
     availableQuantity,
     onSetMax
 }: TransactionFormProps) => {
+    
+    //# 2-Renderizar formulario con validación y costos
     return (
         <Box>
             <Typography variant="h6" color="primary.main" gutterBottom sx={{ mt: 4, mb: 2, borderBottom: '1px solid rgba(0,243,255,0.2)', display: 'inline-block', pb: 1 }}>
@@ -160,7 +161,7 @@ export const TransactionForm = ({
                             label="Dirección de Destino"
                             name="recipientAddress"
                             fullWidth
-                            // State logic for recipient needed if implemented
+                            
                             sx={{ mb: 2, '& input': { color: 'white' } }}
                         />
                         )}

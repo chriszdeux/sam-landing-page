@@ -1,3 +1,5 @@
+// 1-Lógica principal y renderizado del módulo
+
 export interface CryptoHoldings {
   id: string;
   name: string;
@@ -21,7 +23,7 @@ export interface WalletInterface {
 export interface Wallet {
   label: string;
   walletAddress: string;
-  details?: WalletInterface; // Keeping this for backward compatibility if needed, though we move to walletsInfo
+  details?: WalletInterface; 
 }
 
 export interface Reward {
@@ -64,5 +66,6 @@ export interface AuthState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
   walletsInfo: WalletInterface | null;
-  registrationData?: RegistrationData; // Temporary storage for registration inputs
+  lastRefresh?: number;
+  registrationData?: RegistrationData; 
 }

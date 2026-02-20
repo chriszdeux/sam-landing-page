@@ -1,3 +1,7 @@
+// 1-Rastreo de elemento seleccionado para selected feature
+// 2-Estructuración y renderizado visual del componente UI
+// 3-Estructuración y renderizado visual del componente UI
+
 import React, { useState } from 'react';
 import { Box, Typography, Container, Grid, Stack } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -8,15 +12,23 @@ import { FeatureModal } from './FeatureModal';
 import { AnimationRegistry } from './AnimationRegistry';
 
 export const LayoutType2 = ({ mechanic }: { mechanic: Mechanic }) => {
+    
+    
+    //# 1-Rastreo de elemento seleccionado para selected feature
     const [selectedFeature, setSelectedFeature] = useState<{title: string, description: string, modalContent?: string, modalImage?: string} | null>(null);
 
     const renderAnimation = (animationType?: string) => {
         if (!animationType) return null;
         const AnimationComponent = AnimationRegistry[animationType];
         if (!AnimationComponent) return null;
+        
+        //# 2-Estructuración y renderizado visual del componente UI
         return <AnimationComponent color={mechanic.color} />;
     };
 
+    
+    
+    //# 3-Estructuración y renderizado visual del componente UI
     return (
     <Box>
         <FeatureModal 
@@ -94,7 +106,7 @@ export const LayoutType2 = ({ mechanic }: { mechanic: Mechanic }) => {
                                                 {mechanic.id === 'combat' && <Info sx={{ fontSize: 16, ml: 1, color: 'text.secondary' }} />}
                                             </Typography>
                                         </Box>
-                                        {/* For Mining (or others not combat), show description inline */}
+                                        {}
                                         {mechanic.id !== 'combat' && (
                                             <Typography variant="body2" color="gray" sx={{ ml: 4 }}>
                                                 {f.description}

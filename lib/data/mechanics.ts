@@ -1,8 +1,7 @@
-/* eslint-disable max-lines */
+// 1-Lógica principal y renderizado del módulo
 
 import { Rocket, Pickaxe, Building2, FlaskConical, Shield, LucideIcon, ShoppingCart, Repeat, Wallet } from 'lucide-react';
 import { EnvVariables } from '../constants/variables';
-
 
 export interface Mechanic {
   id: string;
@@ -30,6 +29,7 @@ export interface Mechanic {
   };
 }
 const {project, coin1, coin2, coin3} = EnvVariables
+
 export const mechanicsData: Mechanic[] = [
   {
     id: 'market',
@@ -83,17 +83,17 @@ export const mechanicsData: Mechanic[] = [
         {
           title: 'Explorador de Bloques',
           description: 'Visualiza en tiempo real cómo se minan los bloques y se confirman las transacciones. Rastre a el origen y destino de cada token.',
-          // modalImage removed for animation
+          
         },
         {
           title: 'Historial Personal',
           description: 'Un registro detallado de todas tus actividades financieras. Exporta tus datos para análisis fiscal o simplemente para recordar tus glorias pasadas.',
-          // modalImage removed for animation
+          
         },
         {
           title: 'Verificación Criptográfica',
           description: 'Herramientas integradas para validar firmas y asegurar que las transacciones provienen de fuentes legítimas y no de actores maliciosos.',
-          // modalImage removed for animation
+          
         }
       ],
       imageAlt: 'Flumo de datos digitales formando una cadena infinita',
@@ -144,7 +144,7 @@ export const mechanicsData: Mechanic[] = [
     title: 'Exploración de Nodos',
     description: `Descubre sistemas estelares para expandir la Red ${project}.`,
     icon: Rocket,
-    color: '#00f3ff', // Cyan
+    color: '#00f3ff', 
     layoutType: 'type1',
     content: {
       heading: 'La Expansión del Protocolo Galáctico',
@@ -182,7 +182,7 @@ export const mechanicsData: Mechanic[] = [
     title: 'Minería de Forja',
     description: 'Extrae recursos para construir Aceleradores y Forjas.',
     icon: Pickaxe,
-    color: '#ffb700', // Gold/Orange
+    color: '#ffb700', 
     layoutType: 'type2',
     backgroundAnimation: 'mining-bg',
     content: {
@@ -221,7 +221,7 @@ export const mechanicsData: Mechanic[] = [
     title: 'Soberanía de Colonia',
     description: 'Establece colonias independientes conectadas a la Red.',
     icon: Building2,
-    color: '#00ff9d', // Neon Green
+    color: '#00ff9d', 
     layoutType: 'type3',
     content: {
       heading: 'Vivir Dentro del Código',
@@ -267,7 +267,7 @@ export const mechanicsData: Mechanic[] = [
     title: 'Evolución de Protocolo',
     description: 'Investiga mejoras para optimizar el rendimiento de la red.',
     icon: FlaskConical,
-    color: '#a855f7', // Lighter Purple (Purple 500)
+    color: '#a855f7', 
     layoutType: 'type3',
     backgroundImage: '/assets/images/game-mecanics/evolution/protocol_evolution.jpg',
     content: {
@@ -305,7 +305,7 @@ export const mechanicsData: Mechanic[] = [
     title: 'Defensa de la Red',
     description: 'Protege la integridad del sistema contra amenazas externas.',
     icon: Shield,
-    color: '#ff3333', // Pure Red
+    color: '#ff3333', 
     layoutType: 'defense',
     content: {
       heading: 'Protocolos de Seguridad Activa',

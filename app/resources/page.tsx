@@ -1,3 +1,6 @@
+// 1-Gestión de estado local para search term
+// 2-Estructuración y renderizado visual del componente UI
+
 'use client';
 
 import React, { useState } from 'react';
@@ -13,6 +16,9 @@ import { EnvVariables } from '@/lib/constants/variables';
 import { motion } from 'framer-motion';
 
 export default function ResourcesPage() {
+  
+  
+  //# 1-Gestión de estado local para search term
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredResources = resourcesData.filter(resource =>
@@ -20,6 +26,9 @@ export default function ResourcesPage() {
     resource.type.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  
+  
+  //# 2-Estructuración y renderizado visual del componente UI
   return (
     <Box sx={{ minHeight: '100vh', position: 'relative' }}>
       <Background />

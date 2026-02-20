@@ -1,8 +1,7 @@
-/**
- * Componente Título de Sección
- * Renderiza título y subtítulo con estilos tipográficos
- * Incluye divisor decorativo
- */
+// 1-Definir componente de título de sección
+// 2-Renderizar título con subtítulo y divisor
+
+//# 1-Definir componente de título de sección
 import React from 'react';
 import { Typography, Divider, Box } from '@mui/material';
 
@@ -14,6 +13,8 @@ interface SectionTitleProps {
 }
 
 export const SectionTitle = ({ children, subtitle, align = 'center', color = '#00f3ff' }: SectionTitleProps) => {
+  
+  //# 2-Renderizar título con subtítulo y divisor
   return (
     <Box sx={{ mb: 8, textAlign: align }}>
       {subtitle && (

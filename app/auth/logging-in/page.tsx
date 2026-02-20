@@ -1,5 +1,13 @@
+// 1-Efecto secundario para sincronización del ciclo de vida
+// 2-Efecto secundario para sincronización del ciclo de vida
+// 3-Estructuración y renderizado visual del componente UI
+// 4-Efecto secundario para sincronización del ciclo de vida
+// 5-Estructuración y renderizado visual del componente UI
+// 6-Estructuración y renderizado visual del componente UI
+
 'use client';
 
+//# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useEffect, useRef } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
@@ -8,13 +16,22 @@ export default function LoggingIn() {
     const router = useRouter();
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
+    
+    
+    //# 2-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         const timer = setTimeout(() => {
             router.push('/');
         }, 5000);
+        
+        
+        //# 3-Estructuración y renderizado visual del componente UI
         return () => clearTimeout(timer);
     }, [router]);
 
+    
+    
+    //# 4-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -53,9 +70,15 @@ export default function LoggingIn() {
         };
 
         const interval = setInterval(draw, 33);
+        
+        
+        //# 5-Estructuración y renderizado visual del componente UI
         return () => clearInterval(interval);
     }, []);
 
+    
+    
+    //# 6-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{ 
             minHeight: '100vh', 

@@ -1,8 +1,7 @@
-/**
- * Componente de Estadísticas de Criptomonedas
- * Grid de tarjetas mostrando métricas financieras clave
- * (Capitalización, Volumen, Suministro, Máximos/Mínimos)
- */
+// 1-Definir componente de estadísticas de criptomoneda
+// 2-Renderizar grid de estadísticas financieras
+
+//# 1-Definir componente de estadísticas de criptomoneda
 import React from 'react';
 import { Grid, Typography } from '@mui/material';
 import { Financial } from '../../lib/types/crypto';
@@ -33,6 +32,8 @@ const StatItem = ({ label, value, subValue, color }: { label: string, value: Rea
 );
 
 export const CryptoStats = ({ financial, color }: CryptoStatsProps) => {
+    
+    //# 2-Renderizar grid de estadísticas financieras
     return (
         <Grid container spacing={2}>
             <Grid size={{ xs: 6, md: 6 }}>

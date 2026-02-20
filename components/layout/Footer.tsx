@@ -1,16 +1,16 @@
-/**
- * Pie de Página de la Aplicación
- * Enlaces de navegación rápida
- * Iconos de redes sociales
- * Información de copyright
- * Descripción breve del proyecto
- */
+// 1-Definir estructura visual del pie de página
+// 2-Renderizar enlaces rápidos y redes sociales
+// 3-Mostrar información de derechos de autor
+
+//# 1-Definir estructura visual del pie de página
 import React from 'react';
 import { Box, Container, Grid, Typography, IconButton, Stack } from '@mui/material';
 import { Twitter, GitHub, LinkedIn } from '@mui/icons-material';
 import { EnvVariables } from '@/lib/constants/variables';
 
 export const Footer = () => {
+  
+  //# 2-Renderizar enlaces rápidos y redes sociales
   return (
     <Box component="footer" sx={{ bgcolor: 'background.paper', py: 6, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
       <Container maxWidth="lg">
@@ -52,9 +52,13 @@ export const Footer = () => {
             </Stack>
           </Grid>
         </Grid>
-        <Box sx={{ mt: 5, pt: 3, borderTop: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
+        {/* //# 3-Mostrar información de derechos de autor */}
+        <Box sx={{ mt: 5, pt: 3, borderTop: '1px solid rgba(255,255,255,0.1)', textAlign: 'center', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
           <Typography variant="body2" color="text.secondary">
             © {new Date().getFullYear()} {EnvVariables.project}. Todos los derechos reservados.
+          </Typography>
+          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>
+            v0.1.0
           </Typography>
         </Box>
       </Container>

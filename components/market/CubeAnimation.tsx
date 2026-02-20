@@ -1,8 +1,7 @@
-/**
- * Animación de Cubo
- * Visualización 3D para estados de transacción (Procesando/Éxito)
- * Muestra flujos de entrada/salida y explosión de partículas
- */
+// 1-Definir componente de animación de cubo
+// 2-Renderizar cubo 3D y partículas
+
+//# 1-Definir componente de animación de cubo
 import React from 'react';
 import { Box } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -25,6 +24,7 @@ export const CubeAnimation = ({ type, status = 'PROCESSING' }: CubeAnimationProp
   
   const burstPositions = BURST_POSITIONS;
 
+  //# 2-Renderizar cubo 3D y partículas
   return (
     <Box sx={{ position: 'relative', width: '100%', height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
       
@@ -76,7 +76,6 @@ export const CubeAnimation = ({ type, status = 'PROCESSING' }: CubeAnimationProp
          )}
       </motion.div>
 
-
       {!isSuccess && (
       <Box sx={{ position: 'absolute', left: 0, width: '50%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', pl: 5 }}>
           {[...Array(8)].map((_, i) => (
@@ -97,7 +96,6 @@ export const CubeAnimation = ({ type, status = 'PROCESSING' }: CubeAnimationProp
           ))}
       </Box>
       )}
-
 
       <Box sx={{ position: 'absolute', right: 0, width: '50%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {!isSuccess && [...Array(8)].map((_, i) => (

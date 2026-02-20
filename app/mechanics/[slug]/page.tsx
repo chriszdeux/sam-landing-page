@@ -1,3 +1,6 @@
+// 1-Estructuración y renderizado visual del componente UI
+// 2-Estructuración y renderizado visual del componente UI
+
 'use client';
 
 import React, { use } from 'react';
@@ -15,6 +18,9 @@ export default function MechanicPage({ params }: { params: Promise<{ slug: strin
   const mechanic = mechanicsData.find(m => m.slug === slug);
 
   if (!mechanic) {
+    
+    
+    //# 1-Estructuración y renderizado visual del componente UI
     return (
       <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Typography>Mecánica no encontrada</Typography>
@@ -33,6 +39,9 @@ export default function MechanicPage({ params }: { params: Promise<{ slug: strin
       }
   };
 
+  
+  
+  //# 2-Estructuración y renderizado visual del componente UI
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', position: 'relative' }}>
       <Box sx={{ position: 'fixed', top: 100, left: { xs: 20, md: 40 }, zIndex: 100 }}>

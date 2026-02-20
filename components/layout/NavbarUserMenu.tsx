@@ -1,9 +1,9 @@
-/**
- * Menú de Usuario en Navbar
- * Muestra saldo y nombre de usuario
- * Acceso a configuración y cierre de sesión
- * Botones de login/registro si no hay sesión
- */
+// 1-Definir componente de menú de usuario
+// 2-Obtener despachador y router
+// 3-Renderizar menú para usuario autenticado
+// 4-Renderizar botones de acceso para invitados
+
+//# 1-Definir componente de menú de usuario
 "use client";
 
 import React from "react";
@@ -22,6 +22,7 @@ import {
 import { TaoIcon } from "../ui/TaoIcon";
 import { Button } from "../ui/Button";
 import { CountUp } from "../ui/CountUp";
+
 import { useAppDispatch } from "../../lib/hooks";
 import { openModal } from "../../lib/features/uiSlice";
 
@@ -29,8 +30,6 @@ interface UserInfo {
   username: string;
   balance: number;
 }
-
-
 
 interface NavbarUserMenuProps {
   userInfo: UserInfo | null;
@@ -42,10 +41,15 @@ export const NavbarUserMenu = ({
   userInfo,
   onLogoutClick,
 }: NavbarUserMenuProps) => {
+  //# 2-Obtención del despachador y router
   const router = useRouter();
+  
   const dispatch = useAppDispatch();
 
   if (userInfo) {
+    
+    
+    //# 3-Renderizar menú para usuario autenticado
     return (
       <Stack direction="row" spacing={2} alignItems="center">
         <Button
@@ -99,8 +103,6 @@ export const NavbarUserMenu = ({
           </Box>
         </Typography>
 
-
-
         <IconButton
           onClick={() => router.push("/settings")}
           sx={{
@@ -128,6 +130,7 @@ export const NavbarUserMenu = ({
     );
   }
 
+  //# 4-Renderizar botones de acceso para invitados
   return (
     <Stack direction="row" spacing={1}>
       <Button

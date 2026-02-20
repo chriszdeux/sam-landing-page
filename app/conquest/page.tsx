@@ -1,3 +1,5 @@
+// 1-Estructuración y renderizado visual del componente UI
+
 'use client';
 
 import React from 'react';
@@ -8,6 +10,9 @@ import { EnvVariables } from '@/lib/constants/variables';
 
 export default function ConquestPage() {
     const { project } = EnvVariables;
+  
+  
+  //# 1-Estructuración y renderizado visual del componente UI
   return (
     <Box sx={{ minHeight: '100vh', position: 'relative' }}>
         <Background />

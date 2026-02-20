@@ -1,12 +1,30 @@
+// 1-Efecto secundario para sincronización del ciclo de vida
+// 2-Gestión de estado local para threats
+// 3-Efecto secundario para sincronización del ciclo de vida
+// 4-Estructuración y renderizado visual del componente UI
+// 5-Estructuración y renderizado visual del componente UI
+// 6-Estructuración y renderizado visual del componente UI
+// 7-Estructuración y renderizado visual del componente UI
+// 8-Verificación de existencia para active phase
+// 9-Efecto secundario para sincronización del ciclo de vida
+// 10-Estructuración y renderizado visual del componente UI
+// 11-Estructuración y renderizado visual del componente UI
+
+//# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useState, useEffect } from 'react';
 import { Box, Typography } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Distinct animation components for each phase
 const AttackDetection = () => {
-    // Generate random threats
+    
+    
+    
+    //# 2-Gestión de estado local para threats
     const [threats, setThreats] = useState<{id: number, angle: number, distance: number, delay: number}[]>([]);
 
+    
+    
+    //# 3-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         setThreats(Array.from({ length: 5 }).map((_, i) => ({
             id: i,
@@ -16,9 +34,12 @@ const AttackDetection = () => {
         })));
     }, []);
 
+    
+    
+    //# 4-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {/* Radar Sweep */}
+            {}
             <motion.div
                 style={{
                     width: 400,
@@ -38,7 +59,7 @@ const AttackDetection = () => {
                 }}
             />
             
-            {/* Radar Line */}
+            {}
             <motion.div
                 style={{
                     width: 200,
@@ -53,10 +74,10 @@ const AttackDetection = () => {
                 transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
             />
 
-            {/* Central Node */}
+            {}
             <Box sx={{ width: 20, height: 20, bgcolor: '#ff3333', borderRadius: '50%', zIndex: 10, boxShadow: '0 0 20px #ff3333' }} />
 
-            {/* Threats */}
+            {}
             {threats.map((threat) => (
                 <motion.div
                     key={threat.id}
@@ -84,9 +105,12 @@ const AttackDetection = () => {
 };
 
 const InformationInterception = () => {
+    
+    
+    //# 5-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-            {/* Data Stream */}
+            {}
             {Array.from({ length: 8 }).map((_, i) => (
                 <motion.div
                     key={i}
@@ -102,7 +126,7 @@ const InformationInterception = () => {
                     animate={{ 
                         x: [0, 800],
                         opacity: [0, 1, 0],
-                        background: ['#00f3ff', '#00f3ff', '#ff3333'] // Corrupts midway
+                        background: ['#00f3ff', '#00f3ff', '#ff3333'] 
                     }}
                     transition={{ 
                         duration: 2, 
@@ -113,7 +137,7 @@ const InformationInterception = () => {
                 />
             ))}
 
-            {/* Interceptor Shield */}
+            {}
             <motion.div
                 style={{
                     position: 'absolute',
@@ -127,7 +151,7 @@ const InformationInterception = () => {
                 transition={{ duration: 2, repeat: Infinity }}
             />
             
-            {/* Lock Icon effect */}
+            {}
             <motion.div
                  style={{
                     position: 'absolute',
@@ -151,20 +175,26 @@ const InformationInterception = () => {
 };
 
 const NetworkInterruption = () => {
-    // Grid of nodes
+    
     const nodes = [
         { x: -100, y: -50 }, { x: 100, y: -50 },
         { x: -100, y: 50 }, { x: 100, y: 50 },
-        { x: 0, y: 0 } // Center
+        { x: 0, y: 0 } 
     ];
 
+    
+    
+    //# 6-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {/* Connections */}
+            {}
             <svg style={{ position: 'absolute', width: '100%', height: '100%', overflow: 'visible' }}>
                 {nodes.map((node, i) => (
                     nodes.map((target, j) => {
-                        if (i >= j) return null; // Avoid duplicates
+                        if (i >= j) return null; 
+                        
+                        
+                        //# 7-Estructuración y renderizado visual del componente UI
                         return (
                             <motion.line
                                 key={`${i}-${j}`}
@@ -191,7 +221,7 @@ const NetworkInterruption = () => {
                 ))}
             </svg>
 
-            {/* Nodes */}
+            {}
             {nodes.map((node, i) => (
                 <motion.div
                     key={i}
@@ -213,7 +243,7 @@ const NetworkInterruption = () => {
                 />
             ))}
 
-             {/* Glitch Overlay Text */}
+             {}
              <motion.div
                 animate={{ x: [-2, 2, -2], opacity: [0.8, 1, 0.8] }}
                 transition={{ duration: 0.1, repeat: Infinity }}
@@ -227,12 +257,21 @@ const NetworkInterruption = () => {
 };
 
 export const DefenseAnimation = () => {
+    
+    
+    //# 8-Verificación de existencia para active phase
     const [activePhase, setActivePhase] = useState(0);
 
+    
+    
+    //# 9-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         const interval = setInterval(() => {
             setActivePhase((prev) => (prev + 1) % 3);
         }, 5000);
+        
+        
+        //# 10-Estructuración y renderizado visual del componente UI
         return () => clearInterval(interval);
     }, []);
 
@@ -242,6 +281,9 @@ export const DefenseAnimation = () => {
         <NetworkInterruption key="interruption" />
     ];
 
+    
+    
+    //# 11-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{ 
             width: '100%', 
@@ -252,7 +294,7 @@ export const DefenseAnimation = () => {
             overflow: 'hidden',
             position: 'relative'
         }}>
-            {/* Grid Background */}
+            {}
             <Box sx={{ 
                 position: 'absolute', 
                 inset: 0, 
@@ -274,7 +316,7 @@ export const DefenseAnimation = () => {
                 </motion.div>
             </AnimatePresence>
 
-            {/* Pagination/Status Indicators */}
+            {}
             <Box sx={{ position: 'absolute', bottom: 20, left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 2 }}>
                 {[0, 1, 2].map((i) => (
                     <Box 

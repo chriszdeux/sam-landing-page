@@ -1,8 +1,8 @@
-/**
- * Gráfico de Línea de Mercado
- * Visualización simplificada de tendencias de mercado
- * Utiliza Chart.js con degradados personalizados
- */
+// 1-Definir componente de gráfico de línea de mercado
+// 2-Configurar datos y opciones de ChartJS
+// 3-Renderizar gráfico de línea
+
+//# 1-Definir componente de gráfico de línea de mercado
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler, Legend, ScriptableContext } from 'chart.js';
@@ -26,8 +26,7 @@ interface MarketLineChartProps {
 }
 
 export const MarketLineChart = ({ color = '#00f3ff', height = 300, showLabel = true }: MarketLineChartProps) => {
-    
-
+    //# 2-Configurar datos y opciones de ChartJS
     const labels = ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00', '24:00'];
     const dataPoints = [80, 75, 78, 90, 60, 95, 85, 30, 60];
 
@@ -96,6 +95,7 @@ export const MarketLineChart = ({ color = '#00f3ff', height = 300, showLabel = t
         }
     };
 
+    //# 3-Renderizar gráfico de línea
     return (
         <Box sx={{ width: '100%', height: height, bgcolor: 'rgba(0,0,0,0.3)', borderRadius: 2, p: 2, position: 'relative', overflow: 'hidden', mb: 8, border: `1px solid ${color}20` }}>
             {showLabel && <Typography variant="h6" sx={{ color: color, mb: 1 }}>Tendencia General del Mercado (24h)</Typography>}

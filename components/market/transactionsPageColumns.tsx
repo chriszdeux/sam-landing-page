@@ -1,8 +1,7 @@
-/**
- * Definición de Columnas para Página de Transacciones (Detallado)
- * Configuración extendida para la tabla principal de transacciones
- * Renderizado condicional de estados y tipos de operación
- */
+// 1-Definir columnas para la página de transacciones
+// 2-Configurar renderizado condicional de tipo y estado de transacción
+
+//# 1-Definir columnas para la página de transacciones
 import React from 'react';
 import { TaoIcon } from '../ui/TaoIcon';
 import { Chip, Typography, Box } from '@mui/material';
@@ -83,6 +82,7 @@ export const transactionsPageColumns: Column<TransactionsInterface>[] = [
                    break;
            }
 
+           //# 2-Configurar renderizado condicional de tipo y estado de transacción
            return (
                <Chip 
                   label={label} 
@@ -158,6 +158,9 @@ export const transactionsPageColumns: Column<TransactionsInterface>[] = [
                 color = 'warning.main';
             }
             
+            
+            
+            //# 2-Estructuración y renderizado visual del componente UI
             return (
                 <Typography variant="body2" sx={{ color }}>
                     {label as React.ReactNode}

@@ -1,26 +1,45 @@
+// 1-Obtención del despachador para emitir acciones al store
+// 2-Obtención del despachador para emitir acciones al store
+// 3-Selección de datos desde el estado global de Redux
+// 4-Efecto secundario para sincronización del ciclo de vida
+// 5-Estructuración y renderizado visual del componente UI
+// 6-Estructuración y renderizado visual del componente UI
+
 'use client';
 
 import React, { use } from 'react';
 import { Box, Typography, Stack } from '@mui/material';
 import { ParticleBackground } from '../../../../components/ui/ParticleBackground';
 import { useRouter } from 'next/navigation';
+
+//# 1-Obtención del despachador para emitir acciones al store
 import { useAppSelector, useAppDispatch } from '../../../../lib/hooks';
 import { setSelectedNetwork } from '../../../../lib/features/blockchain/reducer';
 
 export default function NetworkConnectingPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const router = useRouter();
+    
+    //# 2-Obtención del despachador para emitir acciones al store
     const dispatch = useAppDispatch();
+    
+    //# 3-Selección de datos desde el estado global de Redux
     const { networks } = useAppSelector((state) => state.blockchain);
     const network = networks.find(n => n.id === id);
 
+    
+    
+    //# 4-Efecto secundario para sincronización del ciclo de vida
     React.useEffect(() => {
         if (network) {
             const timer = setTimeout(() => {
                 dispatch(setSelectedNetwork(network));
                 router.push('/');
-            }, 6000); // 6 seconds for the show
+            }, 6000); 
 
+            
+            
+            //# 5-Estructuración y renderizado visual del componente UI
             return () => clearTimeout(timer);
         }
     }, [network, dispatch, router, id]);
@@ -29,6 +48,9 @@ export default function NetworkConnectingPage({ params }: { params: Promise<{ id
 
     const color = network.additionalInfo.color || '#00f3ff';
 
+    
+    
+    //# 6-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{ 
             minHeight: '100vh', 
@@ -42,7 +64,7 @@ export default function NetworkConnectingPage({ params }: { params: Promise<{ id
         }}>
             <ParticleBackground />
             
-            {/* Hexagon Grid Overlay */}
+            {}
             <Box sx={{
                 position: 'absolute',
                 inset: 0,
@@ -58,10 +80,10 @@ export default function NetworkConnectingPage({ params }: { params: Promise<{ id
 
             <Box sx={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 
-                {/* Advanced Holographic Animation Container */}
+                {}
                 <Box sx={{ position: 'relative', width: 300, height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 4 }}>
                     
-                    {/* Outer Rotating Relays */}
+                    {}
                     <Box sx={{
                         position: 'absolute',
                         width: '100%',
@@ -95,7 +117,7 @@ export default function NetworkConnectingPage({ params }: { params: Promise<{ id
                         animation: 'spin 4s linear infinite'
                     }} />
 
-                    {/* Central Data Core */}
+                    {}
                     <Box sx={{
                         width: 100,
                         height: 100,
@@ -103,7 +125,7 @@ export default function NetworkConnectingPage({ params }: { params: Promise<{ id
                         transformStyle: 'preserve-3d',
                         animation: 'float 3s ease-in-out infinite'
                     }}>
-                         {/* Glowing Core */}
+                         {}
                          <Box sx={{
                              position: 'absolute',
                              inset: 0,
@@ -112,7 +134,7 @@ export default function NetworkConnectingPage({ params }: { params: Promise<{ id
                              filter: 'blur(10px)',
                              animation: 'pulse 1.5s ease-in-out infinite alternate'
                          }} />
-                         {/* Tech Symbol */}
+                         {}
                          <Typography variant="h2" sx={{ 
                              position: 'absolute',
                              top: '50%',
@@ -127,7 +149,7 @@ export default function NetworkConnectingPage({ params }: { params: Promise<{ id
                          </Typography>
                     </Box>
 
-                     {/* Scanning Line */}
+                     {}
                      <Box sx={{
                          position: 'absolute',
                          width: '120%',
@@ -139,7 +161,7 @@ export default function NetworkConnectingPage({ params }: { params: Promise<{ id
 
                 </Box>
 
-                {/* Status Text with Typing Effect/Decoding */}
+                {}
                 <Typography variant="h4" sx={{ 
                     color: '#fff', 
                     fontWeight: 900, 

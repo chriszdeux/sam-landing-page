@@ -1,8 +1,8 @@
-/**
- * Selector de Billetera
- * Muestra las billeteras disponibles del usuario en formato de tarjeta
- * Permite seleccionar la billetera activa para operaciones
- */
+// 1-Definir componente de selección de wallet
+// 2-Renderizar selector de wallet con grid
+// 3-Renderizar carta de wallet individual
+
+//# 1-Definir componente de selección de wallet
 import React from 'react';
 import { Box, Typography, Stack } from '@mui/material';
 import { Card } from '../ui/Card';
@@ -16,6 +16,8 @@ interface WalletSelectorProps {
 }
 
 export const WalletSelector = ({ userInfo, walletsInfo, selectedWalletId, onSelect }: WalletSelectorProps) => {
+    
+    //# 2-Renderizar selector de wallet con grid
     return (
         <Box>
             <Typography variant="h6" color="primary.main" gutterBottom sx={{ mb: 2, borderBottom: '1px solid rgba(0,243,255,0.2)', display: 'inline-block', pb: 1 }}>
@@ -29,6 +31,7 @@ export const WalletSelector = ({ userInfo, walletsInfo, selectedWalletId, onSele
                     ? walletsInfo.store.length 
                     : '?';
 
+                    //# 3-Renderizar carta de wallet individual
                     return (
 
                         <Card

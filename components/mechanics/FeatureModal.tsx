@@ -1,3 +1,5 @@
+// 1-Lógica principal y renderizado del módulo
+
 import React from 'react';
 import { Box, Typography, Modal as MuiModal, IconButton } from '@mui/material';
 import { Close } from '@mui/icons-material';

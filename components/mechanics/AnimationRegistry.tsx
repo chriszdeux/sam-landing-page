@@ -1,3 +1,5 @@
+// 1-Lógica principal y renderizado del módulo
+
 import React from 'react';
 import { MarketAnimation } from './MarketAnimation';
 import { MiningAnimation } from './MiningAnimation';

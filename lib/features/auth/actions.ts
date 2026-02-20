@@ -1,9 +1,9 @@
+// 1-Lógica principal y renderizado del módulo
+
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { loginApi, registerApi, validateAccountApi, getUserInfoApi } from './api';
 import { RegistrationData } from './types';
 import api from '../../api';
-
-// ... (existing code found implicitly, but we are appending)
 
 export const refreshUserInfo = createAsyncThunk(
   'auth/refreshUserInfo',
@@ -15,6 +15,17 @@ export const refreshUserInfo = createAsyncThunk(
       const message = (err as { message?: string })?.message || 'Failed to refresh user info';
       return rejectWithValue(message);
     }
+  },
+  {
+      condition: (_, { getState }) => {
+          const { auth } = getState() as { auth: { status: string; lastRefresh?: number } };
+          if (auth.status === 'loading') {
+              return false;
+          }
+          if (auth.lastRefresh && Date.now() - auth.lastRefresh < 240000) { // 4 minutes
+              return false;
+          }
+      }
   }
 );
 
@@ -39,7 +50,7 @@ export const login = createAsyncThunk(
       if (data.token) {
         localStorage.setItem('token', data.token);
         
-        // Saving encoded credentials as per user request (Note: Security Risk)
+        
         const encoded = btoa(`${credentials.email}:${credentials.password}`);
         localStorage.setItem('_c', encoded);
       }
@@ -61,10 +72,10 @@ export const checkAuth = createAsyncThunk(
      const encodedCreds = localStorage.getItem('_c');
 
      if (token) {
-        // First try to validate current token if we had an endpoint, 
-        // but since we are simulating persistence or using full credentials re-login:
         
-        // If we have credentials saved, we prioritize re-logging to get fresh data
+        
+        
+        
         if (encodedCreds) {
             try {
                 const decoded = atob(encodedCreds);
@@ -77,13 +88,13 @@ export const checkAuth = createAsyncThunk(
                 return data;
             } catch (e) {
                 console.error("Auto-login failed", e);
-                // If auto-login fails, we might want to logout
+                
                 return rejectWithValue('Auto-login failed');
             }
         }
         
-        // If no credentials but we have token, maybe we could try getProfile if available?
-        // For now, based on requirements, we mostly rely on the stored credentials logic.
+        
+        
      }
      
      return rejectWithValue('No session');
@@ -97,7 +108,7 @@ export const register = createAsyncThunk(
       const data = await registerApi(userData);
       return data;
     } catch (err: unknown) {
-      // detailed error handling could use isAxiosError but simple property check is improved over straight any
+      
       const errorMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Registration failed';
       return rejectWithValue(errorMsg);
     }

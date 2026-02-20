@@ -1,3 +1,19 @@
+// 1-Obtención del despachador para emitir acciones al store
+// 2-Gestión de estado local para time left
+// 3-Efecto secundario para sincronización del ciclo de vida
+// 4-Estructuración y renderizado visual del componente UI
+// 5-Estructuración y renderizado visual del componente UI
+// 6-Obtención del despachador para emitir acciones al store
+// 7-Selección de datos desde el estado global de Redux
+// 8-Selección de datos desde el estado global de Redux
+// 9-Gestión de estado local para tick
+// 10-Efecto secundario para sincronización del ciclo de vida
+// 11-Efecto secundario para sincronización del ciclo de vida
+// 12-Gestión de estado local para claiming reward id
+// 13-Manejo de lógica de usuario para handleClaim
+// 14-Estructuración y renderizado visual del componente UI
+// 15-Estructuración y renderizado visual del componente UI
+
 'use client';
 
 import React from 'react';
@@ -5,6 +21,8 @@ import { Box, Container, Typography, Grid, CircularProgress, Button } from '@mui
 import { Background } from '../../components/layout/Background';
 import { TechFrame } from '../../components/ui/TechFrame';
 import { PageHeader } from '../../components/ui/PageHeader';
+
+//# 1-Obtención del despachador para emitir acciones al store
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { claimReward, fetchRewards } from '../../lib/features/blockchain/actions';
 import { motion } from 'framer-motion';
@@ -14,11 +32,14 @@ import { Check } from 'lucide-react';
 import { addNotification } from '../../lib/features/uiSlice';
 import { EnvVariables } from '@/lib/constants/variables';
 
-
-
 const Countdown = ({ targetDate, onComplete }: { targetDate: number; onComplete?: () => void }) => {
+    
+    //# 2-Gestión de estado local para time left
     const [timeLeft, setTimeLeft] = React.useState('');
 
+    
+    
+    //# 3-Efecto secundario para sincronización del ciclo de vida
     React.useEffect(() => {
         const calculateTimeLeft = () => {
             const difference = targetDate - Date.now();
@@ -36,11 +57,17 @@ const Countdown = ({ targetDate, onComplete }: { targetDate: number; onComplete?
 
         calculateTimeLeft();
         const timer = setInterval(calculateTimeLeft, 1000);
+        
+        
+        //# 4-Estructuración y renderizado visual del componente UI
         return () => clearInterval(timer);
     }, [targetDate, onComplete]);
 
     if (!timeLeft) return null;
 
+    
+    
+    //# 5-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{ 
             position: 'absolute', 
@@ -62,40 +89,54 @@ const Countdown = ({ targetDate, onComplete }: { targetDate: number; onComplete?
 };
 
 export default function RewardsPage() {
+  
+  //# 6-Obtención del despachador para emitir acciones al store
   const dispatch = useAppDispatch();
+  
+  //# 7-Selección de datos desde el estado global de Redux
   const { rewards, isLoading, error } = useAppSelector((state) => state.blockchain);
+  
+  //# 8-Selección de datos desde el estado global de Redux
   const { userInfo } = useAppSelector((state) => state.auth);
-  // Tick state to force re-render when a timer expires
+  
+  
+  //# 9-Gestión de estado local para tick
   const [tick, setTick] = React.useState(0);
   
-  // Force re-render on tick change (implicit via state update)
+  
+  
+  
+  //# 10-Efecto secundario para sincronización del ciclo de vida
   React.useEffect(() => {
-    // This effect ensures we react to tick changes if needed, 
-    // though the state update itself triggers re-render.
+    
+    
   }, [tick]);
 
+  
+  
+  //# 11-Efecto secundario para sincronización del ciclo de vida
   React.useEffect(() => {
     if (rewards.length === 0 && !isLoading && !error) {
         dispatch(fetchRewards());
     }
   }, [dispatch, rewards.length, isLoading, error]);
 
+  
+  //# 12-Gestión de estado local para claiming reward id
   const [claimingRewardId, setClaimingRewardId] = React.useState<string | null>(null);
 
+  
+  
+  //# 13-Manejo de lógica de usuario para handleClaim
   const handleClaim = async (reward: Reward) => {
     if (!userInfo) {
          dispatch(addNotification({ type: 'warning', message: 'Debes iniciar sesión para reclamar recompensas.' }));
          return;
     }
 
-    // We allow the claim attempt even if the store says isClaimed, because the local timer (which enables the button) 
-    // indicates the cooldown has passed. The backend is the ultimate source of truth.
-    /*
-    if (reward.isClaimed) {
-         dispatch(addNotification({ type: 'info', message: 'Esta recompensa ya ha sido reclamada.' }));
-         return;
-    }
-    */
+    
+    
+    
 
     setClaimingRewardId(reward.id);
     try {
@@ -108,6 +149,9 @@ export default function RewardsPage() {
     }
   };
 
+  
+  
+  //# 14-Estructuración y renderizado visual del componente UI
   return (
     <Box sx={{ minHeight: '100vh', position: 'relative' }}>
       <Background />
@@ -128,26 +172,33 @@ export default function RewardsPage() {
         ) : error ? (
             <Typography align="center" color="error">Error al cargar recompensas: {error}</Typography>
         ) : (
-            <Grid container spacing={4}>
+            <Grid container spacing={4} sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}>
                 {rewards.map((reward, index) => {
-                    // Calculate claim status based on User Info
+                    
                     const userReward = userInfo?.rewards?.find((r) => r.id === reward.id);
                     const lastClaimedAt = userReward?.claimedAt;
                     
                     const intervalVal = typeof reward.interval === 'number' ? reward.interval : parseInt(reward.interval || '1', 10);
-                    const intervalMinutes = intervalVal; // Default treatment as minutes
+                    const intervalMinutes = intervalVal; 
                     const nextClaimTime = lastClaimedAt 
                         ? new Date(lastClaimedAt).getTime() + (intervalMinutes * 60 * 1000)
                         : null;
                         
-                    // Check if claimed in persisted user info OR in current session state
-                    // Note: reward.nextClaimTime is set by reducer upon successful claim in this session
+                    
+                    
                     const isClaimedPersisted = !!nextClaimTime && Date.now() < nextClaimTime;
                     const isClaimedSession = !!(reward.nextClaimTime && Date.now() < reward.nextClaimTime);
                     
                     const isClaimedNow = isClaimedPersisted || isClaimedSession;
                     const targetTime = isClaimedSession ? (reward.nextClaimTime || 0) : (nextClaimTime || 0);
 
+                    
+                    
+                    //# 15-Estructuración y renderizado visual del componente UI
                     return (
                     <Grid size={{ xs: 12, sm: 6, md: 4 }} key={reward.id}>
                         <motion.div 

@@ -1,3 +1,5 @@
+// 1-Lógica principal y renderizado del módulo
+
 import { EnvVariables } from "../constants/variables";
 
 export interface HistoryEvent {
@@ -12,6 +14,7 @@ export interface HistoryEvent {
   }[];
 }
 const { project } = EnvVariables;
+
 export const historyData: HistoryEvent[] = [
   {
     year: '2036',

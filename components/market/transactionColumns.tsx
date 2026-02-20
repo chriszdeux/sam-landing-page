@@ -1,8 +1,7 @@
-/**
- * Definición de Columnas para Tabla de Transacciones (Resumen)
- * Configuración de cabeceras, ordenamiento y renderizado de celdas
- * Incluye lógica de visualización para tipos de transacción y activos
- */
+// 1-Definir columnas para la tabla de transacciones simplificada
+// 2-Configurar renderizado condicional de tipo de transacción
+
+//# 1-Definir columnas para la tabla de transacciones simplificada
 import React from 'react';
 import { TaoIcon } from '../ui/TaoIcon';
 import { Chip, Typography } from '@mui/material';
@@ -70,6 +69,7 @@ export const transactionColumns: Column<TransactionsInterface>[] = [
                    break;
            }
 
+           //# 2-Configurar renderizado condicional de tipo de transacción
            return (
                <Chip 
                   label={label} 

@@ -1,3 +1,8 @@
+// 1-Definir interfaz financiera de la criptomoneda
+// 2-Definir interfaz principal de la criptomoneda
+// 3-Definir interfaz simplificada para listados
+
+//# 1-Definir interfaz financiera de la criptomoneda
 export interface Financial {
   isInfiniteSupply?: boolean;
   totalSupply: number;
@@ -9,15 +14,16 @@ export interface Financial {
   volume24h?: number;
   change24h?: number;
   allTimeHigh: number;
-  allTimeHighDate: string; // Changed Date to string for frontend serialization
+  allTimeHighDate: string; 
   allTimeLow: number;
-  allTimeLowDate: string; // Changed Date to string for frontend serialization
+  allTimeLowDate: string; 
   decimals?: number;
   contractAddress?: string;
   tokenType?: string;
   analyticsID: string;
 }
 
+//# 2-Definir interfaz principal de la criptomoneda
 export interface Cryptocurrency {
   id: string;  
   identification: {
@@ -35,8 +41,8 @@ export interface Cryptocurrency {
     pColor: string;
     sColor: string;
     description: string[];
-    dateCreated: string; // string for frontend
-    lastModified?: string; // string for frontend
+    dateCreated: string; 
+    lastModified?: string; 
     descriptionLastUpdated?: string;
     developers: string[];
   };
@@ -44,6 +50,7 @@ export interface Cryptocurrency {
   updatedAt?: string;
 }
 
+//# 3-Definir interfaz simplificada para listados
 export interface RandomCryptocurrency {
   id: string;
   identification: {

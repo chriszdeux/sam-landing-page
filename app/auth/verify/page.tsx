@@ -1,23 +1,51 @@
+// 1-Efecto secundario para sincronización del ciclo de vida
+// 2-Obtención del despachador para emitir acciones al store
+// 3-Gestión de estado local para code
+// 4-Selección de datos desde el estado global de Redux
+// 5-Gestión de estado local para step
+// 6-Obtención del despachador para emitir acciones al store
+// 7-Efecto secundario para sincronización del ciclo de vida
+// 8-Procesamiento de envío de formulario para genérico
+// 9-Estructuración y renderizado visual del componente UI
+// 10-Estructuración y renderizado visual del componente UI
+// 11-Estructuración y renderizado visual del componente UI
+
 'use client';
 
+//# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, TextField, CircularProgress } from '@mui/material';
 import { useRouter } from 'next/navigation';
+
+//# 2-Obtención del despachador para emitir acciones al store
 import { useAppDispatch, useAppSelector } from '../../../lib/hooks';
 import { validateAccount, register as registerUser, login } from '../../../lib/features/auth/actions';
 import { CheckCircleOutline, LockOpen } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 
 export default function VerifyPage() {
+    
+    
+    //# 3-Gestión de estado local para code
     const [code, setCode] = useState('');
+    
+    //# 4-Selección de datos desde el estado global de Redux
     const { registrationData, status, error } = useAppSelector((state) => state.auth);
+    
+    
+    //# 5-Gestión de estado local para step
     const [step, setStep] = useState<'registering' | 'verifying' | 'animating_confirmation'>(
         registrationData ? 'registering' : 'verifying'
     );
     const router = useRouter();
+    
+    //# 6-Obtención del despachador para emitir acciones al store
     const dispatch = useAppDispatch();
 
-    // Handle Registration (unchanged logic mostly)
+    
+    
+    
+    //# 7-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         if (step === 'registering' && registrationData) {
             const performRegister = async () => {
@@ -30,51 +58,57 @@ export default function VerifyPage() {
             };
             performRegister();
         } else if (step === 'registering' && !registrationData) {
-            // Should not happen if initialized correctly, but safe fallback
+            
              setTimeout(() => setStep('verifying'), 0);
         }
     }, [step, registrationData, dispatch]);
 
+    
+    
+    //# 8-Procesamiento de envío de formulario para genérico
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        // Switch to animation state
+        
         setStep('animating_confirmation');
 
-        // Wait 4 seconds for animation
+        
         setTimeout(async () => {
-            // Call validate API
+            
             const result = await dispatch(validateAccount({ code }));
             
             if (validateAccount.fulfilled.match(result)) {
-                // Auto-login logic
+                
                 const email = localStorage.getItem('pending_email');
                 const password = localStorage.getItem('pending_password');
 
                 if (email && password) {
                     const loginResult = await dispatch(login({ email, password }));
                      if (login.fulfilled.match(loginResult)) {
-                         // Optional: Fetch wallet details if needed, though login might handle basic info
-                         // Proceed to home
+                         
+                         
                          localStorage.removeItem('pending_email');
                          localStorage.removeItem('pending_password');
                          router.push('/');
                      } else {
-                         // Fallback if login fails (shouldn't typically happen if register just worked)
+                         
                          router.push('/');
                      }
                 } else {
                      router.push('/');
                 }
             } else {
-                // Return to verifying state on error so user can try again
+                
                 setStep('verifying');
             }
         }, 4000);
     };
 
     if (step === 'registering') {
-         // ... (existing registering UI)
+         
+         
+         
+         //# 9-Estructuración y renderizado visual del componente UI
          return (
             <Box sx={{ 
                 minHeight: '100vh', 
@@ -121,6 +155,9 @@ export default function VerifyPage() {
     }
 
     if (step === 'animating_confirmation') {
+        
+        
+        //# 10-Estructuración y renderizado visual del componente UI
         return (
             <Box sx={{ 
                 minHeight: '100vh', 
@@ -150,7 +187,7 @@ export default function VerifyPage() {
                     }}>
                         <CheckCircleOutline sx={{ fontSize: 60, color: '#00f3ff' }} />
                         
-                        {/* Orbiting particles animation */}
+                        {}
                         <Box sx={{
                             position: 'absolute',
                             width: '100%',
@@ -178,7 +215,10 @@ export default function VerifyPage() {
         );
     }
 
-    // Default: Verifying step UI (form)
+    
+    
+    
+    //# 11-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{ 
             minHeight: '100vh', 
@@ -189,7 +229,7 @@ export default function VerifyPage() {
             justifyContent: 'center',
             p: 3
         }}>
-           {/* ... existing form UI ... */ }
+           { }
             <motion.div 
                 initial={{ scale: 0.8, opacity: 0 }} 
                 animate={{ scale: 1, opacity: 1 }} 

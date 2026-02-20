@@ -1,8 +1,7 @@
-/**
- * Componente Tarjeta (Card) Estilizada
- * Efectos de borde y esquinas futuristas
- * Estilos de hover y backdrop filter
- */
+// 1-Definir componente de tarjeta personalizada
+// 2-Renderizar tarjeta con efectos de bordes y brillo
+
+//# 1-Definir componente de tarjeta personalizada
 import React from 'react';
 import { Card as MuiCard, CardProps as MuiCardProps } from '@mui/material';
 
@@ -12,6 +11,8 @@ interface CardProps extends MuiCardProps {
 }
 
 export const Card = ({ hoverEffect = true, glowColor = '#00f3ff', sx, children, ...props }: CardProps) => {
+  
+  //# 2-Renderizar tarjeta con efectos de bordes y brillo
   return (
     <MuiCard
       sx={{

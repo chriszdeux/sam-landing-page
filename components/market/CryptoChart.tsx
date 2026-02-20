@@ -1,8 +1,11 @@
-/**
- * Componente de Gráfico de Criptomonedas
- * Visualización interactiva de precios históricos usando Chart.js
- * Incluye tooltips personalizados y efectos visuales
- */
+// 1-Definir componente de gráfico de criptomonedas
+// 2-Obtener despachador y selector de Redux
+// 3-Efecto para cargar historial de precios
+// 4-Preparar datos y configuración del gráfico
+// 5-Renderizar gráfico con tooltip personalizado
+
+//# 1-Definir componente de gráfico de criptomonedas
+
 import React from 'react';
 import { Box } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -31,6 +34,7 @@ ChartJS.register(
   Legend
 );
 
+//# 1-Obtención del despachador para emitir acciones al store
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { fetchCryptoHistory } from '../../lib/features/market/actions';
 
@@ -41,13 +45,23 @@ interface CryptoChartProps {
 }
 
 export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps) => {
+    
+    //# 2-Obtención del despachador para emitir acciones al store
     const dispatch = useAppDispatch();
+    
+    //# 3-Selección de datos desde el estado global de Redux
     const { historicalData } = useAppSelector((state) => state.market);
     
 
+    
+    
+    //# 4-Efecto secundario para sincronización del ciclo de vida
     React.useEffect(() => {
         if (cryptoId) {
             const promise = dispatch(fetchCryptoHistory({ cryptoId, range }));
+            
+            
+            //# 5-Estructuración y renderizado visual del componente UI
             return () => {
                 promise.abort();
             };
@@ -115,8 +129,8 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
             },
             tooltip: {
                 enabled: false,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                external: (context: any) => {
+                
+                external: (context: { chart: ChartJS; tooltip: any }) => {
                     const { chart, tooltip } = context;
                     const tooltipEl = tooltipRef.current;
 
@@ -129,8 +143,8 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
 
                     if (tooltip.body) {
                         const titleLines = tooltip.title || [];
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        const bodyLines = tooltip.body.map((b: any) => b.lines);
+                        
+                        const bodyLines = tooltip.body.map((b: { lines: string[] }) => b.lines);
 
                         let innerHtml = '<div style="margin-bottom: 8px;">';
 
@@ -153,8 +167,8 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
                     tooltipEl.style.left = positionX + tooltip.caretX + 'px';
                     tooltipEl.style.top = positionY + tooltip.caretY + 'px';
                     tooltipEl.style.fontFamily = 'Inter, sans-serif';
-                    // tooltipEl.style.padding = tooltip.options.padding + 'px ' + tooltip.options.padding + 'px';
-                    // tooltipEl.style.transform = 'translate(-50%, -110%) scale(1)';
+                    
+                    
                     tooltipEl.style.transform = `translate(-50%, -120%) scale(1)`; 
                 }
             },
@@ -186,6 +200,9 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
         }
     };
 
+    
+    
+    //# 6-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{ width: '100%', height: 400, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 4, border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden', position: 'relative' }}>
             <motion.div

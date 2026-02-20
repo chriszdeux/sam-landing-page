@@ -1,9 +1,7 @@
-/**
- * Componente de Fondo de Orbe IA
- * Animaciones complejas con Framer Motion (rotación, escala)
- * Efectos de nebulosa y grid tecnológico
- * Personalizable por props (color, intensidad)
- */
+// 1-Definir componente de fondo de orbe IA
+// 2-Renderizar orbe animado con Framer Motion
+
+//# 1-Definir componente de fondo de orbe IA
 'use client';
 
 import React from 'react';
@@ -22,6 +20,7 @@ export const AIOrbBackground = ({
  
 }: AIOrbBackgroundProps) => {
 
+    //# 2-Renderizar orbe animado con Framer Motion
     return (
         <Box sx={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0, bgcolor: '#050a14' }}>
             
@@ -50,7 +49,6 @@ export const AIOrbBackground = ({
                 }}
             />
 
-
             <motion.div
                  animate={{
                     rotate: 360,
@@ -75,7 +73,6 @@ export const AIOrbBackground = ({
                 }}
             />
 
-
              <motion.div
                  animate={{
                     rotate: -360,
@@ -98,7 +95,6 @@ export const AIOrbBackground = ({
                     zIndex: 0
                 }}
             />
-
 
             <motion.div
                 animate={{
