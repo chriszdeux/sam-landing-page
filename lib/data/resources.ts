@@ -1,4 +1,4 @@
-
+// 1-Lógica principal y renderizado del módulo
 
 export interface Resource {
   id: string;

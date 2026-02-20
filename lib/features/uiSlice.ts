@@ -1,3 +1,10 @@
+// 1-Definir tipos e interfaces para el estado de la UI
+// 2-Establecer el estado inicial para modales y alertas
+// 3-Crear slice de Redux y configuracion de reducers
+// 4-Exportar acciones para manipular el estado
+// 5-Exportar reducer para integracion en store
+
+//# 1-Definir tipos e interfaces para el estado de la UI
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export type NotificationType = 'success' | 'error' | 'info' | 'warning';
@@ -16,6 +23,7 @@ interface UiState {
   notifications: Notification[];
 }
 
+//# 2-Establecer el estado inicial para modales y alertas
 const initialState: UiState = {
   isModalOpen: false,
   activeModalContent: null,
@@ -23,6 +31,7 @@ const initialState: UiState = {
   notifications: [],
 };
 
+//# 3-Crear slice de Redux y configuracion de reducers
 const uiSlice = createSlice({
   name: 'ui',
   initialState,
@@ -52,5 +61,8 @@ const uiSlice = createSlice({
   },
 });
 
+//# 4-Exportar acciones para manipular el estado
 export const { openModal, closeModal, setCurrentSection, addNotification, removeNotification } = uiSlice.actions;
+
+//# 5-Exportar reducer para integracion en store
 export default uiSlice.reducer;

@@ -1,3 +1,10 @@
+// 1-Definir interfaz para activos financieros y estado
+// 2-Configurar acciones asíncronas para operar con activos
+// 3-Crear slice con reducers síncronos y asíncronos
+// 4-Exportar acciones para controlar el estado
+// 5-Exportar reducer para la tienda
+
+//# 1-Definir interfaz para activos financieros y estado
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import api from '../api';
 
@@ -12,9 +19,9 @@ interface Asset {
   financial: {
     price: number;
     change24h: number;
-    marketCap?: string; // Optional as it's not in the sample
-    volume?: string;    // Optional as it's not in the sample
-    supply?: string;    // Optional as it's not in the sample
+    marketCap?: string; 
+    volume?: string;    
+    supply?: string;    
   };
   additionalInfo: {
     pColor: string;
@@ -46,12 +53,13 @@ const initialState: EconomyState = {
   totalVolume: '0',
 };
 
-// Async Thunks
+//# 2-Configurar acciones asíncronas para operar con activos
 export const fetchAssets = createAsyncThunk(
   'economy/fetchAssets',
   async ({ page = 1, limit = 10 }: { page?: number; limit?: number }, { rejectWithValue }) => {
     try {
-      // Backend route: GET /blockchain/cryptocurrencies (maps to getCryptocurrencies)
+      // NOTE: Parameters are currently unused but kept for future pagination support
+      // console.debug('Fetching assets with:', { page, limit });
       const response = await api.get(`/blockchain/crypto`);
       return response.data;
     } catch (error: unknown) {
@@ -65,7 +73,7 @@ export const fetchAssetDetails = createAsyncThunk(
   'economy/fetchAssetDetails',
   async (id: string, { rejectWithValue }) => {
     try {
-      // Backend route: GET /blockchain/cryptocurrencies/:id (maps to getCryptoInfo)
+      
       const response = await api.get(`/blockchain/crypto/${id}`);
       return response.data;
     } catch (error: unknown) {
@@ -79,9 +87,9 @@ export const buyAsset = createAsyncThunk(
   'economy/buyAsset',
   async ({ assetId, amount }: { assetId: string; amount: number }, { rejectWithValue }) => {
     try {
-      // Backend route: POST /blockchain/trades/start-buy-transaction
+      
       const response = await api.post('/blockchain/trades/start-buy-transaction', {
-        networkId: assetId, // Assuming assetId maps to networkId
+        networkId: assetId, 
         amount
       });
       return response.data;
@@ -96,9 +104,9 @@ export const sellAsset = createAsyncThunk(
   'economy/sellAsset',
   async ({ assetId, amount }: { assetId: string; amount: number }, { rejectWithValue }) => {
     try {
-      // Backend route: POST /blockchain/trades/start-sell-transaction
+      
       const response = await api.post('/blockchain/trades/start-sell-transaction', {
-        networkId: assetId, // Assuming assetId maps to networkId
+        networkId: assetId, 
         amount
       });
       return response.data;
@@ -109,6 +117,7 @@ export const sellAsset = createAsyncThunk(
   }
 );
 
+//# 3-Crear slice con reducers síncronos y asíncronos
 const economySlice = createSlice({
   name: 'economy',
   initialState,
@@ -122,17 +131,17 @@ const economySlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch Assets
+      
       .addCase(fetchAssets.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchAssets.fulfilled, (state, action) => {
         state.loading = false;
-        // Handle response structure: array or object with assets property
+        
         if (Array.isArray(action.payload)) {
           state.assets = action.payload;
-          state.totalPages = 1; // Default if no pagination info
+          state.totalPages = 1; 
         } else {
           state.assets = action.payload.assets || [];
           state.totalPages = action.payload.totalPages || 1;
@@ -144,7 +153,7 @@ const economySlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      // Fetch Asset Details
+      
       .addCase(fetchAssetDetails.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -157,16 +166,19 @@ const economySlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      // Buy Asset
-      .addCase(buyAsset.fulfilled, (state) => {
-        // Optionally refresh assets or user balance here
+      
+      .addCase(buyAsset.fulfilled, () => {
+        // Handle successful purchase if needed
       })
-      // Sell Asset
-      .addCase(sellAsset.fulfilled, (state) => {
-        // Optionally refresh assets or user balance here
+      
+      .addCase(sellAsset.fulfilled, () => {
+        // Handle successful sale if needed
       });
   },
 });
 
+//# 4-Exportar acciones para controlar el estado
 export const { setPage, clearSelectedAsset } = economySlice.actions;
+
+//# 5-Exportar reducer para la tienda
 export default economySlice.reducer;

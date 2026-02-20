@@ -1,6 +1,10 @@
+// 1-Definir enumeraciones para transacciones
+// 2-Definir interfaces para transacciones y bloques
+// 3-Definir interfaces para recompensas y estado
+
+//# 1-Definir enumeraciones para transacciones
 import { BlockchainInterface } from '../../types/blockchain';
 
-// Basic Transaction Interface from backend
 export enum TransactionType {
     BUY = 'BUY',
     SELL = 'SELL',
@@ -13,6 +17,7 @@ export enum TransactionStatus {
     FAILED = 'FAILED'
 }
 
+//# 2-Definir interfaces para transacciones y bloques
 export interface TransactionsInterface {
   id: string;
   transactionDocumentID?: string;
@@ -34,7 +39,7 @@ export interface TransactionsInterface {
   }
   transactionType: TransactionType;
   status: TransactionStatus;
-  dateCreated: string; // Serialized date
+  dateCreated: string; 
   duration: string;
 }
 
@@ -48,20 +53,21 @@ export interface TransactionBucket {
   transactionsTransferQueue: string[] | [];
   prevBlockID?: string | null;
   nextBlockID?: string | null;
-  startDate: string; // Serialized date
-  endDate: string | null; // Serialized date
+  startDate: string; 
+  endDate: string | null; 
   currentTransactionBlock: number;
 }
 
+//# 3-Definir interfaces para recompensas y estado
 export interface Reward {
     id: string;
     name: string;
     description: string;
     amount: number;
-    interval: number; // Days between claims
+    interval: number; 
     rewardType: 'CREDIT';
-    isClaimed?: boolean; // Frontend helper
-    nextClaimTime?: number; // Timestamp for next availability
+    isClaimed?: boolean; 
+    nextClaimTime?: number; 
 }
 
 export interface BlockchainState {

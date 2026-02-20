@@ -1,3 +1,5 @@
+// 1-Estructuración y renderizado visual del componente UI
+
 'use client';
 
 import React from 'react';
@@ -12,6 +14,9 @@ import { motion } from 'framer-motion';
 import { AccessTime, Person, ArrowForward } from '@mui/icons-material';
 
 export default function NewsPage() {
+  
+  
+  //# 1-Estructuración y renderizado visual del componente UI
   return (
     <Box sx={{ minHeight: '100vh', position: 'relative' }}>
       <Background />
@@ -117,6 +122,8 @@ export default function NewsPage() {
                                     background: 'linear-gradient(45deg, #fff, #aaa)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
+                                    wordBreak: 'break-word',
+                                    hyphens: 'auto',
                                 }}
                             >
                                 {news.title}

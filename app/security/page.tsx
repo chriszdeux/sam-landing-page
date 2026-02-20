@@ -1,3 +1,5 @@
+// 1-Estructuración y renderizado visual del componente UI
+
 'use client';
 
 import React from 'react';
@@ -13,6 +15,9 @@ import { EnvVariables } from '@/lib/constants/variables';
 export default function SecurityPage() {
     const { project } = EnvVariables;
     const router = useRouter();
+  
+  
+  //# 1-Estructuración y renderizado visual del componente UI
   return (
     <Box sx={{ minHeight: '100vh', position: 'relative' }}>
       <Box sx={{ position: 'fixed', top: 100, left: { xs: 20, md: 40 }, zIndex: 100 }}>

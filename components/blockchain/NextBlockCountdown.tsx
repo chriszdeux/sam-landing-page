@@ -1,8 +1,15 @@
+// 1-Definir componente de cuenta regresiva de bloque
+// 2-Obtener despachador y estado de blockchain
+// 3-Efecto para sincronizar tiempo del próximo bloque
+// 4-Renderizar contador de tiempo
+
+//# 1-Definir componente de cuenta regresiva de bloque
 "use client";
 
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Tooltip } from '@mui/material';
 import { AccessTime } from '@mui/icons-material';
+
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { fetchNextBlockTime } from '../../lib/features/blockchain/actions';
 
@@ -11,17 +18,21 @@ interface NextBlockCountdownProps {
 }
 
 export const NextBlockCountdown: React.FC<NextBlockCountdownProps> = ({ networkId }) => {
+    
+    //# 2-Obtención del despachador y estado de blockchain
     const dispatch = useAppDispatch();
     const { nextBlockTime } = useAppSelector((state) => state.blockchain);
+    
     const [timeLeft, setTimeLeft] = useState<string>('--:--');
 
-    useEffect(() => {
+    //# 3-Efecto para sincronizar tiempo del próximo bloque
+    useEffect(function updateBlockTime() {
         if (networkId) {
             dispatch(fetchNextBlockTime(networkId));
         }
     }, [dispatch, networkId]);
 
-    useEffect(() => {
+    useEffect(function syncCountdown() {
         if (!nextBlockTime) return;
 
         const calculateTime = () => {
@@ -40,7 +51,6 @@ export const NextBlockCountdown: React.FC<NextBlockCountdownProps> = ({ networkI
             }
         };
 
-        // Calculate immediately
         calculateTime();
 
         const interval = setInterval(calculateTime, 1000);
@@ -48,7 +58,7 @@ export const NextBlockCountdown: React.FC<NextBlockCountdownProps> = ({ networkI
         return () => clearInterval(interval);
     }, [nextBlockTime, dispatch, networkId]);
 
-
+    //# 4-Renderizar contador de tiempo
     return (
         <Tooltip title="Próximo bloque">
             <Box 

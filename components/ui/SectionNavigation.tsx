@@ -1,10 +1,14 @@
-/**
- * Navegación Flotante entre Secciones
- * Detección de sección activa al hacer scroll
- * Botones para navegar arriba/abajo
- */
+// 1-Efecto secundario para sincronización del ciclo de vida
+// 2-Gestión de estado local para current index
+// 3-Efecto secundario para sincronización del ciclo de vida
+// 4-Manejo de lógica de usuario para handleScroll
+// 5-Estructuración y renderizado visual del componente UI
+// 6-Manejo de lógica de usuario para handleScrollTo
+// 7-Estructuración y renderizado visual del componente UI
+
 'use client';
 
+//# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useEffect, useState } from 'react';
 import { IconButton, Box } from '@mui/material';
 import { KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material';
@@ -14,11 +18,20 @@ const sections = ['home', 'history', 'mechanics'];
 
 export const SectionNavigation = () => {
   const pathname = usePathname();
+  
+  
+  //# 2-Gestión de estado local para current index
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  
+  
+  //# 3-Efecto secundario para sincronización del ciclo de vida
   useEffect(() => {
     if (pathname !== '/') return;
 
+    
+    
+    //# 4-Manejo de lógica de usuario para handleScroll
     const handleScroll = () => {
       const sectionElements = sections.map(id => document.getElementById(id));
       
@@ -50,6 +63,9 @@ export const SectionNavigation = () => {
 
     handleScroll();
     
+    
+    
+    //# 5-Estructuración y renderizado visual del componente UI
     return () => window.removeEventListener('scroll', handleScroll);
     
 
@@ -57,18 +73,24 @@ export const SectionNavigation = () => {
 
   if (pathname !== '/') return null;
 
+  
+  
+  //# 6-Manejo de lógica de usuario para handleScrollTo
   const handleScrollTo = (index: number) => {
     if (index < 0 || index >= sections.length) return;
     const id = sections[index];
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  
+  
+  //# 7-Estructuración y renderizado visual del componente UI
   return (
     <Box sx={{
       position: 'fixed',
       bottom: 32,
       right: 32,
-      display: 'flex',
+      display: { xs: 'none', md: 'flex' },
       flexDirection: 'column',
       gap: 1,
       zIndex: 50,

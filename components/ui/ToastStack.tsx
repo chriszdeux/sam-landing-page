@@ -1,29 +1,40 @@
-/**
- * Gestor de Notificaciones (Stack de Toasts)
- * Muestra alertas temporales superpuestas
- * Gestionado via Redux (uiSlice)
- */
+// 1-Definir componente de notificación individual
+// 2-Obtener despachador y configurar temporizador
+// 3-Efecto para auto-eliminar notificación
+// 4-Determinar icono y colores según tipo
+// 5-Renderizar notificación con animación de salida
+// 6-Definir contenedor de pila de notificaciones
+// 7-Seleccionar notificaciones del estado global
+// 8-Renderizar lista de notificaciones
+
+//# 1-Definir componente de notificación individual
 'use client';
 
 import React, { useEffect } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Close, CheckCircle, Error, Info, Warning } from '@mui/icons-material';
+
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { removeNotification, Notification } from '../../lib/features/uiSlice';
 
 const ToastItem = ({ notification }: { notification: Notification }) => {
+    
+    //# 2-Obtener despachador y configurar temporizador
     const dispatch = useAppDispatch();
 
-    useEffect(() => {
+    //# 3-Efecto para auto-eliminar notificación
+    useEffect(function autoDismiss() {
         if (notification.duration) {
             const timer = setTimeout(() => {
                 dispatch(removeNotification(notification.id));
             }, notification.duration);
+            
             return () => clearTimeout(timer);
         }
     }, [notification, dispatch]);
 
+    //# 4-Determinar icono y colores según tipo
     const getIcon = () => {
         switch (notification.type) {
             case 'success': return <CheckCircle fontSize="small" sx={{ color: '#00fa9a' }} />;
@@ -44,6 +55,7 @@ const ToastItem = ({ notification }: { notification: Notification }) => {
     
     const colors = getColors();
 
+    //# 5-Renderizar notificación con animación de salida
     return (
         <motion.div
             layout
@@ -87,9 +99,13 @@ const ToastItem = ({ notification }: { notification: Notification }) => {
     );
 };
 
+//# 6-Definir contenedor de pila de notificaciones
 export const ToastStack = () => {
+    
+    //# 7-Seleccionar notificaciones del estado global
     const notifications = useAppSelector(state => state.ui.notifications);
 
+    //# 8-Renderizar lista de notificaciones
     return (
         <Box sx={{
             position: 'fixed',

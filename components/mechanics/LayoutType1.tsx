@@ -1,18 +1,28 @@
+// 1-Selección de datos desde el estado global de Redux
+// 2-Estructuración y renderizado visual del componente UI
+// 3-Selección de datos desde el estado global de Redux
+// 4-Estructuración y renderizado visual del componente UI
+// 5-Estructuración y renderizado visual del componente UI
+
 import React from 'react';
 import { Box, Typography, Container, Grid, Stack } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Mechanic } from '../../lib/data/mechanics';
+
+//# 1-Selección de datos desde el estado global de Redux
 import { useSelector } from 'react-redux';
 import { BlockchainState } from '@/lib/features/blockchain/types';
 
-
 export const ProbePulse = ({ color }: { color: string }) => {
+  
+  
+  //# 2-Estructuración y renderizado visual del componente UI
   return (
     <Box sx={{ position: 'relative', width: 300, height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      {/* Core */}
+      {}
       <Box sx={{ width: 16, height: 16, borderRadius: '50%', bgcolor: color, zIndex: 10, boxShadow: `0 0 20px ${color}` }} />
       
-      {/* Expanding Pulses */}
+      {}
       {[0, 1, 2].map((i) => (
         <motion.div
             key={i}
@@ -42,7 +52,7 @@ export const ProbePulse = ({ color }: { color: string }) => {
         />
       ))}
       
-      {/* Rotating Orbit/Galaxy ring */}
+      {}
        <motion.div
             style={{
                 position: 'absolute',
@@ -70,7 +80,13 @@ export const ProbePulse = ({ color }: { color: string }) => {
 }
 
 export const LayoutType1 = ({ mechanic }: { mechanic: Mechanic }) => {
+  
+  
+  //# 3-Selección de datos desde el estado global de Redux
   const { networks } = useSelector((state: { blockchain: BlockchainState }) => state.blockchain);
+   
+   
+   //# 4-Estructuración y renderizado visual del componente UI
    return (
      <Container maxWidth="xl" sx={{ pt: 20 }}>
     <Grid container spacing={8} alignItems="center">
@@ -105,12 +121,15 @@ export const LayoutType1 = ({ mechanic }: { mechanic: Mechanic }) => {
                 boxShadow: `0 0 50px ${mechanic.color}20`
             }}>
                 <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                     {/* Background Stars Effect */}
+                     {}
                      {[...Array(20)].map((_, i) => {
-                        // Use a deterministic pseudo-random approach based on index
+                        
                         const top = ((i * 17) % 100);
                         const left = ((i * 23) % 100);
                         const delay = (i % 5);
+                        
+                        
+                        //# 5-Estructuración y renderizado visual del componente UI
                         return (
                         <motion.div 
                             key={i}
@@ -128,7 +147,7 @@ export const LayoutType1 = ({ mechanic }: { mechanic: Mechanic }) => {
                      )})}
                      <ProbePulse color={mechanic.color} />
                 </Box>
-                {/* Simulated UI Overlay */}
+                {}
                 <Box sx={{ position: 'absolute', bottom: 30, left: 30, right: 30, p: 3, bgcolor: 'rgba(0,0,0,0.8)', borderRadius: 4, backdropFilter: 'blur(10px)' }}>
                     <Typography variant="subtitle2" color={mechanic.color}>Estado del Sistema - {networks[0]?.isActive ? "Operativo" : "No operativo"}</Typography>
                     <Box sx={{ height: 4, bgcolor: 'rgba(255,255,255,0.1)', mt: 1, borderRadius: 2 }}>

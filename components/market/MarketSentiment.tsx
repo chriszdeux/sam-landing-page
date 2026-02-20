@@ -1,10 +1,11 @@
-/**
- * Componente de Sentimiento de Mercado
- * Visualiza la relación Compra vs Venta (Codicia vs Miedo)
- * Barra de progreso animada y estadísticas de transacciones
- */
+// 1-Definir componente de sentimiento de mercado
+// 2-Obtener datos históricos y calcular sentimiento
+// 3-Renderizar indicador visual de sentimiento y volumen
+
+//# 1-Definir componente de sentimiento de mercado
 import React from 'react';
 import { Box, Typography, Stack, Tooltip } from '@mui/material';
+
 import { useAppSelector } from '../../lib/hooks';
 import { TrendingUp, TrendingDown, InfoOutlined } from '@mui/icons-material';
 
@@ -13,6 +14,8 @@ interface MarketSentimentProps {
 }
 
 export const MarketSentiment = ({ cryptoId }: MarketSentimentProps) => {
+    
+    //# 2-Obtener datos históricos y calcular sentimiento
     const { historicalData } = useAppSelector((state) => state.market);
     const data = historicalData[cryptoId];
 
@@ -23,7 +26,6 @@ export const MarketSentiment = ({ cryptoId }: MarketSentimentProps) => {
     const buyCount = data.currentBuyState.counter;
     const sellCount = data.currentSellState.counter;
     const totalCount = buyCount + sellCount;
-
 
     const buyPercentage = totalCount > 0 ? (buyCount / totalCount) * 100 : 50;
     const sellPercentage = totalCount > 0 ? (sellCount / totalCount) * 100 : 50;
@@ -39,6 +41,7 @@ export const MarketSentiment = ({ cryptoId }: MarketSentimentProps) => {
         sentimentColor = '#ff0055';
     }
 
+    //# 3-Renderizar indicador visual de sentimiento y volumen
     return (
         <Box sx={{ 
             bgcolor: 'rgba(255,255,255,0.02)', 
@@ -58,7 +61,6 @@ export const MarketSentiment = ({ cryptoId }: MarketSentimentProps) => {
                     {sentiment}
                 </Typography>
             </Stack>
-
 
             <Box sx={{ position: 'relative', height: 12, bgcolor: '#333', borderRadius: 6, overflow: 'hidden', mb: 2 }}>
 
@@ -85,7 +87,6 @@ export const MarketSentiment = ({ cryptoId }: MarketSentimentProps) => {
                     boxShadow: '0 0 10px rgba(255, 0, 85, 0.5)'
                 }} />
             </Box>
-
 
             <Stack direction="row" justifyContent="space-between" sx={{ fontSize: '0.875rem' }}>
                 <Box sx={{ textAlign: 'left' }}>

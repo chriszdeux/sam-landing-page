@@ -1,7 +1,6 @@
-/**
- * Configuración de Items de Navegación
- * Lista de rutas y etiquetas
- */
+// 1-Definir elementos de navegación principal
+
+//# 1-Definir elementos de navegación principal
 export const navItems = [
   { name: "Inicio", id: "home", path: "/" },
   { name: "Mercado", id: "market", path: "/market" },

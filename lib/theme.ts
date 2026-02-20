@@ -1,3 +1,5 @@
+// 1-Lógica principal y renderizado del módulo
+
 'use client';
 import { createTheme, alpha } from '@mui/material/styles';
 import { Roboto } from 'next/font/google';
@@ -12,22 +14,22 @@ const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#ffffff', // White
+      main: '#ffffff', 
     },
     secondary: {
-      main: '#00efcb', // Cyan/Teal
+      main: '#00efcb', 
     },
     error: {
-      main: '#ef9a9a', // Pastel Red
+      main: '#ef9a9a', 
     },
     warning: {
-      main: '#ffcc80', // Pastel Orange
+      main: '#ffcc80', 
     },
     info: {
-      main: '#90caf9', // Pastel Blue
+      main: '#90caf9', 
     },
     success: {
-      main: '#a5d6a7', // Pastel Green
+      main: '#a5d6a7', 
     },
     background: {
       default: '#0a0a0a',
@@ -53,8 +55,8 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 4, // Sharper corners from sam-mvp
-          padding: '8px 16px', // Padding from sam-mvp
+          borderRadius: 4, 
+          padding: '8px 16px', 
           textTransform: 'none',
           fontWeight: 600,
           transition: 'all 0.2s ease-in-out',

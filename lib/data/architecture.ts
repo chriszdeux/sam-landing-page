@@ -1,3 +1,5 @@
+// 1-Lógica principal y renderizado del módulo
+
 export interface Building {
   id: string;
   name: string;

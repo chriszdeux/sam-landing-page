@@ -1,8 +1,20 @@
+// 1-Efecto secundario para sincronización del ciclo de vida
+// 2-Obtención del despachador para emitir acciones al store
+// 3-Obtención del despachador para emitir acciones al store
+// 4-Efecto secundario para sincronización del ciclo de vida
+// 5-Estructuración y renderizado visual del componente UI
+// 6-Efecto secundario para sincronización del ciclo de vida
+// 7-Estructuración y renderizado visual del componente UI
+// 8-Estructuración y renderizado visual del componente UI
+
 'use client';
 
+//# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useEffect, useRef } from 'react';
 import { Box, Typography, Container } from '@mui/material';
 import { useRouter } from 'next/navigation';
+
+//# 2-Obtención del despachador para emitir acciones al store
 import { useAppDispatch } from '../../../lib/hooks';
 import { logout } from '../../../lib/features/auth';
 import { Background } from '../../../components/layout/Background';
@@ -11,17 +23,28 @@ import { LogOut } from 'lucide-react';
 
 export default function LoggingOut() {
     const router = useRouter();
+    
+    //# 3-Obtención del despachador para emitir acciones al store
     const dispatch = useAppDispatch();
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
+    
+    
+    //# 4-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         dispatch(logout());
         const timer = setTimeout(() => {
             router.push('/');
         }, 4000);
+        
+        
+        //# 5-Estructuración y renderizado visual del componente UI
         return () => clearTimeout(timer);
     }, [router, dispatch]);
 
+    
+    
+    //# 6-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -45,7 +68,7 @@ export default function LoggingOut() {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = '#ff0055'; // Use neon red/pink
+            ctx.fillStyle = '#ff0055'; 
             ctx.font = `${fontSize}px monospace`;
 
             for (let i = 0; i < drops.length; i++) {
@@ -60,9 +83,15 @@ export default function LoggingOut() {
         };
 
         const interval = setInterval(draw, 50);
+        
+        
+        //# 7-Estructuración y renderizado visual del componente UI
         return () => clearInterval(interval);
     }, []);
 
+    
+    
+    //# 8-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: '#000', position: 'relative', overflow: 'hidden' }}>
             <Background />

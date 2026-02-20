@@ -1,13 +1,6 @@
-/**
- * Importación de componentes de diseño y secciones.
- * Estructura principal de la página de inicio.
- * Fondo animado y navegación de secciones.
- * Renderizado de secciones: Héroe, Historia, Mecánicas.
- * Pie de página y modal informativo global.
- */
+// 1-Estructuración y renderizado visual del componente UI
 
 'use client';
-
 
 import { Footer } from "../components/layout/Footer";
 import { Background } from "../components/layout/Background";
@@ -18,11 +11,13 @@ import { Modal } from "../components/ui/Modal";
 import { SectionNavigation } from "../components/ui/SectionNavigation";
 
 export default function Home() {
+  
+  
+  //# 1-Estructuración y renderizado visual del componente UI
   return (
     <main className="min-h-screen relative">
       <Background />
       <SectionNavigation />
-
 
       <div className="relative z-10">
         <HeroSection />

@@ -1,26 +1,51 @@
+// 1-Efecto secundario para sincronización del ciclo de vida
+// 2-Gestión de estado local para balance
+// 3-Gestión de estado local para assets
+// 4-Efecto secundario para sincronización del ciclo de vida
+// 5-Estructuración y renderizado visual del componente UI
+// 6-Estructuración y renderizado visual del componente UI
+// 7-Estructuración y renderizado visual del componente UI
+// 8-Estructuración y renderizado visual del componente UI
+
+//# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Grid } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Backpack, TrendingUp, LocalAtm } from '@mui/icons-material';
 
 export const PortfolioAnimation = ({ color, variant = 'balance' }: { color: string, variant?: 'balance' | 'inventory' | 'stats' }) => {
+    
+    
+    //# 2-Gestión de estado local para balance
     const [balance, setBalance] = useState(1000);
+    
+    
+    //# 3-Gestión de estado local para assets
     const [assets, setAssets] = useState<{name: string, value: number, percentage: number}[]>([
-        { name: 'SOL', value: 80, percentage: 80 },
-        { name: 'ETH', value: 15, percentage: 15 },
-        { name: 'BTC', value: 5, percentage: 5 }
+        { name: 'LYN', value: 80, percentage: 80 },
+        { name: 'SOL', value: 15, percentage: 15 },
+        { name: 'IXNN', value: 5, percentage: 5 }
     ]);
 
+    
+    
+    //# 4-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         const interval = setInterval(() => {
             setBalance(prev => prev + Math.random() * 10 - 2);
             setAssets(prev => prev.map(asset => ({ ...asset, value: asset.value + Math.random() * 2 - 1 })));
         }, 1000);
+        
+        
+        //# 5-Estructuración y renderizado visual del componente UI
         return () => clearInterval(interval);
     }, []);
 
     if (variant === 'inventory') {
         const items = ['Engine V2', 'Shield Mk1', 'Laser Cannon', 'Mining Drone', 'Fuel Cell', 'Nav Module'];
+        
+        
+        //# 6-Estructuración y renderizado visual del componente UI
         return (
              <Box sx={{ width: '100%', height: '100%', p: 4, bgcolor: 'rgba(0,0,0,0.8)', color: 'white', display: 'flex', flexDirection: 'column' }}>
                 <Typography variant="overline" color={color} fontWeight="bold" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -54,6 +79,9 @@ export const PortfolioAnimation = ({ color, variant = 'balance' }: { color: stri
     }
 
     if (variant === 'stats') {
+        
+        
+        //# 7-Estructuración y renderizado visual del componente UI
         return (
             <Box sx={{ width: '100%', height: '100%', p: 4, bgcolor: 'rgba(0,0,0,0.8)', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <Typography variant="overline" color={color} fontWeight="bold" sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -93,7 +121,10 @@ export const PortfolioAnimation = ({ color, variant = 'balance' }: { color: stri
         );
     }
 
-    // Default: Balance
+    
+    
+    
+    //# 8-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{ 
             width: '100%', 

@@ -1,17 +1,25 @@
+// 1-Estructuración y renderizado visual del componente UI
+// 2-Estructuración y renderizado visual del componente UI
+
 import React from 'react';
 import { Box, Typography, Container, Grid, Divider } from '@mui/material';
 import { Mechanic } from '../../lib/data/mechanics';
 import { AnimationRegistry } from './AnimationRegistry';
 
 export const LayoutType4 = ({ mechanic }: { mechanic: Mechanic }) => {
-    // Helper to render animation component
+    
     const renderAnimation = (animationType?: string) => {
         if (!animationType) return null;
         const AnimationComponent = AnimationRegistry[animationType];
         if (!AnimationComponent) return null;
+        
+        //# 1-Estructuración y renderizado visual del componente UI
         return <AnimationComponent color={mechanic.color} />;
     };
 
+    
+    
+    //# 2-Estructuración y renderizado visual del componente UI
     return (
     <Container maxWidth="xl" sx={{ pt: 22, pb: 12 }}>
         <Grid container spacing={0}>
@@ -32,7 +40,7 @@ export const LayoutType4 = ({ mechanic }: { mechanic: Mechanic }) => {
                      {mechanic.backgroundImage && (
                         <Box sx={{ 
                             position: 'absolute', 
-                            inset: -20, // Extend slightly to avoid blur edges
+                            inset: -20, 
                             backgroundImage: `url(${mechanic.backgroundImage})`,
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
@@ -42,7 +50,7 @@ export const LayoutType4 = ({ mechanic }: { mechanic: Mechanic }) => {
                         }} />
                      )}
                      
-                     {/* Gradient Glow */}
+                     {}
                      <Box sx={{ 
                          position: 'absolute', 
                          top: 0, 

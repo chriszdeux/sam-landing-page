@@ -1,8 +1,11 @@
-/**
- * Componente de Tabla Genérica
- * Soporta ordenamiento, filtrado y paginación (manual o automática)
- * Renderizado dinámico de columnas
- */
+// 1-Definir componente de tabla genérica reutilizable
+// 2-Gestionar estado de paginación y filtros
+// 3-Manejar cambios en filtros y ordenamiento
+// 4-Calcular datos filtrados y ordenados
+// 5-Manejar paginación
+// 6-Renderizar estructura de la tabla y controles
+
+//# 1-Definir componente de tabla genérica reutilizable
 import React, { useState, useMemo } from 'react';
 import {
   Table,
@@ -17,6 +20,7 @@ import {
 } from '@mui/material';
 import { Input } from './Input';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
+import { motion } from 'framer-motion';
 
 export interface Column<T> {
   Header: string;
@@ -48,6 +52,8 @@ export function GenericTable<T>({
   totalRows,
   page: propPage
 }: GenericTableProps<T>) {
+  
+  //# 2-Gestionar estado de paginación y filtros
   const [internalPage, setInternalPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pageSize);
   const [filters, setFilters] = useState<Record<string, string>>({});
@@ -55,8 +61,7 @@ export function GenericTable<T>({
 
   const page = manualPagination && propPage !== undefined ? propPage : internalPage;
 
-
-
+  //# 3-Manejar cambios en filtros y ordenamiento
   const handleFilterChange = (header: string, value: string) => {
     setFilters((prev) => ({ ...prev, [header]: value }));
     if (manualPagination && onPageChange) {
@@ -66,8 +71,6 @@ export function GenericTable<T>({
     }
   };
 
-
-
   const handleSort = (header: string) => {
       let direction: 'asc' | 'desc' = 'asc';
       if (sortConfig && sortConfig.key === header && sortConfig.direction === 'asc') {
@@ -76,7 +79,7 @@ export function GenericTable<T>({
       setSortConfig({ key: header, direction });
   };
 
-
+  //# 4-Calcular datos filtrados y ordenados
   const filteredData = useMemo(() => {
     return (data || []).filter((row) => {
       return columns.every((col) => {
@@ -86,8 +89,6 @@ export function GenericTable<T>({
         if (col.filterMethod) {
           return col.filterMethod(filterValue, row);
         }
-
-
 
         const cellValue = typeof col.accessor === 'function' 
             ? col.accessor(row) 
@@ -119,14 +120,16 @@ export function GenericTable<T>({
       });
   }, [filteredData, sortConfig, columns]);
 
-
+  //# 5-Manejar paginación
   const paginatedData = enablePagination && !manualPagination
-
     ? sortedData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
     : manualPagination && data.length > rowsPerPage
         ? sortedData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
         : sortedData;
 
+  
+  
+  //# 8-Manejo de cambios en el input page
   const handleChangePage = (event: unknown, newPage: number) => {
     if (manualPagination && onPageChange) {
         onPageChange(newPage);
@@ -135,6 +138,9 @@ export function GenericTable<T>({
     }
   };
 
+  
+  
+  //# 9-Manejo de cambios en el input rowsperpage
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     if (manualPagination && onPageChange) {
@@ -151,6 +157,9 @@ export function GenericTable<T>({
       return col.accessor ? row[col.accessor] : null;
   };
 
+  
+  
+  //# 10-Estructuración y renderizado visual del componente UI
   return (
     <Box sx={{ width: '100%' }}>
       <TableContainer component={Paper} sx={{ bgcolor: 'transparent', backgroundImage: 'none', boxShadow: 'none' }}>
@@ -195,17 +204,27 @@ export function GenericTable<T>({
           <TableBody>
             {paginatedData.length > 0 ? (
                 paginatedData.map((row, rowIndex) => (
-                <TableRow 
+                <motion.tr 
                     key={rowIndex} 
-                    hover
-                    sx={{ '&:hover': { bgcolor: 'rgba(255,255,255,0.05) !important' } }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: rowIndex * 0.05 }}
+                    style={{ 
+                        backgroundColor: 'transparent',
+                        borderBottom: '1px solid rgba(255,255,255,0.05)',
+                        cursor: 'default'
+                    }}
+                    className="hover:bg-white/5 transition-colors"
                 >
                     {columns.map((col) => {
                     const value = getValue(row, col);
+                    
+                    
+                    //# 11-Estructuración y renderizado visual del componente UI
                     return (
                         <TableCell 
                             key={col.Header}
-                            sx={{ color: 'white', borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+                            sx={{ color: 'white', borderBottom: 'none' }}
                         >
                         {col.Cell ? (
                             <col.Cell value={value} row={row} />
@@ -215,7 +234,7 @@ export function GenericTable<T>({
                         </TableCell>
                     );
                     })}
-                </TableRow>
+                </motion.tr>
                 ))
             ) : (
                 <TableRow>

@@ -1,3 +1,5 @@
+// 1-Estructuración y renderizado visual del componente UI
+
 'use client';
 
 import React from 'react';
@@ -10,6 +12,9 @@ import { architectureData } from '../../lib/data/architecture';
 import { motion } from 'framer-motion';
 
 export default function ArchitecturePage() {
+  
+  
+  //# 1-Estructuración y renderizado visual del componente UI
   return (
     <Box sx={{ minHeight: '100vh', position: 'relative' }}>
       <Background />
