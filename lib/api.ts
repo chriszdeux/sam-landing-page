@@ -1,13 +1,16 @@
+// 1-Configurar cliente Axios con URL base
+// 2-Interceptar peticiones para inyectar token
+
+//# 1-Configurar cliente Axios con URL base
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL, // Backend URL
+  baseURL: process.env.NEXT_PUBLIC_API_URL, 
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Add a request interceptor
 api.interceptors.request.use(
   (config) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;

@@ -1,8 +1,15 @@
+// 1-Importar dependencias y slices de economía
+// 2-Definir componente y estados del formulario
+// 3-Implementar lógica de compra y venta
+// 4-Renderizar formulario de intercambio de activos
+
 'use client';
 
 import React, { useState } from 'react';
 import { Box, Button, Typography, Stack, Alert, CircularProgress } from '@mui/material';
 import { Input } from '../ui/Input';
+
+//# 1-Importar dependencias y slices de economía
 import { useAppDispatch } from '../../lib/hooks';
 import { buyAsset, sellAsset } from '../../lib/features/economySlice';
 
@@ -13,12 +20,29 @@ interface BuySellFormsProps {
 }
 
 export const BuySellForms: React.FC<BuySellFormsProps> = ({ assetId, assetSymbol, currentPrice }) => {
+  
+  //# 2-Definir componente y estados del formulario
   const dispatch = useAppDispatch();
+  
+  
+  
   const [amount, setAmount] = useState('');
+  
+  
+  
   const [mode, setMode] = useState<'buy' | 'sell'>('buy');
+  
+  
+  
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  
+  
+  
   const [message, setMessage] = useState('');
 
+  
+  
+  //# 3-Implementar lógica de compra y venta
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
@@ -48,6 +72,9 @@ export const BuySellForms: React.FC<BuySellFormsProps> = ({ assetId, assetSymbol
 
   const totalCost = amount ? (Number(amount) * currentPrice).toFixed(2) : '0.00';
 
+  
+  
+  //# 4-Renderizar formulario de intercambio de activos
   return (
     <Box sx={{ p: 3, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 4, border: '1px solid rgba(255,255,255,0.1)' }}>
       <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
@@ -79,9 +106,9 @@ export const BuySellForms: React.FC<BuySellFormsProps> = ({ assetId, assetSymbol
             fullWidth
             sx={{
               '& .MuiInputBase-input': { color: 'white' },
-              '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' }, // This needs containerSx
-               // But sx passed to Input goes to input container.
-               // Label is rendered by Input component separately.
+              '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' }, 
+               
+               
             }}
             containerSx={{
                 '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' }

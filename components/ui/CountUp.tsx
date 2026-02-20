@@ -1,8 +1,8 @@
-/**
- * Componente Contador Animado
- * Anima números incrementales
- * Utiliza Framer Motion y requestAnimationFrame
- */
+// 1-Definir componente de animación numérica
+// 2-Efecto para animar el conteo
+// 3-Renderizar número animado
+
+//# 1-Definir componente de animación numérica
 'use client';
 
 import { useEffect, useRef } from 'react';
@@ -19,7 +19,8 @@ export const CountUp = ({ to, from = 0, duration = 2, className }: CountUpProps)
   const nodeRef = useRef<HTMLSpanElement>(null);
   const isInView = useInView(nodeRef, { once: true });
 
-  useEffect(() => {
+  //# 2-Efecto para animar el conteo
+  useEffect(function animateCount() {
     const node = nodeRef.current;
     if (!node || !isInView) return;
 
@@ -46,5 +47,6 @@ export const CountUp = ({ to, from = 0, duration = 2, className }: CountUpProps)
     };
   }, [to, from, duration, isInView]);
 
+  //# 3-Renderizar número animado
   return <span ref={nodeRef} className={className}>{from.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>;
 };

@@ -1,3 +1,6 @@
+// 1-Gestión de estado local para chart type
+// 2-Estructuración y renderizado visual del componente UI
+
 import React from 'react';
 import { Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { Doughnut, Radar, PolarArea, Bar } from 'react-chartjs-2';
@@ -17,6 +20,8 @@ interface PortfolioChartProps {
 }
 
 export const PortfolioChart: React.FC<PortfolioChartProps> = ({ assets, controls }) => {
+    
+    //# 1-Gestión de estado local para chart type
     const [chartType, setChartType] = React.useState('doughnut');
 
     const chartData = {
@@ -86,6 +91,9 @@ export const PortfolioChart: React.FC<PortfolioChartProps> = ({ assets, controls
         }
     };
 
+    
+    
+    //# 2-Estructuración y renderizado visual del componente UI
     return (
         <motion.div animate={controls}>
             <Box sx={{ position: 'relative', height: 400, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

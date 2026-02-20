@@ -1,10 +1,11 @@
-/**
- * Barra de Navegación Principal
- * Gestión de estado de navegación
- * Muestra información del usuario
- * Manejo de menú móvil
- * Integración de billetera y red
- */
+// 1-Importar dependencias y componentes de UI
+// 2-Definir componente y estados locales
+// 3-Obtener datos de Redux y hooks
+// 4-Efecto para sincronizar detalles de billetera
+// 5-Funciones para manejar eventos de usuario
+// 6-Renderizar estructura principal de la barra
+
+
 "use client";
 
 import React, { useState } from "react";
@@ -23,6 +24,8 @@ import {
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { Button } from "../ui/Button";
+
+//# 1-Importar dependencias y componentes de UI
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { setCurrentSection } from "../../lib/features/uiSlice";
 import { fetchWalletDetails } from "../../lib/features/auth/actions";
@@ -32,12 +35,13 @@ import { LogoutDialog } from "./LogoutDialog";
 import { NavbarUserMenu } from "./NavbarUserMenu";
 import { EnvVariables } from "@/lib/constants/variables";
 
-
-
-
 export const Navbar = () => {
+  
+  //# 2-Definir componente y estados locales
   const [mobileOpen, setMobileOpen] = useState(false);
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  
+  //# 3-Obtener datos de Redux y hooks
   const dispatch = useAppDispatch();
   const { userInfo, walletsInfo } = useAppSelector((state) => state.auth);
   const { networks, selectedNetwork: selectedNetworkState } = useAppSelector((state) => state.blockchain);
@@ -47,7 +51,10 @@ export const Navbar = () => {
 
   const selectedNetwork = networks.find(n => n.id === selectedNetworkState?.id) || networks[0];
 
-  React.useEffect(() => {
+  
+  
+  //# 4-Efecto para sincronizar detalles de la billetera
+  React.useEffect(function syncWalletData() {
       if (userInfo && userInfo.wallets && userInfo.wallets.length > 0) {
           const primaryWallet = userInfo.wallets[0];
           if (!walletsInfo) {
@@ -60,6 +67,9 @@ export const Navbar = () => {
     return null;
   }
 
+  
+  
+  //# 5-Funciones para manejar eventos de usuario
   const handleNavClick = (item: (typeof navItems)[0]) => {
     if (item.path === "/") {
       if (pathname !== "/") {
@@ -86,14 +96,15 @@ export const Navbar = () => {
       }
   };
 
-
-
+  
+  
+  //# 6-Renderizar estructura principal de la barra
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
         position="fixed"
         sx={{
-          bgcolor: "rgba(5, 5, 12, 0.8)", // Darker tech background
+          bgcolor: "rgba(5, 5, 12, 0.8)", 
           backdropFilter: "blur(16px)",
           borderBottom: "1px solid rgba(0, 243, 255, 0.1)",
           boxShadow: "0 10px 30px -10px rgba(0, 0, 0, 0.8)", 
@@ -103,7 +114,7 @@ export const Navbar = () => {
           backgroundSize: '30px 30px',
         }}
       >
-        {/* Decorative Top Line */}
+        {}
         <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent, #00f3ff, transparent)', opacity: 1, boxShadow: '0 0 15px #00f3ff' }} />
         
         <Toolbar sx={{ px: { xs: 2, md: 4 } }}>
@@ -168,6 +179,9 @@ export const Navbar = () => {
           >
             {navItems.filter(item => userInfo || item.path !== '/portfolio').map((item) => {
               const isActive = pathname === item.path;
+              
+              
+
               return (
                 <Box key={item.id} sx={{ position: 'relative' }}>
                     {isActive && (

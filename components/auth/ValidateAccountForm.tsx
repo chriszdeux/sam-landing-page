@@ -1,8 +1,9 @@
-/**
- * Formulario de Validación de Cuenta
- * Verifica el código enviado al correo electrónico del usuario
- * Completa el proceso de registro y permite el inicio de sesión
- */
+// 1-Definir componente de validación de cuenta
+// 2-Obtener despachador y estado
+// 3-Definir esquema de validación y manejo de envío
+// 4-Renderizar formulario de ingreso de código
+
+//# 1-Definir componente de validación de cuenta
 'use client';
 
 import React from 'react';
@@ -10,6 +11,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Typography, Alert, Stack, Box } from '@mui/material';
+
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { validateAccount } from '../../lib/features/auth';
 import { openModal } from '../../lib/features/uiSlice';
@@ -24,9 +26,12 @@ const validateSchema = z.object({
 type ValidateFormInputs = z.infer<typeof validateSchema>;
 
 export const ValidateAccountForm = () => {
+  
+  //# 2-Obtención del despachador y estado
   const dispatch = useAppDispatch();
   const { status, error } = useAppSelector((state) => state.auth);
-
+  
+  //# 3-Definir esquema de validación y manejo de envío
   const {
     register,
     handleSubmit,
@@ -43,6 +48,7 @@ export const ValidateAccountForm = () => {
     }
   };
 
+  //# 4-Renderizar formulario de ingreso de código
   return (
     <form onSubmit={handleSubmit(onSubmit)} style={{ height: '100%' }}>
       <Box sx={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>

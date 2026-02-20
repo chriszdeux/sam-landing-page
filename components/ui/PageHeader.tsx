@@ -1,9 +1,7 @@
-/**
- * Encabezado de Página Estilizado
- * Título y subtítulo con efectos visuales
- * Animación de entrada
- * Elementos decorativos (líneas, brackets)
- */
+// 1-Definir componente de encabezado de página
+// 2-Renderizar encabezado con título animado
+
+//# 1-Definir componente de encabezado de página
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -16,6 +14,7 @@ interface PageHeaderProps {
 
 export const PageHeader = ({ title, subtitle, color = '#00f3ff' }: PageHeaderProps) => {
   
+  //# 2-Renderizar encabezado con título animado
   return (
     <Box sx={{ mb: 8, position: 'relative', textAlign: 'center' }}>
       <motion.div
@@ -35,8 +34,6 @@ export const PageHeader = ({ title, subtitle, color = '#00f3ff' }: PageHeaderPro
             <Box sx={{ width: 60, height: 2, background: `linear-gradient(-90deg, transparent, ${color})` }} />
         </Box>
 
-
-
         <Typography  
             variant="h2" 
             component="h1"
@@ -54,8 +51,6 @@ export const PageHeader = ({ title, subtitle, color = '#00f3ff' }: PageHeaderPro
         >
           {title}
         </Typography>
-
-
 
         <Box sx={{ 
             display: 'inline-block',

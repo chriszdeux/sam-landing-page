@@ -1,3 +1,5 @@
+// 1-Lógica principal y renderizado del módulo
+
 import api from '../../api';
 
 import { RegistrationData } from './types';
@@ -32,8 +34,8 @@ export const validateAccountApi = async (data: { code: string }) => {
 export const getProfileApi = async () => {
   const response = await api.get('/auth/profile');
   if (!response || !response.data) {
-     // Optional: alert only on critical failures or rely on UI to handle the thrown error
-     // User asked to alert if response.data doesn't exist.
+     
+     
      if (typeof window !== 'undefined') alert("Error: No se pudo obtener el perfil");
      throw new Error("No profile data received");
   }

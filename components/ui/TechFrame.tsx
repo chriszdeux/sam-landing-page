@@ -1,8 +1,7 @@
-/**
- * Componente Marco Tecnológico
- * Contenedor con bordes y efectos de sci-fi
- * Incluye efectos de scanline y hover
- */
+// 1-Definir componente de marco tecnológico
+// 2-Renderizar contenedor con bordes animados y efectos
+
+//# 1-Definir componente de marco tecnológico
 import { Box, BoxProps } from '@mui/material';
 
 interface TechFrameProps extends BoxProps {
@@ -12,6 +11,7 @@ interface TechFrameProps extends BoxProps {
 }
 
 export const TechFrame = ({ children, color = '#ff0055', className, sx, ...props }: TechFrameProps) => (
+  //# 2-Renderizar contenedor con bordes animados y efectos
   <Box
     className={className}
     {...props}

@@ -1,3 +1,5 @@
+// 1-Estructuración y renderizado visual del componente UI
+
 import React from 'react';
 import { Box, Typography, Container, Grid } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -5,14 +7,17 @@ import { Mechanic } from '../../lib/data/mechanics';
 import { DefenseAnimation } from './DefenseAnimation';
 
 export const LayoutTypeDefense = ({ mechanic }: { mechanic: Mechanic }) => {
+    
+    
+    //# 1-Estructuración y renderizado visual del componente UI
     return (
     <Box sx={{ 
         width: '100%',
         minHeight: '100vh',
         position: 'relative',
-        bgcolor: '#050000' // Deep dark red/black background
+        bgcolor: '#050000' 
     }}>
-        {/* Cinematic Background Layer */}
+        {}
         {mechanic.backgroundImage && (
             <Box sx={{ 
                 position: 'fixed',
@@ -25,7 +30,7 @@ export const LayoutTypeDefense = ({ mechanic }: { mechanic: Mechanic }) => {
             }} />
         )}
 
-        {/* Dark Overlay Gradient */}
+        {}
         <Box sx={{ 
             position: 'fixed',
             inset: 0, 
@@ -35,7 +40,7 @@ export const LayoutTypeDefense = ({ mechanic }: { mechanic: Mechanic }) => {
 
     <Container maxWidth="xl" sx={{ pt: 25, pb: 10, position: 'relative', zIndex: 1 }}>
         
-        {/* Header Section */}
+        {}
         <Box sx={{ textAlign: 'center', mb: 15 }}>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
                 <Typography variant="h6" color={mechanic.color} gutterBottom sx={{ letterSpacing: 4 }}>SISTEMA DE DEFENSA</Typography>
@@ -50,7 +55,7 @@ export const LayoutTypeDefense = ({ mechanic }: { mechanic: Mechanic }) => {
             </motion.div>
         </Box>
 
-        {/* Intro Paragraphs */}
+        {}
         <Grid container spacing={4} sx={{ mb: 10 }}>
             {mechanic.content.paragraphs.map((p: string, i: number) => (
                 <Grid size={{ xs: 12, md: 4 }} key={i}>
@@ -73,7 +78,7 @@ export const LayoutTypeDefense = ({ mechanic }: { mechanic: Mechanic }) => {
             ))}
         </Grid>
 
-        {/* Central Animation Section */}
+        {}
         <Box sx={{ mb: 10 }}>
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}

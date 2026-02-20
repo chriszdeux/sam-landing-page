@@ -1,6 +1,12 @@
+// 1-Importar dependencias para acciones asíncronas
+// 2-Acción para obtener listado de criptomonedas
+// 3-Acción para obtener historial de precios
+
+//# 1-Importar dependencias para acciones asíncronas
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { getCryptosApi, getCryptoHistoryApi } from './api';
 
+//# 2-Acción para obtener listado de criptomonedas
 export const fetchCryptos = createAsyncThunk(
     'market/fetchCryptos',
     async (args: string | { networkId?: string; page?: number; limit?: number } = 'ETH-SEPOLIA', { rejectWithValue }) => {
@@ -17,15 +23,21 @@ export const fetchCryptos = createAsyncThunk(
         }
     },
     {
-        condition: (_, { getState }) => {
-            const { market } = getState() as { market: { isLoading: boolean } };
+        condition: (args, { getState }) => {
+            const { market } = getState() as { market: { isLoading: boolean; lastFetch?: number; lastArgs?: string } };
             if (market.isLoading) {
+                return false;
+            }
+            if (market.lastFetch && 
+                Date.now() - market.lastFetch < 240000 && // 4 minutes
+                market.lastArgs === JSON.stringify(args)) {
                 return false;
             }
         },
     }
 );
 
+//# 3-Acción para obtener historial de precios
 export const fetchCryptoHistory = createAsyncThunk(
     'market/fetchCryptoHistory',
     async ({ cryptoId, range }: { cryptoId: string; range: string }, { rejectWithValue, signal }) => {

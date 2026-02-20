@@ -1,9 +1,8 @@
-/**
- * Fondo de Partículas Interactivo
- * Renderizado en HTML5 Canvas con 2D Context
- * Simulación física (movimiento, repulsión, fricción)
- * Efectos visuales de conexión y electricidad
- */
+// 1-Definir componente de fondo de partículas canvas
+// 2-Inicializar y dibujar partículas y conexiones
+// 3-Renderizar elemento canvas
+
+//# 1-Definir componente de fondo de partículas canvas
 'use client';
 
 import React, { useEffect, useRef } from 'react';
@@ -21,7 +20,8 @@ interface Particle {
 export const ParticleBackground = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
+  //# 2-Inicializar y dibujar partículas y conexiones
+  useEffect(function initParticleSystem() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -199,6 +199,9 @@ export const ParticleBackground = () => {
     };
   }, []);
 
+  
+  
+  //# 5-Estructuración y renderizado visual del componente UI
   return (
     <>
     <Box

@@ -1,8 +1,7 @@
-/**
- * Componente Sección Base
- * Contenedor estándar con animación de entrada
- * Wrapper de Container maxWidth="xl"
- */
+// 1-Definir componente de sección con scroll reveal
+// 2-Renderizar sección con animación de entrada
+
+//# 1-Definir componente de sección con scroll reveal
 import React from 'react';
 import { Box, Container } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -14,6 +13,8 @@ interface SectionProps {
 }
 
 export const Section = ({ id, children, className }: SectionProps) => {
+  
+  //# 2-Renderizar sección con animación de entrada
   return (
     <Box
       component={motion.section}

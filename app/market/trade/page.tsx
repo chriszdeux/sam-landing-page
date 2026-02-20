@@ -1,21 +1,38 @@
-/**
- * Importación de hooks, componentes y utilidades.
- * Definición de tipos para datos del formulario.
- * Componente principal con lógica de negocio y estado.
- * Efectos para cargar tarifas y manejar redirección.
- * Manejadores de cambios en inputs y selección de wallet.
- * Validación previa y ejecución de transacciones.
- * Renderizado de estados de éxito o carga.
- * Estructura visual del formulario de comercio.
- */
+// 1-Efecto secundario para sincronización del ciclo de vida
+// 2-Obtención del despachador para emitir acciones al store
+// 3-Obtención del despachador para emitir acciones al store
+// 4-Manejo de datos de formulario para form
+// 5-Gestión de estado local para status
+// 6-Gestión de errores y excepciones para error msg
+// 7-Estado de apertura para modal o menú confirm modal open
+// 8-Selección de datos desde el estado global de Redux
+// 9-Selección de datos desde el estado global de Redux
+// 10-Selección de datos desde el estado global de Redux
+// 11-Gestión de estado local para network fee
+// 12-Efecto secundario para sincronización del ciclo de vida
+// 13-Efecto secundario para sincronización del ciclo de vida
+// 14-Estructuración y renderizado visual del componente UI
+// 15-Efecto secundario para sincronización del ciclo de vida
+// 16-Estructuración y renderizado visual del componente UI
+// 17-Manejo de cambios en el input genérico
+// 18-Selección de ítem y actualización de wallet
+// 19-Manejo de lógica de usuario para handleSetMax
+// 20-Procesamiento de envío de formulario para pre
+// 21-Manejo de lógica de usuario para handleConfirmTransaction
+// 22-Estructuración y renderizado visual del componente UI
+// 23-Estructuración y renderizado visual del componente UI
+// 24-Estructuración y renderizado visual del componente UI
 
 'use client';
 
+//# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Box, Container, Typography, Button, Alert, Stack, SelectChangeEvent } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Background } from '../../../components/layout/Background';
+
+//# 2-Obtención del despachador para emitir acciones al store
 import { useAppSelector, useAppDispatch } from '../../../lib/hooks';
 import { updateBalance, updateWalletAssets } from '../../../lib/features/auth/reducer';
 import { refreshUserInfo } from '../../../lib/features/auth/actions';
@@ -37,11 +54,16 @@ interface TradeFormData {
 
 const TradeContent = () => {
   const router = useRouter();
+  
+  //# 3-Obtención del despachador para emitir acciones al store
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
   const transactionType = (searchParams.get('type') as 'BUY' | 'SELL' | 'TRANSFER') || 'BUY';
   const cryptoIdParam = searchParams.get('cryptoId') || '';
 
+  
+  
+  //# 4-Manejo de datos de formulario para form
   const [form, setForm] = useState<TradeFormData>({
     walletId: '',
     cryptoId: cryptoIdParam,
@@ -49,16 +71,37 @@ const TradeContent = () => {
     quantity: 0
   });
 
+  
+  
+  //# 5-Gestión de estado local para status
   const [status, setStatus] = useState<'IDLE' | 'PROCESSING' | 'SUCCESS' | 'ERROR'>('IDLE');
+  
+  
+  //# 6-Gestión de errores y excepciones para error msg
   const [errorMsg, setErrorMsg] = useState('');
+  
+  
+  //# 7-Estado de apertura para modal o menú confirm modal open
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
+  
+  //# 8-Selección de datos desde el estado global de Redux
   const { cryptos } = useAppSelector((state) => state.market);
+  
+  //# 9-Selección de datos desde el estado global de Redux
   const { userInfo, walletsInfo } = useAppSelector((state) => state.auth);
+  
+  //# 10-Selección de datos desde el estado global de Redux
   const { selectedNetwork } = useAppSelector((state) => state.blockchain);
 
+  
+  
+  //# 11-Gestión de estado local para network fee
   const [networkFee, setNetworkFee] = useState<number | null>(null);
 
+  
+  
+  //# 12-Efecto secundario para sincronización del ciclo de vida
   useEffect(() => {
     const fetchFee = async () => {
         if (selectedNetwork?.id) {
@@ -75,15 +118,24 @@ const TradeContent = () => {
     fetchFee();
   }, [selectedNetwork?.id]);
 
+  
+  
+  //# 13-Efecto secundario para sincronización del ciclo de vida
   useEffect(() => {
     if (cryptoIdParam && form.cryptoId !== cryptoIdParam) {
         const timer = setTimeout(() => {
             setForm(prev => ({ ...prev, cryptoId: cryptoIdParam }));
         }, 0);
+        
+        
+        //# 14-Estructuración y renderizado visual del componente UI
         return () => clearTimeout(timer);
     }
   }, [cryptoIdParam, form.cryptoId]);
 
+  
+  
+  //# 15-Efecto secundario para sincronización del ciclo de vida
   useEffect(() => {
     if (status === 'SUCCESS') {
         const timer = setTimeout(() => {
@@ -96,10 +148,16 @@ const TradeContent = () => {
                 router.push('/market');
             }
         }, 3000); 
+        
+        
+        //# 16-Estructuración y renderizado visual del componente UI
         return () => clearTimeout(timer);
     }
   }, [status, router, searchParams, form.cryptoId]);
 
+  
+  
+  //# 17-Manejo de cambios en el input genérico
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
     const { name, value } = e.target;
     setForm(prev => ({
@@ -108,6 +166,9 @@ const TradeContent = () => {
     }));
   };
 
+  
+  
+  //# 18-Selección de ítem y actualización de wallet
   const handleWalletSelect = (walletId: string) => {
       setForm(prev => ({ ...prev, walletId }));
   };
@@ -117,12 +178,18 @@ const TradeContent = () => {
   const selectedAsset = walletsInfo?.store?.find(a => a.id === form.cryptoId || a.symbol === selectedCrypto?.identification.symbol);
   const availableQuantity = selectedAsset ? Number(selectedAsset.quantity) : 0;
 
+  
+  
+  //# 19-Manejo de lógica de usuario para handleSetMax
   const handleSetMax = () => {
     if (availableQuantity > 0) {
         setForm(prev => ({ ...prev, quantity: availableQuantity }));
     }
   };
 
+  
+  
+  //# 20-Procesamiento de envío de formulario para pre
   const handlePreSubmit = () => {
     if (!form.walletId || !form.cryptoId) {
         setErrorMsg('Por favor selecciona una wallet y una criptomoneda.');
@@ -153,6 +220,9 @@ const TradeContent = () => {
     setConfirmModalOpen(true);
   };
 
+  
+  
+  //# 21-Manejo de lógica de usuario para handleConfirmTransaction
   const handleConfirmTransaction = async () => {
     setConfirmModalOpen(false);
     setStatus('PROCESSING');
@@ -216,6 +286,9 @@ const TradeContent = () => {
   };
 
   if (status === 'SUCCESS' || status === 'PROCESSING') {
+      
+      
+      //# 22-Estructuración y renderizado visual del componente UI
       return (
           <Container maxWidth="md" sx={{ pt: 15, textAlign: 'center' }}>
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -250,6 +323,9 @@ const TradeContent = () => {
       );
   }
 
+  
+  
+  //# 23-Estructuración y renderizado visual del componente UI
   return (
     <Container maxWidth="md" sx={{ pt: 15, pb: 10 }}>
         <Box sx={{ width: '100%', maxWidth: 600, mx: 'auto' }}>
@@ -310,6 +386,9 @@ const TradeContent = () => {
 };
 
 export default function TradePage() {
+    
+    
+    //# 24-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{ minHeight: '100vh', position: 'relative' }}>
             <Background />

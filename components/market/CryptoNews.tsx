@@ -1,8 +1,7 @@
-/**
- * Componente de Noticias Cripto
- * Muestra las últimas novedades relacionadas con el activo
- * Diseño de tarjetas con resumen y fecha
- */
+// 1-Definir componente de noticias de criptomonedas
+// 2-Renderizar lista de noticias
+
+//# 1-Definir componente de noticias de criptomonedas
 'use client';
 
 import React from 'react';
@@ -17,6 +16,8 @@ const newsItems = [
 ];
 
 export const CryptoNews = ({ name }: { name: string }) => {
+  
+  //# 2-Renderizar lista de noticias
   return (
     <Box>
         <Typography variant="h6" sx={{ mb: 2, color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 1 }}>

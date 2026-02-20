@@ -1,8 +1,9 @@
-/**
- * Formulario de Registro
- * Recopila datos del nuevo usuario y gestiona el proceso de registro
- * Almacena credenciales temporales para inicio de sesión automático
- */
+// 1-Definir componente de formulario de registro
+// 2-Obtener despachador y router
+// 3-Seleccionar estado de autenticación
+// 4-Renderizar formulario con validación Zod
+
+//# 1-Definir componente de formulario de registro
 'use client';
 
 import React from 'react';
@@ -12,6 +13,7 @@ import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { useRouter } from 'next/navigation';
 import { setRegistrationData } from '../../lib/features/auth/reducer';
@@ -19,10 +21,6 @@ import { closeModal } from '../../lib/features/uiSlice';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { TechFrame } from '../ui/TechFrame';
-
-
-
-
 
 const registerSchema = z.object({
   name: z.string().min(2, 'El nombre es requerido'),
@@ -37,8 +35,12 @@ const registerSchema = z.object({
 type RegisterFormInputs = z.infer<typeof registerSchema>;
 
 export const RegisterForm = () => {
+  
+  //# 2-Obtención del despachador y router
   const dispatch = useAppDispatch();
   const router = useRouter();
+  
+  //# 3-Selección de datos desde el estado global de Redux
   const { status, error } = useAppSelector((state) => state.auth);
 
   const {
@@ -57,12 +59,12 @@ export const RegisterForm = () => {
     dispatch(closeModal());
     router.push('/auth/verify');
   };
-
+  
+  //# 4-Renderizar formulario con validación Zod
   return (
     <form onSubmit={handleSubmit(onSubmit)} style={{ height: '100%' }}>
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} style={{ height: '100%' }}>
         
-
 
         <Box sx={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
             

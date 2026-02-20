@@ -1,3 +1,5 @@
+// 1-Lógica principal y renderizado del módulo
+
 export interface CryptoAsset {
   id: string;
   symbol: string;

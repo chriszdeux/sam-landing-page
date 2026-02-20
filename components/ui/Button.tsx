@@ -1,7 +1,7 @@
-/**
- * Componente Botón Personalizado
- * Extiende MUI Button con props de brillo (glow)
- */
+// 1-Definir componente de botón personalizado
+// 2-Renderizar botón con estilos condicionales
+
+//# 1-Definir componente de botón personalizado
 import React from 'react';
 import { Button as MuiButton, ButtonProps as MuiButtonProps } from '@mui/material';
 
@@ -10,6 +10,8 @@ interface ButtonProps extends MuiButtonProps {
 }
 
 export const Button = ({ glow, sx, ...props }: ButtonProps) => {
+  
+  //# 2-Renderizar botón con estilos condicionales
   return (
     <MuiButton
       sx={{

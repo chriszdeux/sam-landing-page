@@ -1,9 +1,6 @@
-/**
- * Sección de Historia/Cronología
- * Componentes visuales personalizados (TechFrame, DataLog)
- * Animaciones complejas con GSAP (ScrollTrigger)
- * Renderizado de eventos históricos
- */
+// 1-Estructuración y renderizado visual del componente UI
+// 2-Estructuración y renderizado visual del componente UI
+
 'use client';
 
 import React, { useRef } from 'react';
@@ -149,6 +146,9 @@ export const HistorySection = () => {
 
   }, { scope: container });
 
+  
+  
+  //# 1-Estructuración y renderizado visual del componente UI
   return (
     <Section id="history" className="overflow-hidden">
       <Box ref={container}>
@@ -170,7 +170,7 @@ export const HistorySection = () => {
 
               <Box className="history-year-header" sx={{ textAlign: 'center', mb: 10 }}>
                   <Typography variant="overline" sx={{ color: '#ffb700', letterSpacing: 8, fontSize: '1.2rem', display: 'block', mb: 2 }}>
-                      AÑO // {eventData.year}
+                      AÑO 
                   </Typography>
                   <Typography variant="h3" sx={{ 
                       fontSize: { xs: '1.8rem', md: '4rem' }, 
@@ -192,6 +192,9 @@ export const HistorySection = () => {
                   {eventData.details.map((detail, index) => {
                       const isEven = index % 2 === 0;
                       
+                      
+                      
+                      //# 2-Estructuración y renderizado visual del componente UI
                       return (
                           <React.Fragment key={`${eventData.year}-${index}`}>
 
@@ -212,8 +215,6 @@ export const HistorySection = () => {
                                       ))}
                                   </DataLog>
                               </Grid>
-
-
 
                               <Grid 
                                 size={{ xs: 12, md: 6 }} 

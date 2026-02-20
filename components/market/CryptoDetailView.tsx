@@ -1,14 +1,10 @@
-/**
- * Importación de UI, gráficos y herramientas de Redux.
- * Definición de props para el componente de detalle.
- * Inicialización de router y selección de datos del store.
- * Manejo de selección de rango de tiempo para gráficos.
- * Lógica de carga y redirección si no hay datos.
- * Renderizado de encabezado con estadísticas y estado.
- * Visualización de gráfico, historial y sentimiento de mercado.
- * Panel lateral con acciones de compra/venta y detalles info.
- */
+// 1-Definir vista de detalles de criptomoneda
+// 2-Obtener estado global, autenticación y configuración
+// 3-Manejar navegación a transacción
+// 4-Renderizar vista de carga o error
+// 5-Renderizar detalles completos de la criptomoneda
 
+//# 1-Definir vista de detalles de criptomoneda
 'use client';
 
 import React from 'react';
@@ -22,6 +18,7 @@ import { TransactionHistory } from './TransactionHistory';
 import { MarketSentiment } from './MarketSentiment';
 import { Card } from '../ui/Card';
 import { TaoIcon } from '../ui/TaoIcon';
+
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { addNotification } from '../../lib/features/uiSlice';
 
@@ -31,6 +28,8 @@ interface CryptoDetailViewProps {
 
 export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
     const router = useRouter();
+    
+    //# 2-Obtener estado global, autenticación y configuración
     const dispatch = useAppDispatch();
     const { cryptos, isLoading } = useAppSelector((state) => state.market);
     const { token } = useAppSelector((state) => state.auth);
@@ -39,6 +38,7 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
     
     const crypto = cryptos.find((c) => c.id === id);
 
+    //# 3-Manejar navegación a transacción
     const handleTransaction = (type: 'BUY' | 'SELL' | 'TRANSFER') => {
         if (!token) {
             dispatch(addNotification({
@@ -50,6 +50,7 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
         router.push(`/market/trade?type=${type}&cryptoId=${id}&redirect=detail`);
     };
 
+    //# 4-Renderizar vista de carga o error
     if (isLoading && !crypto) {
         return (
             <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#000' }}>
@@ -73,6 +74,7 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
         `${crypto.identification.name} is a cryptocurrency on the ${crypto.network.name} network.`
     ];
 
+    //# 5-Renderizar detalles completos de la criptomoneda
     return (
         <Box sx={{ minHeight: '100vh', position: 'relative', overflow: 'hidden', pt: 10, pb: 10 }}>
             <ParticleBackground />
@@ -119,8 +121,6 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                                 </Stack>
                             </Box>
                         </Stack>
-
-
 
                         <Box sx={{ textAlign: { xs: 'left', md: 'right' } }}>
                             <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 1 }}>

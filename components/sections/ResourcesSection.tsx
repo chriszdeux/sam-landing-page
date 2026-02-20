@@ -1,8 +1,5 @@
-/**
- * Sección de Recursos
- * Visualización de recursos galácticos disponibles
- * Animaciones coordinadas para elementos de la UI
- */
+// 1-Estructuración y renderizado visual del componente UI
+
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -60,6 +57,9 @@ export const ResourcesSection = () => {
 
   }, { scope: container });
 
+  
+  
+  //# 1-Estructuración y renderizado visual del componente UI
   return (
     <Section id="resources">
       <Box ref={container}>
@@ -68,8 +68,6 @@ export const ResourcesSection = () => {
                 Recursos Galácticos
             </SectionTitle>
         </Box>
-
-
 
         <Grid container spacing={4} justifyContent="center" alignItems="stretch" className="resources-grid">
             {previewResources.map((resource, index) => (

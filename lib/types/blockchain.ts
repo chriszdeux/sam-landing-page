@@ -1,7 +1,15 @@
+// 1-Definir propiedades de minería e información básica
+// 2-Definir información adicional y rangos de tarifas
+// 3-Definir estados y niveles de carga de la red
+// 4-Definir propiedades detalladas de la blockchain
+// 5-Definir interfaces para tokens, transacciones y pools
+// 6-Definir interfaz principal de la blockchain
+
+//# 1-Definir propiedades de minería e información básica
 export interface MiningProps {
-  baseWorkRequired: number; // Variable value
-  workIncreaseFactor: number; // Float value
-  rewardReductionFactor: number; // Float value
+  baseWorkRequired: number; 
+  workIncreaseFactor: number; 
+  rewardReductionFactor: number; 
 }
 
 export interface BlockchainInfo {
@@ -10,11 +18,12 @@ export interface BlockchainInfo {
   image?: string;
 }
 
+//# 2-Definir información adicional y rangos de tarifas
 export interface AdditionalInfo {
   description: string[];
   color: string;
-  dateCreated: string; // Changed to string for frontend serialization
-  lastUpdated?: string; // Changed to string for frontend serialization
+  dateCreated: string; 
+  lastUpdated?: string; 
   developers: string[];
 }
 
@@ -23,7 +32,7 @@ export interface FeeRange {
   max: number;
 }
 
-// Enum placeholders based on usage context
+//# 3-Definir estados y niveles de carga de la red
 export enum BlockchainStatus {
   Active = 'Active',
   Inactive = 'Inactive',
@@ -37,6 +46,7 @@ export enum NetworkLoadLevel {
   Congested = 'Congested'
 }
 
+//# 4-Definir propiedades detalladas de la blockchain
 export interface BlockchainProps {
   miningProps?: MiningProps;
   initialNodeCount: number;
@@ -44,7 +54,7 @@ export interface BlockchainProps {
   blockCount?: number;
   blockInterval: number;
   runningProcess: boolean;
-  lastRunDate: string; // Changed to string
+  lastRunDate: string; 
   difficulty: number;
   fees?: FeeRange;
   feeBase: number;
@@ -54,9 +64,10 @@ export interface BlockchainProps {
   maxSupply: number;
   marketCap: number;
   status?: BlockchainStatus;
-  operationStatus?: NetworkLoadLevel; // mostrar 3 estados
+  operationStatus?: NetworkLoadLevel; 
 }
 
+//# 5-Definir interfaces para tokens, transacciones y pools
 export interface CryptoGenesis {
   id: string;
   name: string;
@@ -76,12 +87,12 @@ export interface TransactionsProps {
   transactionStoreID: string;
 }
 
-// Stub for missing interface
 export interface BlockchainPoolNetwork {
     poolID: string;
-    // Add other fields if known
+    
 }
 
+//# 6-Definir interfaz principal de la blockchain
 export interface BlockchainInterface {
   id: string;
   identification: BlockchainInfo;

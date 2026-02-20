@@ -1,3 +1,5 @@
+// 1-Estructuración y renderizado visual del componente UI
+
 'use client';
 
 import React from 'react';
@@ -10,8 +12,6 @@ import { Button } from '../../components/ui/Button';
 import Image from 'next/image';
 import { ParticleBackground } from '../../components/ui/ParticleBackground';
 import { EnvVariables } from '@/lib/constants/variables';
-
-// Custom components for the Sci-Fi aesthetic
 
 const TechFrame = ({ children, color = '#00f3ff' }: { children: React.ReactNode; color?: string }) => (
   <Box
@@ -38,7 +38,7 @@ const TechFrame = ({ children, color = '#00f3ff' }: { children: React.ReactNode;
       bgcolor: 'rgba(0,0,0,0.5)',
     }}>
       {children}
-      {/* Scanline effect */}
+      {}
       <Box sx={{
         position: 'absolute',
         top: 0,
@@ -87,6 +87,9 @@ export default function InfiniteExplorationPage() {
     const { project } = EnvVariables;
     const router = useRouter();
 
+  
+  
+  //# 1-Estructuración y renderizado visual del componente UI
   return (
     <>
       <ParticleBackground />
@@ -106,11 +109,11 @@ export default function InfiniteExplorationPage() {
         pt: 16, 
         pb: 12,
         overflow: 'hidden',
-        position: 'relative', // Ensure context for children
+        position: 'relative', 
         zIndex: 1
       }}>
         <Container maxWidth="xl">
-          {/* HERO SECTION */}
+          {}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -118,7 +121,7 @@ export default function InfiniteExplorationPage() {
           >
             <Box sx={{ textAlign: 'center', mb: 16, position: 'relative' }}>
               <Typography variant="overline" sx={{ color: '#ffb700', letterSpacing: 8, fontSize: '1.2rem', display: 'block', mb: 2 }}>
-                SYSTEM OVERRIDE // CLASSIFIED
+                SYSTEM OVERRIDE 
               </Typography>
               <Typography variant="h1" sx={{
                 fontSize: { xs: '3rem', md: '6rem' },
@@ -136,10 +139,10 @@ export default function InfiniteExplorationPage() {
             </Box>
           </motion.div>
 
-          {/* CONTENT GRID */}
+          {}
           <Grid container spacing={8} alignItems="center">
             
-            {/* BLOCK 1: Text Left, Image Right */}
+            {}
             <Grid size={{ xs: 12, md: 6 }}>
               <motion.div initial={{ x: -100, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
                 <DataLog title="Más allá de la Heliosfera" date="2065.04.12">
@@ -163,7 +166,7 @@ export default function InfiniteExplorationPage() {
               </motion.div>
             </Grid>
 
-            {/* BLOCK 2: Image Left, Text Right */}
+            {}
              <Grid size={{ xs: 12, md: 6 }} sx={{ order: { xs: 2, md: 1 } }}>
               <motion.div initial={{ x: -100, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
                 <TechFrame color="#ffb700">
@@ -197,7 +200,7 @@ export default function InfiniteExplorationPage() {
               </motion.div>
             </Grid>
             
-            {/* BLOCK 3: Text Left, Image Right */}
+            {}
             <Grid size={{ xs: 12, md: 6 }}>
               <motion.div initial={{ x: -100, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} transition={{ duration: 0.8 }} viewport={{ once: true }}>
                  <DataLog title="La Soberanía Estelar" date="2088.01.01">

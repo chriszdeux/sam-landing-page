@@ -1,9 +1,8 @@
+// 1-Definir componente de visualización de datos blockchain
+// 2-Renderizar estado vacío
+// 3-Renderizar datos de la red con animaciones
 
-/**
- * Componente para Visualización de Datos Blockchain
- * Muestra métricas detalladas y estado de la red seleccionada
- * Incluye animaciones de escaneo y visualización de identidad
- */
+//# 1-Definir componente de visualización de datos blockchain
 import React from 'react';
 import { Box, Typography, Paper, Avatar } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -16,6 +15,8 @@ interface BlockchainDataDisplayProps {
 export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ network }) => {
 
   if (!network) {
+    
+    //# 2-Renderizar estado vacío
     return (
         <Paper sx={{ p: 4, bgcolor: 'rgba(10,12,16,0.8)', border: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
             <Typography color="text.secondary">Seleccione una red para ver sus datos.</Typography>
@@ -36,6 +37,7 @@ export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ ne
     }
   };
 
+  //# 3-Renderizar datos de la red con animaciones
   return (
     <Box sx={{ width: '100%', mb: 6 }}>
         <motion.div
@@ -117,17 +119,10 @@ export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ ne
                      </Box>
                  </Box>
 
-
                  <Box component="img" src={identification.image} sx={{ position: 'absolute', top: -20, right: -20, opacity: 0.05, width: 300, height: 300 }} alt="" />
             </Paper>
         </motion.div>
     </Box>
   );
 };
-
-
-
-
-
-
 

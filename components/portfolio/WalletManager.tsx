@@ -1,27 +1,54 @@
+// 1-Obtención del despachador para emitir acciones al store
+// 2-Obtención del despachador para emitir acciones al store
+// 3-Selección de datos desde el estado global de Redux
+// 4-Estado de apertura para modal o menú open dialog
+// 5-Gestión de estado local para label
+// 6-Gestión de estado local para wallet address
+// 7-Gestión de estado local para snackbar
+// 8-Manejo de lógica de usuario para handleAddWallet
+// 9-Manejo de lógica de usuario para handleRemoveWallet
+// 10-Manejo de lógica de usuario para handleCopyToClipboard
+// 11-Estructuración y renderizado visual del componente UI
+
 'use client';
 
 import React, { useState } from 'react';
-import { Box, Typography, Grid, Avatar, Button, Dialog, Snackbar, Alert, IconButton } from '@mui/material';
-import { Input } from '../ui/Input';
+import { Box, Typography, Grid, Avatar, Button, Snackbar, Alert, IconButton } from '@mui/material';
 import { TechFrame } from '../ui/TechFrame';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { AddWalletDialog } from './AddWalletDialog';
+
+//# 1-Obtención del despachador para emitir acciones al store
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { addWallet, removeWallet } from '../../lib/features/auth/actions';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export const WalletManager = () => {
+    
+    //# 2-Obtención del despachador para emitir acciones al store
     const dispatch = useAppDispatch();
+    
+    //# 3-Selección de datos desde el estado global de Redux
     const { userInfo } = useAppSelector((state) => state.auth);
 
+    
+    
+    //# 4-Estado de apertura para modal o menú open dialog
     const [openDialog, setOpenDialog] = useState(false);
-    const [label, setLabel] = useState('');
-    const [walletAddress, setWalletAddress] = useState('');
+    
+    
+    
+    
+    //# 7-Gestión de estado local para snackbar
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
 
-    const handleAddWallet = async () => {
+    
+    
+    //# 8-Manejo de lógica de usuario para handleAddWallet
+    const handleAddWallet = async (label: string, walletAddress: string) => {
         if (!label || !walletAddress) {
             setSnackbar({ open: true, message: 'Please fill in all fields', severity: 'error' });
             return;
@@ -33,8 +60,6 @@ export const WalletManager = () => {
             if (addWallet.fulfilled.match(resultAction)) {
                  setSnackbar({ open: true, message: 'Wallet added successfully!', severity: 'success' });
                  setOpenDialog(false);
-                 setLabel('');
-                 setWalletAddress('');
             } else {
                 setSnackbar({ open: true, message: resultAction.payload as string || 'Failed to add wallet', severity: 'error' });
             }
@@ -43,6 +68,9 @@ export const WalletManager = () => {
         }
     };
 
+    
+    
+    //# 9-Manejo de lógica de usuario para handleRemoveWallet
     const handleRemoveWallet = async (walletAddress: string) => {
         if (!userInfo?.id) return;
         try {
@@ -57,6 +85,9 @@ export const WalletManager = () => {
         }
     };
 
+    
+    
+    //# 10-Manejo de lógica de usuario para handleCopyToClipboard
     const handleCopyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
         setSnackbar({ open: true, message: 'Address copied to clipboard', severity: 'success' });
@@ -64,101 +95,122 @@ export const WalletManager = () => {
 
     if (!userInfo) return null;
 
+    
+    
+    //# 11-Estructuración y renderizado visual del componente UI
     return (
         <Box sx={{ mb: 8 }}>
-            {/* Xbox Dashboard Layout Container */}
+            {}
             <Box sx={{ overflowX: 'hidden', p: 1 }}>
                 
-                {/* Header Status Bar style */}
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, borderBottom: '2px solid rgba(255,255,255,0.1)', pb: 2 }}>
-                    <Typography variant="h3" sx={{ color: 'white', fontWeight: 'bold', letterSpacing: 1, mr: 3 }}>
-                        PORTFOLIO
-                    </Typography>
-                    <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 'light', textTransform: 'uppercase' }}>
-                        Dashboard
-                    </Typography>
-                </Box>
-
-                <Grid container spacing={3}>
-                    {/* MAIN CONTENT - ACTIVE APPS STYLE (Mis Wallets) */}
-                    <Grid size={{ xs: 12, md: 8, lg: 9 }}>
-                        <Typography variant="overline" sx={{ color: '#00f3ff', fontWeight: 'bold', mb: 2, display: 'block', letterSpacing: 4 }}>
-                            {'// ACTIVOS_LOCALES'}
-                        </Typography>
+                {}
+                <Grid container spacing={4} sx={{ display: 'flex', flexWrap: 'wrap-reverse' }}>
+                    <Grid size={{ xs: 12 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                             <Typography variant="overline" sx={{ color: '#00f3ff', fontWeight: 'bold', letterSpacing: 2 }}>
+                                {'// MIS_BILLETERAS'}
+                            </Typography>
+                            <Button
+                                variant="outlined"
+                                startIcon={<AddCircleOutlineIcon />}
+                                onClick={() => setOpenDialog(true)}
+                                size="small"
+                                sx={{
+                                    color: '#00f3ff',
+                                    borderColor: 'rgba(0, 243, 255, 0.3)',
+                                    fontSize: '0.7rem',
+                                    '&:hover': { borderColor: '#00f3ff', bgcolor: 'rgba(0, 243, 255, 0.1)' }
+                                }}
+                            >
+                                NUEVA WALLET
+                            </Button>
+                        </Box>
                         
-                        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 3 }}>
+                        <Box sx={{ 
+                            display: 'flex', 
+                            gap: 2, 
+                            overflowX: 'auto', 
+                            pb: 2,
+                            '::-webkit-scrollbar': { height: 6 },
+                            '::-webkit-scrollbar-track': {  background: 'rgba(255, 255, 255, 0.05)' },
+                            '::-webkit-scrollbar-thumb': { background: '#00f3ff', borderRadius: 4 }
+                        }}>
                             {userInfo.wallets && userInfo.wallets.map((wallet, index) => (
-                                <Box key={index} sx={{ height: 200 }}>
-                                    <TechFrame color="#00f3ff" className="h-full">
+                                <Box key={index} sx={{ minWidth: 320, maxWidth: 320 }}>
+                                    <TechFrame color="#00f3ff">
                                         <Box sx={{ 
                                             p: 3,
-                                            height: '100%',
+                                            height: 180,
                                             display: 'flex',
                                             flexDirection: 'column',
                                             justifyContent: 'space-between',
-                                            position: 'relative'
+                                            position: 'relative',
+                                            background: 'linear-gradient(135deg, rgba(0, 243, 255, 0.1) 0%, rgba(0,0,0,0) 100%)',
+                                            transition: 'transform 0.2s',
+                                            '&:hover': { transform: 'translateY(-4px)' }
                                         }}>
                                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                                 <Box>
-                                                    <Typography variant="overline" sx={{ color: 'rgba(0, 243, 255, 0.6)', letterSpacing: 2 }}>
-                                                        LOCAL_WALLET_NODES
-                                                    </Typography>
-                                                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: 'white', mt: 1 }}>
-                                                        {wallet.label}
-                                                    </Typography>
+                                                    <Box sx={{ 
+                                                        width: 40, 
+                                                        height: 28, 
+                                                        bgcolor: 'rgba(255, 215, 0, 0.15)', 
+                                                        border: '1px solid rgba(255, 215, 0, 0.3)', 
+                                                        borderRadius: 1, 
+                                                        mb: 2,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center'
+                                                    }}>
+                                                        <Box sx={{ width: 20, height: 16, border: '1px solid rgba(255, 215, 0, 0.4)', borderRadius: 0.5 }} />
+                                                    </Box>
                                                 </Box>
-                                                <AccountBalanceWalletIcon sx={{ color: '#00f3ff', opacity: 0.3, fontSize: 40 }} />
+                                                <AccountBalanceWalletIcon sx={{ color: 'rgba(255,255,255,0.1)', fontSize: 60, position: 'absolute', top: 10, right: 10 }} />
                                             </Box>
 
                                             <Box>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: 'rgba(0,0,0,0.3)', p: 1, borderRadius: 1, mb: 1 }}>
-                                                    <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#00f3ff', flexGrow: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                        {wallet.walletAddress}
+                                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'white', mb: 0.5, letterSpacing: 1 }}>
+                                                    {wallet.label.toUpperCase()}
+                                                </Typography>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'rgba(0, 243, 255, 0.8)', fontSize: '0.8rem', letterSpacing: 1 }}>
+                                                        {wallet.walletAddress.substring(0, 8)} •••• {wallet.walletAddress.substring(wallet.walletAddress.length - 6)}
                                                     </Typography>
                                                     <IconButton 
                                                         size="small" 
                                                         onClick={() => handleCopyToClipboard(wallet.walletAddress)}
-                                                        sx={{ color: '#00f3ff', ml: 1 }}
+                                                        sx={{ color: '#00f3ff', p: 0.5 }}
                                                     >
-                                                        <ContentCopyIcon sx={{ fontSize: 16 }} />
+                                                        <ContentCopyIcon sx={{ fontSize: 14 }} />
                                                     </IconButton>
-                                                </Box>
-                                                <Box sx={{ display: 'flex', gap: 1 }}>
-                                                    <Box sx={{ px: 1, py: 0.25, bgcolor: 'rgba(0, 243, 255, 0.1)', border: '1px solid rgba(0, 243, 255, 0.3)', borderRadius: 0.5 }}>
-                                                        <Typography variant="caption" sx={{ color: '#00f3ff', fontSize: '0.6rem', fontWeight: 'bold' }}>SYSTEM_ACTIVE</Typography>
-                                                    </Box>
-                                                    <Box sx={{ px: 1, py: 0.25, bgcolor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 0.5 }}>
-                                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.6rem' }}>GENESIS_01</Typography>
-                                                    </Box>
                                                 </Box>
                                             </Box>
                                         </Box>
                                     </TechFrame>
                                 </Box>
                             ))}
+                            
+                            {(!userInfo.wallets || userInfo.wallets.length === 0) && (
+                                <Box sx={{ minWidth: 320, height: 180, display: 'flex', alignItems: 'center', justifyItems: 'center' }}>
+                                    <Button 
+                                        variant="outlined" 
+                                        fullWidth 
+                                        sx={{ height: '100%', borderStyle: 'dashed', borderColor: 'rgba(255,255,255,0.1)', color: 'text.secondary' }}
+                                        onClick={() => setOpenDialog(true)}
+                                    >
+                                        Agregar Primera Wallet
+                                    </Button>
+                                </Box>
+                            )}
                         </Box>
                     </Grid>
 
-                    {/* SIDEBAR - FRIENDS/ACTIVITY STYLE (Wallets Guardadas) */}
-                    <Grid size={{ xs: 12, md: 4, lg: 3 }}>
+                    {}
+                    <Grid size={{ xs: 12 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                             <Typography variant="overline" sx={{ color: '#ce93d8', fontWeight: 'bold', letterSpacing: 4 }}>
                                 {'// EXTERNAL_LINKS'}
                             </Typography>
-                            <Button
-                                variant="text"
-                                startIcon={<AddCircleOutlineIcon />}
-                                onClick={() => setOpenDialog(true)}
-                                sx={{
-                                    color: '#ce93d8',
-                                    fontSize: '0.75rem',
-                                    fontWeight: 'bold',
-                                    textTransform: 'uppercase',
-                                    '&:hover': { bgcolor: 'rgba(206, 147, 216, 0.1)' }
-                                }}
-                            >
-                                Registrar
-                            </Button>
                         </Box>
                         
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -234,72 +286,11 @@ export const WalletManager = () => {
                 </Grid>
             </Box>
 
-            {/* Add Wallet Dialog */}
-            <Dialog 
+            <AddWalletDialog 
                 open={openDialog} 
-                onClose={() => setOpenDialog(false)}
-                maxWidth="sm"
-                fullWidth
-                PaperProps={{
-                    sx: {
-                        bgcolor: 'transparent',
-                        boxShadow: 'none',
-                        backgroundImage: 'none',
-                    }
-                }}
-            >
-                <TechFrame color="#00f3ff">
-                    <Box sx={{ p: 4, bgcolor: 'rgba(10, 15, 30, 0.95)', backdropFilter: 'blur(10px)' }}>
-                        <Typography variant="h5" sx={{ color: '#00f3ff', fontWeight: 'bold', mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <AddCircleOutlineIcon /> REGISTRAR NUEVA WALLET
-                        </Typography>
-                        
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                            <Box>
-                                <Typography variant="overline" sx={{ color: 'text.secondary', display: 'block', mb: 1 }}>ETIQUETA_SISTEMA</Typography>
-                                <Input
-                                    autoFocus
-                                    placeholder="Ej. Principal, Trading, Reserva"
-                                    fullWidth
-                                    value={label}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLabel(e.target.value)}
-                                />
-                            </Box>
-                            <Box>
-                                <Typography variant="overline" sx={{ color: 'text.secondary', display: 'block', mb: 1 }}>DIRECCION_DE_ENLACE</Typography>
-                                <Input
-                                    placeholder="0x..."
-                                    fullWidth
-                                    value={walletAddress}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWalletAddress(e.target.value)}
-                                />
-                            </Box>
-                        </Box>
-
-                        <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-                            <Button 
-                                onClick={() => setOpenDialog(false)} 
-                                sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: 'white' } }}
-                            >
-                                Abortar
-                            </Button>
-                            <Button 
-                                onClick={handleAddWallet} 
-                                variant="contained"
-                                sx={{
-                                    bgcolor: '#00f3ff',
-                                    color: '#000',
-                                    fontWeight: 'bold',
-                                    px: 4,
-                                    '&:hover': { bgcolor: '#00d0db' }
-                                }}
-                            >
-                                Vincular Portafolio
-                            </Button>
-                        </Box>
-                    </Box>
-                </TechFrame>
-            </Dialog>
+                onClose={() => setOpenDialog(false)} 
+                onAdd={handleAddWallet} 
+            />
 
             <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
                 <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
