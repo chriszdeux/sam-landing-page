@@ -177,7 +177,7 @@ export const Navbar = () => {
               backdropFilter: 'blur(5px)'
             }}
           >
-            {navItems.filter(item => userInfo || item.path !== '/portfolio').map((item) => {
+            {navItems.filter(item => userInfo || (item.path !== '/portfolio' && item.path !== '/laboratorio')).map((item) => {
               const isActive = pathname === item.path;
               
               

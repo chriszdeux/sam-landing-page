@@ -6,6 +6,7 @@ interface EnvVariables {
   coin2: string;
   coin3: string;
   connect: string;
+  apiVersion: string;
 }
 
 export const EnvVariables: EnvVariables = {
@@ -14,4 +15,5 @@ export const EnvVariables: EnvVariables = {
   coin2: process.env.NEXT_PUBLIC_COIN2 || '',
   coin3: process.env.NEXT_PUBLIC_COIN3 || '',
   connect: process.env.NEXT_PUBLIC_API_URL || '',
+  apiVersion: '/sam-v1',
 }
