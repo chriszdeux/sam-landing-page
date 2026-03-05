@@ -73,7 +73,7 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({
             }}
           />
         </ListItem>
-        {navItems.map((item) => (
+        {navItems.filter(item => userInfo || (item.path !== '/portfolio' && item.path !== '/laboratorio')).map((item) => (
           <ListItem
             key={item.id}
             disablePadding

@@ -42,6 +42,7 @@ export interface TransactionsInterface {
   }
   transactionType: TransactionType;
   status: TransactionStatus;
+  confirmedBy?: string;
   dateCreated: string; 
   duration: string;
 }

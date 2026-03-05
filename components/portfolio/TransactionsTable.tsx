@@ -34,7 +34,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({ storeId, w
 
     useEffect(() => {
         if (storeId) {
-            dispatch(fetchTransactions({ storeId, walletId, page: 1, limit: 5 }));
+            dispatch(fetchTransactions({ storeId, walletId, page: 1, limit: 10 }));
         }
     }, [storeId, walletId]);
 
@@ -88,11 +88,12 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({ storeId, w
                                 <TableCell sx={{ color: 'rgba(0, 243, 255, 0.7)', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace' }}>TIPO</TableCell>
                                 <TableCell sx={{ color: 'rgba(0, 243, 255, 0.7)', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace' }}>ACTIVO</TableCell>
                                 <TableCell align="right" sx={{ color: 'rgba(0, 243, 255, 0.7)', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace' }}>CANTIDAD</TableCell>
+                                <TableCell align="center" sx={{ color: 'rgba(0, 243, 255, 0.7)', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace' }}>VALIDADO</TableCell>
                                 <TableCell align="center" sx={{ color: 'rgba(0, 243, 255, 0.7)', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace' }}>ESTADO</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {transactionsData.slice(0, 5).map((tx) => (
+                            {transactionsData.slice(0, 10).map((tx) => (
                                 <TableRow key={tx.id} hover sx={{ '&:hover': { bgcolor: 'rgba(0, 243, 255, 0.05)' } }}>
                                     <TableCell sx={{ color: 'rgba(255,255,255,0.8)', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace', fontSize: '0.85rem' }}>
                                         {new Date(tx.dateCreated).toLocaleDateString()} {new Date(tx.dateCreated).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
@@ -116,6 +117,9 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({ storeId, w
                                     </TableCell>
                                     <TableCell align="right" sx={{ color: 'white', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace' }}>
                                         {tx.financialInfo.quantity}
+                                    </TableCell>
+                                    <TableCell align="center" sx={{ color: 'rgba(255,255,255,0.8)', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                                        {tx.confirmedBy || '-'}
                                     </TableCell>
                                     <TableCell align="center" sx={{ color: 'white', borderColor: 'rgba(0, 243, 255, 0.1)' }}>
                                          <Chip 

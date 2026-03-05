@@ -3,7 +3,7 @@
 
 //# 1-Definir componente de formulario de transacción
 import React from 'react';
-import { Box, MenuItem, Paper, Typography, Button, CircularProgress, SelectChangeEvent } from '@mui/material';
+import { Box, MenuItem, Paper, Typography, Button, CircularProgress, SelectChangeEvent, Alert } from '@mui/material';
 import { Input } from '../ui/Input';
 import { Cryptocurrency } from '../../lib/types/crypto';
 import { TaoIcon } from '../ui/TaoIcon';
@@ -47,6 +47,12 @@ export const TransactionForm = ({
             <Typography variant="h6" color="primary.main" gutterBottom sx={{ mt: 4, mb: 2, borderBottom: '1px solid rgba(0,243,255,0.2)', display: 'inline-block', pb: 1 }}>
                 2. DETALLES DE LA TRANSACCIÓN
             </Typography>
+
+            {transactionType === 'TRANSFER' && (
+                <Alert severity="warning" sx={{ mb: 3, bgcolor: 'transparent', color: '#ffb700' }}>
+                    Las transferencias entre billeteras tienen un costo de red del 0.5%.
+                </Alert>
+            )}
             
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 4 }}>
                 <Box>

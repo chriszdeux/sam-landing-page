@@ -3,9 +3,10 @@
 
 //# 1-Configurar cliente Axios con URL base
 import axios from 'axios';
+import { EnvVariables } from './constants/variables';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL, 
+  baseURL: `${EnvVariables.connect}${EnvVariables.apiVersion}`, 
   headers: {
     'Content-Type': 'application/json',
   },
