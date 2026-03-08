@@ -41,6 +41,7 @@ export interface User {
   confirmedAccount: boolean;
   isBanned: boolean;
   transactions: unknown[]; 
+  idLabs?: string[];
   wallets: Wallet[];
   walletsSaved: Wallet[];
   rewards: Reward[];
