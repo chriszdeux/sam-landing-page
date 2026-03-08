@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Box, Grid, Typography, Button, Paper, Stack, CircularProgress } from "@mui/material";
-import { PowerSettingsNew, DeveloperBoard, AddCircleOutline } from "@mui/icons-material";
+import { Box, Grid, Typography, Button, Paper, Stack, CircularProgress, Snackbar, Alert } from "@mui/material";
+import { PowerSettingsNew } from "@mui/icons-material";
 import { MiningBackground } from "./MiningBackground";
 import { LaboratorioChartsSection } from "./LaboratorioChartsSection";
 import { useAppSelector } from "../../lib/hooks";
@@ -13,6 +13,8 @@ import api from "../../lib/api";
 import { useEffect } from "react";
 import { LaboratorioMarketDrawer, HardwareItem } from "./LaboratorioMarketDrawer";
 import { LaboratorioHardwareDetailDrawer } from "./LaboratorioHardwareDetailDrawer";
+import { LaboratorioSlotsGrid } from "./LaboratorioSlotsGrid";
+import { AxiosError } from "axios";
 
 export function LaboratorioView() {
   const { userInfo, status } = useAppSelector((state) => state.auth);
@@ -24,6 +26,10 @@ export function LaboratorioView() {
   // US-003 Inventory Detailed states
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [currentDetailIndex, setCurrentDetailIndex] = useState<number | null>(null);
+  
+  // Maintenance states
+  const [isMaintenanceLoading, setIsMaintenanceLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   
   const hasLab = userInfo?.idLabs && userInfo.idLabs.length > 0;
 
@@ -52,12 +58,18 @@ export function LaboratorioView() {
 
   const handleMaintenance = async () => {
     if (labData?.id && currentDetailIndex !== null) {
+      setIsMaintenanceLoading(true);
       try {
-        await api.post(`/labs/${labData.id}/maintenance`, { slotIndex: currentDetailIndex });
+        await api.post(`/labs/${labData.id}/slot/${currentDetailIndex}/repair`);
         const res = await api.get(`/labs/${labData.id}`);
         setLabData(res.data.laboratory || res.data);
-      } catch (err) {
+        setSnackbar({ open: true, message: 'Hardware reparado exitosamente (10 tokens consumidos)', severity: 'success' });
+      } catch (err: unknown) {
         console.error("Error maintenance hardware", err);
+        const errorMsg = (err as AxiosError<{message: string}>).response?.data?.message || 'Error al intentar reparar el hardware';
+        setSnackbar({ open: true, message: errorMsg, severity: 'error' });
+      } finally {
+        setIsMaintenanceLoading(false);
       }
     }
   };
@@ -153,96 +165,14 @@ export function LaboratorioView() {
           <Grid container spacing={4}>
             <Grid size={{ xs: 12 }}>
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.5 }}>
-                 <Box display="flex" justifyContent="space-between" alignItems="flex-start" gap={3} flexWrap="wrap" 
-                      sx={{ p: 4, bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 4, border: '1px solid rgba(255,255,255,0.05)' }}>
-                    {Array.from({ length: labData?.capacity || 6 }).map((_, index) => {
-                      const currentSlots = labData?.slots || [];
-                      const slot = index < currentSlots.length ? currentSlots[index] : { id: `empty-${index}`, name: "", performance: "", color: "#ffffff" };
-                      const slotId = slot.id || `slot-${index}`;
-                      const isSelected = selectedSlot === slotId;
-                      const hasData = !!slot.performance;
-                      const slotColor = slot.color || "#00f3ff";
-                      return (
-                      <Box key={slotId} display="flex" flexDirection="column" alignItems="center" sx={{ flex: 1, minWidth: 100 }}>
-                        <motion.div
-                          initial={{ opacity: 0, y: 30 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
-                          style={{ width: '100%' }}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <Paper 
-                            onClick={() => {
-                              if (!hasData) {
-                                handleOpenMarket(index);
-                              } else {
-                                setSelectedSlot(slotId);
-                                handleOpenDetail(index);
-                              }
-                            }}
-                          variant="outlined" 
-                          sx={{ 
-                            width: '100%', 
-                            aspectRatio: '1', 
-                            display: 'flex', 
-                            flexDirection: 'column',
-                            justifyContent: 'center', 
-                            alignItems: 'center',
-                            cursor: 'pointer',
-                            bgcolor: isSelected ? `${slotColor}15` : 'rgba(10,12,16,0.8)', 
-                            backdropFilter: 'blur(10px)', 
-                            borderWidth: isSelected ? 2 : 1,
-                            borderColor: isSelected ? slotColor : 'rgba(255,255,255,0.1)',
-                            borderRadius: 3,
-                            boxShadow: isSelected ? `0 0 15px ${slotColor}30` : 'none',
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            '&:hover': {
-                              borderColor: isSelected ? slotColor : (hasData ? 'rgba(255,255,255,0.3)' : '#00f3ff'),
-                              transform: 'translateY(-2px)'
-                            },
-                            position: 'relative',
-                            overflow: 'hidden'
-                          }}
-                        >
-                            {hasData ? (
-                              <DeveloperBoard sx={{ 
-                                fontSize: 40, 
-                                color: isSelected ? slotColor : 'text.secondary', 
-                                opacity: 1,
-                                filter: isSelected ? `drop-shadow(0 0 8px ${slotColor}80)` : 'none',
-                                transition: 'all 0.3s'
-                              }} />
-                            ) : (
-                              <Box sx={{ 
-                                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
-                                opacity: 0.5, transition: 'all 0.3s',
-                                '&:hover': { opacity: 1 }
-                              }}>
-                                <AddCircleOutline sx={{ fontSize: 40, color: 'rgba(255,255,255,0.7)', transition: 'all 0.2s', '&:hover': { color: '#00f3ff', filter: 'drop-shadow(0 0 8px #00f3ff)' } }} />
-                              </Box>
-                            )}
-                            
-                            <Typography variant="caption" sx={{ mt: 1, color: isSelected ? '#fff' : 'rgba(255,255,255,0.5)', fontWeight: 600 }}>
-                              {slot.name || 'SLOT VACÍO'}
-                            </Typography>
-
-                            <Typography variant="h6" sx={{ 
-                              mt: 0.5, 
-                              fontWeight: 700, 
-                              color: isSelected ? '#fff' : 'text.secondary',
-                              textShadow: isSelected ? '0 2px 4px rgba(0,0,0,0.5)' : 'none'
-                            }}>
-                              {slot.performance || '-'}
-                            </Typography>
-                          </Paper>
-                        </motion.div>
-                        
-                        {/* Legacy control buttons removed in favor of US-003 Side Drawer Details */}
-                      </Box>
-                    )})}
-                  </Box>
-               </motion.div>
+                  <LaboratorioSlotsGrid 
+                    labData={labData}
+                    selectedSlot={selectedSlot}
+                    onOpenMarket={handleOpenMarket}
+                    onOpenDetail={handleOpenDetail}
+                    onSelectSlot={setSelectedSlot}
+                  />
+                </motion.div>
             </Grid>
           </Grid>
         </Grid>
@@ -295,7 +225,19 @@ export function LaboratorioView() {
         slot={currentDetailIndex !== null ? (labData?.slots?.[currentDetailIndex] || null) : null}
         onUninstall={handleUninstall}
         onMaintenance={handleMaintenance}
+        isMaintenanceLoading={isMaintenanceLoading}
       />
+
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={4000} 
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity={snackbar.severity} variant="filled" sx={{ width: '100%', borderRadius: 2, boxShadow: '0 0 15px rgba(0,0,0,0.5)' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
