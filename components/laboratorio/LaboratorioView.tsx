@@ -12,18 +12,10 @@ import { LaboratorioMetersSection, LabDataInterface } from "./LaboratorioMetersS
 import api from "../../lib/api";
 import { useEffect } from "react";
 
-const slotsData = [
-  { id: 1, name: "Antminer S19", performance: "77Gh", color: "#00f3ff" },
-  { id: 2, name: "Whatsminer M30", performance: "13%", color: "#ff0055" },
-  { id: 3, name: "Avalon A1246", performance: "16%", color: "#ffaa00" },
-  { id: 4, name: "Antminer T19", performance: "15%", color: "#00e676" },
-  { id: 5, name: "Goldshell KD5", performance: "99%", color: "#b000ff" },
-  { id: 6, name: "", performance: "", color: "#ffffff" },
-];
 
 export function LaboratorioView() {
   const { userInfo, status } = useAppSelector((state) => state.auth);
-  const [selectedSlot, setSelectedSlot] = useState<number | null>(4);
+  const [selectedSlot, setSelectedSlot] = useState<number | string | null>(null);
   const [labData, setLabData] = useState<LabDataInterface | null>(null);
   
   const hasLab = userInfo?.idLabs && userInfo.idLabs.length > 0;
@@ -103,11 +95,15 @@ export function LaboratorioView() {
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.5 }}>
                  <Box display="flex" justifyContent="space-between" alignItems="flex-start" gap={3} flexWrap="wrap" 
                       sx={{ p: 4, bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 4, border: '1px solid rgba(255,255,255,0.05)' }}>
-                    {slotsData.map((slot, index) => {
-                      const isSelected = selectedSlot === slot.id;
+                    {Array.from({ length: labData?.capacity || 6 }).map((_, index) => {
+                      const currentSlots = labData?.slots || [];
+                      const slot = index < currentSlots.length ? currentSlots[index] : { id: `empty-${index}`, name: "", performance: "", color: "#ffffff" };
+                      const slotId = slot.id || `slot-${index}`;
+                      const isSelected = selectedSlot === slotId;
                       const hasData = !!slot.performance;
+                      const slotColor = slot.color || "#00f3ff";
                       return (
-                      <Box key={slot.id} display="flex" flexDirection="column" alignItems="center" sx={{ flex: 1, minWidth: 100 }}>
+                      <Box key={slotId} display="flex" flexDirection="column" alignItems="center" sx={{ flex: 1, minWidth: 100 }}>
                         <motion.div
                           initial={{ opacity: 0, y: 30 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -117,7 +113,7 @@ export function LaboratorioView() {
                           whileTap={{ scale: 0.95 }}
                         >
                           <Paper 
-                            onClick={() => setSelectedSlot(slot.id)}
+                            onClick={() => setSelectedSlot(slotId)}
                           variant="outlined" 
                           sx={{ 
                             width: '100%', 
@@ -127,24 +123,24 @@ export function LaboratorioView() {
                             justifyContent: 'center', 
                             alignItems: 'center',
                             cursor: 'pointer',
-                            bgcolor: isSelected ? `${slot.color}15` : 'rgba(10,12,16,0.8)', 
+                            bgcolor: isSelected ? `${slotColor}15` : 'rgba(10,12,16,0.8)', 
                             backdropFilter: 'blur(10px)', 
                             borderWidth: isSelected ? 2 : 1,
-                            borderColor: isSelected ? slot.color : 'rgba(255,255,255,0.1)',
+                            borderColor: isSelected ? slotColor : 'rgba(255,255,255,0.1)',
                             borderRadius: 3,
-                            boxShadow: isSelected ? `0 0 15px ${slot.color}30` : 'none',
+                            boxShadow: isSelected ? `0 0 15px ${slotColor}30` : 'none',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': {
-                              borderColor: isSelected ? slot.color : 'rgba(255,255,255,0.3)',
+                              borderColor: isSelected ? slotColor : 'rgba(255,255,255,0.3)',
                               transform: 'translateY(-2px)'
                             }
                           }}
                         >
                             <DeveloperBoard sx={{ 
                               fontSize: 40, 
-                              color: isSelected ? slot.color : 'text.secondary', 
+                              color: isSelected ? slotColor : 'text.secondary', 
                               opacity: hasData ? 1 : 0.2,
-                              filter: isSelected ? `drop-shadow(0 0 8px ${slot.color}80)` : 'none',
+                              filter: isSelected ? `drop-shadow(0 0 8px ${slotColor}80)` : 'none',
                               transition: 'all 0.3s'
                             }} />
                             
@@ -174,9 +170,9 @@ export function LaboratorioView() {
                         }}>
                             <Box sx={{ 
                               display: 'flex', alignItems: 'center', 
-                              border: `1px solid ${slot.color}50`, 
+                              border: `1px solid ${slotColor}50`, 
                               borderRadius: 8, 
-                              bgcolor: `${slot.color}10`,
+                              bgcolor: `${slotColor}10`,
                               backdropFilter: 'blur(10px)',
                               p: 0.5
                             }}>
@@ -185,9 +181,9 @@ export function LaboratorioView() {
                                 </IconButton>
                                 <IconButton size="small" sx={{ 
                                   p: 1, mx: 0.5, 
-                                  color: slot.color, 
-                                  bgcolor: `${slot.color}20`,
-                                  '&:hover': { bgcolor: `${slot.color}40`, boxShadow: `0 0 10px ${slot.color}50` }
+                                  color: slotColor, 
+                                  bgcolor: `${slotColor}20`,
+                                  '&:hover': { bgcolor: `${slotColor}40`, boxShadow: `0 0 10px ${slotColor}50` }
                                 }}>
                                   <PowerSettingsNew fontSize="small" />
                                 </IconButton>
