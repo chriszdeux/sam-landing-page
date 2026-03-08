@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Box, Grid, Typography, Button, IconButton, Paper, Stack, CircularProgress } from "@mui/material";
-import { KeyboardArrowLeft, KeyboardArrowRight, PowerSettingsNew, DeveloperBoard } from "@mui/icons-material";
+import { KeyboardArrowLeft, KeyboardArrowRight, PowerSettingsNew, DeveloperBoard, AddCircleOutline } from "@mui/icons-material";
 import { MiningBackground } from "./MiningBackground";
 import { LaboratorioChartsSection } from "./LaboratorioChartsSection";
 import { useAppSelector } from "../../lib/hooks";
@@ -11,14 +11,38 @@ import { LaboratorioRegistration } from "./LaboratorioRegistration";
 import { LaboratorioMetersSection, LabDataInterface } from "./LaboratorioMetersSection";
 import api from "../../lib/api";
 import { useEffect } from "react";
-
+import { LaboratorioMarketDrawer, HARDWARE_CATALOG } from "./LaboratorioMarketDrawer";
 
 export function LaboratorioView() {
   const { userInfo, status } = useAppSelector((state) => state.auth);
   const [selectedSlot, setSelectedSlot] = useState<number | string | null>(null);
   const [labData, setLabData] = useState<LabDataInterface | null>(null);
+  const [isMarketOpen, setIsMarketOpen] = useState(false);
+  const [buyingSlotIndex, setBuyingSlotIndex] = useState<number | null>(null);
   
   const hasLab = userInfo?.idLabs && userInfo.idLabs.length > 0;
+
+  const handleOpenMarket = (index: number) => {
+    setBuyingSlotIndex(index);
+    setIsMarketOpen(true);
+  };
+
+  const handleBuy = (hw: typeof HARDWARE_CATALOG[0]) => {
+     // TODO: Lógica real cuando el endpoint POST esté activo
+     if (labData && buyingSlotIndex !== null) {
+       const currentSlots = labData.slots || [];
+       const newSlots = [...currentSlots];
+       
+       newSlots[buyingSlotIndex] = {
+         id: `sim-${hw.hw_id}-${buyingSlotIndex}`,
+         name: hw.name,
+         performance: hw.performance,
+         color: hw.color
+       };
+       setLabData({ ...labData, slots: newSlots });
+     }
+     setIsMarketOpen(false);
+  };
 
   useEffect(() => {
     if (hasLab && userInfo?.idLabs) {
@@ -113,7 +137,13 @@ export function LaboratorioView() {
                           whileTap={{ scale: 0.95 }}
                         >
                           <Paper 
-                            onClick={() => setSelectedSlot(slotId)}
+                            onClick={() => {
+                              if (!hasData) {
+                                handleOpenMarket(index);
+                              } else {
+                                setSelectedSlot(slotId);
+                              }
+                            }}
                           variant="outlined" 
                           sx={{ 
                             width: '100%', 
@@ -131,18 +161,30 @@ export function LaboratorioView() {
                             boxShadow: isSelected ? `0 0 15px ${slotColor}30` : 'none',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': {
-                              borderColor: isSelected ? slotColor : 'rgba(255,255,255,0.3)',
+                              borderColor: isSelected ? slotColor : (hasData ? 'rgba(255,255,255,0.3)' : '#00f3ff'),
                               transform: 'translateY(-2px)'
-                            }
+                            },
+                            position: 'relative',
+                            overflow: 'hidden'
                           }}
                         >
-                            <DeveloperBoard sx={{ 
-                              fontSize: 40, 
-                              color: isSelected ? slotColor : 'text.secondary', 
-                              opacity: hasData ? 1 : 0.2,
-                              filter: isSelected ? `drop-shadow(0 0 8px ${slotColor}80)` : 'none',
-                              transition: 'all 0.3s'
-                            }} />
+                            {hasData ? (
+                              <DeveloperBoard sx={{ 
+                                fontSize: 40, 
+                                color: isSelected ? slotColor : 'text.secondary', 
+                                opacity: 1,
+                                filter: isSelected ? `drop-shadow(0 0 8px ${slotColor}80)` : 'none',
+                                transition: 'all 0.3s'
+                              }} />
+                            ) : (
+                              <Box sx={{ 
+                                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
+                                opacity: 0.5, transition: 'all 0.3s',
+                                '&:hover': { opacity: 1 }
+                              }}>
+                                <AddCircleOutline sx={{ fontSize: 40, color: 'rgba(255,255,255,0.7)', transition: 'all 0.2s', '&:hover': { color: '#00f3ff', filter: 'drop-shadow(0 0 8px #00f3ff)' } }} />
+                              </Box>
+                            )}
                             
                             <Typography variant="caption" sx={{ mt: 1, color: isSelected ? '#fff' : 'rgba(255,255,255,0.5)', fontWeight: 600 }}>
                               {slot.name || 'SLOT VACÍO'}
@@ -234,6 +276,13 @@ export function LaboratorioView() {
           </motion.div>
         </Grid>
       </Grid>
+
+      <LaboratorioMarketDrawer 
+        open={isMarketOpen} 
+        onClose={() => setIsMarketOpen(false)} 
+        buyingSlotIndex={buyingSlotIndex}
+        onBuy={handleBuy}
+      />
     </Box>
   );
 }
