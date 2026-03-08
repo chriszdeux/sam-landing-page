@@ -30,7 +30,6 @@ import { Reward } from '../../lib/features/blockchain/types';
 import { TaoIcon } from '../../components/ui/TaoIcon';
 import { Check } from 'lucide-react';
 import { addNotification } from '../../lib/features/uiSlice';
-import { EnvVariables } from '@/lib/constants/variables';
 
 const Countdown = ({ targetDate, onComplete }: { targetDate: number; onComplete?: () => void }) => {
     
@@ -99,27 +98,31 @@ export default function RewardsPage() {
   //# 8-Selección de datos desde el estado global de Redux
   const { userInfo } = useAppSelector((state) => state.auth);
   
-  
-  //# 9-Gestión de estado local para tick
-  const [tick, setTick] = React.useState(0);
-  
-  
-  
-  
-  //# 10-Efecto secundario para sincronización del ciclo de vida
-  React.useEffect(() => {
-    
-    
-  }, [tick]);
+  // forceUpdate: flips when a countdown finishes to refresh card claimed-state
+  // without triggering a re-fetch (safe unlike the old tick + useEffect combo)
+  const [, forceUpdate] = React.useReducer(x => x + 1, 0);
 
-  
-  
+  // FIX: hasFetched ref prevents the infinite loop.
+  // The original deps (rewards.length, isLoading, error) all change as a
+  // side effect of calling fetchRewards() itself, creating an endless cycle.
+  const hasFetched = React.useRef(false);
+  const prevUserId = React.useRef<string | null>(null);
+
   //# 11-Efecto secundario para sincronización del ciclo de vida
   React.useEffect(() => {
-    if (rewards.length === 0 && !isLoading && !error) {
-        dispatch(fetchRewards());
+    if (!userInfo) return;
+
+    // Reset when the logged-in user changes (logout / re-login)
+    if (prevUserId.current && prevUserId.current !== userInfo.id) {
+      hasFetched.current = false;
     }
-  }, [dispatch, rewards.length, isLoading, error]);
+    prevUserId.current = userInfo.id ?? null;
+
+    if (!hasFetched.current) {
+      hasFetched.current = true;
+      dispatch(fetchRewards());
+    }
+  }, [dispatch, userInfo]);
 
   
   //# 12-Gestión de estado local para claiming reward id
@@ -223,7 +226,7 @@ export default function RewardsPage() {
                                     {isClaimedNow && targetTime > 0 && (
                                         <Countdown 
                                             targetDate={targetTime} 
-                                            onComplete={() => setTick(t => t + 1)} 
+                                            onComplete={forceUpdate} 
                                         />
                                     )}
                                     <Box sx={{
