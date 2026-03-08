@@ -1,5 +1,8 @@
 import React from "react";
 import { Box, Typography, Grid } from "@mui/material";
+import { motion } from "framer-motion";
+
+// ... interfaces line 4-32
 
 export interface SlotMachine {
   id?: string | number;
@@ -33,11 +36,42 @@ export interface LabDataInterface {
 
 interface Props {
   labData: LabDataInterface | null;
+  isWinner?: boolean;
 }
 
-export function LaboratorioMetersSection({ labData }: Props) {
+export function LaboratorioMetersSection({ labData, isWinner }: Props) {
   return (
-    <Grid container spacing={4} sx={{ width: '100%', maxWidth: 1000 }}>
+    <Box 
+      component={motion.div}
+      animate={isWinner ? { 
+        scale: [1, 1.02, 1],
+        boxShadow: ["0 0 0px #ffb70000", "0 0 30px #ffb70060", "0 0 0px #ffb70000"]
+      } : {}}
+      transition={{ duration: 0.8, repeat: isWinner ? Infinity : 0 }}
+      sx={{ 
+        width: '100%', 
+        maxWidth: 1000,
+        p: 2,
+        borderRadius: 4,
+        position: 'relative',
+        transition: 'all 0.5s',
+        border: isWinner ? '1px solid #ffb700' : '1px solid transparent',
+        bgcolor: isWinner ? 'rgba(255,183,0,0.05)' : 'transparent'
+      }}
+    >
+      {isWinner && (
+        <Typography 
+          variant="caption" 
+          sx={{ 
+            position: 'absolute', top: -15, left: '50%', transform: 'translateX(-50%)',
+            bgcolor: '#ffb700', color: '#000', px: 2, py: 0.5, borderRadius: 10,
+            fontWeight: 'bold', zIndex: 10, boxShadow: '0 0 10px #ffb700'
+          }}
+        >
+          ¡COMISIÓN DE RED GANADA!
+        </Typography>
+      )}
+      <Grid container spacing={4}>
       {/* System Load Meter */}
       <Grid size={{ xs: 12, md: 6 }}>
         <Box sx={{ mb: 1, display: 'flex', justifyContent: 'space-between' }}>
@@ -170,6 +204,7 @@ export function LaboratorioMetersSection({ labData }: Props) {
         </Box>
       </Grid>
 
-    </Grid>
+      </Grid>
+    </Box>
   );
 }

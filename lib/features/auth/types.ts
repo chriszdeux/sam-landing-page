@@ -44,6 +44,7 @@ export interface User {
   idLabs?: string[];
   wallets: Wallet[];
   walletsSaved: Wallet[];
+  wallet?: Wallet;
   rewards: Reward[];
   balance: number;
   referralCode: string;

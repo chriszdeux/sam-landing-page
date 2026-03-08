@@ -108,6 +108,38 @@ export function LaboratorioSlotsGrid({ labData, selectedSlot, onOpenMarket, onOp
                 }}>
                   {slot.performance || '-'}
                 </Typography>
+
+                {/* Power Injection Animation (Particles) */}
+                {hasData && (
+                  <Box sx={{ position: 'absolute', top: '50%', left: '50%', pointerEvents: 'none' }}>
+                    {[1, 2, 3].map((i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ x: 0, y: 0, opacity: 0, scale: 0.5 }}
+                        animate={{ 
+                          x: 400, // Move towards the network section (right)
+                          y: Math.sin(i * 2) * 50, // Wave effect
+                          opacity: [0, 0.8, 0],
+                          scale: [0.5, 1, 0.5]
+                        }}
+                        transition={{ 
+                          duration: 2 + i, 
+                          repeat: Infinity, 
+                          delay: i * 0.8,
+                          ease: "linear"
+                        }}
+                        style={{ 
+                          position: 'absolute',
+                          width: 4,
+                          height: 4,
+                          borderRadius: '50%',
+                          backgroundColor: slotColor,
+                          boxShadow: `0 0 10px ${slotColor}`
+                        }}
+                      />
+                    ))}
+                  </Box>
+                )}
               </Paper>
             </motion.div>
           </Box>
