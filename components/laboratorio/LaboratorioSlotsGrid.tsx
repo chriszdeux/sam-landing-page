@@ -18,11 +18,15 @@ export function LaboratorioSlotsGrid({ labData, selectedSlot, onOpenMarket, onOp
          sx={{ p: 4, bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 4, border: '1px solid rgba(255,255,255,0.05)' }}>
       {Array.from({ length: labData?.capacity || 6 }).map((_, index) => {
         const currentSlots = labData?.slots || [];
-        const slot = index < currentSlots.length ? currentSlots[index] : { id: `empty-${index}`, name: "", performance: "", color: "#ffffff", currentLife: 100, lifeLimit: 100 };
+        // Backend can return null for empty slots
+        const rawSlot = index < currentSlots.length ? currentSlots[index] : null;
+        const slot = rawSlot ?? { id: `empty-${index}`, name: '', performance: '', color: '#ffffff', currentLife: 100, lifeLimit: 100 };
         const slotId = slot.id || `slot-${index}`;
         const isSelected = selectedSlot === slotId;
-        const hasData = !!slot.performance;
-        const slotColor = slot.color || "#00f3ff";
+        // A slot is active if it has a name or a hashRate (real data from backend)
+        const hasData = !!(slot.name || slot.hashRate);
+        const slotColor = slot.color || '#00f3ff';
+        const displayPerf = slot.performance || (slot.hashRate ? `${slot.hashRate} TH/s` : '');
         const lifePercent = slot.currentLife && slot.lifeLimit ? (slot.currentLife / slot.lifeLimit) * 100 : 100;
         const isLowLife = hasData && lifePercent < 20;
 
@@ -106,7 +110,7 @@ export function LaboratorioSlotsGrid({ labData, selectedSlot, onOpenMarket, onOp
                   color: isSelected ? '#fff' : 'text.secondary',
                   textShadow: isSelected ? '0 2px 4px rgba(0,0,0,0.5)' : 'none'
                 }}>
-                  {slot.performance || '-'}
+                  {displayPerf || '-'}
                 </Typography>
 
                 {/* Power Injection Animation (Particles) */}

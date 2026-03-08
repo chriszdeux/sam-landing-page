@@ -49,10 +49,11 @@ export function LaboratorioNetworkSection({ labData }: NetworkSectionProps) {
     return () => clearInterval(interval);
   }, [labData?.powerMining]);
 
-  const blockProgress = 457; // Mocked
+  // Real data from backend (with safe fallbacks while loading)
+  const blockProgress = labData?.blockProgress ?? 0;
   const blockLimit = 1000;
-  const networkPower = 1240.5; // Mocked
-  const totalFees = labData?.powerMining ? (labData.powerMining * 0.12).toFixed(2) : 28.45;
+  const networkPower = labData?.networkPower ?? 0;
+  const totalFees = labData?.powerMining ? (labData.powerMining * 0.12).toFixed(2) : '0.00';
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, height: '100%', opacity: labData ? 1 : 0.6 }}>
