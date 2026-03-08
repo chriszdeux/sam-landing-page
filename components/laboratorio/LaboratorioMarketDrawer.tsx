@@ -1,22 +1,58 @@
-import React from "react";
-import { Box, Typography, Button, IconButton, Paper, Stack, Drawer, Divider } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Box, Typography, Button, IconButton, Paper, Stack, Drawer, Divider, CircularProgress } from "@mui/material";
 import { Close, ShoppingCartCheckout, LocalOffer, PowerSettingsNew } from "@mui/icons-material";
+import api from "../../lib/api";
 
-export const HARDWARE_CATALOG = [
-  { hw_id: "hw-1", name: "Antminer S19 Pro", performance: "110 TH/s", energy: "3250W", price: "1500 USDT", color: "#00f3ff" },
-  { hw_id: "hw-2", name: "Whatsminer M30s", performance: "88 TH/s", energy: "3344W", price: "1200 USDT", color: "#ff0055" },
-  { hw_id: "hw-3", name: "Goldshell KD5", performance: "18 TH/s", energy: "2250W", price: "2000 USDT", color: "#b000ff" },
-  { hw_id: "hw-4", name: "Avalon A1246", performance: "90 TH/s", energy: "3420W", price: "1150 USDT", color: "#ffaa00" },
-];
+export interface HardwareItem {
+  id: string;
+  name: string;
+  description: string;
+  hashRate: number;
+  energyConsumption: number;
+  priceTokens: number;
+  priceUSD: number;
+  stock: number;
+  type: string;
+}
 
 interface LaboratorioMarketDrawerProps {
   open: boolean;
   onClose: () => void;
   buyingSlotIndex: number | null;
-  onBuy: (hw: typeof HARDWARE_CATALOG[0]) => void;
+  onBuy: (hw: HardwareItem) => void;
 }
 
+const TYPE_COLORS: Record<string, string> = {
+  ASIC: "#00f3ff",
+  GPU: "#b000ff",
+  FPGA: "#ff0055",
+  CPU: "#ffaa00",
+  DEFAULT: "#00e676"
+};
+
 export function LaboratorioMarketDrawer({ open, onClose, buyingSlotIndex, onBuy }: LaboratorioMarketDrawerProps) {
+  const [catalog, setCatalog] = useState<HardwareItem[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (open && catalog.length === 0) {
+      const fetchData = async () => {
+        setLoading(true);
+        try {
+          const res = await api.get("/hardware");
+          if (isMounted) setCatalog(res.data.catalog || []);
+        } catch (err) {
+          console.error("Error fetching hardware catalog", err);
+        } finally {
+          if (isMounted) setLoading(false);
+        }
+      };
+      fetchData();
+    }
+    return () => { isMounted = false; };
+  }, [open, catalog.length]);
+
   return (
     <Drawer
       anchor="right"
@@ -47,60 +83,74 @@ export function LaboratorioMarketDrawer({ open, onClose, buyingSlotIndex, onBuy 
           Selecciona una máquina minera para asignar al Slot {buyingSlotIndex !== null ? buyingSlotIndex + 1 : ''}.
         </Typography>
 
-        <Stack spacing={3}>
-          {HARDWARE_CATALOG.map((hw) => (
-            <Paper 
-              key={hw.hw_id} 
-              sx={{ 
-                p: 2, 
-                bgcolor: 'rgba(0,0,0,0.6)', 
-                border: `1px solid ${hw.color}50`, 
-                borderRadius: 3,
-                position: 'relative',
-                overflow: 'hidden',
-                transition: 'all 0.3s',
-                '&:hover': {
-                  borderColor: hw.color,
-                  boxShadow: `0 0 15px ${hw.color}40`,
-                  transform: 'translateY(-2px)'
-                }
-              }}
-            >
-              <Box sx={{ position: 'absolute', top: 0, left: 0, width: 4, height: '100%', bgcolor: hw.color }} />
-              
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                <Box>
-                  <Typography variant="h6" fontWeight="bold">{hw.name}</Typography>
-                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <PowerSettingsNew sx={{ fontSize: 14 }} /> Consumo: {hw.energy}
-                  </Typography>
-                </Box>
-                <Typography variant="h6" fontWeight="bold" sx={{ color: hw.color }}>
-                  {hw.performance}
-                </Typography>
-              </Box>
-
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-                <Typography variant="body1" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <LocalOffer sx={{ fontSize: 16, color: 'text.secondary' }} /> {hw.price}
-                </Typography>
-                <Button 
-                  variant="contained" 
-                  onClick={() => onBuy(hw)}
+        {loading ? (
+          <Box display="flex" justifyContent="center" mt={4}>
+            <CircularProgress sx={{ color: '#00f3ff' }} />
+          </Box>
+        ) : (
+          <Stack spacing={3}>
+            {catalog.map((hw) => {
+              const color = TYPE_COLORS[hw.type] || TYPE_COLORS.DEFAULT;
+              return (
+                <Paper 
+                  key={hw.id} 
                   sx={{ 
-                    bgcolor: `${hw.color}20`, 
-                    color: hw.color,
-                    border: `1px solid ${hw.color}`,
-                    '&:hover': { bgcolor: hw.color, color: '#000', boxShadow: `0 0 10px ${hw.color}` }
+                    p: 2, 
+                    bgcolor: 'rgba(0,0,0,0.6)', 
+                    border: `1px solid ${color}50`, 
+                    borderRadius: 3,
+                    position: 'relative',
+                    overflow: 'hidden',
+                    transition: 'all 0.3s',
+                    '&:hover': {
+                      borderColor: color,
+                      boxShadow: `0 0 15px ${color}40`,
+                      transform: 'translateY(-2px)'
+                    }
                   }}
-                  startIcon={<ShoppingCartCheckout />}
                 >
-                  Instalar
-                </Button>
-              </Box>
-            </Paper>
-          ))}
-        </Stack>
+                  <Box sx={{ position: 'absolute', top: 0, left: 0, width: 4, height: '100%', bgcolor: color }} />
+                  
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                    <Box>
+                      <Typography variant="h6" fontWeight="bold">{hw.name}</Typography>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', mb: 1 }}>
+                        {hw.description}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <PowerSettingsNew sx={{ fontSize: 14 }} /> Consumo: {hw.energyConsumption}W
+                      </Typography>
+                    </Box>
+                    <Typography variant="h6" fontWeight="bold" sx={{ color: color, whiteSpace: 'nowrap', ml: 1 }}>
+                      {hw.hashRate} TH/s
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
+                    <Typography variant="body1" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <LocalOffer sx={{ fontSize: 16, color: 'text.secondary' }} /> {hw.priceTokens} USDT
+                    </Typography>
+                    <Button 
+                      variant="contained" 
+                      onClick={() => onBuy(hw)}
+                      disabled={hw.stock <= 0}
+                      sx={{ 
+                        bgcolor: `${color}20`, 
+                        color: color,
+                        border: `1px solid ${color}`,
+                        '&:hover': { bgcolor: color, color: '#000', boxShadow: `0 0 10px ${color}` },
+                        '&.Mui-disabled': { borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.2)' }
+                      }}
+                      startIcon={<ShoppingCartCheckout />}
+                    >
+                      {hw.stock > 0 ? "Instalar" : "Agotado"}
+                    </Button>
+                  </Box>
+                </Paper>
+              );
+            })}
+          </Stack>
+        )}
       </Box>
     </Drawer>
   );
