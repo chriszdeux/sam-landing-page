@@ -11,7 +11,7 @@ import { LaboratorioRegistration } from "./LaboratorioRegistration";
 import { LaboratorioMetersSection, LabDataInterface } from "./LaboratorioMetersSection";
 import api from "../../lib/api";
 import { useEffect } from "react";
-import { LaboratorioMarketDrawer, HARDWARE_CATALOG } from "./LaboratorioMarketDrawer";
+import { LaboratorioMarketDrawer, HardwareItem } from "./LaboratorioMarketDrawer";
 
 export function LaboratorioView() {
   const { userInfo, status } = useAppSelector((state) => state.auth);
@@ -27,21 +27,22 @@ export function LaboratorioView() {
     setIsMarketOpen(true);
   };
 
-  const handleBuy = (hw: typeof HARDWARE_CATALOG[0]) => {
-     // TODO: Lógica real cuando el endpoint POST esté activo
-     if (labData && buyingSlotIndex !== null) {
-       const currentSlots = labData.slots || [];
-       const newSlots = [...currentSlots];
-       
-       newSlots[buyingSlotIndex] = {
-         id: `sim-${hw.hw_id}-${buyingSlotIndex}`,
-         name: hw.name,
-         performance: hw.performance,
-         color: hw.color
-       };
-       setLabData({ ...labData, slots: newSlots });
+  const handleBuy = async (hw: HardwareItem) => {
+     if (labData && labData.id && buyingSlotIndex !== null) {
+       try {
+         await api.post(`/labs/${labData.id}/buy-slot`, {
+           hardwareId: hw.id,
+           slotIndex: buyingSlotIndex
+         });
+         
+         // Refetch
+         const res = await api.get(`/labs/${labData.id}`);
+         setLabData(res.data.laboratory || res.data);
+         setIsMarketOpen(false);
+       } catch (error) {
+         console.error("Error comprar hardware", error);
+       }
      }
-     setIsMarketOpen(false);
   };
 
   useEffect(() => {
