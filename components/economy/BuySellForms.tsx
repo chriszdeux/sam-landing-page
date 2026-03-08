@@ -56,11 +56,13 @@ export const BuySellForms: React.FC<BuySellFormsProps> = ({ assetId, assetSymbol
 
     try {
       if (mode === 'buy') {
-        await dispatch(buyAsset({ assetId, amount: Number(amount) })).unwrap();
-        setMessage(`Has comprado ${amount} ${assetSymbol} exitosamente!`);
+        const payload: any = await dispatch(buyAsset({ assetId, amount: Number(amount) })).unwrap();
+        const fee = payload?.transaction?.financialInfo?.fee || payload?.fee || 0;
+        setMessage(`Has comprado ${amount} ${assetSymbol} exitosamente! | Impuesto de Red: -${fee}`);
       } else {
-        await dispatch(sellAsset({ assetId, amount: Number(amount) })).unwrap();
-        setMessage(`Has vendido ${amount} ${assetSymbol} exitosamente!`);
+        const payload: any = await dispatch(sellAsset({ assetId, amount: Number(amount) })).unwrap();
+        const fee = payload?.transaction?.financialInfo?.fee || payload?.fee || 0;
+        setMessage(`Has vendido ${amount} ${assetSymbol} exitosamente! | Impuesto de Red: -${fee}`);
       }
       setStatus('success');
       setAmount('');
@@ -77,6 +79,11 @@ export const BuySellForms: React.FC<BuySellFormsProps> = ({ assetId, assetSymbol
   //# 4-Renderizar formulario de intercambio de activos
   return (
     <Box sx={{ p: 3, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 4, border: '1px solid rgba(255,255,255,0.1)' }}>
+      {mode === 'sell' && (
+        <Alert severity="warning" sx={{ mb: 2, bgcolor: 'transparent', color: '#ffb700' }}>
+          La venta de activos conlleva un impuesto de red del 3%.
+        </Alert>
+      )}
       <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
         <Button
           fullWidth
