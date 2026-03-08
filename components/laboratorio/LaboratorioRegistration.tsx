@@ -19,7 +19,7 @@ export function LaboratorioRegistration({ userInfo }: { userInfo: User }) {
     setIsRegistering(true);
     try {
       const payloadObj = {
-        ownerID: userInfo.id,
+        userId: userInfo.id,
         name: `Lab - ${userInfo.username || 'Main'}`,
         laboratoryType: labType 
       };
