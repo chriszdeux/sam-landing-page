@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Box, Grid, Typography, Button, IconButton, Paper, Stack, CircularProgress } from "@mui/material";
-import { KeyboardArrowLeft, KeyboardArrowRight, PowerSettingsNew, DeveloperBoard, AddCircleOutline } from "@mui/icons-material";
+import { Box, Grid, Typography, Button, Paper, Stack, CircularProgress } from "@mui/material";
+import { PowerSettingsNew, DeveloperBoard, AddCircleOutline } from "@mui/icons-material";
 import { MiningBackground } from "./MiningBackground";
 import { LaboratorioChartsSection } from "./LaboratorioChartsSection";
 import { useAppSelector } from "../../lib/hooks";
@@ -12,6 +12,7 @@ import { LaboratorioMetersSection, LabDataInterface } from "./LaboratorioMetersS
 import api from "../../lib/api";
 import { useEffect } from "react";
 import { LaboratorioMarketDrawer, HardwareItem } from "./LaboratorioMarketDrawer";
+import { LaboratorioHardwareDetailDrawer } from "./LaboratorioHardwareDetailDrawer";
 
 export function LaboratorioView() {
   const { userInfo, status } = useAppSelector((state) => state.auth);
@@ -20,11 +21,45 @@ export function LaboratorioView() {
   const [isMarketOpen, setIsMarketOpen] = useState(false);
   const [buyingSlotIndex, setBuyingSlotIndex] = useState<number | null>(null);
   
+  // US-003 Inventory Detailed states
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [currentDetailIndex, setCurrentDetailIndex] = useState<number | null>(null);
+  
   const hasLab = userInfo?.idLabs && userInfo.idLabs.length > 0;
 
   const handleOpenMarket = (index: number) => {
     setBuyingSlotIndex(index);
     setIsMarketOpen(true);
+  };
+
+  const handleOpenDetail = (index: number) => {
+    setCurrentDetailIndex(index);
+    setIsDetailOpen(true);
+  };
+
+  const handleUninstall = async () => {
+    if (labData?.id && currentDetailIndex !== null) {
+      try {
+        await api.post(`/labs/${labData.id}/uninstall-hardware`, { slotIndex: currentDetailIndex });
+        const res = await api.get(`/labs/${labData.id}`);
+        setLabData(res.data.laboratory || res.data);
+        setIsDetailOpen(false);
+      } catch (err) {
+        console.error("Error unistalling hardware", err);
+      }
+    }
+  };
+
+  const handleMaintenance = async () => {
+    if (labData?.id && currentDetailIndex !== null) {
+      try {
+        await api.post(`/labs/${labData.id}/maintenance`, { slotIndex: currentDetailIndex });
+        const res = await api.get(`/labs/${labData.id}`);
+        setLabData(res.data.laboratory || res.data);
+      } catch (err) {
+        console.error("Error maintenance hardware", err);
+      }
+    }
   };
 
   const handleBuy = async (hw: HardwareItem) => {
@@ -143,6 +178,7 @@ export function LaboratorioView() {
                                 handleOpenMarket(index);
                               } else {
                                 setSelectedSlot(slotId);
+                                handleOpenDetail(index);
                               }
                             }}
                           variant="outlined" 
@@ -202,43 +238,11 @@ export function LaboratorioView() {
                           </Paper>
                         </motion.div>
                         
-                        {/* Control buttons only for selected slot */}
-                        <Box sx={{ 
-                          height: 50, 
-                          mt: 2, 
-                          opacity: (isSelected && hasData) ? 1 : 0, 
-                          transform: (isSelected && hasData) ? 'translateY(0)' : 'translateY(-10px)',
-                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                          pointerEvents: (isSelected && hasData) ? 'auto' : 'none'
-                        }}>
-                            <Box sx={{ 
-                              display: 'flex', alignItems: 'center', 
-                              border: `1px solid ${slotColor}50`, 
-                              borderRadius: 8, 
-                              bgcolor: `${slotColor}10`,
-                              backdropFilter: 'blur(10px)',
-                              p: 0.5
-                            }}>
-                                <IconButton size="small" sx={{ p: 1, color: 'text.secondary', '&:hover': { color: '#fff', bgcolor: 'rgba(255,255,255,0.1)' } }}>
-                                  <KeyboardArrowLeft fontSize="small" />
-                                </IconButton>
-                                <IconButton size="small" sx={{ 
-                                  p: 1, mx: 0.5, 
-                                  color: slotColor, 
-                                  bgcolor: `${slotColor}20`,
-                                  '&:hover': { bgcolor: `${slotColor}40`, boxShadow: `0 0 10px ${slotColor}50` }
-                                }}>
-                                  <PowerSettingsNew fontSize="small" />
-                                </IconButton>
-                                <IconButton size="small" sx={{ p: 1, color: 'text.secondary', '&:hover': { color: '#fff', bgcolor: 'rgba(255,255,255,0.1)' } }}>
-                                  <KeyboardArrowRight fontSize="small" />
-                                </IconButton>
-                            </Box>
-                        </Box>
+                        {/* Legacy control buttons removed in favor of US-003 Side Drawer Details */}
                       </Box>
                     )})}
-                 </Box>
-              </motion.div>
+                  </Box>
+               </motion.div>
             </Grid>
           </Grid>
         </Grid>
@@ -283,6 +287,14 @@ export function LaboratorioView() {
         onClose={() => setIsMarketOpen(false)} 
         buyingSlotIndex={buyingSlotIndex}
         onBuy={handleBuy}
+      />
+
+      <LaboratorioHardwareDetailDrawer
+        open={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+        slot={currentDetailIndex !== null ? (labData?.slots?.[currentDetailIndex] || null) : null}
+        onUninstall={handleUninstall}
+        onMaintenance={handleMaintenance}
       />
     </Box>
   );

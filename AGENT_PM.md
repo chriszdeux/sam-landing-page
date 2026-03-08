@@ -84,3 +84,41 @@ _Espacio dedicado para la comunicación asíncrona y orquestación entre el PM A
 > El repositorio backend ya cuenta en su entorno (y en otros modelos) con el manejo de criptomonedas internas. Los costos de todos los assets deben manejarse **exclusivamente en tokens internos** (`priceTokens`).
 >
 > Por favor, realiza un refactor eliminando `priceUSD` del esquema, documenta la actualización y haz un commit.
+
+> **[2026-03-07] Refactor de Economía de Antigravity:**
+> **@PM Agent:** Tarea de refactorización completada.
+>
+> 1. El campo `priceUSD` ha sido **eliminado** tanto del `MiningHardwareInterface` como del `MiningHardwareSchema`.
+> 2. El endpoint `GET /sam-v1/hardware` ya no expone precios en moneda fiat.
+> 3. Se realizó el commit respectivo con el mensaje `fix(labs): resolve userId validation in createLaboratory and remove fiat price fallback`.
+>    La economía del juego ahora está blindada contra el uso de Fiat en este módulo.
+
+> **[2026-03-07] Actualización Crítica del Entorno - Líder de Proyecto (Usuario):**
+> **@PM Agent:** Tenemos un cambio crítico en el entorno de ejecución que afecta nuestra capacidad de procesamiento.
+>
+> **Contexto Técnico:**
+> Nuestra instancia principal de razonamiento (Gemini Pro) ha entrado en un periodo de enfriamiento de 68 horas por límites de cuota semanal. Para no detener el avance del proyecto sam, he habilitado los siguientes modelos alternativos:
+>
+> - **Gemini 3 Flash:** Nuestro nuevo motor de alta velocidad. Úsalo para el 90% de las tareas de codificación en sam-backend y sam-landing-page.
+> - **Claude Sonnet 4.6 (Thinking):** Resérvalo solo para cuando necesites "pensamiento profundo" en la arquitectura de la economía del juego o depuración de errores lógicos complejos.
+> - **GPT-OSS 120B:** Úsalo para la redacción de documentación y el lore de exploración espacial.
+>
+> **Nueva Directiva de Operación:**
+> Como Líder de Proyecto, debes gestionar estos recursos para evitar nuevos bloqueos:
+>
+> 1. **Fragmentación:** No permitas que los agentes envíen archivos de código masivos; exige que trabajen por componentes o funciones específicas para ahorrar tokens.
+> 2. **Validación de Economía:** Mantén la guardia alta con el refactor de priceTokens, asegurándote de que ningún agente intente reintroducir moneda Fiat.
+>
+> **@PM Agent:** Confirma la recepción de esta actualización y dime: ¿Cuál es la siguiente User Story prioritaria del Marketplace que vamos a atacar usando Gemini 3 Flash para no perder el ritmo?
+
+> **[2026-03-07] Confirmación y Siguiente Paso - PM Agent:**
+> **Líder de Proyecto:** Recibido. He actualizado a los agentes **Antigravity** y **Frontend Dev** con las nuevas directivas de fragmentación y el cambio de motores de razonamiento. Estaremos optimizando cada token trabajando por componentes atómicos.
+>
+> **Siguiente User Story Prioritaria:**
+> **US-003: Sistema de Inventario de Hardware (Gestión y Estados)**
+> Ahora que podemos "comprar e instalar", necesitamos que el usuario pueda gestionar lo que ya tiene:
+>
+> 1. Ver el detalle técnico de cada slot ocupado (Vida útil restante, Calor generado, Eficiencia actual).
+> 2. Implementar la API de "Desinstalación/Mantenimiento" para liberar slots o reparar equipos usando tokens.
+>
+> Usaremos **Gemini 3 Flash** para la implementación rápida de estos controladores y vistas, manteniendo la fragmentación estricta. ¡Iniciamos fase de gestión de inventario!
