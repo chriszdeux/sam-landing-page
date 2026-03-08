@@ -46,11 +46,26 @@ export const RewardsModal = () => {
     
     
     //# 8-Efecto secundario para sincronización del ciclo de vida
+    // FIX: Use a ref-based guard to prevent the infinite loop caused by
+    // having isLoading/error/rewards.length as effect dependencies.
+    // Those state changes were re-triggering the effect after each fetch.
+    const hasFetched = React.useRef(false);
+    const prevUserId = React.useRef<string | null>(null);
+
     useEffect(() => {
-        if (userInfo && rewards.length === 0 && !isLoading && !error) {
+        if (!userInfo) return;
+
+        // Reset fetch guard when the logged-in user changes (logout/re-login)
+        if (prevUserId.current && prevUserId.current !== userInfo.id) {
+            hasFetched.current = false;
+        }
+        prevUserId.current = userInfo.id ?? null;
+
+        if (!hasFetched.current) {
+            hasFetched.current = true;
             dispatch(fetchRewards());
         }
-    }, [dispatch, userInfo, rewards.length, isLoading, error]);
+    }, [dispatch, userInfo]);
 
     const triggerSuccessConfetti = () => {
         const count = 200;
