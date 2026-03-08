@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Button, IconButton, Paper, Stack, Drawer, Divider, LinearProgress, Grid } from "@mui/material";
+import { Box, Typography, Button, IconButton, Paper, Stack, Drawer, Divider, LinearProgress, Grid, CircularProgress } from "@mui/material";
 import { Close, Settings, DeleteForever, Speed, Thermostat, Timer } from "@mui/icons-material";
 import { SlotMachine } from "./LaboratorioMetersSection";
 
@@ -9,9 +9,10 @@ interface LaboratorioHardwareDetailDrawerProps {
   slot: SlotMachine | null;
   onUninstall: () => void;
   onMaintenance: () => void;
+  isMaintenanceLoading?: boolean;
 }
 
-export function LaboratorioHardwareDetailDrawer({ open, onClose, slot, onUninstall, onMaintenance }: LaboratorioHardwareDetailDrawerProps) {
+export function LaboratorioHardwareDetailDrawer({ open, onClose, slot, onUninstall, onMaintenance, isMaintenanceLoading }: LaboratorioHardwareDetailDrawerProps) {
   if (!slot) return null;
 
   const lifePercent = slot.currentLife && slot.lifeLimit ? (slot.currentLife / slot.lifeLimit) * 100 : 0;
@@ -98,16 +99,18 @@ export function LaboratorioHardwareDetailDrawer({ open, onClose, slot, onUninsta
             <Button 
               fullWidth 
               variant="contained" 
-              startIcon={<Settings />}
+              startIcon={isMaintenanceLoading ? <CircularProgress size={20} sx={{ color: '#fff' }} /> : <Settings />}
               onClick={() => onMaintenance()}
+              disabled={isMaintenanceLoading}
               sx={{ 
                 bgcolor: 'rgba(255,255,255,0.05)', 
                 color: '#fff',
                 py: 1.5,
-                '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' }
+                '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' },
+                '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.02)', color: 'rgba(255,255,255,0.2)' }
               }}
             >
-              Mantenimiento
+              {isMaintenanceLoading ? "Procesando..." : "Mantenimiento"}
             </Button>
             <Button 
               fullWidth 
