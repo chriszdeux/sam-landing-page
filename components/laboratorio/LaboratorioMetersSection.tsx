@@ -1,10 +1,19 @@
 import React from "react";
 import { Box, Typography, Grid } from "@mui/material";
 
+export interface SlotMachine {
+  id?: string | number;
+  name?: string;
+  performance?: string;
+  color?: string;
+}
+
 export interface LabDataInterface {
   id?: string;
+  userId?: string;
   type?: string;
   capacity?: number;
+  extraCapacity?: number;
   powerMining?: number;
   storage?: number;
   temperature?: number;
@@ -13,6 +22,7 @@ export interface LabDataInterface {
   currentLife?: number;
   lifeLimit?: number;
   efficiency?: number;
+  slots?: SlotMachine[];
   createdAt?: string;
 }
 
