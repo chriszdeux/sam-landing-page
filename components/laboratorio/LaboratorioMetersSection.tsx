@@ -6,6 +6,11 @@ export interface SlotMachine {
   name?: string;
   performance?: string;
   color?: string;
+  currentLife?: number;
+  lifeLimit?: number;
+  temperature?: number;
+  efficiency?: number;
+  installedAt?: string;
 }
 
 export interface LabDataInterface {
