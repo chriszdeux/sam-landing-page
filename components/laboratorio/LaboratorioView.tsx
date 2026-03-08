@@ -103,23 +103,37 @@ export function LaboratorioView() {
     }
   }, [hasLab, userInfo]);
 
-  // Mock winner logic for US-Lotería
+  // Real polling: refresh lab data every 10s when lab is active
+  // Detects wins via confirmedBy === user wallet address
   useEffect(() => {
-    if (hasLab && labData?.powerMining && labData.powerMining > 0) {
-      const interval = setInterval(() => {
-        if (Math.random() > 0.9) { // 10% chance every 10s to win
+    if (!hasLab || !userInfo?.idLabs) return;
+    const labId = userInfo.idLabs[0];
+
+    const poll = setInterval(async () => {
+      try {
+        const res = await api.get(`/labs/${labId}`);
+        const freshLab = res.data.laboratory || res.data;
+        
+        // Check if this user won a network transaction confirmation
+        const userWalletId = userInfo?.wallet?.walletAddress;
+        if (userWalletId && freshLab.confirmedBy === userWalletId) {
           setIsWinnerActive(true);
-          setSnackbar({ 
-            open: true, 
-            message: '🎉 ¡HAS GANADO UNA COMISIÓN DE RED! (+12.4 SAMT)', 
-            severity: 'success' 
+          setSnackbar({
+            open: true,
+            message: `🎉 ¡HAS GANADO UNA COMISIÓN DE RED! (+${freshLab.lastReward || '12.4'} SAMT)`,
+            severity: 'success'
           });
           setTimeout(() => setIsWinnerActive(false), 5000);
         }
-      }, 10000);
-      return () => clearInterval(interval);
-    }
-  }, [hasLab, labData?.powerMining]);
+
+        setLabData(freshLab);
+      } catch (err) {
+        console.error('Lab polling error:', err);
+      }
+    }, 10000);
+
+    return () => clearInterval(poll);
+  }, [hasLab, userInfo]);
 
   if (status === 'loading') {
     return (

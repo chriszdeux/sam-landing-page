@@ -2,10 +2,10 @@ import React from "react";
 import { Box, Typography, Grid } from "@mui/material";
 import { motion } from "framer-motion";
 
-// ... interfaces line 4-32
 
 export interface SlotMachine {
   id?: string | number;
+  hardwareId?: string;       // NEW: reference ID of installed hardware
   name?: string;
   performance?: string;
   color?: string;
@@ -13,6 +13,7 @@ export interface SlotMachine {
   lifeLimit?: number;
   temperature?: number;
   efficiency?: number;
+  hashRate?: number;         // NEW: hash rate from backend slot data
   installedAt?: string;
 }
 
@@ -23,6 +24,8 @@ export interface LabDataInterface {
   capacity?: number;
   extraCapacity?: number;
   powerMining?: number;
+  networkPower?: number;     // NEW: real power from backend
+  blockProgress?: number;    // NEW: % progress on current block
   storage?: number;
   temperature?: number;
   maxTemperature?: number;
