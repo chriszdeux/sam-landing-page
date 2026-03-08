@@ -16,7 +16,12 @@ interface WalletSelectorProps {
 }
 
 export const WalletSelector = ({ userInfo, walletsInfo, selectedWalletId, onSelect }: WalletSelectorProps) => {
-    
+    const allWallets = [
+      ...(userInfo?.wallet ? [userInfo.wallet] : []),
+      ...(userInfo?.wallets || []),
+      ...(userInfo?.walletsSaved || [])
+    ].filter((v, i, a) => a.findIndex(t => t.walletAddress === v.walletAddress) === i);
+
     //# 2-Renderizar selector de wallet con grid
     return (
         <Box>
@@ -25,15 +30,14 @@ export const WalletSelector = ({ userInfo, walletsInfo, selectedWalletId, onSele
             </Typography>
             
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} useFlexGap sx={{ flexWrap: 'wrap' }}>
-                {userInfo?.wallets.map((wallet, index) => {
+                {allWallets.map((wallet, index) => {
                     const isSelected = selectedWalletId === wallet.walletAddress;
-                    const walletAssetsCount = (walletsInfo && userInfo.wallets[0]?.walletAddress === wallet.walletAddress) 
+                    const walletAssetsCount = (walletsInfo && (userInfo?.wallet?.walletAddress === wallet.walletAddress || userInfo?.wallets?.[0]?.walletAddress === wallet.walletAddress || userInfo?.walletsSaved?.[0]?.walletAddress === wallet.walletAddress)) 
                     ? walletsInfo.store.length 
                     : '?';
 
                     //# 3-Renderizar carta de wallet individual
                     return (
-
                         <Card
                             key={index}
                             onClick={() => onSelect(wallet.walletAddress)}
@@ -58,7 +62,7 @@ export const WalletSelector = ({ userInfo, walletsInfo, selectedWalletId, onSele
                                 <Box sx={{ flex: 1, bgcolor: 'rgba(0,0,0,0.3)', p: 1, borderRadius: 1 }}>
                                     <Typography variant="caption" color="text.secondary">Dinero</Typography>
                                     <Typography variant="body1" color="success.main" fontWeight="bold">
-                                        ${userInfo.balance?.toLocaleString() || 0}
+                                        ${userInfo?.balance?.toLocaleString() || 0}
                                     </Typography>
                                 </Box>
                                 <Box sx={{ flex: 1, bgcolor: 'rgba(0,0,0,0.3)', p: 1, borderRadius: 1 }}>
@@ -74,9 +78,8 @@ export const WalletSelector = ({ userInfo, walletsInfo, selectedWalletId, onSele
                             )}
                         </Card>
                     );
-
                 })}
-                {(!userInfo?.wallets || userInfo.wallets.length === 0) && (
+                {allWallets.length === 0 && (
                     <Typography color="text.secondary">No se encontraron wallets asociadas.</Typography>
                 )}
             </Stack>

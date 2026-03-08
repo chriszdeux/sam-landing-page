@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Box, Grid, Typography, Button, Paper, Stack, CircularProgress, Snackbar, Alert } from "@mui/material";
+import { Box, Grid, Typography, Paper, CircularProgress, Snackbar, Alert } from "@mui/material";
 import { PowerSettingsNew } from "@mui/icons-material";
 import { MiningBackground } from "./MiningBackground";
 import { LaboratorioChartsSection } from "./LaboratorioChartsSection";
@@ -15,6 +15,7 @@ import { LaboratorioMarketDrawer, HardwareItem } from "./LaboratorioMarketDrawer
 import { LaboratorioHardwareDetailDrawer } from "./LaboratorioHardwareDetailDrawer";
 import { LaboratorioSlotsGrid } from "./LaboratorioSlotsGrid";
 import { AxiosError } from "axios";
+import { LaboratorioNetworkSection } from "./LaboratorioNetworkSection";
 
 export function LaboratorioView() {
   const { userInfo, status } = useAppSelector((state) => state.auth);
@@ -37,7 +38,6 @@ export function LaboratorioView() {
     setBuyingSlotIndex(index);
     setIsMarketOpen(true);
   };
-
   const handleOpenDetail = (index: number) => {
     setCurrentDetailIndex(index);
     setIsDetailOpen(true);
@@ -74,6 +74,9 @@ export function LaboratorioView() {
     }
   };
 
+  // Lottery Winner states
+  const [isWinnerActive, setIsWinnerActive] = useState(false);
+
   const handleBuy = async (hw: HardwareItem) => {
      if (labData && labData.id && buyingSlotIndex !== null) {
        try {
@@ -99,6 +102,24 @@ export function LaboratorioView() {
          .catch(err => console.error("Error fetching lab data", err));
     }
   }, [hasLab, userInfo]);
+
+  // Mock winner logic for US-Lotería
+  useEffect(() => {
+    if (hasLab && labData?.powerMining && labData.powerMining > 0) {
+      const interval = setInterval(() => {
+        if (Math.random() > 0.9) { // 10% chance every 10s to win
+          setIsWinnerActive(true);
+          setSnackbar({ 
+            open: true, 
+            message: '🎉 ¡HAS GANADO UNA COMISIÓN DE RED! (+12.4 SAMT)', 
+            severity: 'success' 
+          });
+          setTimeout(() => setIsWinnerActive(false), 5000);
+        }
+      }, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [hasLab, labData?.powerMining]);
 
   if (status === 'loading') {
     return (
@@ -133,7 +154,7 @@ export function LaboratorioView() {
       pt: 12, 
       pb: 6, 
       px: { xs: 2, sm: 3, lg: 4 }, 
-      maxWidth: 1400, 
+      maxWidth: 1600, 
       mx: 'auto',
       position: 'relative' 
     }}>
@@ -153,13 +174,13 @@ export function LaboratorioView() {
             Cluster <span style={{ color: '#00f3ff' }}>{"->"}</span> Laboratorio
           </Typography>
 
-          <LaboratorioMetersSection labData={labData} />
+          <LaboratorioMetersSection labData={labData} isWinner={isWinnerActive} />
         </Box>
       </motion.div>
 
       <Grid container spacing={4}>
         {/* Left Area (Charts and Bottom Slots) */}
-        <Grid size={{ xs: 12, md: 10, lg: 11 }}>
+        <Grid size={{ xs: 12, md: 8, lg: 9 }}>
           <LaboratorioChartsSection />
 
           <Grid container spacing={4}>
@@ -177,37 +198,10 @@ export function LaboratorioView() {
           </Grid>
         </Grid>
 
-        {/* Right Vertical Buttons */}
-        <Grid size={{ xs: 12, md: 2, lg: 1 }}>
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.4 }} style={{ height: '100%' }}>
-            <Stack spacing={2} sx={{ 
-              height: '100%', 
-              bgcolor: 'rgba(10,12,16,0.6)', 
-              p: 2, 
-              borderRadius: 4, 
-              border: '1px solid rgba(255,255,255,0.05)',
-              justifyContent: 'center'
-            }}>
-               {[1, 2, 3, 4, 5].map((btn) => (
-                  <Button 
-                    key={btn}
-                    variant="outlined" 
-                    sx={{ 
-                      height: 60, 
-                      minWidth: 40, 
-                      borderRadius: 2,
-                      borderColor: 'rgba(255,255,255,0.1)', 
-                      bgcolor: 'rgba(0,0,0,0.4)',
-                      transition: 'all 0.2s',
-                      '&:hover': { 
-                        bgcolor: 'rgba(0, 243, 255, 0.1)', 
-                        borderColor: '#00f3ff',
-                        boxShadow: '0 0 15px rgba(0,243,255,0.2)'
-                      }
-                    }}
-                  />
-               ))}
-            </Stack>
+        {/* Right Area (Network Monitoring) */}
+        <Grid size={{ xs: 12, md: 4, lg: 3 }}>
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.4 }}>
+            <LaboratorioNetworkSection labData={labData} />
           </motion.div>
         </Grid>
       </Grid>
