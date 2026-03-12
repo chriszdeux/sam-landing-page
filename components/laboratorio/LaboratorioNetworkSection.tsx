@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Stack, Paper, CircularProgress, LinearProgress } from "@mui/material";
+import { Box, Typography, Stack, Paper, CircularProgress, LinearProgress, Button } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
-import { Hub, ElectricBolt, ReceiptLong, AccountTree } from "@mui/icons-material";
+import { Hub, ElectricBolt, ReceiptLong, AccountTree, Savings } from "@mui/icons-material";
 import { LabDataInterface } from "./LaboratorioMetersSection";
+import api from "../../lib/api";
 
 interface NetworkSectionProps {
   labData: LabDataInterface | null;
@@ -19,6 +20,24 @@ interface Transaction {
 
 export function LaboratorioNetworkSection({ labData }: NetworkSectionProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [isClaiming, setIsClaiming] = useState(false);
+  const [showClaimParticles, setShowClaimParticles] = useState(false);
+
+  const handleClaim = async () => {
+    if (!labData?.id || (labData.pendingRewards ?? 0) <= 0) return;
+    
+    setIsClaiming(true);
+    try {
+      await api.post(`/labs/${labData.id}/claim`);
+      setShowClaimParticles(true);
+      setTimeout(() => setShowClaimParticles(false), 2000);
+      console.log("Claim successful");
+    } catch (error) {
+      console.error("Error claiming rewards:", error);
+    } finally {
+      setIsClaiming(false);
+    }
+  };
   
   // Mocking real-time network activity including lottery
   useEffect(() => {
@@ -86,10 +105,131 @@ export function LaboratorioNetworkSection({ labData }: NetworkSectionProps) {
           textAlign: 'center'
         }}>
           <ReceiptLong sx={{ color: '#b000ff', mb: 1 }} />
-          <Typography variant="caption" display="block" color="rgba(255,255,255,0.5)">Fees Ganados</Typography>
+          <Typography variant="caption" display="block" color="rgba(255,255,255,0.5)">Fees Históricos</Typography>
           <Typography variant="h6" color="#fff" fontWeight="bold">+{totalFees} SAMT</Typography>
         </Paper>
       </Stack>
+
+      {/* Rewards Claim Section */}
+      <Paper 
+        component={motion.div}
+        whileHover={{ scale: 1.01 }}
+        sx={{ 
+          p: 2.5, 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          bgcolor: 'rgba(40, 167, 69, 0.08)',
+          border: '1px solid rgba(40, 167, 69, 0.2)',
+          borderRadius: 4,
+          boxShadow: (labData?.pendingRewards ?? 0) > 0 ? '0 0 20px rgba(40, 167, 69, 0.15)' : 'none'
+        }}
+      >
+        <Box>
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+            <Savings sx={{ color: '#28a745', fontSize: 20 }} />
+            <Typography variant="subtitle2" color="#fff" fontWeight="bold">RECOMPENSAS PENDIENTES</Typography>
+          </Stack>
+          <Typography variant="h5" color="#28a745" fontWeight="bold">
+            {(labData?.pendingRewards ?? 0).toFixed(4)} <Typography component="span" variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>SAMT</Typography>
+          </Typography>
+        </Box>
+        
+        <Button
+          variant="contained"
+          size="large"
+          disabled={isClaiming || (labData?.pendingRewards ?? 0) <= 0}
+          onClick={handleClaim}
+          sx={{ 
+            borderRadius: 3,
+            px: 4,
+            bgcolor: '#28a745',
+            '&:hover': { bgcolor: '#218838' },
+            '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.2)' },
+            textTransform: 'none',
+            fontWeight: 'bold',
+            boxShadow: '0 4px 15px rgba(40, 167, 69, 0.3)'
+          }}
+        >
+          {isClaiming ? <CircularProgress size={24} color="inherit" /> : 'RECLAMAR (CLAIM)'}
+        </Button>
+      </Paper>
+
+      {/* Blockchain Energy Meter */}
+      <Paper sx={{ 
+        p: 3, 
+        bgcolor: 'rgba(10,12,16,0.6)', 
+        border: labData?.operationStatus === 'low_energy' ? '1px solid rgba(255, 23, 68, 0.4)' : '1px solid rgba(255,255,255,0.05)',
+        borderRadius: 4,
+        position: 'relative',
+        overflow: 'hidden',
+        transition: 'all 0.5s ease'
+      }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <motion.div
+              animate={labData?.operationStatus === 'low_energy' ? { 
+                scale: [1, 1.2, 1],
+                opacity: [1, 0.6, 1]
+              } : {}}
+              transition={{ duration: 1, repeat: Infinity }}
+            >
+              <ElectricBolt sx={{ 
+                color: labData?.operationStatus === 'low_energy' ? '#ff1744' : '#ffeb3b', 
+                fontSize: 20 
+              }} />
+            </motion.div>
+            <Typography variant="subtitle2" color="#fff" fontWeight="bold">ENERGÍA DE RED</Typography>
+          </Stack>
+          <Typography 
+            variant="caption" 
+            color={labData?.operationStatus === 'low_energy' ? '#ff1744' : '#ffeb3b'} 
+            fontWeight="bold"
+          >
+            {labData?.blockchainEnergy ?? 1000} / {labData?.blockchainMaxEnergy ?? 1000} EP
+          </Typography>
+        </Box>
+        
+        <LinearProgress 
+          variant="determinate" 
+          value={((labData?.blockchainEnergy ?? 1000) / (labData?.blockchainMaxEnergy ?? 1000)) * 100} 
+          sx={{ 
+            height: 10, 
+            borderRadius: 5, 
+            bgcolor: 'rgba(255, 235, 59, 0.1)',
+            '& .MuiLinearProgress-bar': {
+              bgcolor: labData?.operationStatus === 'low_energy' ? '#ff1744' : '#ffeb3b',
+              boxShadow: labData?.operationStatus === 'low_energy' ? '0 0 15px #ff1744' : '0 0 10px #ffeb3b',
+              transition: 'all 0.5s ease'
+            }
+          }}
+        />
+
+        {labData?.operationStatus === 'low_energy' && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                mt: 1.5, 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 1, 
+                color: '#ff1744', 
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                fontSize: '0.65rem'
+              }}
+            >
+              <Box sx={{ width: 6, height: 6, bgcolor: '#ff1744', borderRadius: '50%' }} component={motion.div} animate={{ opacity: [1, 0, 1] }} transition={{ duration: 0.8, repeat: Infinity }} />
+              Red en estado Crítico: Baja Energía
+            </Typography>
+          </motion.div>
+        )}
+      </Paper>
+
 
       {/* Block Progress Monitor */}
       <Paper sx={{ 
@@ -143,7 +283,33 @@ export function LaboratorioNetworkSection({ labData }: NetworkSectionProps) {
           <AccountTree sx={{ fontSize: 18 }} /> ACTIVIDAD DE RED
         </Typography>
 
-        <Stack spacing={1.5} sx={{ overflow: 'hidden' }}>
+        <Box sx={{ position: 'relative', flex: 1, minHeight: 200 }}>
+          {labData?.blockchainEnergy === 0 && (
+            <Box 
+              component={motion.div}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              sx={{ 
+                position: 'absolute', inset: -10, zIndex: 10,
+                display: 'flex', justifyContent: 'center', alignItems: 'center',
+                flexDirection: 'column',
+                bgcolor: 'rgba(10,12,16,0.85)',
+                backdropFilter: 'blur(4px)',
+                borderRadius: 4,
+                border: '1px solid rgba(255, 23, 68, 0.3)'
+              }}
+            >
+              <ElectricBolt sx={{ color: '#ff1744', fontSize: 40, mb: 1 }} />
+              <Typography variant="h6" color="#ff1744" fontWeight="bold" sx={{ letterSpacing: 1, textAlign: 'center' }}>
+                NETWORK OFFLINE
+              </Typography>
+              <Typography variant="caption" color="rgba(255,23,68,0.7)" fontWeight="bold">
+                RECHARGING ENERGY...
+              </Typography>
+            </Box>
+          )}
+
+          <Stack spacing={1.5} sx={{ overflow: 'hidden', opacity: labData?.blockchainEnergy === 0 ? 0.3 : 1 }}>
           <AnimatePresence mode="popLayout">
             {transactions.map((tx) => (
               <motion.div
@@ -218,6 +384,49 @@ export function LaboratorioNetworkSection({ labData }: NetworkSectionProps) {
             ))}
           </AnimatePresence>
         </Stack>
+        </Box>
+
+        {/* Claim Particles Animation */}
+        <AnimatePresence>
+          {showClaimParticles && (
+            <Box sx={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: 9999 }}>
+              {Array.from({ length: 20 }).map((_, i) => (
+                <Box
+                  key={i}
+                  component={motion.div}
+                  initial={{ 
+                    x: window.innerWidth / 2 + (Math.random() - 0.5) * 200, 
+                    y: window.innerHeight / 2 + (Math.random() - 0.5) * 100,
+                    scale: 0,
+                    opacity: 1
+                  }}
+                  animate={{ 
+                    x: window.innerWidth - 100, 
+                    y: 50, 
+                    scale: [0, 1.2, 0.8],
+                    opacity: [1, 1, 0]
+                  }}
+                  transition={{ 
+                    duration: 1.2 + Math.random() * 0.5, 
+                    delay: i * 0.05,
+                    ease: "easeOut" 
+                  }}
+                  sx={{ 
+                    position: 'absolute', 
+                    width: 14, height: 14, 
+                    bgcolor: '#28a745', 
+                    borderRadius: '50%',
+                    boxShadow: '0 0 10px #28a745',
+                    display: 'flex', justifyContent: 'center', alignItems: 'center',
+                    color: '#fff', fontSize: 10, fontWeight: 'bold'
+                  }}
+                >
+                  $
+                </Box>
+              ))}
+            </Box>
+          )}
+        </AnimatePresence>
       </Paper>
     </Box>
   );

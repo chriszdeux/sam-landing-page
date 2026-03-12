@@ -1,5 +1,6 @@
 import React from "react";
-import { Box, Typography, Grid } from "@mui/material";
+import { Box, Typography, Grid, Stack } from "@mui/material";
+import { Bolt } from "@mui/icons-material";
 import { motion } from "framer-motion";
 
 
@@ -33,6 +34,12 @@ export interface LabDataInterface {
   currentLife?: number;
   lifeLimit?: number;
   efficiency?: number;
+  energy?: number;           // NEW: current Laboratory energy (local, 0-50)
+  maxEnergy?: number;        // NEW: max Laboratory energy (50)
+  blockchainEnergy?: number; // RENAMED: was energy
+  blockchainMaxEnergy?: number; // RENAMED: was maxEnergy
+  pendingRewards?: number;   // NEW: accumulated rewards to be claimed
+  operationStatus?: string;  // NEW: network status (e.g. 'low_energy')
   slots?: SlotMachine[];
   createdAt?: string;
 }
@@ -200,6 +207,45 @@ export function LaboratorioMetersSection({ labData, isWinner }: Props) {
                   boxShadow: isActive ? '0 0 10px #b000ff, inset 0 0 5px rgba(255,255,255,0.5)' : 'none',
                   opacity: isActive ? 1 : 0.4,
                   transition: 'all 0.3s ease'
+                }} 
+              />
+            );
+          })}
+        </Box>
+      </Grid>
+
+      {/* Laboratory Individual Energy Meter */}
+      <Grid size={{ xs: 12 }}>
+        <Box sx={{ mb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Bolt sx={{ color: '#ffd700', fontSize: 18 }} />
+            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600, letterSpacing: 1 }}>Energía de Operaciones (Local)</Typography>
+          </Stack>
+          <Typography variant="caption" sx={{ color: '#ffd700', fontWeight: 600, letterSpacing: 1 }}>
+            {labData ? `${labData.energy || 0} / ${labData.maxEnergy || 50} EP` : '-- / 50 EP'}
+          </Typography>
+        </Box>
+        <Box sx={{ 
+          display: 'flex', gap: 0.8, p: 1.2, 
+          bgcolor: 'rgba(255, 215, 0, 0.03)', borderRadius: 2, 
+          border: '1px solid rgba(255, 215, 0, 0.15)',
+          boxShadow: '0 0 30px rgba(255, 215, 0, 0.05)'
+        }}>
+          {Array.from({ length: 25 }).map((_, index) => {
+            const energy = labData?.energy ?? 0;
+            const max = labData?.maxEnergy ?? 50;
+            const items = Math.round((energy / max) * 25);
+            const isActive = index < items;
+            return (
+              <Box 
+                key={index}
+                sx={{ 
+                  flex: 1, height: 16, 
+                  bgcolor: isActive ? '#ffd700' : 'rgba(255, 215, 0, 0.05)', 
+                  borderRadius: '2px', 
+                  boxShadow: isActive ? '0 0 15px rgba(255, 215, 0, 0.6), inset 0 0 8px rgba(255,255,255,0.6)' : 'none',
+                  opacity: isActive ? 1 : 0.2,
+                  transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
                 }} 
               />
             );

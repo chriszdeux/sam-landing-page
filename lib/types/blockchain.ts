@@ -65,6 +65,8 @@ export interface BlockchainProps {
   marketCap: number;
   status?: BlockchainStatus;
   operationStatus?: NetworkLoadLevel; 
+  energy?: number;
+  maxEnergy?: number;
 }
 
 //# 5-Definir interfaces para tokens, transacciones y pools
