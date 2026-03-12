@@ -48,7 +48,15 @@ export function LaboratorioView() {
       try {
         await api.post(`/labs/${labData.id}/uninstall-hardware`, { slotIndex: currentDetailIndex });
         const res = await api.get(`/labs/${labData.id}`);
-        setLabData(res.data.laboratory || res.data);
+        const freshLab = res.data.laboratory || res.data;
+        if (res.data.blockchainProps) {
+          freshLab.blockchainEnergy = res.data.blockchainProps.energy;
+          freshLab.blockchainMaxEnergy = res.data.blockchainProps.maxEnergy;
+          // merge other props if any, but skipping old energy/maxEnergy
+          const { energy, maxEnergy, ...otherProps } = res.data.blockchainProps;
+          Object.assign(freshLab, otherProps);
+        }
+        setLabData(freshLab);
         setIsDetailOpen(false);
       } catch (err) {
         console.error("Error unistalling hardware", err);
@@ -62,7 +70,15 @@ export function LaboratorioView() {
       try {
         await api.post(`/labs/${labData.id}/slot/${currentDetailIndex}/repair`);
         const res = await api.get(`/labs/${labData.id}`);
-        setLabData(res.data.laboratory || res.data);
+        const freshLab = res.data.laboratory || res.data;
+        if (res.data.blockchainProps) {
+          freshLab.blockchainEnergy = res.data.blockchainProps.energy;
+          freshLab.blockchainMaxEnergy = res.data.blockchainProps.maxEnergy;
+          // merge other props if any, but skipping old energy/maxEnergy
+          const { energy, maxEnergy, ...otherProps } = res.data.blockchainProps;
+          Object.assign(freshLab, otherProps);
+        }
+        setLabData(freshLab);
         setSnackbar({ open: true, message: 'Hardware reparado exitosamente (10 tokens consumidos)', severity: 'success' });
       } catch (err: unknown) {
         console.error("Error maintenance hardware", err);
@@ -87,7 +103,14 @@ export function LaboratorioView() {
          
          // Refetch
          const res = await api.get(`/labs/${labData.id}`);
-         setLabData(res.data.laboratory || res.data);
+         const freshLab = res.data.laboratory || res.data;
+         if (res.data.blockchainProps) {
+           freshLab.blockchainEnergy = res.data.blockchainProps.energy;
+           freshLab.blockchainMaxEnergy = res.data.blockchainProps.maxEnergy;
+           const { energy, maxEnergy, ...otherProps } = res.data.blockchainProps;
+           Object.assign(freshLab, otherProps);
+         }
+         setLabData(freshLab);
          setIsMarketOpen(false);
        } catch (error) {
          console.error("Error comprar hardware", error);
@@ -98,7 +121,16 @@ export function LaboratorioView() {
   useEffect(() => {
     if (hasLab && userInfo?.idLabs) {
       api.get(`/labs/${userInfo.idLabs[0]}`)
-         .then(res => setLabData(res.data.laboratory || res.data))
+         .then(res => {
+           const freshLab = res.data.laboratory || res.data;
+           if (res.data.blockchainProps) {
+             freshLab.blockchainEnergy = res.data.blockchainProps.energy;
+             freshLab.blockchainMaxEnergy = res.data.blockchainProps.maxEnergy;
+             const { energy, maxEnergy, ...otherProps } = res.data.blockchainProps;
+             Object.assign(freshLab, otherProps);
+           }
+           setLabData(freshLab);
+         })
          .catch(err => console.error("Error fetching lab data", err));
     }
   }, [hasLab, userInfo]);
@@ -113,6 +145,13 @@ export function LaboratorioView() {
       try {
         const res = await api.get(`/labs/${labId}`);
         const freshLab = res.data.laboratory || res.data;
+        if (res.data.blockchainProps) {
+          freshLab.blockchainEnergy = res.data.blockchainProps.energy;
+          freshLab.blockchainMaxEnergy = res.data.blockchainProps.maxEnergy;
+          // merge other props if any, but skipping old energy/maxEnergy
+          const { energy, maxEnergy, ...otherProps } = res.data.blockchainProps;
+          Object.assign(freshLab, otherProps);
+        }
         
         // Check if this user won a network transaction confirmation
         const userWalletId = userInfo?.wallet?.walletAddress;
@@ -187,6 +226,23 @@ export function LaboratorioView() {
           }}>
             Cluster <span style={{ color: '#00f3ff' }}>{"->"}</span> Laboratorio
           </Typography>
+
+          {/* Individual Lab Energy Mini-Indicator */}
+          <Box 
+            sx={{ 
+              mb: 3, px: 2, py: 0.5, 
+              bgcolor: 'rgba(255, 215, 0, 0.05)', 
+              border: '1px solid rgba(255, 215, 0, 0.2)',
+              borderRadius: 2,
+              display: 'flex', alignItems: 'center', gap: 1,
+              boxShadow: '0 0 15px rgba(255, 215, 0, 0.1)'
+            }}
+          >
+            <Box sx={{ width: 8, height: 8, bgcolor: '#ffd700', borderRadius: '50%', boxShadow: '0 0 8px #ffd700' }} />
+            <Typography variant="caption" sx={{ color: '#ffd700', fontWeight: 'bold', letterSpacing: 1 }}>
+              LAB ENERGY: {labData?.energy ?? 0} / {labData?.maxEnergy ?? 50} EP
+            </Typography>
+          </Box>
 
           <LaboratorioMetersSection labData={labData} isWinner={isWinnerActive} />
         </Box>
