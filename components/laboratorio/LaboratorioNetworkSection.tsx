@@ -137,10 +137,10 @@ export function LaboratorioNetworkSection({ labData, currentEnergy, onEnergyChan
         </Stack>
         <Stack direction="row" justifyContent="space-between" sx={{ mb: 1.5 }}>
           <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.6rem' }}>
-            Energía a enviar: <Box component="span" sx={{ color: '#ffd700', fontWeight: 'bold' }}>{currentEnergy} EP</Box>
+            Energía disponible: <Box component="span" sx={{ color: '#ffd700', fontWeight: 'bold' }}>{currentEnergy} EP</Box>
           </Typography>
           <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.6rem' }}>
-            Costo estimado: <Box component="span" sx={{ color: '#ff9800', fontWeight: 'bold' }}>-{estimatedCost} EP</Box>
+            Costo: <Box component="span" sx={{ color: '#ff9800', fontWeight: 'bold' }}>-{estimatedCost} EP</Box>
           </Typography>
         </Stack>
         <Button
@@ -150,7 +150,7 @@ export function LaboratorioNetworkSection({ labData, currentEnergy, onEnergyChan
           disabled={isInjecting || !blockchainId || !canInject}
           onClick={handleInjectPower}
           startIcon={isInjecting ? <CircularProgress size={14} color="inherit" /> : <Bolt />}
-          title={!canInject ? 'Sin energía acumulada' : `Enviar ${currentEnergy} EP (costo: ${estimatedCost} EP)`}
+          title={!canInject ? 'Sin energía acumulada' : `Inyectar poder (costo: ${estimatedCost} EP)`}
           component={motion.button}
           whileHover={!isInjecting && canInject ? { scale: 1.02 } : {}}
           whileTap={!isInjecting && canInject ? { scale: 0.98 } : {}}
@@ -165,7 +165,7 @@ export function LaboratorioNetworkSection({ labData, currentEnergy, onEnergyChan
             '&.Mui-disabled': { borderColor: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.2)' },
           }}
         >
-          {isInjecting ? 'Inyectando...' : !canInject ? 'Sin energía acumulada' : `⚡ Inyectar ${currentEnergy} EP`}
+          {isInjecting ? 'Inyectando...' : !canInject ? 'Sin energía acumulada' : `⚡ Inyectar Poder (${effectivePower} GH/s)`}
         </Button>
       </Paper>
 
