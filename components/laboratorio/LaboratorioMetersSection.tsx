@@ -19,41 +19,52 @@ export interface SlotMachine {
 }
 
 export interface LabDataInterface {
+  // Core identity
   id?: string;
   userId?: string;
   type?: string;
+  createdAt?: string;
+  lastEnergyUpdate?: string;
+  lastProcessedAt?: string;
+  // Capacity & storage
   capacity?: number;
   extraCapacity?: number;
-  powerMining?: number;
-  effectivePower?: number;   // NEW: real power after temperature/life penalties
-  networkPower?: number;     // NEW: real power from backend
-  blockProgress?: number;    // NEW: % progress on current block
   storage?: number;
+  // Power
+  powerMining?: number;
+  effectivePower?: number;   // real power after temperature/life penalties
+  networkPower?: number;     // global network power
+  blockProgress?: number;    // current block TX progress
+  // Health
   temperature?: number;
   maxTemperature?: number;
   coolingLevel?: number;
   currentLife?: number;
   lifeLimit?: number;
   efficiency?: number;
-  energy?: number;           // NEW: current Laboratory energy (local, 0-50)
-  maxEnergy?: number;        // NEW: max Laboratory energy (50)
-  blockchainEnergy?: number; // RENAMED: was energy
-  blockchainMaxEnergy?: number; // RENAMED: was maxEnergy
-  pendingRewards?: number;   // NEW: accumulated rewards to be claimed
-  operationStatus?: string;  // NEW: network status (e.g. 'low_energy')
-  pendingTxCount?: number;   // NEW: pending transactions in the global queue
-  confirmedBy?: string;      // wallet address of last lottery winner
-  lastReward?: number;       // last reward amount earned
+  // Lab energy (0–maxEnergy, default 50)
+  energy?: number;
+  maxEnergy?: number;
+  // Rewards
+  pendingRewards?: number;
+  // Blockchain network props (from blockchainProps in GET response)
+  blockchainEnergy?: number;
+  blockchainMaxEnergy?: number;
+  operationStatus?: string;
+  pendingTxCount?: number;
+  confirmedBy?: string;
+  lastReward?: number;
+  // Slots
   slots?: SlotMachine[];
-  createdAt?: string;
 }
 
 interface Props {
   labData: LabDataInterface | null;
+  currentEnergy?: number;
   isWinner?: boolean;
 }
 
-export function LaboratorioMetersSection({ labData, isWinner }: Props) {
+export function LaboratorioMetersSection({ labData, currentEnergy, isWinner }: Props) {
   return (
     <Box 
       component={motion.div}
@@ -226,7 +237,7 @@ export function LaboratorioMetersSection({ labData, isWinner }: Props) {
             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600, letterSpacing: 1 }}>Energía de Operaciones (Local)</Typography>
           </Stack>
           <Typography variant="caption" sx={{ color: '#ffd700', fontWeight: 600, letterSpacing: 1 }}>
-            {labData ? `${labData.energy || 0} / ${labData.maxEnergy || 50} EP` : '-- / 50 EP'}
+            {labData ? `${currentEnergy ?? labData.energy ?? 0} / ${labData.maxEnergy ?? 50} EP` : '-- / 50 EP'}
           </Typography>
         </Box>
         <Box sx={{ 
@@ -236,7 +247,7 @@ export function LaboratorioMetersSection({ labData, isWinner }: Props) {
           boxShadow: '0 0 30px rgba(255, 215, 0, 0.05)'
         }}>
           {Array.from({ length: 25 }).map((_, index) => {
-            const energy = labData?.energy ?? 0;
+            const energy = currentEnergy ?? labData?.energy ?? 0;
             const max = labData?.maxEnergy ?? 50;
             const items = Math.round((energy / max) * 25);
             const isActive = index < items;
