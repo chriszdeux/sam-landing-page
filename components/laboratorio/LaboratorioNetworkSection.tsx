@@ -41,6 +41,20 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
   const labDataId = labData?.id;
   useEffect(() => { setLocalLabState({}); }, [labDataId]);
 
+  // Passive energy recharge — frontend-driven: +5 to +10 EP per minute, capped at maxEnergy
+  const maxEnergy = labData?.maxEnergy ?? 50;
+  useEffect(() => {
+    if (!labDataId) return;
+    const interval = setInterval(() => {
+      const recharge = Math.floor(Math.random() * 6) + 5; // 5–10 EP
+      setLocalLabState(prev => {
+        const base = prev.energy ?? labData?.energy ?? 0;
+        return { ...prev, energy: Math.min(maxEnergy, base + recharge) };
+      });
+    }, 60000); // every 60 seconds
+    return () => clearInterval(interval);
+  }, [labDataId, maxEnergy, labData?.energy]);
+
   // effectivePower = real power after penalties; fallback to powerMining if not yet available
   const effectivePower = labData?.effectivePower ?? labData?.powerMining ?? 10;
   // New energy model: user sends all accumulated energy, cost = 5% capped at 100 EP
@@ -116,33 +130,33 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
   };
   
   // Mocking real-time network activity including lottery
-  useEffect(() => {
-    const types: ("BUY" | "SELL" | "TRANSFER")[] = ["BUY", "SELL", "TRANSFER"];
-    const interval = setInterval(() => {
-      const isWinner = Math.random() > 0.8; // 20% chance to 'win' a confirmation
-      const isQueue = labData?.powerMining === 0;
+  // useEffect(() => {
+  //   const types: ("BUY" | "SELL" | "TRANSFER")[] = ["BUY", "SELL", "TRANSFER"];
+  //   const interval = setInterval(() => {
+  //     const isWinner = Math.random() > 0.8; // 20% chance to 'win' a confirmation
+  //     const isQueue = labData?.powerMining === 0;
 
-      const newTx: Transaction = {
-        id: Math.random().toString(36).substring(7),
-        hash: `0x${Math.random().toString(16).substring(2, 10)}...${Math.random().toString(16).substring(2, 6)}`,
-        type: types[Math.floor(Math.random() * types.length)],
-        status: isQueue ? "QUEUED" : "CONFIRMING",
-        amount: (Math.random() * 500).toFixed(2),
-        isPersonalWin: isWinner && !isQueue
-      };
+  //     const newTx: Transaction = {
+  //       id: Math.random().toString(36).substring(7),
+  //       hash: `0x${Math.random().toString(16).substring(2, 10)}...${Math.random().toString(16).substring(2, 6)}`,
+  //       type: types[Math.floor(Math.random() * types.length)],
+  //       status: isQueue ? "QUEUED" : "CONFIRMING",
+  //       amount: (Math.random() * 500).toFixed(2),
+  //       isPersonalWin: isWinner && !isQueue
+  //     };
       
-      setTransactions(prev => [newTx, ...prev].slice(0, 5));
+  //     setTransactions(prev => [newTx, ...prev].slice(0, 5));
       
-      if (!isQueue) {
-        // Mark as confirmed after 2 seconds
-        setTimeout(() => {
-          setTransactions(prev => prev.map(tx => tx.id === newTx.id ? { ...tx, status: "CONFIRMED" } : tx));
-        }, 2000);
-      }
-    }, 3000);
+  //     if (!isQueue) {
+  //       // Mark as confirmed after 2 seconds
+  //       setTimeout(() => {
+  //         setTransactions(prev => prev.map(tx => tx.id === newTx.id ? { ...tx, status: "CONFIRMED" } : tx));
+  //       }, 2000);
+  //     }
+  //   }, 3000);
     
-    return () => clearInterval(interval);
-  }, [labData?.powerMining]);
+  //   return () => clearInterval(interval);
+  // }, [labData?.powerMining]);
 
   // Real data from backend (with safe fallbacks while loading)
   const blockProgress = labData?.blockProgress ?? 0;
