@@ -18,7 +18,6 @@ import { LaboratorioNetworkSection } from "./LaboratorioNetworkSection";
 /** Normaliza la respuesta del GET /labs/:id al shape de LabDataInterface */
 function normalizeLab(data: Record<string, unknown>): LabDataInterface {
   const lab = (data.laboratory ?? data) as LabDataInterface;
-  // Merge blockchainProps fields if present (energy/maxEnergy go to blockchainEnergy/blockchainMaxEnergy)
   if (data.blockchainProps && typeof data.blockchainProps === 'object') {
     const bp = data.blockchainProps as Record<string, unknown>;
     lab.blockchainEnergy = bp.energy as number | undefined;
@@ -32,22 +31,28 @@ export function LaboratorioView() {
   const { userInfo, status } = useAppSelector((state) => state.auth);
   const [selectedSlot, setSelectedSlot] = useState<number | string | null>(null);
   const [labData, setLabData] = useState<LabDataInterface | null>(null);
+  const [localEnergy, setLocalEnergy] = useState<number | null>(null);
   const [isMarketOpen, setIsMarketOpen] = useState(false);
   const [buyingSlotIndex, setBuyingSlotIndex] = useState<number | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [currentDetailIndex, setCurrentDetailIndex] = useState<number | null>(null);
   const [isMaintenanceLoading, setIsMaintenanceLoading] = useState(false);
-  const [isWinnerActive, setIsWinnerActive] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
 
   const hasLab = userInfo?.idLabs && userInfo.idLabs.length > 0;
   const labId = userInfo?.idLabs?.[0];
 
+  // Derived: current energy — local takes precedence over server value
+  const maxEnergy = labData?.maxEnergy ?? 50;
+  const currentEnergy = localEnergy ?? labData?.energy ?? 0;
+
   const refetchLab = useCallback(async () => {
     if (!labId) return;
     try {
       const res = await api.get(`/labs/${labId}`);
-      setLabData(normalizeLab(res.data));
+      const fresh = normalizeLab(res.data);
+      setLabData(fresh);
+      setLocalEnergy(null); // reset local delta — server is source of truth after GET
     } catch (err) {
       console.error('Error fetching lab data', err);
     }
@@ -58,30 +63,18 @@ export function LaboratorioView() {
     if (hasLab) refetchLab();
   }, [hasLab, refetchLab]);
 
-  // Polling every 10s — detects lottery wins via confirmedBy
+  // Passive energy recharge — frontend-driven: +5 to +10 EP per minute, capped at maxEnergy
   useEffect(() => {
-    if (!hasLab || !labId) return;
-    const poll = setInterval(async () => {
-      try {
-        const res = await api.get(`/labs/${labId}`);
-        const fresh = normalizeLab(res.data);
-        const userWalletId = userInfo?.wallet?.walletAddress;
-        if (userWalletId && fresh.confirmedBy === userWalletId) {
-          setIsWinnerActive(true);
-          setSnackbar({
-            open: true,
-            message: `🎉 ¡HAS GANADO UNA COMISIÓN DE RED! (+${fresh.lastReward ?? '0'} SAMT)`,
-            severity: 'success'
-          });
-          setTimeout(() => setIsWinnerActive(false), 5000);
-        }
-        setLabData(fresh);
-      } catch (err) {
-        console.error('Lab polling error:', err);
-      }
-    }, 10000);
-    return () => clearInterval(poll);
-  }, [hasLab, labId, userInfo?.wallet?.walletAddress]);
+    if (!labData?.id) return;
+    const interval = setInterval(() => {
+      const recharge = Math.floor(Math.random() * 6) + 5; // 5–10 EP
+      setLocalEnergy(prev => {
+        const base = prev ?? labData?.energy ?? 0;
+        return Math.min(maxEnergy, base + recharge);
+      });
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [labData?.id, maxEnergy, labData?.energy]);
 
   const handleOpenMarket = (index: number) => { setBuyingSlotIndex(index); setIsMarketOpen(true); };
   const handleOpenDetail = (index: number) => { setCurrentDetailIndex(index); setIsDetailOpen(true); };
@@ -172,11 +165,11 @@ export function LaboratorioView() {
           }}>
             <Box sx={{ width: 8, height: 8, bgcolor: '#ffd700', borderRadius: '50%', boxShadow: '0 0 8px #ffd700' }} />
             <Typography variant="caption" sx={{ color: '#ffd700', fontWeight: 'bold', letterSpacing: 1 }}>
-              LAB ENERGY: {labData?.energy ?? 0} / {labData?.maxEnergy ?? 50} EP
+              LAB ENERGY: {currentEnergy} / {maxEnergy} EP
             </Typography>
           </Box>
 
-          <LaboratorioMetersSection labData={labData} isWinner={isWinnerActive} />
+          <LaboratorioMetersSection labData={labData} currentEnergy={currentEnergy} />
         </Box>
       </motion.div>
 
@@ -200,7 +193,7 @@ export function LaboratorioView() {
 
         <Grid size={{ xs: 12, md: 4, lg: 3 }}>
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.4 }}>
-            <LaboratorioNetworkSection labData={labData} onRefetch={refetchLab} />
+            <LaboratorioNetworkSection labData={labData} currentEnergy={currentEnergy} onEnergyChange={setLocalEnergy} onRefetch={refetchLab} />
           </motion.div>
         </Grid>
       </Grid>

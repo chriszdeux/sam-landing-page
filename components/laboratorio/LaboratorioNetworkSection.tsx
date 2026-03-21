@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Box, Typography, Stack, Paper, CircularProgress, LinearProgress, Button, Snackbar, Alert } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { Hub, ElectricBolt, ReceiptLong, AccountTree, Savings, Bolt } from "@mui/icons-material";
@@ -8,6 +8,8 @@ import api from "../../lib/api";
 
 interface NetworkSectionProps {
   labData: LabDataInterface | null;
+  currentEnergy: number;
+  onEnergyChange: (newEnergy: number) => void;
   onRefetch?: () => void;
 }
 
@@ -20,7 +22,7 @@ interface Transaction {
   isPersonalWin?: boolean;
 }
 
-export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSectionProps) {
+export function LaboratorioNetworkSection({ labData, currentEnergy, onEnergyChange, onRefetch }: NetworkSectionProps) {
   const blockchainId = useAppSelector((state) => state.blockchain.selectedNetwork?.id ?? null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isClaiming, setIsClaiming] = useState(false);
@@ -28,32 +30,6 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
   const [isInjecting, setIsInjecting] = useState(false);
   const [actionSnackbar, setActionSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'warning' | 'info' }>({ open: false, message: '', severity: 'success' });
   const [showGoldenPulse, setShowGoldenPulse] = useState(false);
-
-  // Local lab state delta — updated optimistically from inject-power response (no GET needed)
-  const [localLabState, setLocalLabState] = useState<{ energy?: number; temperature?: number; currentLife?: number }>({});
-
-  // Merge server data with local delta (local takes precedence after an inject)
-  const currentEnergy = localLabState.energy ?? labData?.energy ?? 0;
-  const currentTemperature = localLabState.temperature ?? labData?.temperature ?? 0;
-  const currentLife = localLabState.currentLife ?? labData?.currentLife ?? 100;
-
-  // Reset local delta when labData refreshes from a full GET
-  const labDataId = labData?.id;
-  useEffect(() => { setLocalLabState({}); }, [labDataId]);
-
-  // Passive energy recharge — frontend-driven: +5 to +10 EP per minute, capped at maxEnergy
-  const maxEnergy = labData?.maxEnergy ?? 50;
-  useEffect(() => {
-    if (!labDataId) return;
-    const interval = setInterval(() => {
-      const recharge = Math.floor(Math.random() * 6) + 5; // 5–10 EP
-      setLocalLabState(prev => {
-        const base = prev.energy ?? labData?.energy ?? 0;
-        return { ...prev, energy: Math.min(maxEnergy, base + recharge) };
-      });
-    }, 60000); // every 60 seconds
-    return () => clearInterval(interval);
-  }, [labDataId, maxEnergy, labData?.energy]);
 
   // effectivePower = real power after penalties; fallback to powerMining if not yet available
   const effectivePower = labData?.effectivePower ?? labData?.powerMining ?? 10;
@@ -78,11 +54,7 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
 
       // Update local state delta immediately — no GET needed
       if (labState) {
-        setLocalLabState({
-          energy: labState.energy,
-          temperature: labState.temperature,
-          currentLife: labState.currentLife,
-        });
+        onEnergyChange(labState.energy);
       }
 
       if (tokensEarned) {
