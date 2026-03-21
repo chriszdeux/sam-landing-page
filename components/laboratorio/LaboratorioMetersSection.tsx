@@ -40,6 +40,7 @@ export interface LabDataInterface {
   blockchainMaxEnergy?: number; // RENAMED: was maxEnergy
   pendingRewards?: number;   // NEW: accumulated rewards to be claimed
   operationStatus?: string;  // NEW: network status (e.g. 'low_energy')
+  pendingTxCount?: number;   // NEW: pending transactions in the global queue
   slots?: SlotMachine[];
   createdAt?: string;
 }

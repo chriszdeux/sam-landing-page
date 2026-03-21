@@ -34,6 +34,23 @@ export function LaboratorioView() {
   
   const hasLab = userInfo?.idLabs && userInfo.idLabs.length > 0;
 
+  const refetchLab = async () => {
+    if (!hasLab || !userInfo?.idLabs) return;
+    try {
+      const res = await api.get(`/labs/${userInfo.idLabs[0]}`);
+      const freshLab = res.data.laboratory || res.data;
+      if (res.data.blockchainProps) {
+        freshLab.blockchainEnergy = res.data.blockchainProps.energy;
+        freshLab.blockchainMaxEnergy = res.data.blockchainProps.maxEnergy;
+        const { energy, maxEnergy, ...otherProps } = res.data.blockchainProps;
+        Object.assign(freshLab, otherProps);
+      }
+      setLabData(freshLab);
+    } catch (err) {
+      console.error('Error refetching lab data', err);
+    }
+  };
+
   const handleOpenMarket = (index: number) => {
     setBuyingSlotIndex(index);
     setIsMarketOpen(true);
@@ -271,7 +288,7 @@ export function LaboratorioView() {
         {/* Right Area (Network Monitoring) */}
         <Grid size={{ xs: 12, md: 4, lg: 3 }}>
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.4 }}>
-            <LaboratorioNetworkSection labData={labData} />
+            <LaboratorioNetworkSection labData={labData} onRefetch={refetchLab} />
           </motion.div>
         </Grid>
       </Grid>
