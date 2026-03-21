@@ -29,7 +29,9 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
   const [actionSnackbar, setActionSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'warning' | 'info' }>({ open: false, message: '', severity: 'success' });
   const [showGoldenPulse, setShowGoldenPulse] = useState(false);
 
-  const hasActivePower = (labData?.powerMining ?? 0) > 0;
+  // effectivePower = real power after penalties; fallback to powerMining if not yet available
+  const effectivePower = labData?.effectivePower ?? labData?.powerMining ?? 10;
+  const hasActivePower = effectivePower > 0;
 
   const handleInjectPower = async () => {
     if (!labData?.id || isInjecting) return;
@@ -320,30 +322,43 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
         </Typography>
 
         {/* Inject Power Button */}
-        <Button
-          fullWidth
-          variant="outlined"
-          size="small"
-          disabled={isInjecting || !blockchainId || !hasActivePower}
-          onClick={handleInjectPower}
-          startIcon={isInjecting ? <CircularProgress size={14} color="inherit" /> : <Bolt />}
-          component={motion.button}
-          whileHover={!isInjecting ? { scale: 1.02 } : {}}
-          whileTap={!isInjecting ? { scale: 0.98 } : {}}
-          sx={{
-            mt: 2,
-            borderColor: showGoldenPulse ? '#ffb700' : 'rgba(0,243,255,0.3)',
-            color: showGoldenPulse ? '#ffb700' : '#00f3ff',
-            textTransform: 'none',
-            fontWeight: 'bold',
-            fontSize: '0.75rem',
-            borderRadius: 2,
-            '&:hover': { borderColor: '#00f3ff', bgcolor: 'rgba(0,243,255,0.05)' },
-            '&.Mui-disabled': { borderColor: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.2)' },
-          }}
-        >
-          {isInjecting ? 'Inyectando...' : !hasActivePower ? 'Sin poder disponible' : '⚡ Inyectar Poder'}
-        </Button>
+        <Box sx={{ mt: 2 }}>
+          {/* Power stats: max vs current */}
+          <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.8, px: 0.5 }}>
+            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.65rem' }}>
+              Poder máx: <Box component="span" sx={{ color: 'rgba(255,255,255,0.6)' }}>{labData?.powerMining ?? 10} GH/s</Box>
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.65rem' }}>
+              Poder actual:{' '}
+              <Box component="span" sx={{ color: effectivePower < (labData?.powerMining ?? 10) ? '#ff9800' : '#00f3ff', fontWeight: 'bold' }}>
+                {effectivePower} GH/s
+              </Box>
+            </Typography>
+          </Stack>
+          <Button
+            fullWidth
+            variant="outlined"
+            size="small"
+            disabled={isInjecting || !blockchainId || !hasActivePower}
+            onClick={handleInjectPower}
+            startIcon={isInjecting ? <CircularProgress size={14} color="inherit" /> : <Bolt />}
+            component={motion.button}
+            whileHover={!isInjecting ? { scale: 1.02 } : {}}
+            whileTap={!isInjecting ? { scale: 0.98 } : {}}
+            sx={{
+              borderColor: showGoldenPulse ? '#ffb700' : 'rgba(0,243,255,0.3)',
+              color: showGoldenPulse ? '#ffb700' : '#00f3ff',
+              textTransform: 'none',
+              fontWeight: 'bold',
+              fontSize: '0.75rem',
+              borderRadius: 2,
+              '&:hover': { borderColor: '#00f3ff', bgcolor: 'rgba(0,243,255,0.05)' },
+              '&.Mui-disabled': { borderColor: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.2)' },
+            }}
+          >
+            {isInjecting ? 'Inyectando...' : '⚡ Inyectar Poder'}
+          </Button>
+        </Box>
       </Paper>
 
       {/* Modern Network Feed */}

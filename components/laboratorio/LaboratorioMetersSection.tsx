@@ -25,6 +25,7 @@ export interface LabDataInterface {
   capacity?: number;
   extraCapacity?: number;
   powerMining?: number;
+  effectivePower?: number;   // NEW: real power after temperature/life penalties
   networkPower?: number;     // NEW: real power from backend
   blockProgress?: number;    // NEW: % progress on current block
   storage?: number;
