@@ -41,7 +41,6 @@ export interface LabDataInterface {
   pendingRewards?: number;   // NEW: accumulated rewards to be claimed
   operationStatus?: string;  // NEW: network status (e.g. 'low_energy')
   pendingTxCount?: number;   // NEW: pending transactions in the global queue
-  blockchainId?: string;     // NEW: id of the active blockchain (for flush body)
   slots?: SlotMachine[];
   createdAt?: string;
 }
