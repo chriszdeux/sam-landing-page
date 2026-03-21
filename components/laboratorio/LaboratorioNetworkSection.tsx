@@ -43,8 +43,9 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
 
   // effectivePower = real power after penalties; fallback to powerMining if not yet available
   const effectivePower = labData?.effectivePower ?? labData?.powerMining ?? 10;
-  const INJECT_ENERGY_COST = 5;
-  const canInject = currentEnergy >= INJECT_ENERGY_COST;
+  // New energy model: user sends all accumulated energy, cost = 5% capped at 100 EP
+  const estimatedCost = Math.min(100, Math.ceil(currentEnergy * 0.05));
+  const canInject = currentEnergy > 0;
 
   const handleInjectPower = async () => {
     if (!labData?.id || isInjecting) return;
@@ -54,7 +55,11 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
     }
     setIsInjecting(true);
     try {
-      const res = await api.post(`/labs/${labData.id}/inject-power`, { blockchainId });
+      // Send all accumulated energy; backend calculates cost (5%, capped at 100 EP)
+      const res = await api.post(`/labs/${labData.id}/inject-power`, {
+        blockchainId,
+        energyAmount: currentEnergy,
+      });
       const { tokensEarned, confirmedTxCount, labState } = res.data;
 
       // Update local state delta immediately — no GET needed
@@ -79,11 +84,13 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
       }
       onRefetch?.();
     } catch (err: unknown) {
-      // HTTP 400 = insufficient lab energy
-      const axiosErr = err as { response?: { status?: number; data?: { energy?: number; required?: number } } };
+      const axiosErr = err as { response?: { status?: number; data?: { available?: number; message?: string } } };
       if (axiosErr?.response?.status === 400) {
-        const { energy = 0, required = INJECT_ENERGY_COST } = axiosErr.response.data ?? {};
-        setActionSnackbar({ open: true, message: `Sin energía. Recargando... (${energy}/${required} EP)`, severity: 'warning' });
+        const { available, message } = axiosErr.response.data ?? {};
+        const msg = available !== undefined
+          ? `Energía insuficiente (disponible: ${available} EP)`
+          : (message ?? 'Sin energía disponible');
+        setActionSnackbar({ open: true, message: msg, severity: 'warning' });
       } else {
         setActionSnackbar({ open: true, message: 'Error al inyectar poder a la red', severity: 'warning' });
       }
@@ -352,7 +359,7 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
 
         {/* Inject Power Button */}
         <Box sx={{ mt: 2 }}>
-          {/* Power stats: max vs current + energy cost indicator */}
+          {/* Power stats: max vs current + energy send info */}
           <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.8, px: 0.5 }}>
             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.65rem' }}>
               Poder máx: <Box component="span" sx={{ color: 'rgba(255,255,255,0.6)' }}>{labData?.powerMining ?? 10} GH/s</Box>
@@ -364,15 +371,15 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
               </Box>
             </Typography>
           </Stack>
-          {/* Energy cost row */}
+          {/* Energy to send + estimated cost */}
           <Stack direction="row" justifyContent="space-between" sx={{ mb: 1, px: 0.5 }}>
             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.6rem' }}>
-              Costo por inyección: <Box component="span" sx={{ color: '#ffd700' }}>{INJECT_ENERGY_COST} EP</Box>
+              Energía a enviar: <Box component="span" sx={{ color: '#ffd700', fontWeight: 'bold' }}>{currentEnergy} EP</Box>
             </Typography>
             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.6rem' }}>
-              Energía lab:{' '}
-              <Box component="span" sx={{ color: canInject ? '#ffd700' : '#ff1744', fontWeight: 'bold' }}>
-                {currentEnergy} / {labData?.maxEnergy ?? 50} EP
+              Costo estimado:{' '}
+              <Box component="span" sx={{ color: '#ff9800', fontWeight: 'bold' }}>
+                -{estimatedCost} EP
               </Box>
             </Typography>
           </Stack>
@@ -383,13 +390,13 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
             disabled={isInjecting || !blockchainId || !canInject}
             onClick={handleInjectPower}
             startIcon={isInjecting ? <CircularProgress size={14} color="inherit" /> : <Bolt />}
-            title={!canInject ? `Sin energía (${currentEnergy}/${INJECT_ENERGY_COST} EP requeridos)` : ''}
+            title={!canInject ? 'Sin energía acumulada' : `Enviar ${currentEnergy} EP (costo: ${estimatedCost} EP)`}
             component={motion.button}
             whileHover={!isInjecting && canInject ? { scale: 1.02 } : {}}
             whileTap={!isInjecting && canInject ? { scale: 0.98 } : {}}
             sx={{
-              borderColor: showGoldenPulse ? '#ffb700' : canInject ? 'rgba(0,243,255,0.3)' : 'rgba(255,23,68,0.3)',
-              color: showGoldenPulse ? '#ffb700' : canInject ? '#00f3ff' : '#ff1744',
+              borderColor: showGoldenPulse ? '#ffb700' : canInject ? 'rgba(0,243,255,0.3)' : 'rgba(255,255,255,0.1)',
+              color: showGoldenPulse ? '#ffb700' : canInject ? '#00f3ff' : 'rgba(255,255,255,0.2)',
               textTransform: 'none',
               fontWeight: 'bold',
               fontSize: '0.75rem',
@@ -398,7 +405,7 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
               '&.Mui-disabled': { borderColor: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.2)' },
             }}
           >
-            {isInjecting ? 'Inyectando...' : !canInject ? `Sin energía (${currentEnergy}/${INJECT_ENERGY_COST} EP)` : '⚡ Inyectar Poder'}
+            {isInjecting ? 'Inyectando...' : !canInject ? 'Sin energía acumulada' : `⚡ Inyectar ${currentEnergy} EP`}
           </Button>
         </Box>
       </Paper>
