@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Box, Typography, Stack, Paper, CircularProgress, LinearProgress, Button, Snackbar, Alert } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
-import { Hub, ElectricBolt, ReceiptLong, AccountTree, Savings, FlashOn } from "@mui/icons-material";
+import { Hub, ElectricBolt, ReceiptLong, AccountTree, Savings, Bolt } from "@mui/icons-material";
 import { LabDataInterface } from "./LaboratorioMetersSection";
 import { useAppSelector } from "../../lib/hooks";
 import api from "../../lib/api";
@@ -25,40 +25,39 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isClaiming, setIsClaiming] = useState(false);
   const [showClaimParticles, setShowClaimParticles] = useState(false);
-  const [isFlushing, setIsFlushing] = useState(false);
-  const [flushSnackbar, setFlushSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'warning' | 'info' }>({ open: false, message: '', severity: 'success' });
+  const [isInjecting, setIsInjecting] = useState(false);
+  const [actionSnackbar, setActionSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'warning' | 'info' }>({ open: false, message: '', severity: 'success' });
   const [showGoldenPulse, setShowGoldenPulse] = useState(false);
 
-  const handleFlush = async () => {
-    if (!labData?.id || isFlushing) return;
+  const hasActivePower = (labData?.powerMining ?? 0) > 0;
+
+  const handleInjectPower = async () => {
+    if (!labData?.id || isInjecting) return;
     if (!blockchainId) {
-      setFlushSnackbar({ open: true, message: 'Red no disponible: blockchain no cargada', severity: 'warning' });
+      setActionSnackbar({ open: true, message: 'Red no disponible: blockchain no cargada', severity: 'warning' });
       return;
     }
-    setIsFlushing(true);
+    setIsInjecting(true);
     try {
-      const res = await api.post(`/labs/${labData.id}/flush`, { blockchainId });
-      const { operationStatus, confirmedBy, tokensEarned, pendingTxCount } = res.data;
+      const res = await api.post(`/labs/${labData.id}/inject-power`, { blockchainId });
+      const { tokensEarned, confirmedTxCount } = res.data;
 
-      if (operationStatus === 'low_energy') {
-        setFlushSnackbar({ open: true, message: 'Red sin energía suficiente para procesar', severity: 'warning' });
-      } else if (operationStatus === 'no_pending_txs') {
-        setFlushSnackbar({ open: true, message: 'No hay transacciones pendientes en la cola', severity: 'info' });
+      if (tokensEarned) {
+        setShowGoldenPulse(true);
+        setTimeout(() => setShowGoldenPulse(false), 3000);
+        setActionSnackbar({
+          open: true,
+          message: `¡Ganaste! +${tokensEarned} SAMT — ${confirmedTxCount} TX confirmadas`,
+          severity: 'success'
+        });
       } else {
-        const userWalletId = typeof window !== 'undefined' ? localStorage.getItem('walletId') : null;
-        if (confirmedBy && userWalletId && confirmedBy === userWalletId) {
-          setShowGoldenPulse(true);
-          setTimeout(() => setShowGoldenPulse(false), 3000);
-          setFlushSnackbar({ open: true, message: `¡Bloque confirmado! +${tokensEarned} SAMT`, severity: 'success' });
-        } else {
-          setFlushSnackbar({ open: true, message: `Bloque procesado. ${pendingTxCount} TXs restantes en cola`, severity: 'success' });
-        }
-        onRefetch?.();
+        setActionSnackbar({ open: true, message: 'Poder inyectado a la red.', severity: 'info' });
       }
+      onRefetch?.();
     } catch {
-      setFlushSnackbar({ open: true, message: 'Error al procesar la cola de transacciones', severity: 'warning' });
+      setActionSnackbar({ open: true, message: 'Error al inyectar poder a la red', severity: 'warning' });
     } finally {
-      setIsFlushing(false);
+      setIsInjecting(false);
     }
   };
 
@@ -320,17 +319,17 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
           * El bloque se cerrará al alcanzar las {blockLimit} transacciones.
         </Typography>
 
-        {/* Confirm Transactions Button */}
+        {/* Inject Power Button */}
         <Button
           fullWidth
           variant="outlined"
           size="small"
-          disabled={isFlushing || !blockchainId || labData?.operationStatus === 'low_energy' || (labData?.pendingTxCount !== undefined && labData.pendingTxCount === 0)}
-          onClick={handleFlush}
-          startIcon={isFlushing ? <CircularProgress size={14} color="inherit" /> : <FlashOn />}
+          disabled={isInjecting || !blockchainId || !hasActivePower}
+          onClick={handleInjectPower}
+          startIcon={isInjecting ? <CircularProgress size={14} color="inherit" /> : <Bolt />}
           component={motion.button}
-          whileHover={!isFlushing ? { scale: 1.02 } : {}}
-          whileTap={!isFlushing ? { scale: 0.98 } : {}}
+          whileHover={!isInjecting ? { scale: 1.02 } : {}}
+          whileTap={!isInjecting ? { scale: 0.98 } : {}}
           sx={{
             mt: 2,
             borderColor: showGoldenPulse ? '#ffb700' : 'rgba(0,243,255,0.3)',
@@ -343,13 +342,7 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
             '&.Mui-disabled': { borderColor: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.2)' },
           }}
         >
-          {isFlushing
-            ? 'Procesando...'
-            : labData?.operationStatus === 'low_energy'
-            ? 'Red sin energía'
-            : (labData?.pendingTxCount !== undefined && labData.pendingTxCount === 0)
-            ? 'Sin TXs Pendientes'
-            : 'Confirmar Transacciones'}
+          {isInjecting ? 'Inyectando...' : !hasActivePower ? 'Sin poder disponible' : '⚡ Inyectar Poder'}
         </Button>
       </Paper>
 
@@ -513,19 +506,19 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
         </AnimatePresence>
       </Paper>
 
-      {/* Flush Snackbar */}
+      {/* Action Snackbar */}
       <Snackbar
-        open={flushSnackbar.open}
+        open={actionSnackbar.open}
         autoHideDuration={4000}
-        onClose={() => setFlushSnackbar(prev => ({ ...prev, open: false }))}
+        onClose={() => setActionSnackbar(prev => ({ ...prev, open: false }))}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
         <Alert
-          severity={flushSnackbar.severity}
-          onClose={() => setFlushSnackbar(prev => ({ ...prev, open: false }))}
-          sx={{ bgcolor: flushSnackbar.severity === 'success' ? 'rgba(0,230,118,0.15)' : undefined, border: '1px solid', borderColor: flushSnackbar.severity === 'success' ? '#00e676' : undefined }}
+          severity={actionSnackbar.severity}
+          onClose={() => setActionSnackbar(prev => ({ ...prev, open: false }))}
+          sx={{ bgcolor: actionSnackbar.severity === 'success' ? 'rgba(0,230,118,0.15)' : undefined, border: '1px solid', borderColor: actionSnackbar.severity === 'success' ? '#00e676' : undefined }}
         >
-          {flushSnackbar.message}
+          {actionSnackbar.message}
         </Alert>
       </Snackbar>
     </Box>
