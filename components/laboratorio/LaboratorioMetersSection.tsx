@@ -42,6 +42,8 @@ export interface LabDataInterface {
   pendingRewards?: number;   // NEW: accumulated rewards to be claimed
   operationStatus?: string;  // NEW: network status (e.g. 'low_energy')
   pendingTxCount?: number;   // NEW: pending transactions in the global queue
+  confirmedBy?: string;      // wallet address of last lottery winner
+  lastReward?: number;       // last reward amount earned
   slots?: SlotMachine[];
   createdAt?: string;
 }

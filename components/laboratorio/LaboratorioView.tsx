@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Box, Grid, Typography, Paper, CircularProgress, Snackbar, Alert } from "@mui/material";
 import { PowerSettingsNew } from "@mui/icons-material";
@@ -9,13 +9,24 @@ import { LaboratorioChartsSection } from "./LaboratorioChartsSection";
 import { useAppSelector } from "../../lib/hooks";
 import { LaboratorioRegistration } from "./LaboratorioRegistration";
 import { LaboratorioMetersSection, LabDataInterface } from "./LaboratorioMetersSection";
-import api from "../../lib/api";
-import { useEffect } from "react";
-import { LaboratorioMarketDrawer, HardwareItem } from "./LaboratorioMarketDrawer";
+import api from "../../lib/api";import { LaboratorioMarketDrawer, HardwareItem } from "./LaboratorioMarketDrawer";
 import { LaboratorioHardwareDetailDrawer } from "./LaboratorioHardwareDetailDrawer";
 import { LaboratorioSlotsGrid } from "./LaboratorioSlotsGrid";
 import { AxiosError } from "axios";
 import { LaboratorioNetworkSection } from "./LaboratorioNetworkSection";
+
+/** Normaliza la respuesta del GET /labs/:id al shape de LabDataInterface */
+function normalizeLab(data: Record<string, unknown>): LabDataInterface {
+  const lab = (data.laboratory ?? data) as LabDataInterface;
+  // Merge blockchainProps fields if present (energy/maxEnergy go to blockchainEnergy/blockchainMaxEnergy)
+  if (data.blockchainProps && typeof data.blockchainProps === 'object') {
+    const bp = data.blockchainProps as Record<string, unknown>;
+    lab.blockchainEnergy = bp.energy as number | undefined;
+    lab.blockchainMaxEnergy = bp.maxEnergy as number | undefined;
+    lab.operationStatus = bp.operationStatus as string | undefined;
+  }
+  return lab;
+}
 
 export function LaboratorioView() {
   const { userInfo, status } = useAppSelector((state) => state.auth);
@@ -23,173 +34,94 @@ export function LaboratorioView() {
   const [labData, setLabData] = useState<LabDataInterface | null>(null);
   const [isMarketOpen, setIsMarketOpen] = useState(false);
   const [buyingSlotIndex, setBuyingSlotIndex] = useState<number | null>(null);
-  
-  // US-003 Inventory Detailed states
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [currentDetailIndex, setCurrentDetailIndex] = useState<number | null>(null);
-  
-  // Maintenance states
   const [isMaintenanceLoading, setIsMaintenanceLoading] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
-  
-  const hasLab = userInfo?.idLabs && userInfo.idLabs.length > 0;
-
-  const refetchLab = async () => {
-    if (!hasLab || !userInfo?.idLabs) return;
-    try {
-      const res = await api.get(`/labs/${userInfo.idLabs[0]}`);
-      const freshLab = res.data.laboratory || res.data;
-      if (res.data.blockchainProps) {
-        freshLab.blockchainEnergy = res.data.blockchainProps.energy;
-        freshLab.blockchainMaxEnergy = res.data.blockchainProps.maxEnergy;
-        const { energy, maxEnergy, ...otherProps } = res.data.blockchainProps;
-        Object.assign(freshLab, otherProps);
-      }
-      setLabData(freshLab);
-    } catch (err) {
-      console.error('Error refetching lab data', err);
-    }
-  };
-
-  const handleOpenMarket = (index: number) => {
-    setBuyingSlotIndex(index);
-    setIsMarketOpen(true);
-  };
-  const handleOpenDetail = (index: number) => {
-    setCurrentDetailIndex(index);
-    setIsDetailOpen(true);
-  };
-
-  const handleUninstall = async () => {
-    if (labData?.id && currentDetailIndex !== null) {
-      try {
-        await api.post(`/labs/${labData.id}/uninstall-hardware`, { slotIndex: currentDetailIndex });
-        const res = await api.get(`/labs/${labData.id}`);
-        const freshLab = res.data.laboratory || res.data;
-        if (res.data.blockchainProps) {
-          freshLab.blockchainEnergy = res.data.blockchainProps.energy;
-          freshLab.blockchainMaxEnergy = res.data.blockchainProps.maxEnergy;
-          // merge other props if any, but skipping old energy/maxEnergy
-          const { energy, maxEnergy, ...otherProps } = res.data.blockchainProps;
-          Object.assign(freshLab, otherProps);
-        }
-        setLabData(freshLab);
-        setIsDetailOpen(false);
-      } catch (err) {
-        console.error("Error unistalling hardware", err);
-      }
-    }
-  };
-
-  const handleMaintenance = async () => {
-    if (labData?.id && currentDetailIndex !== null) {
-      setIsMaintenanceLoading(true);
-      try {
-        await api.post(`/labs/${labData.id}/slot/${currentDetailIndex}/repair`);
-        const res = await api.get(`/labs/${labData.id}`);
-        const freshLab = res.data.laboratory || res.data;
-        if (res.data.blockchainProps) {
-          freshLab.blockchainEnergy = res.data.blockchainProps.energy;
-          freshLab.blockchainMaxEnergy = res.data.blockchainProps.maxEnergy;
-          // merge other props if any, but skipping old energy/maxEnergy
-          const { energy, maxEnergy, ...otherProps } = res.data.blockchainProps;
-          Object.assign(freshLab, otherProps);
-        }
-        setLabData(freshLab);
-        setSnackbar({ open: true, message: 'Hardware reparado exitosamente (10 tokens consumidos)', severity: 'success' });
-      } catch (err: unknown) {
-        console.error("Error maintenance hardware", err);
-        const errorMsg = (err as AxiosError<{message: string}>).response?.data?.message || 'Error al intentar reparar el hardware';
-        setSnackbar({ open: true, message: errorMsg, severity: 'error' });
-      } finally {
-        setIsMaintenanceLoading(false);
-      }
-    }
-  };
-
-  // Lottery Winner states
   const [isWinnerActive, setIsWinnerActive] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
 
-  const handleBuy = async (hw: HardwareItem) => {
-     if (labData && labData.id && buyingSlotIndex !== null) {
-       try {
-         await api.post(`/labs/${labData.id}/buy-slot`, {
-           hardwareId: hw.id,
-           slotIndex: buyingSlotIndex
-         });
-         
-         // Refetch
-         const res = await api.get(`/labs/${labData.id}`);
-         const freshLab = res.data.laboratory || res.data;
-         if (res.data.blockchainProps) {
-           freshLab.blockchainEnergy = res.data.blockchainProps.energy;
-           freshLab.blockchainMaxEnergy = res.data.blockchainProps.maxEnergy;
-           const { energy, maxEnergy, ...otherProps } = res.data.blockchainProps;
-           Object.assign(freshLab, otherProps);
-         }
-         setLabData(freshLab);
-         setIsMarketOpen(false);
-       } catch (error) {
-         console.error("Error comprar hardware", error);
-       }
-     }
-  };
+  const hasLab = userInfo?.idLabs && userInfo.idLabs.length > 0;
+  const labId = userInfo?.idLabs?.[0];
 
-  useEffect(() => {
-    if (hasLab && userInfo?.idLabs) {
-      api.get(`/labs/${userInfo.idLabs[0]}`)
-         .then(res => {
-           const freshLab = res.data.laboratory || res.data;
-           if (res.data.blockchainProps) {
-             freshLab.blockchainEnergy = res.data.blockchainProps.energy;
-             freshLab.blockchainMaxEnergy = res.data.blockchainProps.maxEnergy;
-             const { energy, maxEnergy, ...otherProps } = res.data.blockchainProps;
-             Object.assign(freshLab, otherProps);
-           }
-           setLabData(freshLab);
-         })
-         .catch(err => console.error("Error fetching lab data", err));
+  const refetchLab = useCallback(async () => {
+    if (!labId) return;
+    try {
+      const res = await api.get(`/labs/${labId}`);
+      setLabData(normalizeLab(res.data));
+    } catch (err) {
+      console.error('Error fetching lab data', err);
     }
-  }, [hasLab, userInfo]);
+  }, [labId]);
 
-  // Real polling: refresh lab data every 10s when lab is active
-  // Detects wins via confirmedBy === user wallet address
+  // Initial load
   useEffect(() => {
-    if (!hasLab || !userInfo?.idLabs) return;
-    const labId = userInfo.idLabs[0];
+    if (hasLab) refetchLab();
+  }, [hasLab, refetchLab]);
 
+  // Polling every 10s — detects lottery wins via confirmedBy
+  useEffect(() => {
+    if (!hasLab || !labId) return;
     const poll = setInterval(async () => {
       try {
         const res = await api.get(`/labs/${labId}`);
-        const freshLab = res.data.laboratory || res.data;
-        if (res.data.blockchainProps) {
-          freshLab.blockchainEnergy = res.data.blockchainProps.energy;
-          freshLab.blockchainMaxEnergy = res.data.blockchainProps.maxEnergy;
-          // merge other props if any, but skipping old energy/maxEnergy
-          const { energy, maxEnergy, ...otherProps } = res.data.blockchainProps;
-          Object.assign(freshLab, otherProps);
-        }
-        
-        // Check if this user won a network transaction confirmation
+        const fresh = normalizeLab(res.data);
         const userWalletId = userInfo?.wallet?.walletAddress;
-        if (userWalletId && freshLab.confirmedBy === userWalletId) {
+        if (userWalletId && fresh.confirmedBy === userWalletId) {
           setIsWinnerActive(true);
           setSnackbar({
             open: true,
-            message: `🎉 ¡HAS GANADO UNA COMISIÓN DE RED! (+${freshLab.lastReward || '12.4'} SAMT)`,
+            message: `🎉 ¡HAS GANADO UNA COMISIÓN DE RED! (+${fresh.lastReward ?? '0'} SAMT)`,
             severity: 'success'
           });
           setTimeout(() => setIsWinnerActive(false), 5000);
         }
-
-        setLabData(freshLab);
+        setLabData(fresh);
       } catch (err) {
         console.error('Lab polling error:', err);
       }
     }, 10000);
-
     return () => clearInterval(poll);
-  }, [hasLab, userInfo]);
+  }, [hasLab, labId, userInfo?.wallet?.walletAddress]);
+
+  const handleOpenMarket = (index: number) => { setBuyingSlotIndex(index); setIsMarketOpen(true); };
+  const handleOpenDetail = (index: number) => { setCurrentDetailIndex(index); setIsDetailOpen(true); };
+
+  const handleBuy = async (hw: HardwareItem) => {
+    if (!labData?.id || buyingSlotIndex === null) return;
+    try {
+      await api.post(`/labs/${labData.id}/buy-slot`, { hardwareId: hw.id, slotIndex: buyingSlotIndex });
+      await refetchLab();
+      setIsMarketOpen(false);
+    } catch (error) {
+      console.error("Error comprar hardware", error);
+    }
+  };
+
+  const handleUninstall = async () => {
+    if (!labData?.id || currentDetailIndex === null) return;
+    try {
+      await api.post(`/labs/${labData.id}/uninstall-hardware`, { slotIndex: currentDetailIndex });
+      await refetchLab();
+      setIsDetailOpen(false);
+    } catch (err) {
+      console.error("Error uninstalling hardware", err);
+    }
+  };
+
+  const handleMaintenance = async () => {
+    if (!labData?.id || currentDetailIndex === null) return;
+    setIsMaintenanceLoading(true);
+    try {
+      await api.post(`/labs/${labData.id}/slot/${currentDetailIndex}/repair`);
+      await refetchLab();
+      setSnackbar({ open: true, message: 'Hardware reparado exitosamente (10 tokens consumidos)', severity: 'success' });
+    } catch (err: unknown) {
+      const errorMsg = (err as AxiosError<{ message: string }>).response?.data?.message ?? 'Error al intentar reparar el hardware';
+      setSnackbar({ open: true, message: errorMsg, severity: 'error' });
+    } finally {
+      setIsMaintenanceLoading(false);
+    }
+  };
 
   if (status === 'loading') {
     return (
@@ -214,47 +146,30 @@ export function LaboratorioView() {
     );
   }
 
-  if (!hasLab && userInfo) {
-    return <LaboratorioRegistration userInfo={userInfo} />;
-  }
+  if (!hasLab) return <LaboratorioRegistration userInfo={userInfo} />;
 
   return (
-    <Box sx={{ 
-      minHeight: '100vh', 
-      pt: 12, 
-      pb: 6, 
-      px: { xs: 2, sm: 3, lg: 4 }, 
-      maxWidth: 1600, 
-      mx: 'auto',
-      position: 'relative' 
-    }}>
+    <Box sx={{ minHeight: '100vh', pt: 12, pb: 6, px: { xs: 2, sm: 3, lg: 4 }, maxWidth: 1600, mx: 'auto', position: 'relative' }}>
       <MiningBackground />
 
-      {/* Top Title and Energy Meter */}
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <Box display="flex" flexDirection="column" alignItems="center" mb={6}>
-          <Typography variant="h4" sx={{ 
-            color: '#fff', 
-            mb: 3, 
-            fontWeight: 800, 
-            textTransform: 'uppercase', 
-            letterSpacing: 2,
+          <Typography variant="h4" sx={{
+            color: '#fff', mb: 3, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2,
             textShadow: '0 0 10px rgba(0, 243, 255, 0.5)'
           }}>
             Cluster <span style={{ color: '#00f3ff' }}>{"->"}</span> Laboratorio
           </Typography>
 
-          {/* Individual Lab Energy Mini-Indicator */}
-          <Box 
-            sx={{ 
-              mb: 3, px: 2, py: 0.5, 
-              bgcolor: 'rgba(255, 215, 0, 0.05)', 
-              border: '1px solid rgba(255, 215, 0, 0.2)',
-              borderRadius: 2,
-              display: 'flex', alignItems: 'center', gap: 1,
-              boxShadow: '0 0 15px rgba(255, 215, 0, 0.1)'
-            }}
-          >
+          {/* Lab Energy Mini-Indicator */}
+          <Box sx={{
+            mb: 3, px: 2, py: 0.5,
+            bgcolor: 'rgba(255, 215, 0, 0.05)',
+            border: '1px solid rgba(255, 215, 0, 0.2)',
+            borderRadius: 2,
+            display: 'flex', alignItems: 'center', gap: 1,
+            boxShadow: '0 0 15px rgba(255, 215, 0, 0.1)'
+          }}>
             <Box sx={{ width: 8, height: 8, bgcolor: '#ffd700', borderRadius: '50%', boxShadow: '0 0 8px #ffd700' }} />
             <Typography variant="caption" sx={{ color: '#ffd700', fontWeight: 'bold', letterSpacing: 1 }}>
               LAB ENERGY: {labData?.energy ?? 0} / {labData?.maxEnergy ?? 50} EP
@@ -266,26 +181,23 @@ export function LaboratorioView() {
       </motion.div>
 
       <Grid container spacing={4}>
-        {/* Left Area (Charts and Bottom Slots) */}
         <Grid size={{ xs: 12, md: 8, lg: 9 }}>
           <LaboratorioChartsSection />
-
           <Grid container spacing={4}>
             <Grid size={{ xs: 12 }}>
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.5 }}>
-                  <LaboratorioSlotsGrid 
-                    labData={labData}
-                    selectedSlot={selectedSlot}
-                    onOpenMarket={handleOpenMarket}
-                    onOpenDetail={handleOpenDetail}
-                    onSelectSlot={setSelectedSlot}
-                  />
-                </motion.div>
+                <LaboratorioSlotsGrid
+                  labData={labData}
+                  selectedSlot={selectedSlot}
+                  onOpenMarket={handleOpenMarket}
+                  onOpenDetail={handleOpenDetail}
+                  onSelectSlot={setSelectedSlot}
+                />
+              </motion.div>
             </Grid>
           </Grid>
         </Grid>
 
-        {/* Right Area (Network Monitoring) */}
         <Grid size={{ xs: 12, md: 4, lg: 3 }}>
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.4 }}>
             <LaboratorioNetworkSection labData={labData} onRefetch={refetchLab} />
@@ -293,9 +205,9 @@ export function LaboratorioView() {
         </Grid>
       </Grid>
 
-      <LaboratorioMarketDrawer 
-        open={isMarketOpen} 
-        onClose={() => setIsMarketOpen(false)} 
+      <LaboratorioMarketDrawer
+        open={isMarketOpen}
+        onClose={() => setIsMarketOpen(false)}
         buyingSlotIndex={buyingSlotIndex}
         onBuy={handleBuy}
       />
@@ -303,16 +215,16 @@ export function LaboratorioView() {
       <LaboratorioHardwareDetailDrawer
         open={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
-        slot={currentDetailIndex !== null ? (labData?.slots?.[currentDetailIndex] || null) : null}
+        slot={currentDetailIndex !== null ? (labData?.slots?.[currentDetailIndex] ?? null) : null}
         onUninstall={handleUninstall}
         onMaintenance={handleMaintenance}
         isMaintenanceLoading={isMaintenanceLoading}
       />
 
-      <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={4000} 
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         <Alert severity={snackbar.severity} variant="filled" sx={{ width: '100%', borderRadius: 2, boxShadow: '0 0 15px rgba(0,0,0,0.5)' }}>
