@@ -3,6 +3,7 @@ import { Box, Typography, Stack, Paper, CircularProgress, LinearProgress, Button
 import { motion, AnimatePresence } from "framer-motion";
 import { Hub, ElectricBolt, ReceiptLong, AccountTree, Savings, FlashOn } from "@mui/icons-material";
 import { LabDataInterface } from "./LaboratorioMetersSection";
+import { useAppSelector } from "../../lib/hooks";
 import api from "../../lib/api";
 
 interface NetworkSectionProps {
@@ -20,6 +21,7 @@ interface Transaction {
 }
 
 export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSectionProps) {
+  const blockchainId = useAppSelector((state) => state.blockchain.selectedNetwork?.id ?? null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isClaiming, setIsClaiming] = useState(false);
   const [showClaimParticles, setShowClaimParticles] = useState(false);
@@ -29,13 +31,13 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
 
   const handleFlush = async () => {
     if (!labData?.id || isFlushing) return;
-    if (!labData.blockchainId) {
-      setFlushSnackbar({ open: true, message: 'Red no disponible: blockchainId no encontrado', severity: 'warning' });
+    if (!blockchainId) {
+      setFlushSnackbar({ open: true, message: 'Red no disponible: blockchain no cargada', severity: 'warning' });
       return;
     }
     setIsFlushing(true);
     try {
-      const res = await api.post(`/labs/${labData.id}/flush`, { blockchainId: labData.blockchainId });
+      const res = await api.post(`/labs/${labData.id}/flush`, { blockchainId });
       const { operationStatus, confirmedBy, tokensEarned, pendingTxCount } = res.data;
 
       if (operationStatus === 'low_energy') {
@@ -323,7 +325,7 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
           fullWidth
           variant="outlined"
           size="small"
-          disabled={isFlushing || !labData?.blockchainId || labData?.operationStatus === 'low_energy' || (labData?.pendingTxCount !== undefined && labData.pendingTxCount === 0)}
+          disabled={isFlushing || !blockchainId || labData?.operationStatus === 'low_energy' || (labData?.pendingTxCount !== undefined && labData.pendingTxCount === 0)}
           onClick={handleFlush}
           startIcon={isFlushing ? <CircularProgress size={14} color="inherit" /> : <FlashOn />}
           component={motion.button}
