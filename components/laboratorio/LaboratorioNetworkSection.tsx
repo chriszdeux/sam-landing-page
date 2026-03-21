@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Stack, Paper, CircularProgress, LinearProgress, Button } from "@mui/material";
+import { Box, Typography, Stack, Paper, CircularProgress, LinearProgress, Button, Snackbar, Alert } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
-import { Hub, ElectricBolt, ReceiptLong, AccountTree, Savings } from "@mui/icons-material";
+import { Hub, ElectricBolt, ReceiptLong, AccountTree, Savings, FlashOn } from "@mui/icons-material";
 import { LabDataInterface } from "./LaboratorioMetersSection";
 import api from "../../lib/api";
 
 interface NetworkSectionProps {
   labData: LabDataInterface | null;
+  onRefetch?: () => void;
 }
 
 interface Transaction {
@@ -18,10 +19,42 @@ interface Transaction {
   isPersonalWin?: boolean;
 }
 
-export function LaboratorioNetworkSection({ labData }: NetworkSectionProps) {
+export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSectionProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isClaiming, setIsClaiming] = useState(false);
   const [showClaimParticles, setShowClaimParticles] = useState(false);
+  const [isFlushing, setIsFlushing] = useState(false);
+  const [flushSnackbar, setFlushSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'warning' | 'info' }>({ open: false, message: '', severity: 'success' });
+  const [showGoldenPulse, setShowGoldenPulse] = useState(false);
+
+  const handleFlush = async () => {
+    if (!labData?.id || isFlushing) return;
+    setIsFlushing(true);
+    try {
+      const res = await api.post(`/labs/${labData.id}/flush`);
+      const { operationStatus, confirmedBy, tokensEarned, pendingTxCount } = res.data;
+
+      if (operationStatus === 'low_energy') {
+        setFlushSnackbar({ open: true, message: 'Red sin energía suficiente para procesar', severity: 'warning' });
+      } else if (operationStatus === 'no_pending_txs') {
+        setFlushSnackbar({ open: true, message: 'No hay transacciones pendientes en la cola', severity: 'info' });
+      } else {
+        const userWalletId = typeof window !== 'undefined' ? localStorage.getItem('walletId') : null;
+        if (confirmedBy && userWalletId && confirmedBy === userWalletId) {
+          setShowGoldenPulse(true);
+          setTimeout(() => setShowGoldenPulse(false), 3000);
+          setFlushSnackbar({ open: true, message: `¡Bloque confirmado! +${tokensEarned} SAMT`, severity: 'success' });
+        } else {
+          setFlushSnackbar({ open: true, message: `Bloque procesado. ${pendingTxCount} TXs restantes en cola`, severity: 'success' });
+        }
+        onRefetch?.();
+      }
+    } catch {
+      setFlushSnackbar({ open: true, message: 'Error al procesar la cola de transacciones', severity: 'warning' });
+    } finally {
+      setIsFlushing(false);
+    }
+  };
 
   const handleClaim = async () => {
     if (!labData?.id || (labData.pendingRewards ?? 0) <= 0) return;
@@ -235,14 +268,16 @@ export function LaboratorioNetworkSection({ labData }: NetworkSectionProps) {
       <Paper sx={{ 
         p: 3, 
         bgcolor: 'rgba(10,12,16,0.6)', 
-        border: '1px solid rgba(255,255,255,0.05)',
+        border: showGoldenPulse ? '1px solid rgba(255,183,0,0.5)' : '1px solid rgba(255,255,255,0.05)',
         borderRadius: 4,
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        transition: 'border 0.3s ease',
+        boxShadow: showGoldenPulse ? '0 0 25px rgba(255,183,0,0.2)' : 'none'
       }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Stack direction="row" spacing={1} alignItems="center">
-            <Hub sx={{ color: '#00f3ff', fontSize: 20 }} />
+            <Hub sx={{ color: showGoldenPulse ? '#ffb700' : '#00f3ff', fontSize: 20, transition: 'color 0.3s' }} />
             <Typography variant="subtitle2" color="#fff" fontWeight="bold">BLOQUE ACTIVO</Typography>
           </Stack>
           <Typography variant="caption" color="rgba(0, 243, 255, 0.8)" fontWeight="bold">
@@ -258,15 +293,58 @@ export function LaboratorioNetworkSection({ labData }: NetworkSectionProps) {
             borderRadius: 4, 
             bgcolor: 'rgba(0, 243, 255, 0.1)',
             '& .MuiLinearProgress-bar': {
-              bgcolor: '#00f3ff',
-              boxShadow: '0 0 10px #00f3ff'
+              bgcolor: showGoldenPulse ? '#ffb700' : '#00f3ff',
+              boxShadow: showGoldenPulse ? '0 0 10px #ffb700' : '0 0 10px #00f3ff',
+              transition: 'all 0.3s ease'
             }
           }}
         />
-        
-        <Typography variant="caption" sx={{ mt: 1.5, display: 'block', color: 'rgba(255,255,255,0.4)', fontStyle: 'italic' }}>
+
+        {/* Pending TX badge */}
+        {(labData?.pendingTxCount ?? 0) > 0 && (
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1.5 }}>
+            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#ff9800' }} component={motion.div} animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1, repeat: Infinity }} />
+            <Typography variant="caption" color="#ff9800" fontWeight="bold">
+              {labData?.pendingTxCount} TXs en espera de procesamiento
+            </Typography>
+          </Stack>
+        )}
+
+        <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'rgba(255,255,255,0.4)', fontStyle: 'italic' }}>
           * El bloque se cerrará al alcanzar las {blockLimit} transacciones.
         </Typography>
+
+        {/* Confirm Transactions Button */}
+        <Button
+          fullWidth
+          variant="outlined"
+          size="small"
+          disabled={isFlushing || labData?.operationStatus === 'low_energy' || (labData?.pendingTxCount !== undefined && labData.pendingTxCount === 0)}
+          onClick={handleFlush}
+          startIcon={isFlushing ? <CircularProgress size={14} color="inherit" /> : <FlashOn />}
+          component={motion.button}
+          whileHover={!isFlushing ? { scale: 1.02 } : {}}
+          whileTap={!isFlushing ? { scale: 0.98 } : {}}
+          sx={{
+            mt: 2,
+            borderColor: showGoldenPulse ? '#ffb700' : 'rgba(0,243,255,0.3)',
+            color: showGoldenPulse ? '#ffb700' : '#00f3ff',
+            textTransform: 'none',
+            fontWeight: 'bold',
+            fontSize: '0.75rem',
+            borderRadius: 2,
+            '&:hover': { borderColor: '#00f3ff', bgcolor: 'rgba(0,243,255,0.05)' },
+            '&.Mui-disabled': { borderColor: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.2)' },
+          }}
+        >
+          {isFlushing
+            ? 'Procesando...'
+            : labData?.operationStatus === 'low_energy'
+            ? 'Red sin energía'
+            : (labData?.pendingTxCount !== undefined && labData.pendingTxCount === 0)
+            ? 'Sin TXs Pendientes'
+            : 'Confirmar Transacciones'}
+        </Button>
       </Paper>
 
       {/* Modern Network Feed */}
@@ -428,6 +506,22 @@ export function LaboratorioNetworkSection({ labData }: NetworkSectionProps) {
           )}
         </AnimatePresence>
       </Paper>
+
+      {/* Flush Snackbar */}
+      <Snackbar
+        open={flushSnackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setFlushSnackbar(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          severity={flushSnackbar.severity}
+          onClose={() => setFlushSnackbar(prev => ({ ...prev, open: false }))}
+          sx={{ bgcolor: flushSnackbar.severity === 'success' ? 'rgba(0,230,118,0.15)' : undefined, border: '1px solid', borderColor: flushSnackbar.severity === 'success' ? '#00e676' : undefined }}
+        >
+          {flushSnackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
