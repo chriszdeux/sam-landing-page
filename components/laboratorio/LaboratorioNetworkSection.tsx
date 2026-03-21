@@ -29,9 +29,22 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
   const [actionSnackbar, setActionSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'warning' | 'info' }>({ open: false, message: '', severity: 'success' });
   const [showGoldenPulse, setShowGoldenPulse] = useState(false);
 
+  // Local lab state delta — updated optimistically from inject-power response (no GET needed)
+  const [localLabState, setLocalLabState] = useState<{ energy?: number; temperature?: number; currentLife?: number }>({});
+
+  // Merge server data with local delta (local takes precedence after an inject)
+  const currentEnergy = localLabState.energy ?? labData?.energy ?? 0;
+  const currentTemperature = localLabState.temperature ?? labData?.temperature ?? 0;
+  const currentLife = localLabState.currentLife ?? labData?.currentLife ?? 100;
+
+  // Reset local delta when labData refreshes from a full GET
+  const labDataId = labData?.id;
+  useEffect(() => { setLocalLabState({}); }, [labDataId]);
+
   // effectivePower = real power after penalties; fallback to powerMining if not yet available
   const effectivePower = labData?.effectivePower ?? labData?.powerMining ?? 10;
-  const hasActivePower = effectivePower > 0;
+  const INJECT_ENERGY_COST = 5;
+  const canInject = currentEnergy >= INJECT_ENERGY_COST;
 
   const handleInjectPower = async () => {
     if (!labData?.id || isInjecting) return;
@@ -42,7 +55,16 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
     setIsInjecting(true);
     try {
       const res = await api.post(`/labs/${labData.id}/inject-power`, { blockchainId });
-      const { tokensEarned, confirmedTxCount } = res.data;
+      const { tokensEarned, confirmedTxCount, labState } = res.data;
+
+      // Update local state delta immediately — no GET needed
+      if (labState) {
+        setLocalLabState({
+          energy: labState.energy,
+          temperature: labState.temperature,
+          currentLife: labState.currentLife,
+        });
+      }
 
       if (tokensEarned) {
         setShowGoldenPulse(true);
@@ -56,8 +78,15 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
         setActionSnackbar({ open: true, message: 'Poder inyectado a la red.', severity: 'info' });
       }
       onRefetch?.();
-    } catch {
-      setActionSnackbar({ open: true, message: 'Error al inyectar poder a la red', severity: 'warning' });
+    } catch (err: unknown) {
+      // HTTP 400 = insufficient lab energy
+      const axiosErr = err as { response?: { status?: number; data?: { energy?: number; required?: number } } };
+      if (axiosErr?.response?.status === 400) {
+        const { energy = 0, required = INJECT_ENERGY_COST } = axiosErr.response.data ?? {};
+        setActionSnackbar({ open: true, message: `Sin energía. Recargando... (${energy}/${required} EP)`, severity: 'warning' });
+      } else {
+        setActionSnackbar({ open: true, message: 'Error al inyectar poder a la red', severity: 'warning' });
+      }
     } finally {
       setIsInjecting(false);
     }
@@ -323,7 +352,7 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
 
         {/* Inject Power Button */}
         <Box sx={{ mt: 2 }}>
-          {/* Power stats: max vs current */}
+          {/* Power stats: max vs current + energy cost indicator */}
           <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.8, px: 0.5 }}>
             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.65rem' }}>
               Poder máx: <Box component="span" sx={{ color: 'rgba(255,255,255,0.6)' }}>{labData?.powerMining ?? 10} GH/s</Box>
@@ -335,19 +364,32 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
               </Box>
             </Typography>
           </Stack>
+          {/* Energy cost row */}
+          <Stack direction="row" justifyContent="space-between" sx={{ mb: 1, px: 0.5 }}>
+            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.6rem' }}>
+              Costo por inyección: <Box component="span" sx={{ color: '#ffd700' }}>{INJECT_ENERGY_COST} EP</Box>
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.6rem' }}>
+              Energía lab:{' '}
+              <Box component="span" sx={{ color: canInject ? '#ffd700' : '#ff1744', fontWeight: 'bold' }}>
+                {currentEnergy} / {labData?.maxEnergy ?? 50} EP
+              </Box>
+            </Typography>
+          </Stack>
           <Button
             fullWidth
             variant="outlined"
             size="small"
-            disabled={isInjecting || !blockchainId || !hasActivePower}
+            disabled={isInjecting || !blockchainId || !canInject}
             onClick={handleInjectPower}
             startIcon={isInjecting ? <CircularProgress size={14} color="inherit" /> : <Bolt />}
+            title={!canInject ? `Sin energía (${currentEnergy}/${INJECT_ENERGY_COST} EP requeridos)` : ''}
             component={motion.button}
-            whileHover={!isInjecting ? { scale: 1.02 } : {}}
-            whileTap={!isInjecting ? { scale: 0.98 } : {}}
+            whileHover={!isInjecting && canInject ? { scale: 1.02 } : {}}
+            whileTap={!isInjecting && canInject ? { scale: 0.98 } : {}}
             sx={{
-              borderColor: showGoldenPulse ? '#ffb700' : 'rgba(0,243,255,0.3)',
-              color: showGoldenPulse ? '#ffb700' : '#00f3ff',
+              borderColor: showGoldenPulse ? '#ffb700' : canInject ? 'rgba(0,243,255,0.3)' : 'rgba(255,23,68,0.3)',
+              color: showGoldenPulse ? '#ffb700' : canInject ? '#00f3ff' : '#ff1744',
               textTransform: 'none',
               fontWeight: 'bold',
               fontSize: '0.75rem',
@@ -356,7 +398,7 @@ export function LaboratorioNetworkSection({ labData, onRefetch }: NetworkSection
               '&.Mui-disabled': { borderColor: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.2)' },
             }}
           >
-            {isInjecting ? 'Inyectando...' : '⚡ Inyectar Poder'}
+            {isInjecting ? 'Inyectando...' : !canInject ? `Sin energía (${currentEnergy}/${INJECT_ENERGY_COST} EP)` : '⚡ Inyectar Poder'}
           </Button>
         </Box>
       </Paper>
