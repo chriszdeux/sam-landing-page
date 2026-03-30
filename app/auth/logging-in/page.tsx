@@ -16,21 +16,21 @@ export default function LoggingIn() {
     const router = useRouter();
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    
-    
+
+
     //# 2-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         const timer = setTimeout(() => {
             router.push('/');
         }, 5000);
-        
-        
+
+
         //# 3-Estructuración y renderizado visual del componente UI
         return () => clearTimeout(timer);
-    }, [router]);
+    }, []);
 
-    
-    
+
+
     //# 4-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -70,42 +70,42 @@ export default function LoggingIn() {
         };
 
         const interval = setInterval(draw, 33);
-        
-        
+
+
         //# 5-Estructuración y renderizado visual del componente UI
         return () => clearInterval(interval);
     }, []);
 
-    
-    
+
+
     //# 6-Estructuración y renderizado visual del componente UI
     return (
-        <Box sx={{ 
-            minHeight: '100vh', 
-            bgcolor: '#000', 
+        <Box sx={{
+            minHeight: '100vh',
+            bgcolor: '#000',
             position: 'relative',
-            display: 'flex', 
+            display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center', 
+            alignItems: 'center',
             justifyContent: 'center',
             overflow: 'hidden'
         }}>
-            <canvas 
-                ref={canvasRef} 
-                style={{ 
-                    position: 'absolute', 
-                    top: 0, 
-                    left: 0, 
-                    opacity: 0.3 
-                }} 
+            <canvas
+                ref={canvasRef}
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    opacity: 0.3
+                }}
             />
-            
+
             <Box sx={{ position: 'relative', zIndex: 10, textAlign: 'center' }}>
-                <Box sx={{ 
-                    position: 'relative', 
-                    width: 100, 
-                    height: 100, 
-                    mx: 'auto', 
+                <Box sx={{
+                    position: 'relative',
+                    width: 100,
+                    height: 100,
+                    mx: 'auto',
                     mb: 4,
                     display: 'flex',
                     alignItems: 'center',
@@ -120,7 +120,7 @@ export default function LoggingIn() {
                         borderTopColor: 'transparent',
                         animation: 'spin 1s linear infinite'
                     }} />
-                     <Box sx={{
+                    <Box sx={{
                         position: 'absolute',
                         width: '70%',
                         height: '70%',
