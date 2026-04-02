@@ -26,7 +26,7 @@ export default function RoadmapPage() {
         <Box sx={{ mt: 8, mb: 10 }}>
           <Grid container spacing={4}>
             {roadmapPhases.map((item, index) => (
-              <Grid item xs={12} md={6} key={index}>
+              <Grid size={{ xs: 12, md: 6 }} key={index}>
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
