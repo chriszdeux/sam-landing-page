@@ -34,12 +34,14 @@ import { NavbarDrawer } from "./NavbarDrawer";
 import { LogoutDialog } from "./LogoutDialog";
 import { NavbarUserMenu } from "./NavbarUserMenu";
 import { EnvVariables } from "@/lib/constants/variables";
+import { WishlistModal } from "../ui/WishlistModal";
 
 export const Navbar = () => {
   
   //# 2-Definir componente y estados locales
   const [mobileOpen, setMobileOpen] = useState(false);
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  const [wishlistOpen, setWishlistOpen] = useState(false);
   
   //# 3-Obtener datos de Redux y hooks
   const dispatch = useAppDispatch();
@@ -229,7 +231,15 @@ export const Navbar = () => {
                 display: { xs: "none", md: "block" }
             }} />
 
-            <Box sx={{ display: { xs: "none", md: "block" } }}>
+            <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 2 }}>
+                <Button 
+                    variant="outlined" 
+                    glow 
+                    onClick={() => setWishlistOpen(true)}
+                    sx={{ color: '#00f3ff', borderColor: 'rgba(0, 243, 255, 0.5)' }}
+                >
+                    Join Wishlist
+                </Button>
                 <NavbarUserMenu 
                     userInfo={userInfo}
                     onLogoutClick={() => setLogoutConfirmOpen(true)}
@@ -282,6 +292,10 @@ export const Navbar = () => {
         open={logoutConfirmOpen} 
         onClose={() => setLogoutConfirmOpen(false)} 
         onConfirm={() => router.push('/auth/logging-out')}
+      />
+      <WishlistModal 
+        open={wishlistOpen} 
+        onClose={() => setWishlistOpen(false)} 
       />
     </Box>
   );
