@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { EnvVariables } from "../../lib/constants/variables";
-import { CardGiftcard } from "@mui/icons-material";
+import { CardGiftcard, Star } from "@mui/icons-material";
 import { Button } from "../ui/Button";
 import { CountUp } from "../ui/CountUp";
 import { openModal } from "../../lib/features/uiSlice";
@@ -106,9 +106,9 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({
                 </Typography>
                 <Box
                   sx={{
+                    display: 'none', // Ocultar por orden del PM
                     color: "text.secondary",
                     mb: 2,
-                    display: "flex",
                     alignItems: "center",
                     gap: 1,
                     justifyContent: "center",
@@ -131,7 +131,13 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({
                       dispatch(openModal('rewards'));
                       handleDrawerToggle();
                   }}
-                  sx={{ mb: 1, borderColor: 'primary.main', color: 'primary.main', bgcolor: 'rgba(0, 243, 255, 0.05)' }}
+                  sx={{ 
+                      display: 'none', // Ocultar por orden del PM
+                      mb: 1, 
+                      borderColor: 'primary.main', 
+                      color: 'primary.main', 
+                      bgcolor: 'rgba(0, 243, 255, 0.05)' 
+                  }}
                 >
                   Recompensas
                 </Button>
@@ -147,7 +153,7 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({
             ) : (
               <>
                 <Button
-                  variant="outlined"
+                  variant="text"
                   fullWidth
                   onClick={() => {
                     dispatch(openModal("login"));

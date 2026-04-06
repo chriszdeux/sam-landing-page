@@ -3,15 +3,18 @@
 
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Box, Typography, Divider, Grid } from '@mui/material';
 import Image from 'next/image';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Section } from '../ui/Section';
+import { Button } from '../ui/Button';
+import { PlayArrow as PlayIcon } from '@mui/icons-material';
 import { historyData } from '../../lib/data/history';
 import { EnvVariables } from '@/lib/constants/variables';
+import { CinematicStoryteller } from '../ui/CinematicStoryteller';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -86,6 +89,7 @@ const DataLog = ({ title, year, children, align = 'left' }: { title: string; yea
 );
 
 export const HistorySection = () => {
+  const [isCinematicOpen, setIsCinematicOpen] = useState(false);
   const container = useRef<HTMLElement | null>(null);
   const { project } = EnvVariables;
 
@@ -161,6 +165,33 @@ export const HistorySection = () => {
           }}>
             Cronología {project}
           </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+            <Button
+              variant="contained"
+              startIcon={<PlayIcon />}
+              onClick={() => setIsCinematicOpen(true)}
+              sx={{ 
+                background: 'rgba(0, 243, 255, 0.05)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(0, 243, 255, 0.5)',
+                color: '#fff', 
+                fontWeight: '900',
+                textTransform: 'uppercase',
+                letterSpacing: 2,
+                px: 4,
+                py: 1.5,
+                boxShadow: '0 0 20px rgba(0, 243, 255, 0.15)',
+                '&:hover': {
+                    background: 'rgba(0, 243, 255, 0.15)',
+                    boxShadow: '0 0 30px rgba(0, 243, 255, 0.4)',
+                    transform: 'translateY(-2px)',
+                },
+                transition: 'all 0.3s ease'
+              }}
+            >
+              Reproducir Historia
+            </Button>
+          </Box>
           <Divider sx={{ my: 4, borderColor: '#00f3ff', opacity: 0.3, maxWidth: '200px', mx: 'auto' }} />
         </Box>
 
@@ -283,6 +314,12 @@ export const HistorySection = () => {
           ))}
         </Box>
       </Box>
+
+      <CinematicStoryteller 
+        data={historyData} 
+        isOpen={isCinematicOpen} 
+        onClose={() => setIsCinematicOpen(false)} 
+      />
     </Section>
   );
 };

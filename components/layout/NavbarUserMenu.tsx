@@ -56,6 +56,7 @@ export const NavbarUserMenu = ({
           variant="text"
           onClick={() => router.push("/rewards")}
           sx={{
+            display: 'none', // Ocultar por orden del PM
             color: "primary.main",
             "&:hover": { bgcolor: "rgba(0, 243, 255, 0.1)" },
           }}
@@ -79,8 +80,8 @@ export const NavbarUserMenu = ({
           component="div"
           variant="body2"
           sx={{
+            display: 'none', // Ocultar por orden del PM
             color: "text.secondary",
-            display: "flex",
             alignItems: "center",
             gap: 0.5,
             mr: 1,
