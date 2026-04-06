@@ -27,14 +27,29 @@ export const WishlistModal: React.FC<WishlistModalProps> = ({ open, onClose }) =
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus("loading");
     setErrorMsg("");
 
+    // Validación básica en el cliente
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!name.trim()) {
+      setStatus("error");
+      setErrorMsg("Por favor, ingresa tu nombre.");
+      return;
+    }
+    if (!emailRegex.test(email)) {
+      setStatus("error");
+      setErrorMsg("Por favor, ingresa un correo electrónico válido.");
+      return;
+    }
+
+    setStatus("loading");
+
     try {
-      const res = await fetch("/sam-v1/wishlist", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
+      const res = await fetch(`${apiUrl}/sam-v1/wishlist`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email }),
+        body: JSON.stringify({ name: name.trim(), email: email.trim() }),
       });
 
       if (!res.ok) {
