@@ -63,7 +63,12 @@ export const Navbar = () => {
       }
   }, [userInfo, dispatch, walletsInfo]);
 
-  if (pathname === '/auth/logging-in' || pathname === '/auth/logging-out' || pathname.includes('/connecting')) {
+  if (
+    pathname === '/auth/logging-in' || 
+    pathname === '/auth/logging-out' || 
+    pathname.includes('/connecting') ||
+    pathname === '/exploracion-infinita'
+  ) {
     return null;
   }
 
@@ -177,7 +182,7 @@ export const Navbar = () => {
               backdropFilter: 'blur(5px)'
             }}
           >
-            {navItems.filter(item => userInfo || (item.path !== '/portfolio' && item.path !== '/laboratorio')).map((item) => {
+            {navItems.filter(item => userInfo || (item.path !== '/portfolio')).map((item) => {
               const isActive = pathname === item.path;
               
               
