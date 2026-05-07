@@ -14,6 +14,7 @@ interface PlanetCanvasProps {
   biome?: string;
   type?: string;
   atmosphere?: number; // 0 to 100
+  atmosphereHue?: number;
   animate?: boolean; 
   // Legacy support
   hue?: number;
@@ -112,7 +113,7 @@ const fbm3D = (noise: (x: number, y: number, z: number) => number, x: number, y:
 export default function PlanetCanvas(props: PlanetCanvasProps) {
   const { 
     seed, size = 300, terrainHue = 30, oceanHue = 200, faunaHue = 120, cloudHue = 0, 
-    radius = 5, atmosphere = 50, hasRings = false, biome, type, animate = false 
+    radius = 5, atmosphere = 50, atmosphereHue, hasRings = false, biome, type, animate = false 
   } = props;
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -161,9 +162,15 @@ export default function PlanetCanvas(props: PlanetCanvasProps) {
             centerX, centerY, visualRadius * 0.8,
             centerX, centerY, atmosphereRadius
           );
-          const aColor = `hsla(${oceanHue}, 90%, 75%`;
-          bloomGradient.addColorStop(0, `${aColor}, ${0.5 * (atmosphere / 100)})`);
-          bloomGradient.addColorStop(0.4, `${aColor}, ${0.2 * (atmosphere / 100)})`);
+          const aHue = atmosphereHue ?? oceanHue;
+          const aColor = `hsla(${aHue}, 90%, 75%`;
+          
+          // Pulse effect if animated
+          const pulse = animate ? Math.sin(Date.now() / 1000) * 0.05 : 0;
+          const intensity = Math.max(0, (atmosphere / 100) + pulse);
+
+          bloomGradient.addColorStop(0, `${aColor}, ${0.5 * intensity})`);
+          bloomGradient.addColorStop(0.4, `${aColor}, ${0.2 * intensity})`);
           bloomGradient.addColorStop(1, `${aColor}, 0)`);
           
           ctx.save();
@@ -280,9 +287,9 @@ export default function PlanetCanvas(props: PlanetCanvasProps) {
                 ctx.fillRect(lx, ly, resolution + 0.1, resolution + 0.1);
             }
 
-            // Layer 4: Specular Highlight (The "Sun Reflection") [NEW]
-            const specX = centerX - visualRadius * 0.4;
-            const specY = centerY - visualRadius * 0.4;
+            // Layer 4: Specular Highlight (The "Sun Reflection") [NEW] - Fixed Position
+            const specX = centerX + lx_norm * visualRadius * 0.5;
+            const specY = centerY + ly_norm * visualRadius * 0.5;
             const specDist = Math.sqrt(Math.pow(lx - specX, 2) + Math.pow(ly - specY, 2));
             if (specDist < visualRadius * 0.15) {
                 const specIntensity = Math.pow(1 - (specDist / (visualRadius * 0.15)), 2) * 0.4;
@@ -309,11 +316,11 @@ export default function PlanetCanvas(props: PlanetCanvasProps) {
 
     render();
     return () => { if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current); };
-  }, [seed, size, terrainHue, oceanHue, faunaHue, cloudHue, radius, atmosphere, hasRings, biome, type, animate]);
+  }, [seed, size, terrainHue, oceanHue, faunaHue, cloudHue, radius, atmosphere, atmosphereHue, hasRings, biome, type, animate]);
 
-  const glowSize = (atmosphere / 100) * 80;
-  const glowOpacity = (atmosphere / 100) * 0.4;
-  const glowColor = `hsla(${oceanHue}, 80%, 60%, ${glowOpacity})`;
+  const effectiveAtmosphere = atmosphere / 100;
+  const glowSizeValue = effectiveAtmosphere * 60;
+  const glowColorValue = `hsla(${atmosphereHue ?? oceanHue}, 100%, 70%, ${effectiveAtmosphere * 0.5})`;
 
   return (
     <canvas
@@ -322,8 +329,11 @@ export default function PlanetCanvas(props: PlanetCanvasProps) {
       height={size}
       style={{
         borderRadius: "50%",
-        boxShadow: "0 0 40px rgba(0, 0, 0, 0.5)",
+        boxShadow: atmosphere > 0 
+          ? `0 0 ${glowSizeValue}px ${glowColorValue}, inset 0 0 20px rgba(0,0,0,0.5)` 
+          : "0 0 40px rgba(0, 0, 0, 0.5)",
         backgroundColor: "transparent",
+        transition: "box-shadow 0.3s ease",
       }}
     />
   );
