@@ -14,16 +14,20 @@ export function LaboratorioRegistration({ userInfo }: { userInfo: User }) {
   const [isRegistering, setIsRegistering] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
   const [animLines, setAnimLines] = useState<string[]>([]);
+  const [errorMessage, setErrorMessage] = useState('');
+  
+  const labPrice = 500;
   
   const handleRegister = async () => {
     setIsRegistering(true);
+    setErrorMessage('');
     try {
       const payloadObj = {
         userId: userInfo.id,
-        name: `Lab - ${userInfo.username || 'Main'}`,
-        laboratoryType: labType 
+        laboratoryType: labType,
+        price: labPrice
       };
-      const res = await api.post('/labs/create', payloadObj);
+      const res = await api.post('/labs/buy', payloadObj);
       // Start animation
       setIsRegistering(false);
       setShowAnimation(true);
@@ -52,9 +56,14 @@ export function LaboratorioRegistration({ userInfo }: { userInfo: User }) {
       await new Promise(r => setTimeout(r, 1000));
       // Refresh user info to get the updated idLabs and transition to dashboard
       await dispatch(refreshUserInfo()).unwrap();
-    } catch (error) {
+    } catch (error: any) {
        console.error(error);
        setIsRegistering(false);
+       if (error.response?.data?.message) {
+         setErrorMessage(error.response.data.message);
+       } else {
+         setErrorMessage('Ocurrió un error inesperado al intentar comprar el laboratorio.');
+       }
     }
   };
 
@@ -98,9 +107,19 @@ export function LaboratorioRegistration({ userInfo }: { userInfo: User }) {
               <Typography variant="h3" sx={{ color: 'white', mb: 2, fontWeight: 'bold' }}>
                 REGISTRO DE LABORATORIO
               </Typography>
-              <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.6)', mb: 6 }}>
-                No se detectó ningún laboratorio asociado a tu cuenta. Regístralo ahora para comenzar a operar.
+              <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.6)', mb: 2 }}>
+                No se detectó ningún laboratorio asociado a tu cuenta. Adquiere uno ahora para comenzar a operar.
               </Typography>
+              
+              <Typography variant="body1" sx={{ color: '#00f3ff', mb: 6, fontWeight: 'bold' }}>
+                Tu Balance: {userInfo.balance || 0} Créditos
+              </Typography>
+
+              {errorMessage && (
+                <Typography variant="body1" sx={{ color: '#ff3366', mb: 4, fontWeight: 'bold', p: 2, border: '1px solid #ff3366', borderRadius: 2, bgcolor: 'rgba(255, 51, 102, 0.1)' }}>
+                  {errorMessage}
+                </Typography>
+              )}
 
               <FormControl fullWidth sx={{ mb: 6, textAlign: 'left' }}>
                 <Typography variant="overline" sx={{ color: '#00f3ff', mb: 1, fontWeight: 'bold', fontSize: '1rem' }}>TIPO DE LABORATORIO</Typography>
@@ -146,7 +165,7 @@ export function LaboratorioRegistration({ userInfo }: { userInfo: User }) {
                   }
                 }}
               >
-                {isRegistering ? <CircularProgress size={28} sx={{ color: '#00f3ff' }} /> : 'INICIAR REGISTRO'}
+                {isRegistering ? <CircularProgress size={28} sx={{ color: '#00f3ff' }} /> : `COMPRAR LABORATORIO (${labPrice} CRÉDITOS)`}
               </Button>
             </Paper>
           )}
