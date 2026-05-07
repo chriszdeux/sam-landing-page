@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Box, Typography, IconButton, Paper, Autocomplete, TextField, Fade, Button } from "@mui/material";
-import { ZoomIn, ZoomOut, ArrowBack, Explore } from "@mui/icons-material";
+import { Box, Typography, IconButton, Paper, Autocomplete, TextField, Fade, Button, CircularProgress } from "@mui/material";
+import { ZoomIn, ZoomOut, ArrowBack, Explore, ErrorOutline } from "@mui/icons-material";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { fetchGalaxies, fetchSystemsByGalaxy, fetchPlanetsBySystem } from "@/lib/features/space/actions";
 import PlanetCanvas from "./PlanetCanvas";
@@ -26,7 +26,7 @@ interface Particle {
 export default function GalacticExplorer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dispatch = useAppDispatch();
-  const { galaxies, systems, planets } = useAppSelector((state) => state.space);
+  const { galaxies, systems, planets, loading, error } = useAppSelector((state) => state.space);
 
   const [viewLevel, setViewLevel] = useState<ViewLevel>('GALAXY');
   const [selectedGalaxy, setSelectedGalaxy] = useState<string | null>(null);
@@ -518,7 +518,14 @@ export default function GalacticExplorer() {
       <Paper sx={{ position: 'absolute', top: 20, left: 20, p: 2, bgcolor: 'rgba(5, 5, 20, 0.8)', backdropFilter: 'blur(10px)', width: 300, border: '1px solid rgba(0, 240, 255, 0.2)' }}>
         <Typography variant="h6" sx={{ color: '#00F0FF', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
           <Explore /> Explorador Galáctico
+          {loading && <CircularProgress size={20} sx={{ ml: 'auto', color: '#00F0FF' }} />}
         </Typography>
+
+        {error && (
+          <Typography variant="caption" sx={{ color: '#ff4d4d', mb: 2, display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'rgba(255, 0, 0, 0.1)', p: 1, borderRadius: 1 }}>
+            <ErrorOutline fontSize="small" /> Pérdida de señal con la red galáctica.
+          </Typography>
+        )}
 
         {viewLevel !== 'GALAXY' && (
           <Button 
