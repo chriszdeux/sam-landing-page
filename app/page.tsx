@@ -7,6 +7,7 @@ import { Background } from "../components/layout/Background";
 import { HeroSection } from "../components/sections/HeroSection";
 import { HistorySection } from "../components/sections/HistorySection";
 import { MechanicsSection } from "../components/sections/MechanicsSection";
+import { UniverseSection } from "../components/sections/UniverseSection";
 import { Modal } from "../components/ui/Modal";
 import { SectionNavigation } from "../components/ui/SectionNavigation";
 
@@ -23,6 +24,7 @@ export default function Home() {
         <HeroSection />
         <HistorySection />
         <MechanicsSection />
+        <UniverseSection />
       </div>
 
       <Footer />
