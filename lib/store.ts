@@ -12,6 +12,7 @@ import economyReducer from './features/economySlice';
 import marketReducer from './features/market/reducer';
 import blockchainReducer from './features/blockchain/reducer';
 import transactionsReducer from './features/transactions/reducer';
+import spaceReducer from './features/space/reducer';
 
 export const makeStore = () => {
   //# 2-Configurar store con reducers y middleware
@@ -24,6 +25,7 @@ export const makeStore = () => {
       market: marketReducer,
       blockchain: blockchainReducer,
       transactions: transactionsReducer,
+      space: spaceReducer,
     },
     devTools: {
         //# 3-Sanitizar datos en herramientas de desarrollo

@@ -14,7 +14,7 @@ import { StationModule } from '../../lib/types/core_modules';
 import { ModuleModuleModuleAnchorModal } from './ModuleAnchorModal';
 import api from '../../lib/api';
 import { CircularProgress } from '@mui/material';
-import { calculateResources } from '../../lib/utils/core_modules-logic';
+import { calculateResources } from '../../lib/utils/core_modules_logic';
 
 // Initial data for the simulator
 const INITIAL_MODULES: StationModule[] = [
