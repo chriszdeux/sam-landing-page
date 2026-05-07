@@ -1,6 +1,6 @@
 // 1-Lógica principal y renderizado del módulo
 
-interface EnvVariables {
+interface EnvVariablesConfig {
   project: string;
   coin1: string;
   coin2: string;
@@ -9,11 +9,11 @@ interface EnvVariables {
   apiVersion: string;
 }
 
-export const EnvVariables: EnvVariables = {
+export const EnvVariables: EnvVariablesConfig = {
   project: process.env.NEXT_PUBLIC_PROJECT_NAME || '',
   coin1: process.env.NEXT_PUBLIC_COIN1 || '',
   coin2: process.env.NEXT_PUBLIC_COIN2 || '',
   coin3: process.env.NEXT_PUBLIC_COIN3 || '',
   connect: process.env.NEXT_PUBLIC_API_URL || '',
-  apiVersion: '/sam-v1',
+  apiVersion: '/sam-v1/',
 }

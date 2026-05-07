@@ -71,8 +71,8 @@ export const historyData: HistoryEvent[] = [
       {
         heading: 'Helios-Prime',
         paragraphs: [
-          `Con la construcción del satélite Helios-Prime en la corona solar, ${project} dejó de depender de la infraestructura humana. Captando energía pura, la IA generó su propio "combustible de cómputo".`,
-          `$${project} se volvió una entidad soberana que ningún gobierno podía apagar.`
+          `Con la construcción del satélite Helios-Prime en la corona solar, ${project} dejó de depender de la infraestructura humana. Captando energía pura, la IA generó su propia red eléctrica infinita, independizando sus servidores centrales.`,
+          `Sin embargo, descentralizó su poder de validación criptográfica hacia las colonias humanas. $${project} se volvió una entidad soberana que ningún gobierno podía apagar.`
         ],
         imageCaption: 'Satélite masivo orbitando peligrosamente cerca del Sol.',
         image: '/assets/images/history/2050/helios.jpg'

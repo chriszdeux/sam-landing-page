@@ -1,119 +1,51 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Box, Grid, Typography, Paper, CircularProgress, Snackbar, Alert } from "@mui/material";
-import { PowerSettingsNew } from "@mui/icons-material";
+import { Box, Paper, CircularProgress, Typography, Button, Chip } from "@mui/material";
+import { PowerSettingsNew, Bolt } from "@mui/icons-material";
 import { MiningBackground } from "./MiningBackground";
-import { LaboratorioChartsSection } from "./LaboratorioChartsSection";
 import { useAppSelector } from "../../lib/hooks";
 import { LaboratorioRegistration } from "./LaboratorioRegistration";
-import { LaboratorioMetersSection, LabDataInterface } from "./LaboratorioMetersSection";
-import api from "../../lib/api";import { LaboratorioMarketDrawer, HardwareItem } from "./LaboratorioMarketDrawer";
-import { LaboratorioHardwareDetailDrawer } from "./LaboratorioHardwareDetailDrawer";
-import { LaboratorioSlotsGrid } from "./LaboratorioSlotsGrid";
-import { AxiosError } from "axios";
-import { LaboratorioNetworkSection } from "./LaboratorioNetworkSection";
+import { LaboratorioInventory } from "./LaboratorioInventory";
+import { CoreModulesSimulator } from "../core_modules/CoreModulesSimulator";
+import { useEffect, useState } from "react";
+import api from "../../lib/api";
 
-/** Normaliza la respuesta del GET /labs/:id al shape de LabDataInterface */
-function normalizeLab(data: Record<string, unknown>): LabDataInterface {
-  const lab = (data.laboratory ?? data) as LabDataInterface;
-  if (data.blockchainProps && typeof data.blockchainProps === 'object') {
-    const bp = data.blockchainProps as Record<string, unknown>;
-    lab.blockchainEnergy = bp.energy as number | undefined;
-    lab.blockchainMaxEnergy = bp.maxEnergy as number | undefined;
-    lab.operationStatus = bp.operationStatus as string | undefined;
-  }
-  return lab;
+interface LabBasicData {
+  id: string;
+  type?: string;
+  powerMining?: number;
 }
 
 export function LaboratorioView() {
   const { userInfo, status } = useAppSelector((state) => state.auth);
-  const [selectedSlot, setSelectedSlot] = useState<number | string | null>(null);
-  const [labData, setLabData] = useState<LabDataInterface | null>(null);
-  const [localEnergy, setLocalEnergy] = useState<number | null>(null);
-  const [isMarketOpen, setIsMarketOpen] = useState(false);
-  const [buyingSlotIndex, setBuyingSlotIndex] = useState<number | null>(null);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [currentDetailIndex, setCurrentDetailIndex] = useState<number | null>(null);
-  const [isMaintenanceLoading, setIsMaintenanceLoading] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+  const [labData, setLabData] = useState<LabBasicData | null>(null);
+  const [injecting, setInjecting] = useState(false);
 
   const hasLab = userInfo?.idLabs && userInfo.idLabs.length > 0;
   const labId = userInfo?.idLabs?.[0];
 
-  // Derived: current energy — local takes precedence over server value
-  const maxEnergy = labData?.maxEnergy ?? 50;
-  const currentEnergy = localEnergy ?? labData?.energy ?? 0;
-
-  const refetchLab = useCallback(async () => {
-    if (!labId) return;
-    try {
-      const res = await api.get(`/labs/${labId}`);
-      const fresh = normalizeLab(res.data);
-      setLabData(fresh);
-      setLocalEnergy(null); // reset local delta — server is source of truth after GET
-    } catch (err) {
-      console.error('Error fetching lab data', err);
-    }
-  }, [labId]);
-
-  // Initial load
   useEffect(() => {
-    if (hasLab) refetchLab();
-  }, [hasLab, refetchLab]);
-
-  // Passive energy recharge — frontend-driven: +5 to +10 EP per minute, capped at maxEnergy
-  useEffect(() => {
-    if (!labData?.id) return;
-    const interval = setInterval(() => {
-      const recharge = Math.floor(Math.random() * 6) + 5; // 5–10 EP
-      setLocalEnergy(prev => {
-        const base = prev ?? labData?.energy ?? 0;
-        return Math.min(maxEnergy, base + recharge);
-      });
-    }, 60000);
-    return () => clearInterval(interval);
-  }, [labData?.id, maxEnergy, labData?.energy]);
-
-  const handleOpenMarket = (index: number) => { setBuyingSlotIndex(index); setIsMarketOpen(true); };
-  const handleOpenDetail = (index: number) => { setCurrentDetailIndex(index); setIsDetailOpen(true); };
-
-  const handleBuy = async (hw: HardwareItem) => {
-    if (!labData?.id || buyingSlotIndex === null) return;
-    try {
-      await api.post(`/labs/${labData.id}/buy-slot`, { hardwareId: hw.id, slotIndex: buyingSlotIndex });
-      await refetchLab();
-      setIsMarketOpen(false);
-    } catch (error) {
-      console.error("Error comprar hardware", error);
+    if (hasLab && labId) {
+      api.get(`/labs/${labId}`)
+        .then((res) => {
+          const data = res.data.laboratory || res.data;
+          setLabData({
+            id: data.id,
+            type: data.type || 'MINNING', // Default to MINNING for prototype if missing
+            powerMining: data.powerMining || 1500
+          });
+        })
+        .catch(() => {
+          // Fallback mock for UI visualization if backend is offline or unlinked
+          setLabData({ id: labId, type: 'MINNING', powerMining: 5000 });
+        });
     }
-  };
+  }, [hasLab, labId]);
 
-  const handleUninstall = async () => {
-    if (!labData?.id || currentDetailIndex === null) return;
-    try {
-      await api.post(`/labs/${labData.id}/uninstall-hardware`, { slotIndex: currentDetailIndex });
-      await refetchLab();
-      setIsDetailOpen(false);
-    } catch (err) {
-      console.error("Error uninstalling hardware", err);
-    }
-  };
-
-  const handleMaintenance = async () => {
-    if (!labData?.id || currentDetailIndex === null) return;
-    setIsMaintenanceLoading(true);
-    try {
-      await api.post(`/labs/${labData.id}/slot/${currentDetailIndex}/repair`);
-      await refetchLab();
-      setSnackbar({ open: true, message: 'Hardware reparado exitosamente (10 tokens consumidos)', severity: 'success' });
-    } catch (err: unknown) {
-      const errorMsg = (err as AxiosError<{ message: string }>).response?.data?.message ?? 'Error al intentar reparar el hardware';
-      setSnackbar({ open: true, message: errorMsg, severity: 'error' });
-    } finally {
-      setIsMaintenanceLoading(false);
-    }
+  const handleInjectPower = () => {
+    setInjecting(true);
+    setTimeout(() => setInjecting(false), 2000); // Simulate network/effect
   };
 
   if (status === 'loading') {
@@ -128,10 +60,27 @@ export function LaboratorioView() {
     return (
       <Box sx={{ minHeight: '100vh', pt: 12, display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: '#0a0c10', position: 'relative' }}>
         <MiningBackground />
-        <Paper sx={{ p: 6, bgcolor: 'rgba(10,12,16,0.8)', border: '1px solid #ff0055', textAlign: 'center', zIndex: 1 }}>
+        <Paper 
+          elevation={0}
+          sx={{ 
+            p: 6, 
+            bgcolor: 'rgba(10,12,16,0.8)', 
+            border: '1px solid #ff0055', 
+            textAlign: 'center', 
+            zIndex: 1,
+            backdropFilter: 'blur(10px)',
+            borderRadius: 4,
+            boxShadow: '0 0 30px rgba(255, 0, 85, 0.2)'
+          }}
+        >
           <PowerSettingsNew sx={{ fontSize: 60, color: '#ff0055', mb: 2 }} />
-          <Typography variant="h4" color="white" fontWeight="bold">ACCESO DENEGADO</Typography>
-          <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.6)', mt: 1 }}>
+          <Typography 
+            variant="h4" 
+            sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}
+          >
+            ACCESO DENEGADO
+          </Typography>
+          <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.6)' }}>
             Inicia sesión para acceder al Laboratorio.
           </Typography>
         </Paper>
@@ -142,88 +91,81 @@ export function LaboratorioView() {
   if (!hasLab) return <LaboratorioRegistration userInfo={userInfo} />;
 
   return (
-    <Box sx={{ minHeight: '100vh', pt: 12, pb: 6, px: { xs: 2, sm: 3, lg: 4 }, maxWidth: 1600, mx: 'auto', position: 'relative' }}>
+    <Box 
+      sx={{ 
+        minHeight: '100vh', 
+        pt: 15, 
+        pb: 6, 
+        px: { xs: 2, sm: 3, lg: 4 }, 
+        maxWidth: 1600, 
+        mx: 'auto', 
+        position: 'relative' 
+      }}
+    >
       <MiningBackground />
 
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        <Box display="flex" flexDirection="column" alignItems="center" mb={6}>
-          <Typography variant="h4" sx={{
-            color: '#fff', mb: 3, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 2,
-            textShadow: '0 0 10px rgba(0, 243, 255, 0.5)'
-          }}>
-            Cluster <span style={{ color: '#00f3ff' }}>{"->"}</span> Laboratorio
-          </Typography>
-
-          {/* Lab Energy Mini-Indicator */}
-          <Box sx={{
-            mb: 3, px: 2, py: 0.5,
-            bgcolor: 'rgba(255, 215, 0, 0.05)',
-            border: '1px solid rgba(255, 215, 0, 0.2)',
-            borderRadius: 2,
-            display: 'flex', alignItems: 'center', gap: 1,
-            boxShadow: '0 0 15px rgba(255, 215, 0, 0.1)'
-          }}>
-            <Box sx={{ width: 8, height: 8, bgcolor: '#ffd700', borderRadius: '50%', boxShadow: '0 0 8px #ffd700' }} />
-            <Typography variant="caption" sx={{ color: '#ffd700', fontWeight: 'bold', letterSpacing: 1 }}>
-              LAB ENERGY: {currentEnergy} / {maxEnergy} EP
-            </Typography>
-          </Box>
-
-          <LaboratorioMetersSection labData={labData} currentEnergy={currentEnergy} />
-        </Box>
-      </motion.div>
-
-      <Grid container spacing={4}>
-        <Grid size={{ xs: 12, md: 8, lg: 9 }}>
-          <LaboratorioChartsSection />
-          <Grid container spacing={4}>
-            <Grid size={{ xs: 12 }}>
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.5 }}>
-                <LaboratorioSlotsGrid
-                  labData={labData}
-                  selectedSlot={selectedSlot}
-                  onOpenMarket={handleOpenMarket}
-                  onOpenDetail={handleOpenDetail}
-                  onSelectSlot={setSelectedSlot}
-                />
-              </motion.div>
-            </Grid>
-          </Grid>
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 4, lg: 3 }}>
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.4 }}>
-            <LaboratorioNetworkSection labData={labData} currentEnergy={currentEnergy} onEnergyChange={setLocalEnergy} onRefetch={refetchLab} />
+      <Box display="flex" flexDirection="column" gap={3}>
+        {/* Helios-1 Mining Power UI */}
+        {labData?.type === 'MINNING' && (
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2, px: 3,
+                bgcolor: 'rgba(255, 215, 0, 0.05)',
+                border: '1px solid rgba(255, 215, 0, 0.3)',
+                borderRadius: 3,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                boxShadow: '0 0 20px rgba(255, 215, 0, 0.1)',
+                backdropFilter: 'blur(10px)'
+              }}
+            >
+              <Box display="flex" alignItems="center" gap={2}>
+                <Bolt sx={{ color: '#ffd700', fontSize: 30 }} />
+                <Box>
+                  <Typography variant="overline" sx={{ color: '#ffd700', fontWeight: 'bold', display: 'block', lineHeight: 1 }}>
+                    HELIOS-1 NETWORK
+                  </Typography>
+                  <Typography variant="h6" sx={{ color: 'white', fontFamily: 'monospace' }}>
+                    Poder de Minado (n): <span style={{ color: '#ffd700' }}>{labData.powerMining}</span>
+                  </Typography>
+                </Box>
+              </Box>
+              
+              <Button
+                variant="outlined"
+                disabled={injecting}
+                onClick={handleInjectPower}
+                sx={{
+                  color: '#ffd700',
+                  borderColor: '#ffd700',
+                  fontWeight: 'bold',
+                  letterSpacing: 1,
+                  '&:hover': {
+                    bgcolor: 'rgba(255, 215, 0, 0.1)',
+                    borderColor: '#ffd700',
+                    boxShadow: '0 0 15px rgba(255, 215, 0, 0.4)'
+                  }
+                }}
+              >
+                {injecting ? 'INJECTING...' : 'INJECT POWER'}
+              </Button>
+            </Paper>
           </motion.div>
-        </Grid>
-      </Grid>
+        )}
 
-      <LaboratorioMarketDrawer
-        open={isMarketOpen}
-        onClose={() => setIsMarketOpen(false)}
-        buyingSlotIndex={buyingSlotIndex}
-        onBuy={handleBuy}
-      />
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.98 }} 
+          animate={{ opacity: 1, scale: 1 }} 
+          transition={{ duration: 0.5 }}
+        >
+          <CoreModulesSimulator />
+        </motion.div>
 
-      <LaboratorioHardwareDetailDrawer
-        open={isDetailOpen}
-        onClose={() => setIsDetailOpen(false)}
-        slot={currentDetailIndex !== null ? (labData?.slots?.[currentDetailIndex] ?? null) : null}
-        onUninstall={handleUninstall}
-        onMaintenance={handleMaintenance}
-        isMaintenanceLoading={isMaintenanceLoading}
-      />
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={4000}
-        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert severity={snackbar.severity} variant="filled" sx={{ width: '100%', borderRadius: 2, boxShadow: '0 0 15px rgba(0,0,0,0.5)' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+        <LaboratorioInventory />
+      </Box>
     </Box>
   );
 }

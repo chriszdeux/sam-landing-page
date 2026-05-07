@@ -13,132 +13,41 @@ import Image from 'next/image';
 import { ParticleBackground } from '../../components/ui/ParticleBackground';
 import { EnvVariables } from '@/lib/constants/variables';
 
-const TechFrame = ({ children, color = '#00f3ff' }: { children: React.ReactNode; color?: string }) => (
-  <Box
-    sx={{
-      position: 'relative',
-      p: '4px',
-      background: `linear-gradient(45deg, transparent 5%, ${color} 5%, ${color} 10%, transparent 10%, transparent 90%, ${color} 90%, ${color} 95%, transparent 95%)`,
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        border: `1px solid ${color}40`,
-        clipPath: 'polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%)',
-        pointerEvents: 'none',
-      },
-    }}
-  >
-    <Box sx={{ 
-      position: 'relative', 
-      clipPath: 'polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%)',
-      bgcolor: 'rgba(0,0,0,0.5)',
-    }}>
-      {children}
-      {}
-      <Box sx={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '100%',
-        background: `linear-gradient(to bottom, transparent 50%, ${color}10 50%)`,
-        backgroundSize: '100% 4px',
-        pointerEvents: 'none',
-        zIndex: 2,
-      }} />
-    </Box>
-  </Box>
-);
-
-const DataLog = ({ title, date, children, align = 'left' }: { title: string; date?: string; children: React.ReactNode; align?: 'left' | 'right' }) => (
-  <Box sx={{ 
-    textAlign: align, 
-    position: 'relative',
-    p: 4,
-    borderLeft: align === 'left' ? '2px solid #00f3ff' : 'none',
-    borderRight: align === 'right' ? '2px solid #ffb700' : 'none',
-    background: 'linear-gradient(90deg, rgba(0, 243, 255, 0.05) 0%, rgba(0,0,0,0) 100%)',
-    backdropFilter: 'blur(5px)',
-  }}>
-    <Typography variant="overline" sx={{ color: 'text.secondary', letterSpacing: 2, display: 'block', mb: 1, fontFamily: 'monospace' }}>
-      {'// LOG DATA: '}{date || 'UNKNOWN'}
-    </Typography>
-    <Typography variant="h3" sx={{ 
-      mb: 3, 
-      color: 'white', 
-      textTransform: 'uppercase', 
-      fontWeight: 'bold',
-      textShadow: '0 0 10px rgba(0,243,255,0.5)',
-      fontSize: { xs: '1.8rem', md: '2.5rem' }
-    }}>
-      {title}
-    </Typography>
-    <Typography component="div" variant="body1" sx={{ fontSize: '1.1rem', color: 'gray', lineHeight: 1.8, fontFamily: 'monospace' }}>
-      {children}
-    </Typography>
-  </Box>
-);
-
 export default function InfiniteExplorationPage() {
-    const { project } = EnvVariables;
-    const router = useRouter();
+  const router = useRouter();
 
-  
-  
-  //# 1-Estructuración y renderizado visual del componente UI
   return (
-    <>
+    <Box sx={{ 
+      width: '100vw', 
+      height: '100vh', 
+      bgcolor: '#050514',
+      overflow: 'hidden',
+      position: 'relative'
+    }}>
+      {/* Background Particles */}
       <ParticleBackground />
-      <Box sx={{ position: 'fixed', top: 100, left: { xs: 20, md: 40 }, zIndex: 100 }}>
+
+      {/* Back Button - Positioned overlay */}
+      <Box sx={{ position: 'absolute', top: 20, left: 20, zIndex: 100 }}>
         <Button 
             variant="outlined" 
             startIcon={<ArrowBack />} 
             onClick={() => router.back()}
-            sx={{ backdropFilter: 'blur(5px)' }}
+            sx={{ 
+              backdropFilter: 'blur(5px)',
+              borderColor: 'rgba(0, 243, 255, 0.5)',
+              color: '#00f3ff',
+              '&:hover': {
+                borderColor: '#00f3ff',
+                bgcolor: 'rgba(0, 243, 255, 0.1)'
+              }
+            }}
         >
-            Atrás
+            Regresar
         </Button>
       </Box>
-      <Box sx={{ 
-        minHeight: '100vh', 
-        bgcolor: 'transparent',
-        pt: 16, 
-        pb: 12,
-        overflow: 'hidden',
-        position: 'relative', 
-        zIndex: 1
-      }}>
-        <Container maxWidth="xl">
-          {}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1 }}
-          >
-            <Box sx={{ textAlign: 'center', mb: 16, position: 'relative' }}>
-              <Typography variant="overline" sx={{ color: '#ffb700', letterSpacing: 8, fontSize: '1.2rem', display: 'block', mb: 2 }}>
-                SYSTEM OVERRIDE 
-              </Typography>
-              <Typography variant="h1" sx={{
-                fontSize: { xs: '3rem', md: '6rem' },
-                fontWeight: 900,
-                color: 'white',
-                textTransform: 'uppercase',
-                letterSpacing: '-2px',
-                textShadow: '0 0 20px rgba(0, 243, 255, 0.8)',
-                position: 'relative',
-                display: 'inline-block'
-              }}>
-                UNIVERSO EN <span style={{ color: '#00f3ff' }}>EXPANSIÓN</span>
-              </Typography>
-              <Divider sx={{ my: 4, borderColor: '#00f3ff', opacity: 0.3, maxWidth: '200px', mx: 'auto' }} />
-            </Box>
-          </motion.div>
 
+<<<<<<< Updated upstream
           {}
           <Grid container spacing={8} alignItems="center">
             
@@ -227,7 +136,13 @@ export default function InfiniteExplorationPage() {
 
           </Grid>
         </Container>
+=======
+      {/* Full Screen Map Container */}
+      <Box sx={{ width: '100%', height: '100%' }}>
+        <GalacticExplorer />
+>>>>>>> Stashed changes
       </Box>
-    </>
+    </Box>
   );
 }
+
