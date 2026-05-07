@@ -14,7 +14,6 @@ interface PlanetCanvasProps {
   biome?: string;
   type?: string;
   atmosphere?: number; // 0 to 100
-  atmosphereHue?: number;
   animate?: boolean; 
   // Legacy support
   hue?: number;
@@ -113,12 +112,12 @@ const fbm3D = (noise: (x: number, y: number, z: number) => number, x: number, y:
 export default function PlanetCanvas(props: PlanetCanvasProps) {
   const { 
     seed, size = 300, terrainHue = 30, oceanHue = 200, faunaHue = 120, cloudHue = 0, 
-    radius = 5, atmosphere = 50, atmosphereHue, hasRings = false, biome, type, animate = false 
+    radius = 5, atmosphere = 50, hasRings = false, biome, type, animate = false 
   } = props;
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rotationRef = useRef(0);
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -153,25 +152,21 @@ export default function PlanetCanvas(props: PlanetCanvasProps) {
       const ly_norm = lightY / lightLen;
       const lz_norm = lightZ / lightLen;
 
-      // 0. Atmospheric Outer Glow [T-128] - Enhanced
+      // 0. Atmospheric Outer Glow [T-128] - Premium VFX
       if (atmosphere > 0) {
-          const atmosphereRadius = visualRadius * (1 + (atmosphere / 100) * 0.4);
+          const atmosLevel = atmosphere / 100;
+          const atmosphereRadius = visualRadius * (1 + atmosLevel * 0.4);
           
-          // Outer bloom
+          // Outer bloom (Soft diffuse aura)
           const bloomGradient = ctx.createRadialGradient(
             centerX, centerY, visualRadius * 0.8,
             centerX, centerY, atmosphereRadius
           );
-          const aHue = atmosphereHue ?? oceanHue;
-          const aColor = `hsla(${aHue}, 90%, 75%`;
           
-          // Pulse effect if animated
-          const pulse = animate ? Math.sin(Date.now() / 1000) * 0.05 : 0;
-          const intensity = Math.max(0, (atmosphere / 100) + pulse);
-
-          bloomGradient.addColorStop(0, `${aColor}, ${0.5 * intensity})`);
-          bloomGradient.addColorStop(0.4, `${aColor}, ${0.2 * intensity})`);
-          bloomGradient.addColorStop(1, `${aColor}, 0)`);
+          const aHue = oceanHue;
+          bloomGradient.addColorStop(0, `hsla(${aHue}, 90%, 80%, ${0.6 * atmosLevel})`);
+          bloomGradient.addColorStop(0.3, `hsla(${aHue}, 80%, 70%, ${0.3 * atmosLevel})`);
+          bloomGradient.addColorStop(1, `hsla(${aHue}, 70%, 60%, 0)`);
           
           ctx.save();
           ctx.fillStyle = bloomGradient;
@@ -179,14 +174,21 @@ export default function PlanetCanvas(props: PlanetCanvasProps) {
           ctx.arc(centerX, centerY, atmosphereRadius, 0, Math.PI * 2);
           ctx.fill();
           
-          // Light-side flare (Scatter)
-          const flareGradient = ctx.createRadialGradient(
-            centerX + lx_norm * visualRadius * 0.5, centerY + ly_norm * visualRadius * 0.5, 0,
-            centerX, centerY, atmosphereRadius
+          // Atmospheric Scatter (Light-side glow)
+          const scatterGradient = ctx.createRadialGradient(
+            centerX + lx_norm * visualRadius * 0.6, 
+            centerY + ly_norm * visualRadius * 0.6, 
+            0,
+            centerX, centerY, atmosphereRadius * 1.2
           );
-          flareGradient.addColorStop(0, `hsla(${oceanHue}, 100%, 90%, ${0.3 * (atmosphere / 100)})`);
-          flareGradient.addColorStop(1, 'transparent');
-          ctx.fillStyle = flareGradient;
+          scatterGradient.addColorStop(0, `hsla(${aHue}, 100%, 95%, ${0.4 * atmosLevel})`);
+          scatterGradient.addColorStop(0.4, `hsla(${aHue}, 90%, 85%, ${0.1 * atmosLevel})`);
+          scatterGradient.addColorStop(1, 'transparent');
+          
+          ctx.globalCompositeOperation = "screen";
+          ctx.fillStyle = scatterGradient;
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, atmosphereRadius * 1.2, 0, Math.PI * 2);
           ctx.fill();
           ctx.restore();
       }
@@ -215,6 +217,9 @@ export default function PlanetCanvas(props: PlanetCanvasProps) {
       }
 
       // 2. Draw Planet Sphere
+      const cosRot = Math.cos(rot);
+      const sinRot = Math.sin(rot);
+
       for (let lx = 0; lx < size; lx += resolution) {
         for (let ly = 0; ly < size; ly += resolution) {
           const dx = lx - centerX;
@@ -223,25 +228,30 @@ export default function PlanetCanvas(props: PlanetCanvasProps) {
           const dist = Math.sqrt(distSq);
 
           if (dist <= visualRadius) {
-            // Normal Vector for the sphere [NEW]
-            const nx_sphere = dx / visualRadius;
-            const ny_sphere = dy / visualRadius;
-            const nz_sphere = Math.sqrt(Math.max(0, 1 - (distSq / (visualRadius * visualRadius))));
+            // Normal Vector for the sphere
+            const nx = dx / visualRadius;
+            const ny = dy / visualRadius;
+            const nz = Math.sqrt(Math.max(0, 1 - (distSq / (visualRadius * visualRadius))));
 
-            // Diffuse Shading [NEW]
-            const dotProduct = (nx_sphere * lx_norm + ny_sphere * ly_norm + nz_sphere * lz_norm);
-            const diffuse = Math.max(0.1, dotProduct); // 0.1 ambient
+            // Diffuse Shading
+            const dotProduct = (nx * lx_norm + ny * ly_norm + nz * lz_norm);
+            const diffuse = Math.max(0.1, dotProduct); 
 
-            // Circular Sampling for Noise
-            const angle = (lx / size) * 2 * Math.PI;
-            const horizontalStretch = pType === "GAS_GIANT" ? 0.2 : 0.5;
-            const verticalStretch = pType === "GAS_GIANT" ? 10.0 : 2.0;
+            // 3D Spherical Rotation [NEW]
+            // Rotate around Y axis
+            const rnx = nx * cosRot + nz * sinRot;
+            const rnz = -nx * sinRot + nz * cosRot;
+            const rny = ny;
 
-            const noiseX = Math.cos(angle + rot) * config.scale * horizontalStretch;
-            const noiseZ = Math.sin(angle + rot) * config.scale * horizontalStretch;
-            const noiseY = (ly / size) * config.scale * verticalStretch;
+            // Spherical Sampling for Noise (No distortion at poles)
+            const horizontalStretch = pType === "GAS_GIANT" ? 0.3 : 1.0;
+            const verticalStretch = pType === "GAS_GIANT" ? 4.0 : 1.0;
 
-            const surfaceNoise = fbm3D(noise3D, noiseX, noiseZ, noiseY, config.octaves);
+            const noiseX = rnx * config.scale * horizontalStretch;
+            const noiseY = rny * config.scale * verticalStretch;
+            const noiseZ = rnz * config.scale;
+
+            const surfaceNoise = fbm3D(noise3D, noiseX, noiseY, noiseZ, config.octaves);
 
             let baseH, baseL, baseS = 60;
             if (pType === "GAS_GIANT") {
@@ -250,7 +260,7 @@ export default function PlanetCanvas(props: PlanetCanvasProps) {
                 baseL = 35 + mix * 20;
             } else {
                 if (surfaceNoise > config.threshold) {
-                    const featureMix = fbm3D(noise3D, noiseX * 2, noiseZ * 2, noiseY * 2, 2);
+                    const featureMix = fbm3D(noise3D, noiseX * 2, noiseY * 2, noiseZ * 2, 2);
                     baseH = featureMix > 0.1 ? faunaHue : terrainHue;
                     baseL = 30 + surfaceNoise * 20;
                 } else {
@@ -268,8 +278,13 @@ export default function PlanetCanvas(props: PlanetCanvasProps) {
             ctx.fillStyle = finalColor;
             ctx.fillRect(lx, ly, resolution + 0.1, resolution + 0.1);
 
-            // Layer 2: Clouds with separate lighting
-            const cloudNoise = fbm3D(noise3D, noiseX * 1.5, noiseZ * 1.5, (ly / size) * config.scale * 1.5 * verticalStretch + rot * 0.5, 2);
+            // Layer 2: Clouds with separate lighting & rotation speed
+            const cCosRot = Math.cos(rot * 1.5);
+            const cSinRot = Math.sin(rot * 1.5);
+            const crnx = nx * cCosRot + nz * cSinRot;
+            const crnz = -nx * cSinRot + nz * cCosRot;
+            
+            const cloudNoise = fbm3D(noise3D, crnx * config.scale * 1.5, rny * config.scale * 1.5, crnz * config.scale * 1.5, 2);
             const cloudLimit = pType === "ICE" ? 0.05 : 0.15;
             
             if (cloudNoise > cloudLimit) {
@@ -280,24 +295,24 @@ export default function PlanetCanvas(props: PlanetCanvasProps) {
             }
 
             // Layer 3: Rim Lighting & Fresnel [T-128]
-            const fresnel = Math.pow(1 - nz_sphere, 3);
+            const fresnel = Math.pow(1 - nz, 3);
             if (fresnel > 0.2 && atmosphere > 0) {
                 const rimIntensity = fresnel * (atmosphere / 100) * diffuse;
                 ctx.fillStyle = `hsla(${oceanHue}, 100%, 85%, ${rimIntensity * 0.6})`;
                 ctx.fillRect(lx, ly, resolution + 0.1, resolution + 0.1);
             }
 
-            // Layer 4: Specular Highlight (The "Sun Reflection") [NEW] - Fixed Position
-            const specX = centerX + lx_norm * visualRadius * 0.5;
-            const specY = centerY + ly_norm * visualRadius * 0.5;
-            const specDist = Math.sqrt(Math.pow(lx - specX, 2) + Math.pow(ly - specY, 2));
-            if (specDist < visualRadius * 0.15) {
-                const specIntensity = Math.pow(1 - (specDist / (visualRadius * 0.15)), 2) * 0.4;
+            // Layer 4: Specular Highlight (The "Sun Reflection")
+            const specX = centerX - visualRadius * 0.4;
+            const specY = centerY - visualRadius * 0.4;
+            const specDistSq = Math.pow(lx - specX, 2) + Math.pow(ly - specY, 2);
+            if (specDistSq < visualRadius * visualRadius * 0.02) {
+                const specIntensity = Math.pow(1 - (Math.sqrt(specDistSq) / (visualRadius * 0.15)), 2) * 0.4;
                 ctx.fillStyle = `rgba(255, 255, 255, ${specIntensity})`;
                 ctx.fillRect(lx, ly, resolution + 0.1, resolution + 0.1);
             }
 
-            // Layer 5: Terminator (Day/Night transition) [NEW]
+            // Layer 5: Terminator (Day/Night transition)
             if (dotProduct < 0.1) {
                 const shadowIntensity = Math.min(0.8, (0.1 - dotProduct) * 5);
                 ctx.fillStyle = `rgba(0, 5, 20, ${shadowIntensity})`;
@@ -316,11 +331,11 @@ export default function PlanetCanvas(props: PlanetCanvasProps) {
 
     render();
     return () => { if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current); };
-  }, [seed, size, terrainHue, oceanHue, faunaHue, cloudHue, radius, atmosphere, atmosphereHue, hasRings, biome, type, animate]);
+  }, [seed, size, terrainHue, oceanHue, faunaHue, cloudHue, radius, atmosphere, hasRings, biome, type, animate]);
 
-  const effectiveAtmosphere = atmosphere / 100;
-  const glowSizeValue = effectiveAtmosphere * 60;
-  const glowColorValue = `hsla(${atmosphereHue ?? oceanHue}, 100%, 70%, ${effectiveAtmosphere * 0.5})`;
+  const glowSize = (atmosphere / 100) * 80;
+  const glowOpacity = (atmosphere / 100) * 0.4;
+  const glowColor = `hsla(${oceanHue}, 80%, 60%, ${glowOpacity})`;
 
   return (
     <canvas
@@ -329,11 +344,8 @@ export default function PlanetCanvas(props: PlanetCanvasProps) {
       height={size}
       style={{
         borderRadius: "50%",
-        boxShadow: atmosphere > 0 
-          ? `0 0 ${glowSizeValue}px ${glowColorValue}, inset 0 0 20px rgba(0,0,0,0.5)` 
-          : "0 0 40px rgba(0, 0, 0, 0.5)",
+        boxShadow: "0 0 40px rgba(0, 0, 0, 0.5)",
         backgroundColor: "transparent",
-        transition: "box-shadow 0.3s ease",
       }}
     />
   );

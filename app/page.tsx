@@ -12,8 +12,8 @@ import { Modal } from "../components/ui/Modal";
 import { SectionNavigation } from "../components/ui/SectionNavigation";
 
 export default function Home() {
-  
-  
+
+
   //# 1-Estructuración y renderizado visual del componente UI
   return (
     <main className="min-h-screen relative">
@@ -24,7 +24,6 @@ export default function Home() {
         <HeroSection />
         <HistorySection />
         <MechanicsSection />
-        <UniverseSection />
       </div>
 
       <Footer />
