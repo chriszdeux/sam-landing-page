@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Box, Typography, IconButton, Paper, Autocomplete, TextField, Fade, Button } from "@mui/material";
-import { ZoomIn, ZoomOut, ArrowBack, Explore } from "@mui/icons-material";
+import { Box, Typography, IconButton, Paper, Autocomplete, TextField, Fade, Button, CircularProgress } from "@mui/material";
+import { ZoomIn, ZoomOut, ArrowBack, Explore, ErrorOutline } from "@mui/icons-material";
+import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { fetchGalaxies, fetchSystemsByGalaxy, fetchPlanetsBySystem } from "@/lib/features/space/actions";
 import PlanetCanvas from "./PlanetCanvas";
@@ -24,9 +25,10 @@ interface Particle {
 }
 
 export default function GalacticExplorer() {
+  const router = useRouter();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dispatch = useAppDispatch();
-  const { galaxies, systems, planets } = useAppSelector((state) => state.space);
+  const { galaxies, systems, planets, loading, error } = useAppSelector((state) => state.space);
 
   const [viewLevel, setViewLevel] = useState<ViewLevel>('GALAXY');
   const [selectedGalaxy, setSelectedGalaxy] = useState<string | null>(null);
@@ -515,87 +517,183 @@ export default function GalacticExplorer() {
         onMouseLeave={handleMouseUp}
       />
 
-      <Paper sx={{ position: 'absolute', top: 20, left: 20, p: 2, bgcolor: 'rgba(5, 5, 20, 0.8)', backdropFilter: 'blur(10px)', width: 300, border: '1px solid rgba(0, 240, 255, 0.2)' }}>
-        <Typography variant="h6" sx={{ color: '#00F0FF', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Explore /> Explorador Galáctico
-        </Typography>
-
-        {viewLevel !== 'GALAXY' && (
+      {/* TOP NAVIGATION BAR - New Design based on user sketch */}
+      <Box sx={{ 
+        position: 'absolute', 
+        top: 30, 
+        left: 0, 
+        right: 0, 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        zIndex: 1000,
+        px: 4
+      }}>
+        {/* Regresar Button */}
+        <Box sx={{ position: 'absolute', left: 40 }}>
           <Button 
-            startIcon={<ArrowBack />} 
-            sx={{ mb: 2, color: '#00F0FF' }}
-            onClick={() => {
-              if (viewLevel === 'PLANET') {
-                  setViewLevel('SYSTEM');
-                  setTargetZoom(1.2);
+            variant="outlined" 
+            onClick={() => router.back()}
+            sx={{ 
+              borderRadius: '12px', 
+              textTransform: 'lowercase', 
+              borderColor: 'rgba(0, 240, 255, 0.4)',
+              color: '#00F0FF',
+              px: 4,
+              py: 1,
+              backdropFilter: 'blur(10px)',
+              '&:hover': {
+                borderColor: '#00F0FF',
+                bgcolor: 'rgba(0, 240, 255, 0.1)'
               }
-              else if (viewLevel === 'SYSTEM') {
-                  setViewLevel('GALAXY');
-                  setTargetZoom(1);
-              }
-              setSelectedPlanet(null);
-              setTargetOffset({ x: 0, y: 0 });
             }}
           >
-            Atrás
+            regresar
           </Button>
-        )}
-
-        <Autocomplete
-          options={galaxies}
-          getOptionLabel={(option) => option.name}
-          value={galaxies.find(g => g.id === selectedGalaxy) || null}
-          onChange={(_, newValue) => {
-            if (newValue) {
-              setSelectedGalaxy(newValue.id);
-              setViewLevel('SYSTEM');
-              setTargetZoom(1.5);
-              setTargetOffset({ x: 0, y: 0 });
-            }
-          }}
-          renderInput={(params) => <TextField {...params} label="Galaxia" size="small" sx={{ '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' }, '& .MuiOutlinedInput-root': { color: 'white', '& fieldset': { borderColor: 'rgba(0, 240, 255, 0.2)' } } }} />}
-          sx={{ mb: 2 }}
-        />
-
-        <Fade in={viewLevel !== 'GALAXY'}>
-          <Box>
-            <Autocomplete
-              options={systems[selectedGalaxy || ''] || []}
-              getOptionLabel={(option) => option.name}
-              value={(systems[selectedGalaxy || ''] || []).find(s => s.id === selectedSystem) || null}
-              onChange={(_, newValue) => {
-                if (newValue) {
-                  setSelectedSystem(newValue.id);
-                  setViewLevel('PLANET');
-                  setTargetZoom(1.5);
-                  setTargetOffset({ x: 0, y: 0 });
-                }
-              }}
-              renderInput={(params) => <TextField {...params} label="Sistema Solar" size="small" sx={{ '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' }, '& .MuiOutlinedInput-root': { color: 'white', '& fieldset': { borderColor: 'rgba(0, 240, 255, 0.2)' } } }} />}
-              sx={{ mb: 2 }}
-            />
-          </Box>
-        </Fade>
-
-        <Fade in={viewLevel === 'PLANET'}>
-          <Box>
-            <Autocomplete
-              options={planets[selectedSystem || ''] || []}
-              getOptionLabel={(option) => option.name}
-              value={selectedPlanet}
-              onChange={(_, newValue) => {
-                setSelectedPlanet(newValue);
-              }}
-              renderInput={(params) => <TextField {...params} label="Planeta" size="small" sx={{ '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' }, '& .MuiOutlinedInput-root': { color: 'white', '& fieldset': { borderColor: 'rgba(0, 240, 255, 0.2)' } } }} />}
-            />
-          </Box>
-        </Fade>
-
-        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 3 }}>
-          <IconButton onClick={() => setTargetZoom(z => Math.max(z - 0.2, 0.2))} sx={{ color: 'white' }}><ZoomOut /></IconButton>
-          <IconButton onClick={() => setTargetZoom(z => Math.min(z + 0.2, 5))} sx={{ color: 'white' }}><ZoomIn /></IconButton>
         </Box>
-      </Paper>
+
+        {/* Central Search Container */}
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center',
+          gap: 3, 
+          bgcolor: 'rgba(5, 5, 20, 0.5)', 
+          backdropFilter: 'blur(15px)', 
+          borderRadius: '20px', 
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          p: 1.5,
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)'
+        }}>
+          {/* Galaxy Selector */}
+          <Autocomplete
+            options={galaxies}
+            getOptionLabel={(option) => option.name}
+            value={galaxies.find(g => g.id === selectedGalaxy) || null}
+            onChange={(_, newValue) => {
+              if (newValue) {
+                setSelectedGalaxy(newValue.id);
+                setViewLevel('SYSTEM');
+                setTargetZoom(1.5);
+                setTargetOffset({ x: 0, y: 0 });
+              }
+            }}
+            renderInput={(params) => (
+              <TextField 
+                {...params} 
+                placeholder="galaxia" 
+                variant="standard"
+                InputProps={{ 
+                  ...params.InputProps, 
+                  disableUnderline: true,
+                  sx: { 
+                    color: 'white', 
+                    textAlign: 'center',
+                    fontSize: '0.9rem',
+                    fontFamily: 'monospace',
+                    '& input': { textAlign: 'center' }
+                  }
+                }}
+                sx={{ width: 160 }}
+              />
+            )}
+            sx={{
+              bgcolor: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '12px',
+              px: 2,
+              py: 0.5,
+              '&:hover': { borderColor: 'rgba(0, 240, 255, 0.4)' }
+            }}
+          />
+
+          {/* System Selector */}
+          <Autocomplete
+            options={systems[selectedGalaxy || ''] || []}
+            getOptionLabel={(option) => option.name}
+            value={(systems[selectedGalaxy || ''] || []).find(s => s.id === selectedSystem) || null}
+            disabled={!selectedGalaxy}
+            onChange={(_, newValue) => {
+              if (newValue) {
+                setSelectedSystem(newValue.id);
+                setViewLevel('PLANET');
+                setTargetZoom(1.5);
+                setTargetOffset({ x: 0, y: 0 });
+              }
+            }}
+            renderInput={(params) => (
+              <TextField 
+                {...params} 
+                placeholder="sistema solar" 
+                variant="standard"
+                InputProps={{ 
+                  ...params.InputProps, 
+                  disableUnderline: true,
+                  sx: { 
+                    color: 'white', 
+                    textAlign: 'center',
+                    fontSize: '0.9rem',
+                    fontFamily: 'monospace',
+                    '& input': { textAlign: 'center' }
+                  }
+                }}
+                sx={{ width: 160 }}
+              />
+            )}
+            sx={{
+              bgcolor: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '12px',
+              px: 2,
+              py: 0.5,
+              '&:hover': { borderColor: 'rgba(0, 240, 255, 0.4)' }
+            }}
+          />
+
+          {/* Planet Selector */}
+          <Autocomplete
+            options={planets[selectedSystem || ''] || []}
+            getOptionLabel={(option) => option.name}
+            value={selectedPlanet}
+            disabled={!selectedSystem}
+            onChange={(_, newValue) => {
+              setSelectedPlanet(newValue);
+            }}
+            renderInput={(params) => (
+              <TextField 
+                {...params} 
+                placeholder="planeta" 
+                variant="standard"
+                InputProps={{ 
+                  ...params.InputProps, 
+                  disableUnderline: true,
+                  sx: { 
+                    color: 'white', 
+                    textAlign: 'center',
+                    fontSize: '0.9rem',
+                    fontFamily: 'monospace',
+                    '& input': { textAlign: 'center' }
+                  }
+                }}
+                sx={{ width: 160 }}
+              />
+            )}
+            sx={{
+              bgcolor: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '12px',
+              px: 2,
+              py: 0.5,
+              '&:hover': { borderColor: 'rgba(0, 240, 255, 0.4)' }
+            }}
+          />
+        </Box>
+
+        {/* Zoom Controls - Moved to corner or kept discrete */}
+        <Box sx={{ position: 'absolute', right: 40, display: 'flex', gap: 1 }}>
+          <IconButton onClick={() => setTargetZoom(z => Math.max(z - 0.2, 0.2))} sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: '#00F0FF' } }}><ZoomOut /></IconButton>
+          <IconButton onClick={() => setTargetZoom(z => Math.min(z + 0.2, 5))} sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: '#00F0FF' } }}><ZoomIn /></IconButton>
+        </Box>
+      </Box>
 
       {selectedPlanet && (
         <Fade in={true}>
