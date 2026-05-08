@@ -29,26 +29,6 @@ export default function InfiniteExplorationPage() {
       {/* Background Particles */}
       <ParticleBackground />
 
-      {/* Back Button - Positioned overlay */}
-      <Box sx={{ position: 'absolute', top: 20, left: 20, zIndex: 100 }}>
-        <Button 
-            variant="outlined" 
-            startIcon={<ArrowBack />} 
-            onClick={() => router.back()}
-            sx={{ 
-              backdropFilter: 'blur(5px)',
-              borderColor: 'rgba(0, 243, 255, 0.5)',
-              color: '#00f3ff',
-              '&:hover': {
-                borderColor: '#00f3ff',
-                bgcolor: 'rgba(0, 243, 255, 0.1)'
-              }
-            }}
-        >
-            Regresar
-        </Button>
-      </Box>
-
       {/* Full Screen Map Container */}
       <Box sx={{ width: '100%', height: '100%' }}>
         <GalacticExplorer />
