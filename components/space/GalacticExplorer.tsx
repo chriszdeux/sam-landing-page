@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Box, Typography, IconButton, Paper, Autocomplete, TextField, Fade, Button, CircularProgress } from "@mui/material";
-import { ZoomIn, ZoomOut, ArrowBack, Explore, ErrorOutline } from "@mui/icons-material";
+import { ZoomIn, ZoomOut, ArrowBack, Explore, ErrorOutline, DeleteSweep } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { fetchGalaxies, fetchSystemsByGalaxy, fetchPlanetsBySystem } from "@/lib/features/space/actions";
@@ -34,6 +34,7 @@ export default function GalacticExplorer() {
   const [selectedGalaxy, setSelectedGalaxy] = useState<string | null>(null);
   const [selectedSystem, setSelectedSystem] = useState<string | null>(null);
   const [selectedPlanet, setSelectedPlanet] = useState<any | null>(null);
+  const [hoveredObject, setHoveredObject] = useState<{ id: string; type: ViewLevel } | null>(null);
 
   // Cinematic movement
   const [targetZoom, setTargetZoom] = useState(1);
@@ -57,7 +58,13 @@ export default function GalacticExplorer() {
   ).current;
 
   const dynamicParticles = useRef<Particle[]>([]);
-  const lastSpawn = useRef<Record<string, number>>({});
+  const lastSpawn = useRef<{ [key: string]: number }>({});
+
+  useEffect(() => {
+    if (canvasRef.current) {
+      canvasRef.current.style.cursor = hoveredObject ? 'pointer' : 'default';
+    }
+  }, [hoveredObject]);
 
   useEffect(() => {
     dispatch(fetchGalaxies());
@@ -182,6 +189,23 @@ export default function GalacticExplorer() {
             lastSpawn.current[gid] = Date.now();
           }
 
+          // Pulsating hover/selection effect - DRAWN BEHIND
+          if (hoveredObject?.id === g.id || selectedGalaxy === g.id) {
+            const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 300);
+            const intensity = 0.5 + 0.5 * pulse;
+            
+            ctx.save();
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(0, 240, 255, ${intensity})`;
+            ctx.lineWidth = 8 / currentZoom.current;
+            ctx.shadowBlur = 40 * intensity;
+            ctx.shadowColor = "#00F0FF";
+            // Slightly larger than the galaxy gradient to be visible behind
+            ctx.ellipse(px, py, 310, 310 * 0.35, galaxyTiltAngle, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+          }
+
           ctx.save();
           ctx.translate(px, py);
           ctx.rotate(galaxyTiltAngle);
@@ -198,10 +222,19 @@ export default function GalacticExplorer() {
           ctx.fill();
           ctx.restore();
 
+          ctx.save();
+          ctx.beginPath();
           ctx.fillStyle = "white";
-          ctx.font = "bold 14px monospace";
+          ctx.font = `bold ${26 / currentZoom.current}px 'Geist Sans', sans-serif`;
           ctx.textAlign = "center";
-          ctx.fillText(g.name, px, py + 180);
+          // Multi-layer shadow for maximum visibility
+          ctx.shadowBlur = 20;
+          ctx.shadowColor = "rgba(0,0,0,1)";
+          ctx.strokeStyle = "rgba(0,0,0,0.9)";
+          ctx.lineWidth = 6 / currentZoom.current;
+          ctx.strokeText(g.name, px, py + 230 / currentZoom.current);
+          ctx.fillText(g.name, px, py + 230 / currentZoom.current);
+          ctx.restore();
         });
       }
 
@@ -220,6 +253,22 @@ export default function GalacticExplorer() {
         currentSystems.forEach((s) => {
           const px = (s.coordinates?.x || 0) * 10;
           const py = (s.coordinates?.y || 0) * 10 * 0.6;
+
+          // Pulsating hover/selection effect - DRAWN BEHIND
+          if (hoveredObject?.id === s.id || selectedSystem === s.id) {
+            const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 400);
+            const intensity = 0.6 + 0.4 * pulse;
+            
+            ctx.save();
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(0, 240, 255, ${intensity})`;
+            ctx.lineWidth = 6 / currentZoom.current;
+            ctx.shadowBlur = 35 * intensity;
+            ctx.shadowColor = "#00F0FF";
+            ctx.arc(px, py, 40, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+          }
 
           ctx.beginPath();
           ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
@@ -253,10 +302,17 @@ export default function GalacticExplorer() {
           ctx.fill();
           ctx.shadowBlur = 0;
 
+          ctx.save();
           ctx.fillStyle = "white";
-          ctx.font = "12px monospace";
+          ctx.font = `bold ${24 / currentZoom.current}px 'Geist Sans', sans-serif`;
           ctx.textAlign = "center";
-          ctx.fillText(s.name, px, py + 40);
+          ctx.shadowBlur = 20;
+          ctx.shadowColor = "rgba(0,0,0,1)";
+          ctx.strokeStyle = "rgba(0,0,0,0.9)";
+          ctx.lineWidth = 5 / currentZoom.current;
+          ctx.strokeText(s.name, px, py + 65 / currentZoom.current);
+          ctx.fillText(s.name, px, py + 65 / currentZoom.current);
+          ctx.restore();
         });
       }
 
@@ -303,22 +359,38 @@ export default function GalacticExplorer() {
           const orbitDistance = p.orbitDistance !== undefined ? p.orbitDistance : 120 + orbitIndex * 100;
           const orbitAngle = p.orbitAngle !== undefined ? p.orbitAngle : (i * Math.PI) / 2;
 
+          const currentAngle = orbitAngle + time * (1 / orbitIndex);
+          const px = Math.cos(currentAngle) * orbitDistance;
+          const py = Math.sin(currentAngle) * orbitDistance * 0.6;
+          const visualRadio = 10 + (Math.log10(p.radius || 5) * 10);
+
+          // Pulsating hover/selection effect - DRAWN BEHIND
+          if (selectedPlanet?.id === p.id || hoveredObject?.id === p.id) {
+             const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 250);
+             const intensity = 0.7 + 0.3 * pulse;
+             
+             ctx.save();
+             ctx.beginPath();
+             ctx.strokeStyle = selectedPlanet?.id === p.id ? "rgba(0, 240, 255, 1)" : `rgba(0, 240, 255, ${intensity})`;
+             ctx.lineWidth = 7 / currentZoom.current;
+             ctx.shadowBlur = 30 * intensity;
+             ctx.shadowColor = "#00F0FF";
+             ctx.arc(px, py, visualRadio + 15, 0, Math.PI * 2);
+             ctx.stroke();
+             ctx.restore();
+          }
+
           ctx.beginPath();
           ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
           ctx.lineWidth = 1 / currentZoom.current;
           ctx.ellipse(0, 0, orbitDistance, orbitDistance * 0.6, 0, 0, Math.PI * 2);
           ctx.stroke();
 
-          const currentAngle = orbitAngle + time * (1 / orbitIndex);
-          const px = Math.cos(currentAngle) * orbitDistance;
-          const py = Math.sin(currentAngle) * orbitDistance * 0.6;
-
           ctx.beginPath();
           ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
           ctx.ellipse(px, py + 8, 15, 15 * 0.6, 0, 0, Math.PI * 2);
           ctx.fill();
 
-          const visualRadio = 10 + (Math.log10(p.radius || 5) * 10);
           const pColor = `hsl(${p.terrainHue}, 80%, 50%)`;
           
           // Selection Halo [RESTORED]
@@ -373,18 +445,18 @@ export default function GalacticExplorer() {
             lastSpawn.current[pid] = Date.now();
           }
 
+          ctx.save();
           ctx.fillStyle = "white";
-          ctx.font = `${12 / currentZoom.current}px monospace`;
+          ctx.font = `bold ${22 / currentZoom.current}px 'Geist Sans', sans-serif`;
           ctx.textAlign = "center";
-          ctx.fillText(p.name, px, py + 25 / currentZoom.current);
-          
-          if (selectedPlanet?.id === p.id) {
-             ctx.beginPath();
-             ctx.strokeStyle = "rgba(0, 240, 255, 0.8)";
-             ctx.lineWidth = 2 / currentZoom.current;
-             ctx.arc(px, py, 22, 0, Math.PI * 2);
-             ctx.stroke();
-          }
+          ctx.shadowBlur = 15;
+          ctx.shadowColor = "rgba(0,0,0,1)";
+          ctx.strokeStyle = "rgba(0,0,0,0.9)";
+          ctx.lineWidth = 4 / currentZoom.current;
+          const textY = py + (visualRadio + 30) / currentZoom.current;
+          ctx.strokeText(p.name, px, textY);
+          ctx.fillText(p.name, px, textY);
+          ctx.restore();
         });
       }
 
@@ -417,11 +489,69 @@ export default function GalacticExplorer() {
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    setTargetOffset({
-      x: e.clientX - dragStart.x,
-      y: e.clientY - dragStart.y,
-    });
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    const cw = canvas.width / 2;
+    const ch = canvas.height / 2;
+
+    const wrldX = (mouseX - cw) / currentZoom.current - currentOffset.current.x;
+    const wrldY = (mouseY - ch) / currentZoom.current - currentOffset.current.y;
+
+    // Hit detection for hover
+    let foundHover: { id: string; type: ViewLevel } | null = null;
+
+    if (viewLevel === 'GALAXY') {
+      for (let i = 0; i < galaxies.length; i++) {
+        const px = Math.sin(i * 13.5) * 800;
+        const py = Math.cos(i * 21.2) * 800 * 0.6;
+        if (Math.hypot(wrldX - px, wrldY - py) < 200) {
+          foundHover = { id: galaxies[i].id, type: 'GALAXY' };
+          break;
+        }
+      }
+    } else if (viewLevel === 'SYSTEM' && selectedGalaxy) {
+      const currentSystems = systems[selectedGalaxy] || [];
+      for (let s of currentSystems) {
+        const px = (s.coordinates?.x || 0) * 10;
+        const py = (s.coordinates?.y || 0) * 10 * 0.6;
+        if (Math.hypot(wrldX - px, wrldY - py) < 40) {
+          foundHover = { id: s.id, type: 'SYSTEM' };
+          break;
+        }
+      }
+    } else if (viewLevel === 'PLANET' && selectedSystem) {
+      const currentPlanets = planets[selectedSystem] || [];
+      const time = Date.now() / 10000;
+      for (let i = 0; i < currentPlanets.length; i++) {
+        const p = currentPlanets[i];
+        const orbitIndex = p.orbitIndex !== undefined ? p.orbitIndex : i + 1;
+        const orbitDistance = p.orbitDistance !== undefined ? p.orbitDistance : 120 + orbitIndex * 100;
+        const orbitAngle = p.orbitAngle !== undefined ? p.orbitAngle : (i * Math.PI) / 2;
+        const currentAngle = orbitAngle + time * (1 / orbitIndex);
+        const px = Math.cos(currentAngle) * orbitDistance;
+        const py = Math.sin(currentAngle) * orbitDistance * 0.6;
+        const visualRadio = 10 + (Math.log10(p.radius || 5) * 10);
+
+        if (Math.hypot(wrldX - px, wrldY - py) < visualRadio + 15) {
+          foundHover = { id: p.id, type: 'PLANET' };
+          break;
+        }
+      }
+    }
+
+    setHoveredObject(foundHover);
+
+    if (isDragging) {
+      setTargetOffset({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y,
+      });
+    }
   };
 
   const handleMouseUp = (e: React.MouseEvent) => {
@@ -509,7 +639,7 @@ export default function GalacticExplorer() {
     <Box sx={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', background: '#050514' }}>
       <canvas
         ref={canvasRef}
-        style={{ cursor: isDragging ? 'grabbing' : 'grab', width: '100%', height: '100%' }}
+        style={{ cursor: isDragging ? 'grabbing' : (hoveredObject ? 'pointer' : 'grab'), width: '100%', height: '100%' }}
         onWheel={handleWheel}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -686,6 +816,35 @@ export default function GalacticExplorer() {
               '&:hover': { borderColor: 'rgba(0, 240, 255, 0.4)' }
             }}
           />
+
+          {/* Reset Button - Integrated text button for clarity */}
+          <Button
+            onClick={() => {
+              setSelectedGalaxy(null);
+              setSelectedSystem(null);
+              setSelectedPlanet(null);
+              setViewLevel('GALAXY');
+              setTargetZoom(1);
+              setTargetOffset({ x: 0, y: 0 });
+            }}
+            startIcon={<DeleteSweep />}
+            sx={{ 
+              color: 'rgba(255,255,255,0.5)', 
+              textTransform: 'lowercase',
+              fontSize: '0.8rem',
+              fontFamily: 'monospace',
+              ml: 1,
+              px: 2,
+              borderRadius: '12px',
+              transition: 'all 0.3s',
+              '&:hover': { 
+                color: '#ff4d4d', 
+                bgcolor: 'rgba(255, 77, 77, 0.1)',
+              } 
+            }}
+          >
+            limpiar
+          </Button>
         </Box>
 
         {/* Zoom Controls - Moved to corner or kept discrete */}
