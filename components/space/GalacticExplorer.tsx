@@ -439,7 +439,7 @@ export default function GalacticExplorer() {
         ctx.shadowBlur = 0;
 
         const currentPlanets = planets[selectedSystem] || [];
-        const time = Date.now() / 10000;
+        const time = Date.now() / 40000;
 
         currentPlanets.forEach((p: Planet, i: number) => {
           const orbitIndex = p.orbitIndex !== undefined ? p.orbitIndex : i + 1;
@@ -650,7 +650,7 @@ export default function GalacticExplorer() {
         }
       } else if (viewLevel === 'PLANET' && selectedSystem) {
         const currentPlanets = planets[selectedSystem] || [];
-        const time = Date.now() / 10000;
+        const time = Date.now() / 20000;
         for (let i = 0; i < currentPlanets.length; i++) {
           const p = currentPlanets[i];
           const orbitIndex = p.orbitIndex !== undefined ? p.orbitIndex : i + 1;
@@ -723,7 +723,7 @@ export default function GalacticExplorer() {
       }
     } else if (viewLevel === 'PLANET' && selectedSystem) {
       const currentPlanets = planets[selectedSystem] || [];
-      const time = Date.now() / 10000;
+      const time = Date.now() / 20000;
       for (let i = 0; i < currentPlanets.length; i++) {
         const p = currentPlanets[i];
         const orbitIndex = p.orbitIndex !== undefined ? p.orbitIndex : i + 1;
@@ -811,7 +811,7 @@ export default function GalacticExplorer() {
       else if (viewLevel === 'PLANET' && selectedSystem) {
         let hit = null;
         const currentPlanets = planets[selectedSystem] || [];
-        const time = Date.now() / 10000;
+        const time = Date.now() / 20000;
         for (let i = 0; i < currentPlanets.length; i++) {
            const p = currentPlanets[i];
            const orbitIndex = p.orbitIndex !== undefined ? p.orbitIndex : i + 1;
