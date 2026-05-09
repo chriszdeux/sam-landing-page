@@ -60,8 +60,8 @@ export default function GalacticExplorer() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   // Cinematic movement
-  const [targetZoom, setTargetZoom] = useState(1);
-  const [targetOffset, setTargetOffset] = useState({ x: 0, y: 0 });
+  const targetZoom = useRef(1);
+  const targetOffset = useRef({ x: 0, y: 0 });
   const currentZoom = useRef(1);
   const currentOffset = useRef({ x: 0, y: 0 });
 
@@ -152,9 +152,9 @@ export default function GalacticExplorer() {
       }
       ctx.restore();
 
-      currentZoom.current += (targetZoom - currentZoom.current) * 0.08;
-      currentOffset.current.x += (targetOffset.x - currentOffset.current.x) * 0.08;
-      currentOffset.current.y += (targetOffset.y - currentOffset.current.y) * 0.08;
+      currentZoom.current += (targetZoom.current - currentZoom.current) * 0.15;
+      currentOffset.current.x += (targetOffset.current.x - currentOffset.current.x) * 0.15;
+      currentOffset.current.y += (targetOffset.current.y - currentOffset.current.y) * 0.15;
 
       const cw = canvas.width / 2;
       const ch = canvas.height / 2;
@@ -251,18 +251,19 @@ export default function GalacticExplorer() {
             
             ctx.save();
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(0, 240, 255, ${intensity})`;
-            ctx.lineWidth = (isSelected ? 16 : 10) / currentZoom.current;
-            ctx.shadowBlur = 80 * intensity;
+            // Outer soft glow
+            ctx.strokeStyle = `rgba(0, 240, 255, ${intensity * 0.15})`;
+            ctx.lineWidth = (isSelected ? 40 : 25) / currentZoom.current;
+            ctx.shadowBlur = 50 * intensity;
             ctx.shadowColor = "#00F0FF";
             ctx.ellipse(px, py, 330, 330 * 0.35, galaxyTiltAngle, 0, Math.PI * 2);
             ctx.stroke();
             
-            // Tertiary outer ring for "extreme premium" look
+            // Inner subtle core
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(0, 240, 255, ${intensity * 0.2})`;
-            ctx.lineWidth = 4 / currentZoom.current;
-            ctx.ellipse(px, py, 360, 360 * 0.35, galaxyTiltAngle, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(0, 240, 255, ${intensity * 0.3})`;
+            ctx.lineWidth = (isSelected ? 10 : 5) / currentZoom.current;
+            ctx.ellipse(px, py, 330, 330 * 0.35, galaxyTiltAngle, 0, Math.PI * 2);
             ctx.stroke();
             ctx.restore();
           }
@@ -286,25 +287,14 @@ export default function GalacticExplorer() {
 
           // Enhanced Label - LARGE AND PROMINENT
           ctx.save();
-          const labelY = py + 260 / currentZoom.current;
-          const fontSize = (isSelected || isHovered) ? 24 : 20;
+          const labelY = py + 100 + (30 / currentZoom.current);
+          const fontSize = ((isSelected || isHovered) ? 24 : 20) / currentZoom.current;
           ctx.font = `bold ${fontSize}px 'Geist Sans', sans-serif`;
           ctx.textAlign = "center";
           
           // Shadow/Glow behind text
-          ctx.shadowBlur = 20;
+          ctx.shadowBlur = 10 / currentZoom.current;
           ctx.shadowColor = "#00F0FF";
-          ctx.fillStyle = "white";
-          
-          // Background "holographic" plate for text on mobile
-          if (isMobile || isSelected || isHovered) {
-            const tw = ctx.measureText(g.name).width;
-            ctx.fillStyle = "rgba(5, 5, 20, 0.7)";
-            ctx.fillRect(px - tw / 2 - 20, labelY - (fontSize * 0.8), tw + 40, fontSize * 1.2);
-            ctx.strokeStyle = (isSelected || isHovered) ? "rgba(0, 240, 255, 0.8)" : "rgba(0, 240, 255, 0.3)";
-            ctx.lineWidth = 2;
-            ctx.strokeRect(px - tw / 2 - 20, labelY - (fontSize * 0.8), tw + 40, fontSize * 1.2);
-          }
           
           ctx.fillStyle = (isSelected || isHovered) ? "#00F0FF" : "white";
           ctx.fillText(g.name, px, labelY);
@@ -337,10 +327,18 @@ export default function GalacticExplorer() {
             
             ctx.save();
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(0, 240, 255, ${intensity})`;
-            ctx.lineWidth = (isSelected ? 14 : 8) / currentZoom.current;
-            ctx.shadowBlur = 60 * intensity;
+            // Soft outer glow
+            ctx.strokeStyle = `rgba(0, 240, 255, ${intensity * 0.15})`;
+            ctx.lineWidth = (isSelected ? 30 : 20) / currentZoom.current;
+            ctx.shadowBlur = 40 * intensity;
             ctx.shadowColor = "#00F0FF";
+            ctx.arc(px, py, 55, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Inner subtle core
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(0, 240, 255, ${intensity * 0.3})`;
+            ctx.lineWidth = (isSelected ? 8 : 4) / currentZoom.current;
             ctx.arc(px, py, 55, 0, Math.PI * 2);
             ctx.stroke();
             ctx.restore();
@@ -380,21 +378,12 @@ export default function GalacticExplorer() {
 
           // Label for System - LARGE AND PROMINENT
           ctx.save();
-          const labelY = py + 85 / currentZoom.current;
-          const fontSize = (isSelected || isHovered) ? 24 : 20;
+          const labelY = py + 30 + (20 / currentZoom.current);
+          const fontSize = ((isSelected || isHovered) ? 24 : 20) / currentZoom.current;
           ctx.font = `bold ${fontSize}px 'Geist Sans', sans-serif`;
           ctx.textAlign = "center";
-          ctx.shadowBlur = 20;
+          ctx.shadowBlur = 10 / currentZoom.current;
           ctx.shadowColor = "#00F0FF";
-          
-          if (isMobile || isSelected || isHovered) {
-            const tw = ctx.measureText(s.name).width;
-            ctx.fillStyle = "rgba(5, 5, 20, 0.7)";
-            ctx.fillRect(px - tw / 2 - 15, labelY - (fontSize * 0.8), tw + 30, fontSize * 1.2);
-            ctx.strokeStyle = (isSelected || isHovered) ? "rgba(0, 240, 255, 0.8)" : "rgba(0, 240, 255, 0.3)";
-            ctx.lineWidth = 1.5;
-            ctx.strokeRect(px - tw / 2 - 15, labelY - (fontSize * 0.8), tw + 30, fontSize * 1.2);
-          }
           
           ctx.fillStyle = (isSelected || isHovered) ? "#00F0FF" : "white";
           ctx.fillText(s.name, px, labelY);
@@ -460,10 +449,18 @@ export default function GalacticExplorer() {
              
              ctx.save();
              ctx.beginPath();
-             ctx.strokeStyle = `rgba(0, 240, 255, ${intensity})`;
-             ctx.lineWidth = (isSelected ? 10 : 6) / currentZoom.current;
-             ctx.shadowBlur = 40 * intensity;
+             // Soft outer glow
+             ctx.strokeStyle = `rgba(0, 240, 255, ${intensity * 0.15})`;
+             ctx.lineWidth = (isSelected ? 20 : 15) / currentZoom.current;
+             ctx.shadowBlur = 30 * intensity;
              ctx.shadowColor = "#00F0FF";
+             ctx.arc(px, py, visualRadio + 25, 0, Math.PI * 2);
+             ctx.stroke();
+             
+             // Inner subtle core
+             ctx.beginPath();
+             ctx.strokeStyle = `rgba(0, 240, 255, ${intensity * 0.3})`;
+             ctx.lineWidth = (isSelected ? 6 : 3) / currentZoom.current;
              ctx.arc(px, py, visualRadio + 25, 0, Math.PI * 2);
              ctx.stroke();
              ctx.restore();
@@ -535,21 +532,12 @@ export default function GalacticExplorer() {
 
           // Planet Label - LARGE AND PROMINENT
           ctx.save();
-          const labelY = py + (visualRadio + 55) / currentZoom.current;
-          const fontSize = (isSelected || isHovered) ? 22 : 18;
+          const labelY = py + visualRadio + (20 / currentZoom.current);
+          const fontSize = ((isSelected || isHovered) ? 22 : 18) / currentZoom.current;
           ctx.font = `bold ${fontSize}px 'Geist Sans', sans-serif`;
           ctx.textAlign = "center";
-          ctx.shadowBlur = 15;
+          ctx.shadowBlur = 10 / currentZoom.current;
           ctx.shadowColor = "#00F0FF";
-          
-          if (isMobile || isSelected || isHovered) {
-            const tw = ctx.measureText(p.name).width;
-            ctx.fillStyle = "rgba(5, 5, 20, 0.7)";
-            ctx.fillRect(px - tw / 2 - 12, labelY - (fontSize * 0.8), tw + 24, fontSize * 1.2);
-            ctx.strokeStyle = (isSelected || isHovered) ? "rgba(0, 240, 255, 0.8)" : "rgba(0, 240, 255, 0.3)";
-            ctx.lineWidth = 1;
-            ctx.strokeRect(px - tw / 2 - 12, labelY - (fontSize * 0.8), tw + 24, fontSize * 1.2);
-          }
           
           ctx.fillStyle = (isSelected || isHovered) ? "#00F0FF" : "white";
           ctx.fillText(p.name, px, labelY);
@@ -588,9 +576,9 @@ export default function GalacticExplorer() {
     e.preventDefault();
     const zoomFactor = 0.2;
     if (e.deltaY < 0) {
-      setTargetZoom((z) => Math.min(z + zoomFactor, 5));
+      targetZoom.current = Math.min(targetZoom.current + zoomFactor, 5);
     } else {
-      setTargetZoom((z) => Math.max(z - zoomFactor, 0.2));
+      targetZoom.current = Math.max(targetZoom.current - zoomFactor, 0.2);
     }
   };
 
@@ -612,7 +600,7 @@ export default function GalacticExplorer() {
     const point = getInteractionPoint(e);
     if (!point) return;
     clickStart.current = point;
-    setDragStart({ x: point.x - targetOffset.x, y: point.y - targetOffset.y });
+    setDragStart({ x: point.x - targetOffset.current.x, y: point.y - targetOffset.current.y });
 
     const canvas = canvasRef.current;
     if (canvas) {
@@ -677,7 +665,7 @@ export default function GalacticExplorer() {
       
       if (lastPinchDistance.current !== null) {
         const delta = (dist - lastPinchDistance.current) * 0.01;
-        setTargetZoom((z) => Math.min(Math.max(z + delta, 0.2), 5));
+        targetZoom.current = Math.min(Math.max(targetZoom.current + delta, 0.2), 5);
       }
       lastPinchDistance.current = dist;
       return;
@@ -740,10 +728,10 @@ export default function GalacticExplorer() {
     setHoveredObject(foundHover);
 
     if (isDragging && point) {
-      setTargetOffset({
+      targetOffset.current = {
         x: point.x - dragStart.x,
         y: point.y - dragStart.y,
-      });
+      };
     }
   };
 
@@ -782,8 +770,8 @@ export default function GalacticExplorer() {
         if (hit) {
            setSelectedGalaxy(hit);
            setViewLevel('SYSTEM');
-           setTargetZoom(1.2);
-           setTargetOffset({ x: 0, y: 0 });
+           targetZoom.current = 1.2;
+           targetOffset.current = { x: 0, y: 0 };
         }
       } 
       else if (viewLevel === 'SYSTEM' && selectedGalaxy) {
@@ -800,8 +788,8 @@ export default function GalacticExplorer() {
         if (hit) {
            setSelectedSystem(hit);
            setViewLevel('PLANET');
-           setTargetZoom(1.5);
-           setTargetOffset({ x: 0, y: 0 });
+           targetZoom.current = 1.5;
+           targetOffset.current = { x: 0, y: 0 };
         }
       }
       else if (viewLevel === 'PLANET' && selectedSystem) {
@@ -950,8 +938,8 @@ export default function GalacticExplorer() {
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 backdropFilter: 'blur(15px)'
               }}>
-                <IconButton size="small" onClick={() => setTargetZoom(z => Math.max(z - 0.2, 0.2))} sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: '#00F0FF' } }}><ZoomOut fontSize="small" /></IconButton>
-                <IconButton size="small" onClick={() => setTargetZoom(z => Math.min(z + 0.2, 5))} sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: '#00F0FF' } }}><ZoomIn fontSize="small" /></IconButton>
+                <IconButton size="small" onClick={() => { targetZoom.current = Math.max(targetZoom.current - 0.2, 0.2); }} sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: '#00F0FF' } }}><ZoomOut fontSize="small" /></IconButton>
+                <IconButton size="small" onClick={() => { targetZoom.current = Math.min(targetZoom.current + 0.2, 5); }} sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: '#00F0FF' } }}><ZoomIn fontSize="small" /></IconButton>
               </Box>
             )}
           </Box>
@@ -985,8 +973,8 @@ export default function GalacticExplorer() {
                   setSelectedSystem(null);
                   setSelectedPlanet(null);
                   setViewLevel('SYSTEM');
-                  setTargetZoom(1.2);
-                  setTargetOffset({ x: 0, y: 0 });
+                  targetZoom.current = 1.2;
+                  targetOffset.current = { x: 0, y: 0 };
                   if (isMobile) setShowMobileMenu(false);
                 } else {
                   setSelectedGalaxy(null);
@@ -1038,8 +1026,8 @@ export default function GalacticExplorer() {
                   setSelectedSystem(newValue.id);
                   setSelectedPlanet(null);
                   setViewLevel('PLANET');
-                  setTargetZoom(1.5);
-                  setTargetOffset({ x: 0, y: 0 });
+                  targetZoom.current = 1.5;
+                  targetOffset.current = { x: 0, y: 0 };
                   if (isMobile) setShowMobileMenu(false);
                 } else {
                   setSelectedSystem(null);
@@ -1134,8 +1122,8 @@ export default function GalacticExplorer() {
                   setSelectedSystem(null);
                   setSelectedPlanet(null);
                   setViewLevel('GALAXY');
-                  setTargetZoom(1);
-                  setTargetOffset({ x: 0, y: 0 });
+                  targetZoom.current = 1;
+                  targetOffset.current = { x: 0, y: 0 };
                   if (isMobile) setShowMobileMenu(false);
                 }}
                 sx={{ 
