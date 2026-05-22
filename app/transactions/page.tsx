@@ -45,12 +45,8 @@ export default function TransactionsPage() {
     const rawData = storeId ? byStoreBoxId[storeId] : null;
     let transactionData: TransactionsInterface[] = [];
     
-    if (rawData) {
-        if (Array.isArray(rawData)) {
-            transactionData = rawData[0]?.transactions || [];
-        } else if (rawData.transactions && Array.isArray(rawData.transactions)) {
-            transactionData = rawData.transactions;
-        }
+    if (rawData?.transactions && Array.isArray(rawData.transactions)) {
+        transactionData = rawData.transactions;
     }
 
     

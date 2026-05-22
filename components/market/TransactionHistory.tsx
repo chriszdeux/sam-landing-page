@@ -42,14 +42,9 @@ export const TransactionHistory = ({ walletId }: TransactionHistoryProps) => {
   const rawData = storeId ? transactions[storeId] : null;
   let transactionData: TransactionsInterface[] = [];
   
-  if (rawData) {
-      if (Array.isArray(rawData)) {
-          transactionData = rawData;
-      } else if (rawData.transactions && Array.isArray(rawData.transactions)) {
-          transactionData = rawData.transactions;
-      }
+  if (rawData?.transactions && Array.isArray(rawData.transactions)) {
+      transactionData = rawData.transactions;
   }
-console.log(transactions)
   
   //# 5-Renderizar tabla de transacciones
   return (
