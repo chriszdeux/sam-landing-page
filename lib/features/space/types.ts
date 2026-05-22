@@ -31,6 +31,14 @@ export interface Planet {
   biome?: string;
   atmosphere?: number;
   gravity?: number;
+  dayDuration?: string;
+  moons?: number;
+  hazardLevel?: 'Low' | 'Medium' | 'High' | 'Extreme';
+  minerals?: string[];
+  fauna?: boolean;
+  animalTypes?: string[];
+  habitability?: number;
+  temperature?: number;
   orbitIndex?: number;
   orbitDistance?: number;
   orbitAngle?: number;

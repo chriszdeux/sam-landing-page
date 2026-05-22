@@ -34,7 +34,7 @@ const transactionsSlice = createSlice({
                 if (data === false) return;
                 
                 
-                const newTransactions = data.data || [];
+                const newTransactions = data?.data?.data || [];
                 
                 
                 if (!state.byStoreBoxId[storeId]) {
