@@ -131,15 +131,16 @@ export const WalletManager = () => {
                             gap: 2, 
                             overflowX: 'auto', 
                             pb: 2,
+                            px: { xs: 0, md: 1 },
                             '::-webkit-scrollbar': { height: 6 },
                             '::-webkit-scrollbar-track': {  background: 'rgba(255, 255, 255, 0.05)' },
                             '::-webkit-scrollbar-thumb': { background: '#00f3ff', borderRadius: 4 }
                         }}>
                             {userInfo.wallets && userInfo.wallets.map((wallet, index) => (
-                                <Box key={index} sx={{ minWidth: 320, maxWidth: 320 }}>
+                                <Box key={index} sx={{ minWidth: { xs: 280, sm: 320 }, maxWidth: { xs: '85vw', sm: 320 } }}>
                                     <TechFrame color="#00f3ff">
                                         <Box sx={{ 
-                                            p: 3,
+                                            p: { xs: 2, sm: 3 },
                                             height: 180,
                                             display: 'flex',
                                             flexDirection: 'column',
@@ -165,15 +166,32 @@ export const WalletManager = () => {
                                                         <Box sx={{ width: 20, height: 16, border: '1px solid rgba(255, 215, 0, 0.4)', borderRadius: 0.5 }} />
                                                     </Box>
                                                 </Box>
-                                                <AccountBalanceWalletIcon sx={{ color: 'rgba(255,255,255,0.1)', fontSize: 60, position: 'absolute', top: 10, right: 10 }} />
+                                                <AccountBalanceWalletIcon sx={{ 
+                                                    color: 'rgba(255,255,255,0.1)', 
+                                                    fontSize: { xs: 40, sm: 60 }, 
+                                                    position: 'absolute', 
+                                                    top: 10, 
+                                                    right: 10 
+                                                }} />
                                             </Box>
 
                                             <Box>
-                                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'white', mb: 0.5, letterSpacing: 1 }}>
+                                                <Typography variant="h6" sx={{ 
+                                                    fontWeight: 'bold', 
+                                                    color: 'white', 
+                                                    mb: 0.5, 
+                                                    letterSpacing: 1,
+                                                    fontSize: { xs: '1rem', sm: '1.25rem' }
+                                                }}>
                                                     {wallet.label.toUpperCase()}
                                                 </Typography>
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <Typography variant="caption" sx={{ fontFamily: 'monospace', color: 'rgba(0, 243, 255, 0.8)', fontSize: '0.8rem', letterSpacing: 1 }}>
+                                                    <Typography variant="caption" sx={{ 
+                                                        fontFamily: 'monospace', 
+                                                        color: 'rgba(0, 243, 255, 0.8)', 
+                                                        fontSize: { xs: '0.7rem', sm: '0.8rem' }, 
+                                                        letterSpacing: 1 
+                                                    }}>
                                                         {wallet.walletAddress.substring(0, 8)} •••• {wallet.walletAddress.substring(wallet.walletAddress.length - 6)}
                                                     </Typography>
                                                     <IconButton 
@@ -191,7 +209,7 @@ export const WalletManager = () => {
                             ))}
                             
                             {(!userInfo.wallets || userInfo.wallets.length === 0) && (
-                                <Box sx={{ minWidth: 320, height: 180, display: 'flex', alignItems: 'center', justifyItems: 'center' }}>
+                                <Box sx={{ minWidth: { xs: 280, sm: 320 }, height: 180, display: 'flex', alignItems: 'center', justifyItems: 'center' }}>
                                     <Button 
                                         variant="outlined" 
                                         fullWidth 

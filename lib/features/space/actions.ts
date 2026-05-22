@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import api from "../../api";
+import api, { hadesApi } from "../../api";
 import { EnvVariables } from "../../constants/variables";
 import { Galaxy, SolarSystem, Planet } from "./types";
 
@@ -28,7 +28,7 @@ export const fetchGalaxies = createAsyncThunk<Galaxy[], void, { rejectValue: str
   "space/fetchGalaxies",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get(`${EnvVariables.connect}/modules-v1/space/galaxies`);
+      const response = await hadesApi.get(`/space/galaxies`);
       const data = response.data.data || response.data;
       return normalizeData(data) as Galaxy[];
     } catch (error: any) {
@@ -41,7 +41,7 @@ export const fetchSystemsByGalaxy = createAsyncThunk<{ galaxyId: string; systems
   "space/fetchSystems",
   async (galaxyId: string, { rejectWithValue }) => {
     try {
-      const response = await api.get(`${EnvVariables.connect}/modules-v1/space/galaxies/${galaxyId}/systems`);
+      const response = await hadesApi.get(`/space/galaxies/${galaxyId}/systems`);
       const data = response.data.data || response.data;
       return { galaxyId, systems: normalizeData(data) as SolarSystem[] };
     } catch (error: any) {
@@ -54,7 +54,7 @@ export const fetchPlanetsBySystem = createAsyncThunk<{ systemId: string; planets
   "space/fetchPlanets",
   async (systemId: string, { rejectWithValue }) => {
     try {
-      const response = await api.get(`${EnvVariables.connect}/modules-v1/space/systems/${systemId}/planets`);
+      const response = await hadesApi.get(`/space/systems/${systemId}/planets`);
       const data = response.data.data || response.data;
       return { systemId, planets: normalizeData(data) as Planet[] };
     } catch (error: any) {
