@@ -52,10 +52,12 @@ const marketSlice = createSlice({
                 state.error = action.payload as string;
             })
             
-            .addCase(fetchCryptoHistory.pending, () => {
-                
+            .addCase(fetchCryptoHistory.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
             })
             .addCase(fetchCryptoHistory.fulfilled, (state, action) => {
+                state.isLoading = false;
                 const { cryptoId, range, data } = action.payload;
                 
                 
@@ -85,7 +87,8 @@ const marketSlice = createSlice({
                 };
             })
             .addCase(fetchCryptoHistory.rejected, (state, action) => {
-                 
+                 state.isLoading = false;
+                 state.error = action.payload as string;
                  console.error('History fetch failed', action.payload);
             });
     },

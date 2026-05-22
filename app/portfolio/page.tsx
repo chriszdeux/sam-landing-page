@@ -261,7 +261,7 @@ export default function PortfolioPage() {
                             </Typography>
                             <TransactionsTable 
                                 storeId={selectedNetwork?.id} 
-                                walletId={userInfo?.wallets?.length === 1 ? userInfo.wallets[0].walletAddress : undefined}
+                                walletId={userInfo?.wallets && userInfo.wallets.length > 0 ? userInfo.wallets[0].walletAddress : undefined}
                             />
                         </motion.div>
                     )}
