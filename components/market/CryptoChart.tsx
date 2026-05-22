@@ -7,7 +7,7 @@
 //# 1-Definir componente de gráfico de criptomonedas
 
 import React from 'react';
-import { Box } from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
 import { motion } from 'framer-motion';
 import {
   Chart as ChartJS,
@@ -50,7 +50,7 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
     const dispatch = useAppDispatch();
     
     //# 3-Selección de datos desde el estado global de Redux
-    const { historicalData } = useAppSelector((state) => state.market);
+    const { historicalData, isLoading } = useAppSelector((state) => state.market);
     
 
     
@@ -70,6 +70,14 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
     
     const chartData = historicalData[cryptoId || '']?.data;
     const isDataLoaded = !!chartData && historicalData[cryptoId || '']?.range === range;
+
+    if (isLoading && !isDataLoaded) {
+        return (
+            <Box sx={{ width: '100%', height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 4 }}>
+                <CircularProgress color="primary" />
+            </Box>
+        );
+    }
 
     const labels = React.useMemo(() => {
         if (!isDataLoaded || !Array.isArray(chartData)) return Array.from({ length: 24 }, (_, i) => `${i}:00`);
