@@ -15,7 +15,7 @@ interface TaoIconProps {
 }
 
 export const TaoIcon: React.FC<TaoIconProps> = ({ size = 12, color: customColor, style}) => { 
-    const color = customColor || cyan[200];
+    const color = customColor || 'var(--neon-cyan, #00f3ff)';
     
     //# 2-Renderizar icono con animación Framer Motion
     return (
@@ -25,11 +25,12 @@ export const TaoIcon: React.FC<TaoIconProps> = ({ size = 12, color: customColor,
             animate={{ 
                 opacity: [0.8, 1, 0.8],
                 textShadow: [
-                    `0 0 0px ${color}00`,
-                    `0 0 10px ${color}80`,
-                    `0 0 0px ${color}00`
+                    `0 0 0px ${color === 'var(--neon-cyan, #00f3ff)' ? '#00f3ff00' : color + '00'}`,
+                    `0 0 10px ${color === 'var(--neon-cyan, #00f3ff)' ? '#00f3ff80' : color + '80'}`,
+                    `0 0 0px ${color === 'var(--neon-cyan, #00f3ff)' ? '#00f3ff00' : color + '00'}`
                 ]
             }}
+
             transition={{ 
                 duration: 2, 
                 repeat: Infinity,

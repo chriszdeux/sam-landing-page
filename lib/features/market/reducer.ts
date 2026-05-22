@@ -60,32 +60,37 @@ const marketSlice = createSlice({
                 state.isLoading = false;
                 const { cryptoId, range, data } = action.payload;
                 
+                if (!data) {
+                    console.warn(`[MARKET_REDUCER] No data received for crypto history: ${cryptoId}`);
+                    return;
+                }
                 
                 let history: AnalyticsData[] = [];
                 
+                // Intentar extraer historicalData de múltiples niveles
                 if (Array.isArray(data)) {
                     history = data;
+                } else if (Array.isArray(data?.data)) {
+                    history = data.data;
                 } else if (Array.isArray(data?.historicalData)) {
                      history = data.historicalData;
                 } else if (data?.data && Array.isArray(data.data.historicalData)) {
-                     
                      history = data.data.historicalData;
-                } else if (Array.isArray(data?.data)) {
-                     history = data.data;
                 }
 
-                
-                const currentBuyState = data?.currentBuyState || data?.data?.currentBuyState;
-                const currentSellState = data?.currentSellState || data?.data?.currentSellState;
+                // Intentar extraer trade states
+                const currentBuyState = data?.currentBuyState || data?.data?.currentBuyState || { amount: 0, counter: 0 };
+                const currentSellState = data?.currentSellState || data?.data?.currentSellState || { amount: 0, counter: 0 };
                 
                 state.historicalData[cryptoId] = {
                     data: history,
-                    total: data.total || history.length,
+                    total: data.total || data?.data?.total || history.length,
                     range: range,
                     currentBuyState: currentBuyState,
                     currentSellState: currentSellState
                 };
             })
+
             .addCase(fetchCryptoHistory.rejected, (state, action) => {
                  state.isLoading = false;
                  state.error = action.payload as string;
