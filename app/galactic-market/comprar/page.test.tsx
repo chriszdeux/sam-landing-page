@@ -1,7 +1,7 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import ComprarModulosPage from './page';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import api from '../../../lib/api';
+import api, { hadesApi } from '../../../lib/api';
 
 // Mock the API module
 vi.mock('../../../lib/api', () => ({
@@ -9,6 +9,10 @@ vi.mock('../../../lib/api', () => ({
     get: vi.fn(),
     post: vi.fn(),
   },
+  hadesApi: {
+    get: vi.fn(),
+    post: vi.fn(),
+  }
 }));
 
 describe('ComprarModulosPage', () => {
@@ -33,7 +37,7 @@ describe('ComprarModulosPage', () => {
   });
 
   it('should render the page title and data after loading', async () => {
-    (api.get as any).mockResolvedValueOnce({ data: { listings: mockListings } });
+    (hadesApi.get as any).mockResolvedValueOnce({ data: { listings: mockListings } });
     
     render(<ComprarModulosPage />);
     
@@ -46,8 +50,8 @@ describe('ComprarModulosPage', () => {
   });
 
   it('should handle buy button click', async () => {
-    (api.get as any).mockResolvedValueOnce({ data: { listings: mockListings } });
-    (api.post as any).mockResolvedValueOnce({ data: { success: true } });
+    (hadesApi.get as any).mockResolvedValueOnce({ data: { listings: mockListings } });
+    (hadesApi.post as any).mockResolvedValueOnce({ data: { success: true } });
     
     render(<ComprarModulosPage />);
 
@@ -57,13 +61,13 @@ describe('ComprarModulosPage', () => {
     fireEvent.click(buyButton);
 
     await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith('modules-v1/confirmBuyTransaction', { listingId: 'list-1' });
+      expect(hadesApi.post).toHaveBeenCalledWith('/confirmBuyTransaction', { listingId: 'list-1' });
       expect(screen.getByText(/Estructura Forjada con Éxito/i)).toBeInTheDocument();
     });
   });
 
   it('should show empty state if no listings', async () => {
-    (api.get as any).mockResolvedValueOnce({ data: { listings: [] } });
+    (hadesApi.get as any).mockResolvedValueOnce({ data: { listings: [] } });
     
     render(<ComprarModulosPage />);
 
@@ -78,7 +82,7 @@ describe('ComprarModulosPage', () => {
       price: 500
       // moduleData missing
     }];
-    (api.get as any).mockResolvedValueOnce({ data: { listings: malformedListing } });
+    (hadesApi.get as any).mockResolvedValueOnce({ data: { listings: malformedListing } });
     
     render(<ComprarModulosPage />);
 

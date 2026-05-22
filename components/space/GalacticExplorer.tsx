@@ -248,21 +248,26 @@ export default function GalacticExplorer() {
           if (isSelected || isHovered) {
             const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 300);
             const intensity = (isSelected ? 1.0 : 0.6) * (0.6 + 0.4 * pulse);
+            const dashOffset = Date.now() / 50;
             
             ctx.save();
             ctx.beginPath();
-            // Outer soft glow
+            // Outer soft glow (Non-solid dashed border)
             ctx.strokeStyle = `rgba(0, 240, 255, ${intensity * 0.15})`;
             ctx.lineWidth = (isSelected ? 40 : 25) / currentZoom.current;
             ctx.shadowBlur = 50 * intensity;
             ctx.shadowColor = "#00F0FF";
+            ctx.setLineDash([15, 15]);
+            ctx.lineDashOffset = -dashOffset;
             ctx.ellipse(px, py, 330, 330 * 0.35, galaxyTiltAngle, 0, Math.PI * 2);
             ctx.stroke();
             
-            // Inner subtle core
+            // Inner subtle core (Counter-rotating dash)
             ctx.beginPath();
             ctx.strokeStyle = `rgba(0, 240, 255, ${intensity * 0.3})`;
             ctx.lineWidth = (isSelected ? 10 : 5) / currentZoom.current;
+            ctx.setLineDash([10, 5]);
+            ctx.lineDashOffset = dashOffset * 1.5;
             ctx.ellipse(px, py, 330, 330 * 0.35, galaxyTiltAngle, 0, Math.PI * 2);
             ctx.stroke();
             ctx.restore();
@@ -287,7 +292,8 @@ export default function GalacticExplorer() {
 
           // Enhanced Label - LARGE AND PROMINENT
           ctx.save();
-          const labelY = py + 100 + (30 / currentZoom.current);
+          // [T-133] Dynamic spacing: moves closer as zoom increases
+          const labelY = py + (130 / Math.pow(currentZoom.current, 1.2)); 
           const fontSize = ((isSelected || isHovered) ? 24 : 20) / currentZoom.current;
           ctx.font = `bold ${fontSize}px 'Geist Sans', sans-serif`;
           ctx.textAlign = "center";
@@ -318,12 +324,13 @@ export default function GalacticExplorer() {
           const px = (s.coordinates?.x || 0) * 10;
           const py = (s.coordinates?.y || 0) * 10 * 0.6;
 
-          // Pulsating hover/selection effect
+          // Pulsating hover/selection effect (Non-solid)
           const isSelected = selectedSystem === s.id;
           const isHovered = hoveredObject?.id === s.id;
           if (isSelected || isHovered) {
             const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 400);
             const intensity = (isSelected ? 1.0 : 0.7) * (0.6 + 0.4 * pulse);
+            const dashOffset = Date.now() / 40;
             
             ctx.save();
             ctx.beginPath();
@@ -332,6 +339,8 @@ export default function GalacticExplorer() {
             ctx.lineWidth = (isSelected ? 30 : 20) / currentZoom.current;
             ctx.shadowBlur = 40 * intensity;
             ctx.shadowColor = "#00F0FF";
+            ctx.setLineDash([8, 8]);
+            ctx.lineDashOffset = -dashOffset;
             ctx.arc(px, py, 55, 0, Math.PI * 2);
             ctx.stroke();
             
@@ -339,6 +348,8 @@ export default function GalacticExplorer() {
             ctx.beginPath();
             ctx.strokeStyle = `rgba(0, 240, 255, ${intensity * 0.3})`;
             ctx.lineWidth = (isSelected ? 8 : 4) / currentZoom.current;
+            ctx.setLineDash([5, 3]);
+            ctx.lineDashOffset = dashOffset * 2;
             ctx.arc(px, py, 55, 0, Math.PI * 2);
             ctx.stroke();
             ctx.restore();
@@ -378,7 +389,7 @@ export default function GalacticExplorer() {
 
           // Label for System - LARGE AND PROMINENT
           ctx.save();
-          const labelY = py + 30 + (20 / currentZoom.current);
+          const labelY = py + (50 / Math.pow(currentZoom.current, 1.2));
           const fontSize = ((isSelected || isHovered) ? 24 : 20) / currentZoom.current;
           ctx.font = `bold ${fontSize}px 'Geist Sans', sans-serif`;
           ctx.textAlign = "center";
@@ -428,7 +439,7 @@ export default function GalacticExplorer() {
         ctx.shadowBlur = 0;
 
         const currentPlanets = planets[selectedSystem] || [];
-        const time = Date.now() / 10000;
+        const time = Date.now() / 40000;
 
         currentPlanets.forEach((p: Planet, i: number) => {
           const orbitIndex = p.orbitIndex !== undefined ? p.orbitIndex : i + 1;
@@ -440,12 +451,13 @@ export default function GalacticExplorer() {
           const py = Math.sin(currentAngle) * orbitDistance * 0.6;
           const visualRadio = 10 + (Math.log10(p.radius || 5) * 10);
 
-          // Pulsating effect for Planet
+          // Pulsating effect for Planet (Non-solid)
           const isSelected = selectedPlanet?.id === p.id;
           const isHovered = hoveredObject?.id === p.id;
           if (isSelected || isHovered) {
              const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 250);
              const intensity = (isSelected ? 1.0 : 0.7) * (0.7 + 0.3 * pulse);
+             const dashOffset = Date.now() / 30;
              
              ctx.save();
              ctx.beginPath();
@@ -454,6 +466,8 @@ export default function GalacticExplorer() {
              ctx.lineWidth = (isSelected ? 20 : 15) / currentZoom.current;
              ctx.shadowBlur = 30 * intensity;
              ctx.shadowColor = "#00F0FF";
+             ctx.setLineDash([5, 5]);
+             ctx.lineDashOffset = -dashOffset;
              ctx.arc(px, py, visualRadio + 25, 0, Math.PI * 2);
              ctx.stroke();
              
@@ -461,6 +475,8 @@ export default function GalacticExplorer() {
              ctx.beginPath();
              ctx.strokeStyle = `rgba(0, 240, 255, ${intensity * 0.3})`;
              ctx.lineWidth = (isSelected ? 6 : 3) / currentZoom.current;
+             ctx.setLineDash([3, 2]);
+             ctx.lineDashOffset = dashOffset * 2.5;
              ctx.arc(px, py, visualRadio + 25, 0, Math.PI * 2);
              ctx.stroke();
              ctx.restore();
@@ -532,7 +548,7 @@ export default function GalacticExplorer() {
 
           // Planet Label - LARGE AND PROMINENT
           ctx.save();
-          const labelY = py + visualRadio + (20 / currentZoom.current);
+          const labelY = py + (visualRadio + 25) / Math.pow(currentZoom.current, 1.2);
           const fontSize = ((isSelected || isHovered) ? 22 : 18) / currentZoom.current;
           ctx.font = `bold ${fontSize}px 'Geist Sans', sans-serif`;
           ctx.textAlign = "center";
@@ -634,7 +650,7 @@ export default function GalacticExplorer() {
         }
       } else if (viewLevel === 'PLANET' && selectedSystem) {
         const currentPlanets = planets[selectedSystem] || [];
-        const time = Date.now() / 10000;
+        const time = Date.now() / 20000;
         for (let i = 0; i < currentPlanets.length; i++) {
           const p = currentPlanets[i];
           const orbitIndex = p.orbitIndex !== undefined ? p.orbitIndex : i + 1;
@@ -707,7 +723,7 @@ export default function GalacticExplorer() {
       }
     } else if (viewLevel === 'PLANET' && selectedSystem) {
       const currentPlanets = planets[selectedSystem] || [];
-      const time = Date.now() / 10000;
+      const time = Date.now() / 20000;
       for (let i = 0; i < currentPlanets.length; i++) {
         const p = currentPlanets[i];
         const orbitIndex = p.orbitIndex !== undefined ? p.orbitIndex : i + 1;
@@ -795,7 +811,7 @@ export default function GalacticExplorer() {
       else if (viewLevel === 'PLANET' && selectedSystem) {
         let hit = null;
         const currentPlanets = planets[selectedSystem] || [];
-        const time = Date.now() / 10000;
+        const time = Date.now() / 20000;
         for (let i = 0; i < currentPlanets.length; i++) {
            const p = currentPlanets[i];
            const orbitIndex = p.orbitIndex !== undefined ? p.orbitIndex : i + 1;

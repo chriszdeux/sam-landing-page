@@ -25,7 +25,7 @@ import {
 import { Snackbar, Alert } from "@mui/material";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import api from "../../../lib/api";
+import api, { hadesApi } from "../../../lib/api";
 import { TechFrame } from "../../../components/ui/TechFrame";
 import { StationToast } from "../../../components/core_modules/StationToast";
 
@@ -60,7 +60,7 @@ export default function ComprarModulosPage() {
 
     const fetchListings = async () => {
       try {
-        const res = await api.get('modules-v1/market/listings');
+        const res = await hadesApi.get('/market/listings');
         setListings(res.data.listings || []);
       } catch (error: any) {
         console.error("Error fetching listings:", error);
@@ -77,12 +77,13 @@ export default function ComprarModulosPage() {
     setBuyingId(listingId);
     try {
       // Phase 1: Purchase logic (Backend handles inventory creation)
-      await api.post('modules-v1/confirmBuyTransaction', { listingId });
+      await hadesApi.post('/confirmBuyTransaction', { listingId });
       setErrorMsg(null);
       setToast({ 
         message: "Estructura Forjada con Éxito - Lista en Almacén", 
         type: 'success' 
       });
+      setListings(prev => prev.filter(l => l.listingId !== listingId));
     } catch (error: any) {
       console.error("Error buying module:", error);
       setErrorMsg("No se pudo completar la compra. Revisa tu conexión o saldo.");

@@ -1,8 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Box, Paper, CircularProgress, Typography, Button, Chip } from "@mui/material";
-import { PowerSettingsNew, Bolt } from "@mui/icons-material";
+import { Box, Paper, CircularProgress, Typography, Button, Chip, Tooltip } from "@mui/material";
+import { PowerSettingsNew, Bolt, WarningAmber } from "@mui/icons-material";
+
+const MIN_INJECT_EP = 12; // powerRequired mínimo para que flushTransactionsQueue procese
 import { MiningBackground } from "./MiningBackground";
 import { useAppSelector } from "../../lib/hooks";
 import { LaboratorioRegistration } from "./LaboratorioRegistration";
@@ -15,15 +17,28 @@ interface LabBasicData {
   id: string;
   type?: string;
   powerMining?: number;
+  energy?: number;
+  maxEnergy?: number;
 }
 
 export function LaboratorioView() {
   const { userInfo, status } = useAppSelector((state) => state.auth);
+  const selectedNetwork = useAppSelector((state: any) => state.blockchain?.selectedNetwork);
   const [labData, setLabData] = useState<LabBasicData | null>(null);
   const [injecting, setInjecting] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   const hasLab = userInfo?.idLabs && userInfo.idLabs.length > 0;
   const labId = userInfo?.idLabs?.[0];
+
+  useEffect(() => {
+    if (status !== 'idle' && status !== 'loading') {
+      setIsInitializing(false);
+    }
+    // Fail-safe timeout in case status stays idle for some reason
+    const timer = setTimeout(() => setIsInitializing(false), 2000);
+    return () => clearTimeout(timer);
+  }, [status]);
 
   useEffect(() => {
     if (hasLab && labId) {
@@ -33,22 +48,56 @@ export function LaboratorioView() {
           setLabData({
             id: data.id,
             type: data.type || 'MINNING', // Default to MINNING for prototype if missing
-            powerMining: data.powerMining || 1500
+            powerMining: data.powerMining || 1500,
+            energy: data.energy || 0,
+            maxEnergy: data.maxEnergy || 100
           });
         })
         .catch(() => {
           // Fallback mock for UI visualization if backend is offline or unlinked
-          setLabData({ id: labId, type: 'MINNING', powerMining: 5000 });
+          setLabData({ id: labId, type: 'MINNING', powerMining: 5000, energy: 0, maxEnergy: 100 });
         });
     }
   }, [hasLab, labId]);
 
-  const handleInjectPower = () => {
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setLabData(prev => {
+        if (!prev) return prev;
+        const currentEnergy = prev.energy || 0;
+        const maxEnergy = prev.maxEnergy || 100;
+        if (currentEnergy >= maxEnergy) {
+          return prev;
+        }
+        return { ...prev, energy: currentEnergy + 1 };
+      });
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const currentEnergy = Math.floor(labData?.energy || 0);
+  const canInject = currentEnergy >= MIN_INJECT_EP;
+
+  const handleInjectPower = async () => {
+    if (!labData || !selectedNetwork || !canInject) return;
     setInjecting(true);
-    setTimeout(() => setInjecting(false), 2000); // Simulate network/effect
+    try {
+      const res = await api.post(`/labs/${labData.id}/inject-power`, {
+        blockchainId: selectedNetwork.id,
+        energyAmount: currentEnergy
+      });
+      if (res.data?.labState) {
+        setLabData(prev => prev ? { ...prev, energy: res.data.labState.energy } : prev);
+      }
+    } catch (error) {
+      console.error('Failed to inject power', error);
+    } finally {
+      setInjecting(false);
+    }
   };
 
-  if (status === 'loading') {
+  if (status === 'loading' || isInitializing) {
     return (
       <Box sx={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: '#0a0c10' }}>
         <CircularProgress sx={{ color: '#00f3ff' }} />
@@ -131,27 +180,43 @@ export function LaboratorioView() {
                   <Typography variant="h6" sx={{ color: 'white', fontFamily: 'monospace' }}>
                     Poder de Minado (n): <span style={{ color: '#ffd700' }}>{labData.powerMining}</span>
                   </Typography>
+                  <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                    Energía: {currentEnergy} / {labData.maxEnergy || 100} EP
+                  </Typography>
+                  {!canInject && (
+                    <Box display="flex" alignItems="center" gap={0.5} mt={0.5}>
+                      <WarningAmber sx={{ fontSize: 14, color: '#ff9800' }} />
+                      <Typography variant="caption" sx={{ color: '#ff9800' }}>
+                        Mínimo {MIN_INJECT_EP} EP para confirmar transacciones
+                      </Typography>
+                    </Box>
+                  )}
                 </Box>
               </Box>
               
-              <Button
-                variant="outlined"
-                disabled={injecting}
-                onClick={handleInjectPower}
-                sx={{
-                  color: '#ffd700',
-                  borderColor: '#ffd700',
-                  fontWeight: 'bold',
-                  letterSpacing: 1,
-                  '&:hover': {
-                    bgcolor: 'rgba(255, 215, 0, 0.1)',
-                    borderColor: '#ffd700',
-                    boxShadow: '0 0 15px rgba(255, 215, 0, 0.4)'
-                  }
-                }}
-              >
-                {injecting ? 'INJECTING...' : 'INJECT POWER'}
-              </Button>
+              <Tooltip title={!canInject ? `Necesitas al menos ${MIN_INJECT_EP} EP para procesar transacciones` : ''} arrow>
+                <span>
+                  <Button
+                    variant="outlined"
+                    disabled={injecting || !canInject}
+                    onClick={handleInjectPower}
+                    sx={{
+                      color: canInject ? '#ffd700' : 'rgba(255,215,0,0.3)',
+                      borderColor: canInject ? '#ffd700' : 'rgba(255,215,0,0.2)',
+                      fontWeight: 'bold',
+                      letterSpacing: 1,
+                      transition: 'all 0.3s ease',
+                      '&:not(:disabled):hover': {
+                        bgcolor: 'rgba(255, 215, 0, 0.1)',
+                        borderColor: '#ffd700',
+                        boxShadow: '0 0 15px rgba(255, 215, 0, 0.4)'
+                      }
+                    }}
+                  >
+                    {injecting ? 'INJECTING...' : `INJECT POWER${!canInject ? ` (${MIN_INJECT_EP - currentEnergy} EP)` : ''}`}
+                  </Button>
+                </span>
+              </Tooltip>
             </Paper>
           </motion.div>
         )}
