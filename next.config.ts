@@ -29,6 +29,30 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: '/inicio',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/explorar-universo',
+        destination: '/exploracion-infinita',
+        permanent: true,
+      },
+      {
+        source: '/mercado',
+        destination: '/galactic-market',
+        permanent: true,
+      },
+      {
+        source: '/transacciones',
+        destination: '/transactions',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

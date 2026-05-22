@@ -14,6 +14,9 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
+    if (config.url?.startsWith('/')) {
+      config.url = config.url.substring(1);
+    }
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -25,6 +28,29 @@ api.interceptors.request.use(
     if (error.config) {
        console.error("Request URL:", (error.config.baseURL || '') + error.config.url);
     }
+    return Promise.reject(error);
+  }
+);
+
+export const hadesApi = axios.create({
+  baseURL: `${EnvVariables.connect}/hades-v1/`,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+hadesApi.interceptors.request.use(
+  (config) => {
+    if (config.url?.startsWith('/')) {
+      config.url = config.url.substring(1);
+    }
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
     return Promise.reject(error);
   }
 );

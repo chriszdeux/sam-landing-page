@@ -23,7 +23,7 @@ import {
   AddCircleOutline 
 } from '@mui/icons-material';
 import { StationModule } from '../../lib/types/core_modules';
-import api from '../../lib/api';
+import api, { hadesApi } from '../../lib/api';
 
 interface ModuleModuleModuleAnchorModalProps {
   open: boolean;
@@ -39,7 +39,7 @@ export const ModuleModuleModuleAnchorModal: React.FC<ModuleModuleModuleAnchorMod
   React.useEffect(() => {
     if (open) {
       setLoading(true);
-      api.get('modules-v1/user/inventory')
+      hadesApi.get('/user/inventory')
         .then(res => setInventory(res.data.inventory || []))
         .catch(err => console.error("Error fetching inventory for modal:", err))
         .finally(() => setLoading(false));

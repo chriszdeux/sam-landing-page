@@ -147,12 +147,28 @@ export default function PortfolioPage() {
         
         <Container maxWidth="xl" sx={{ pt: 14, position: 'relative', zIndex: 1 }}>
             <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                <Box sx={{ 
+                    display: 'flex', 
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    justifyContent: 'space-between', 
+                    alignItems: { xs: 'flex-start', sm: 'center' }, 
+                    mb: 4,
+                    gap: 2
+                }}>
                     <Box>
-                         <Typography variant="h3" sx={{ fontWeight: 'bold', color: 'white', letterSpacing: 1 }}>
+                         <Typography variant="h3" sx={{ 
+                             fontWeight: 'bold', 
+                             color: 'white', 
+                             letterSpacing: 1,
+                             fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' }
+                         }}>
                             PORTAFOLIO
                         </Typography>
-                        <Typography variant="subtitle1" sx={{ color: 'rgba(255,255,255,0.5)', letterSpacing: 1 }}>
+                        <Typography variant="subtitle1" sx={{ 
+                            color: 'rgba(255,255,255,0.5)', 
+                            letterSpacing: 1,
+                            fontSize: { xs: '0.8rem', sm: '1rem' }
+                        }}>
                             VISTA GENERAL DE ACTIVOS
                         </Typography>
                     </Box>

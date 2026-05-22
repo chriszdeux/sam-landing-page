@@ -21,7 +21,7 @@ import {
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { StationModule } from "../../lib/types/core_modules";
-import api from "../../lib/api";
+import api, { hadesApi } from "../../lib/api";
 
 export function LaboratorioInventory() {
   const [inventory, setInventory] = useState<StationModule[]>([]);
@@ -32,7 +32,7 @@ export function LaboratorioInventory() {
 
   const fetchInventory = async () => {
     try {
-      const res = await api.get('modules-v1/user/inventory');
+      const res = await hadesApi.get('/user/inventory');
       setInventory(res.data.inventory || []);
     } catch (error) {
       console.error("Error fetching inventory:", error);
@@ -54,7 +54,7 @@ export function LaboratorioInventory() {
       const types = ["energy", "science", "bio", "habitat"];
       const randomType = types[Math.floor(Math.random() * types.length)];
       
-      const res = await api.post('modules-v1/modules', {
+      const res = await hadesApi.post('/modules', {
         moduleType: randomType,
         shapeType: randomType === "energy" ? "square" : randomType === "science" ? "triangle" : randomType === "bio" ? "circle" : "rectangle"
       });
@@ -72,7 +72,7 @@ export function LaboratorioInventory() {
   const handleDelete = async (moduleId: string) => {
     setDeletingId(moduleId);
     try {
-      await api.delete(`modules-v1/modules/${moduleId}`);
+      await hadesApi.delete(`/modules/${moduleId}`);
       setInventory(prev => prev.filter(m => m.moduleId !== moduleId));
     } catch (error: any) {
       console.error("Error deleting module:", error);

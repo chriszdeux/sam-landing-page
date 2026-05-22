@@ -12,7 +12,7 @@ import {
 } from '@mui/icons-material';
 import { StationModule } from '../../lib/types/core_modules';
 import { ModuleModuleModuleAnchorModal } from './ModuleAnchorModal';
-import api from '../../lib/api';
+import api, { hadesApi } from '../../lib/api';
 import { CircularProgress } from '@mui/material';
 import { calculateResources } from '../../lib/utils/core_modules_logic';
 
@@ -82,7 +82,7 @@ export const CoreModulesSimulator: React.FC = () => {
 
   const fetchState = async () => {
     try {
-      const res = await api.get('modules-v1/getStationState');
+      const res = await hadesApi.get('/getStationState');
       setStationModules(res.data.modules || []);
       setServerResources(res.data.resources);
     } catch (error) {
@@ -121,7 +121,7 @@ export const CoreModulesSimulator: React.FC = () => {
 
   const saveState = async (updatedModules: StationModule[]) => {
     try {
-      const res = await api.post('modules-v1/saveStationState', { modules: updatedModules });
+      const res = await hadesApi.post('/saveStationState', { modules: updatedModules });
       setServerResources(res.data.resources);
       setLogs(prev => [...prev, '[SYSTEM] Estado de la estación sincronizado.']);
       window.dispatchEvent(new Event('core_modules-inventory-refresh'));

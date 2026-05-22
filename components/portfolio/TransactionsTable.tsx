@@ -81,7 +81,8 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({ storeId, w
             </Typography>
             <TechFrame>
                 <TableContainer component={Box} sx={{ bgcolor: 'rgba(0,0,0,0.2)', p: 0 }}>
-                    <Table size="small">
+                    {/* Desktop View */}
+                    <Table size="small" sx={{ display: { xs: 'none', md: 'table' } }}>
                         <TableHead>
                             <TableRow>
                                 <TableCell sx={{ color: 'rgba(0, 243, 255, 0.7)', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace' }}>FECHA</TableCell>
@@ -134,6 +135,84 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({ storeId, w
                             ))}
                         </TableBody>
                     </Table>
+
+                    {/* Mobile View */}
+                    <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 2, p: 2 }}>
+                        {Array.isArray(transactionsData) && transactionsData.slice(0, 10).map((tx) => (
+                            <Box 
+                                key={tx.id} 
+                                sx={{ 
+                                    p: 2.5, 
+                                    border: '1px solid rgba(0, 243, 255, 0.1)', 
+                                    borderRadius: '8px',
+                                    bgcolor: 'rgba(255,255,255,0.03)',
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    '&::before': {
+                                        content: '""',
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        width: '4px',
+                                        height: '100%',
+                                        bgcolor: tx.status === 'CONFIRMED' ? '#00e676' : tx.status === 'PENDING' ? '#ff9100' : '#ff1744',
+                                        opacity: 0.7
+                                    }
+                                }}
+                            >
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                                    <Box>
+                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'monospace', display: 'block', mb: 0.5 }}>
+                                            {new Date(tx.dateCreated).toLocaleDateString()} {new Date(tx.dateCreated).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                        </Typography>
+                                        <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold', fontSize: '1rem' }}>
+                                            {tx.financialInfo.symbol}
+                                        </Typography>
+                                    </Box>
+                                    <Chip 
+                                        label={tx.status} 
+                                        size="small" 
+                                        color={getStatusColor(tx.status)}
+                                        variant="outlined"
+                                        sx={{ 
+                                            fontSize: '0.6rem', 
+                                            height: 18,
+                                            borderColor: 'currentColor',
+                                            textTransform: 'uppercase',
+                                            fontWeight: 'bold'
+                                        }}
+                                    />
+                                </Box>
+                                
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                        <Chip 
+                                            label={tx.transactionType} 
+                                            size="small" 
+                                            sx={{ 
+                                                bgcolor: 'rgba(0, 243, 255, 0.1)', 
+                                                color: '#00f3ff',
+                                                border: '1px solid rgba(0, 243, 255, 0.3)',
+                                                fontWeight: 'bold',
+                                                fontSize: '0.65rem',
+                                                height: 22,
+                                                width: 'fit-content'
+                                            }} 
+                                        />
+                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', fontSize: '0.7rem' }}>
+                                            VAL: {tx.confirmedBy || '---'}
+                                        </Typography>
+                                    </Box>
+                                    <Box sx={{ textAlign: 'right' }}>
+                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'block', mb: -0.5 }}>CANTIDAD</Typography>
+                                        <Typography sx={{ color: '#00f3ff', fontFamily: 'monospace', fontWeight: 'bold', fontSize: '1.2rem' }}>
+                                            {tx.financialInfo.quantity}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </Box>
+                        ))}
+                    </Box>
                 </TableContainer>
             </TechFrame>
         </React.Fragment>
