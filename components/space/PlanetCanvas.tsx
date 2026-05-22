@@ -237,7 +237,7 @@ export default function PlanetCanvas(props: PlanetCanvasProps) {
             const dotProduct = (nx * lx_norm + ny * ly_norm + nz * lz_norm);
             const diffuse = Math.max(0.1, dotProduct); 
 
-            // 3D Spherical Rotation [NEW]
+            // 3D Spherical Rotation
             // Rotate around Y axis
             const rnx = nx * cosRot + nz * sinRot;
             const rnz = -nx * sinRot + nz * cosRot;
@@ -253,12 +253,76 @@ export default function PlanetCanvas(props: PlanetCanvasProps) {
 
             const surfaceNoise = fbm3D(noise3D, noiseX, noiseY, noiseZ, config.octaves);
 
+            // [T-121] Lógica de Paletas por Bioma
+            const pBiome = biome?.toUpperCase() || "DEFAULT";
             let baseH, baseL, baseS = 60;
+            
+            // Mask for secondary/tertiary colors [T-121: Horizontal stretch x10]
+            const zoneNoise = fbm3D(noise3D, noiseX * 0.1, noiseY * 2.0, noiseZ * 0.1, 2);
+            const detailNoise = fbm3D(noise3D, noiseX * 3, noiseY * 3, noiseZ * 3, 2);
+
             if (pType === "GAS_GIANT") {
                 const mix = (surfaceNoise + 1) / 2;
                 baseH = oceanHue + (terrainHue - oceanHue) * mix;
                 baseL = 35 + mix * 20;
+            } else if (pBiome === "OCEANIC" || pBiome === "OCEÁNICO") {
+                if (surfaceNoise > config.threshold + 0.1) { // Sparse islands
+                    baseH = terrainHue;
+                    baseL = 40 + detailNoise * 10;
+                } else {
+                    // 3 Colors: Base (oceanHue) + Cobalt + Foam
+                    if (detailNoise > 0.3) { // Foam/Waves
+                        baseH = 0; baseS = 0; baseL = 90; 
+                    } else if (zoneNoise > 0.2) { // Cobalt deeper zones
+                        baseH = 220; baseL = 20;
+                    } else {
+                        baseH = oceanHue; baseL = 30;
+                    }
+                }
+            } else if (pBiome === "TUNDRA") {
+                // 3 Colors: Cyan Base + Stone Gray + Ice Blue
+                if (surfaceNoise > config.threshold) {
+                    if (zoneNoise > 0.3) { // Gray Stone
+                        baseH = 0; baseS = 0; baseL = 40;
+                    } else { // Cyan Base
+                        baseH = terrainHue; baseL = 85;
+                    }
+                } else { // Ice Blue
+                    baseH = 200; baseL = 70;
+                }
+            } else if (pBiome === "VEGETATION" || pBiome === "VEGETACIÓN") {
+                // 3 Colors: Green Base + Earth Brown + Dark Green
+                if (surfaceNoise > config.threshold) {
+                    if (zoneNoise > 0.4) { // Earth Brown
+                        baseH = 30; baseS = 40; baseL = 30;
+                    } else if (detailNoise > 0.1) { // Dark Green
+                        baseH = 140; baseL = 20;
+                    } else { // Green Base
+                        baseH = faunaHue; baseL = 45;
+                    }
+                } else { // Water for vegetation planets
+                    baseH = oceanHue; baseL = 25;
+                }
+            } else if (pBiome === "VOLCANIC" || pBiome === "VOLCÁNICO") {
+                // 3 Colors: Charred Black + Lava Red + Bright Orange
+                if (surfaceNoise > 0.2) { // Charred Rock
+                    baseH = 0; baseS = 0; baseL = 15;
+                } else if (surfaceNoise > 0) { // Lava Red
+                    baseH = 0; baseS = 90; baseL = 50;
+                } else { // Bright Orange
+                    baseH = 30; baseS = 100; baseL = 60;
+                }
+            } else if (pBiome === "DESERT" || pBiome === "DESÉRTICO") {
+                // 3 Colors: Sand Base + Clay Brown + Pale Yellow
+                if (zoneNoise > 0.3) { // Clay Brown
+                    baseH = 20; baseS = 50; baseL = 40;
+                } else if (detailNoise > 0.2) { // Pale Yellow
+                    baseH = 50; baseS = 40; baseL = 70;
+                } else { // Sand Base
+                    baseH = terrainHue; baseL = 55;
+                }
             } else {
+                // Default logic
                 if (surfaceNoise > config.threshold) {
                     const featureMix = fbm3D(noise3D, noiseX * 2, noiseY * 2, noiseZ * 2, 2);
                     baseH = featureMix > 0.1 ? faunaHue : terrainHue;

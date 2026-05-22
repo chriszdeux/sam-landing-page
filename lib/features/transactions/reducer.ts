@@ -31,12 +31,7 @@ const transactionsSlice = createSlice({
                 state.lastArgs = JSON.stringify(action.meta.arg);
                 const { storeId, data, page } = action.payload;
 
-                if (data === false) return;
-                
-                
-                const newTransactions = data?.data || [];
-                
-                
+                // Ensure the store object is initialized even if data is null
                 if (!state.byStoreBoxId[storeId]) {
                     state.byStoreBoxId[storeId] = {
                         id: storeId,
@@ -52,13 +47,26 @@ const transactionsSlice = createSlice({
                     };
                 }
 
+                if (!data || data === false) {
+                    console.warn(`[TRANSACTIONS_REDUCER] No data received for storeId: ${storeId}`);
+                    return;
+                }
+                
+                // El backend devuelve { message: string, data: [] }
+                const newTransactions = Array.isArray(data?.data) ? data.data : [];
+                
                 if (page === 1) {
                     state.byStoreBoxId[storeId].transactions = newTransactions;
                 } else {
-                    
                     const existing = state.byStoreBoxId[storeId].transactions;
-                    state.byStoreBoxId[storeId].transactions = [...existing, ...newTransactions];
+                    // Evitar duplicados por ID
+                    const existingIds = new Set(existing.map((t: any) => t.id));
+                    const uniqueNew = newTransactions.filter((t: any) => !existingIds.has(t.id));
+                    state.byStoreBoxId[storeId].transactions = [...existing, ...uniqueNew];
                 }
+                
+                state.byStoreBoxId[storeId].count = state.byStoreBoxId[storeId].transactions.length;
+
             })
             .addCase(fetchTransactions.rejected, (state, action) => {
                 state.isLoading = false;

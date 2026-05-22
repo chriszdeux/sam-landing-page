@@ -36,7 +36,8 @@ export const AssetList: React.FC<AssetListProps> = ({ assets, totalValue }) => {
                     animate={{ x: 0, opacity: 1 }} 
                     transition={{ delay: 0.3 + i * 0.1 }}
                 >
-                    <TechFrame color={asset.color} className="w-ful                        <Box 
+                    <TechFrame color={asset.color} className="w-full">
+                        <Box 
                             sx={{ 
                                 p: 3, 
                                 display: 'flex',
@@ -143,7 +144,6 @@ export const AssetList: React.FC<AssetListProps> = ({ assets, totalValue }) => {
                                 VENDER
                             </Button>
                         </Box>
-Box>                        
                     </Box>
                     </TechFrame>
                 </motion.div>
