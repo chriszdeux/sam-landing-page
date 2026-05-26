@@ -16,7 +16,7 @@ import { openModal } from '../../lib/features/uiSlice';
 
 //# 1-Obtención del despachador para emitir acciones al store
 import { useAppDispatch } from '../../lib/hooks';
-import { cyan } from '@mui/material/colors';
+// import { cyan } from '@mui/material/colors';
 import { EnvVariables } from '@/lib/constants/variables';
 import { TaoIcon } from '../ui/TaoIcon';
 
@@ -92,6 +92,7 @@ export const HeroSection = () => {
           muted
           loop
           playsInline
+          poster="/assets/images/universe_expansion/beyond.jpg"
           style={{
             width: '100%',
             height: '100%',

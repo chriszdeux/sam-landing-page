@@ -117,7 +117,7 @@ export default function TransactionsPage() {
                 />
 
                 <TechFrame color="#00f3ff">
-                    <Box sx={{ p: 2, display: 'flex', gap: 2, alignItems: 'center', borderBottom: '1px solid rgba(0, 243, 255, 0.1)' }}>
+                    <Box sx={{ p: 2, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, alignItems: 'center', borderBottom: '1px solid rgba(0, 243, 255, 0.1)' }}>
                         <Input 
                             placeholder="Buscar por Wallet Address..." 
                             value={walletSearch}
