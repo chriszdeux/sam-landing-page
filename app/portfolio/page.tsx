@@ -269,7 +269,7 @@ export default function PortfolioPage() {
 
             <Grid container spacing={4}>
                 {/* Left Section: Operational Data */}
-                <Grid size={{ xs: 12, xl: 8 }}>
+                <Grid size={{ xs: 12, lg: 8 }}>
                     <Stack spacing={4}>
                         <Box>
                             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
@@ -300,7 +300,7 @@ export default function PortfolioPage() {
                 </Grid>
 
                 {/* Right Section: Analytics & Assets */}
-                <Grid size={{ xs: 12, xl: 4 }}>
+                <Grid size={{ xs: 12, lg: 4 }}>
                      <Stack spacing={4}>
                         {assets.length > 0 ? (
                             <>
