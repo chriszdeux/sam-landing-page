@@ -24,6 +24,7 @@ export default function Home() {
         <HeroSection />
         <HistorySection />
         <MechanicsSection />
+        <UniverseSection />
       </div>
 
       <Footer />
