@@ -75,7 +75,6 @@ export interface BlockchainState {
     selectedNetwork: BlockchainInterface | null;
     rewards: Reward[];
     nextBlockTime: number | null;
-    totalPowerMinning: number;
 
     isLoading: boolean;
     error: string | null;
