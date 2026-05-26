@@ -61,7 +61,7 @@ export default function PortfolioPage() {
         if (selectedNetwork?.id && cryptos.length === 0) {
             dispatch(fetchCryptos(selectedNetwork.id));
         }
-    }, [dispatch, selectedNetwork?.id, cryptos.length]);
+    }, [selectedNetwork?.id, cryptos.length]);
 
     
     

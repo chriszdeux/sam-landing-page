@@ -63,7 +63,7 @@ export const Navbar = () => {
                dispatch(fetchWalletDetails(primaryWallet.walletAddress));
           }
       }
-  }, [userInfo, dispatch, walletsInfo]);
+  }, [userInfo, walletsInfo]);
 
   React.useEffect(() => {
     // Polling every 5 minutes (300,000 ms) - No initial call as per PM requirement
@@ -75,7 +75,7 @@ export const Navbar = () => {
     }, 300000);
 
     return () => clearInterval(interval);
-  }, [dispatch, userInfo, selectedNetworkState?.id]);
+  }, [userInfo, selectedNetworkState?.id]);
 
   if (
     pathname === '/auth/logging-in' || 

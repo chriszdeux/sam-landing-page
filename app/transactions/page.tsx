@@ -89,7 +89,7 @@ export default function TransactionsPage() {
         if (storeId) {
             dispatch(fetchTransactions({ storeId, walletId: appliedWalletFilter, page: 1, limit: pageSize }));
         }
-    }, [storeId, dispatch, appliedWalletFilter, pageSize]);
+    }, [storeId, appliedWalletFilter, pageSize]);
 
     if (!selectedNetwork) {
          

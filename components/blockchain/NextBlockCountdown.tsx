@@ -30,7 +30,7 @@ export const NextBlockCountdown: React.FC<NextBlockCountdownProps> = ({ networkI
         if (networkId) {
             dispatch(fetchNextBlockTime(networkId));
         }
-    }, [dispatch, networkId]);
+    }, [networkId]);
 
     useEffect(function syncCountdown() {
         if (!nextBlockTime) return;
@@ -56,7 +56,7 @@ export const NextBlockCountdown: React.FC<NextBlockCountdownProps> = ({ networkI
         const interval = setInterval(calculateTime, 1000);
 
         return () => clearInterval(interval);
-    }, [nextBlockTime, dispatch, networkId]);
+    }, [nextBlockTime, networkId]);
 
     //# 4-Renderizar contador de tiempo
     return (

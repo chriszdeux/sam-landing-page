@@ -53,7 +53,7 @@ export default function MarketPage() {
     if (selectedNetwork?.id) {
         dispatch(fetchCryptos(selectedNetwork.id));
     }
-  }, [dispatch, selectedNetwork?.id]);
+  }, [selectedNetwork?.id]);
 
   
   

@@ -22,7 +22,7 @@ export const AuthLoader = ({ children }: { children: React.ReactNode }) => {
     useEffect(function loadInitialData() {
         dispatch(checkAuth());
         dispatch(fetchNetworks());
-    }, [dispatch]);
+    }, []);
 
     //# 4-Efecto para sincronizar detalles de la billetera
     useEffect(function syncWalletDetails() {
@@ -34,7 +34,7 @@ export const AuthLoader = ({ children }: { children: React.ReactNode }) => {
                }
            }
         }
-    }, [userInfo, dispatch]);
+    }, [userInfo]);
 
     //# 5-Renderizar los componentes hijos contenidos
     return <>{children}</>;

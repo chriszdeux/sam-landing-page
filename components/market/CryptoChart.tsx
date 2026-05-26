@@ -66,7 +66,7 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
                 promise.abort();
             };
         }
-    }, [cryptoId, range, dispatch]);
+    }, [cryptoId, range]);
     
     const chartData = historicalData[cryptoId || '']?.data;
     const isDataLoaded = !!chartData && historicalData[cryptoId || '']?.range === range;

@@ -122,7 +122,7 @@ export default function RewardsPage() {
       hasFetched.current = true;
       dispatch(fetchRewards());
     }
-  }, [dispatch, userInfo]);
+  }, [userInfo]);
 
   
   //# 12-Gestión de estado local para claiming reward id
