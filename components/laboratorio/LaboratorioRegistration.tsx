@@ -10,7 +10,7 @@ import { User } from "../../lib/features/auth/types";
 
 export function LaboratorioRegistration({ userInfo }: { userInfo: User }) {
   const dispatch = useAppDispatch();
-  const [labType, setLabType] = useState('MINNING');
+  const [labType, setLabType] = useState('MINING');
   const [isRegistering, setIsRegistering] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
   const [animLines, setAnimLines] = useState<string[]>([]);
