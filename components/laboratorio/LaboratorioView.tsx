@@ -92,8 +92,9 @@ export function LaboratorioView() {
       if (res.data?.labState) {
         setLabData(prev => prev ? { ...prev, energy: res.data.labState.energy } : prev);
       }
-      if (res.data?.totalPowerMinning !== undefined) {
-        dispatch(updateNetworkPower({ id: selectedNetwork.id, totalPowerMinning: res.data.totalPowerMinning }));
+      const newPower = res.data?.totalPowerMinning ?? res.data?.labState?.totalPowerMinning ?? res.data?.blockchainProps?.totalPowerMinning ?? res.data?.networkPower ?? res.data?.data?.totalPowerMinning;
+      if (newPower !== undefined && newPower !== null) {
+        dispatch(updateNetworkPower({ id: selectedNetwork.id, totalPowerMinning: Number(newPower) }));
       }
     } catch (error) {
       console.error('Failed to inject power', error);
