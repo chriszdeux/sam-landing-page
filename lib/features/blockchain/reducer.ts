@@ -45,6 +45,8 @@ const blockchainSlice = createSlice({
                      const exists = state.selectedNetwork && action.payload.find((n: BlockchainInterface) => n.id === state.selectedNetwork?.id);
                      if (!exists) {
                          state.selectedNetwork = action.payload[0];
+                     } else {
+                         state.selectedNetwork = exists;
                      }
                 }
             })
