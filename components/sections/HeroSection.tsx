@@ -59,14 +59,6 @@ export const HeroSection = () => {
   return (
     <Section id="home" className="relative min-h-[90vh] flex items-center overflow-hidden">
       {/* Background with radial gradient instead of video */}
-      <Box className="hero-background-container" sx={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        zIndex: 0,
-        background: 'radial-gradient(circle at 20% 50%, rgba(0, 243, 255, 0.05) 0%, rgba(5, 10, 20, 0.9) 70%, #050a14 100%)',
       }} />
 
       <Box ref={container} sx={{ position: 'relative', zIndex: 3, width: '100%' }}>
