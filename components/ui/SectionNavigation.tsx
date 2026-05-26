@@ -14,7 +14,7 @@ import { IconButton, Box } from '@mui/material';
 import { KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material';
 import { usePathname } from 'next/navigation';
 
-const sections = ['home', 'history', 'mechanics'];
+const sections = ['home', 'history', 'mechanics', 'universo'];
 
 export const SectionNavigation = () => {
   const pathname = usePathname();
