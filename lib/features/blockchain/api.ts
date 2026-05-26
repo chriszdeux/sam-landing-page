@@ -2,6 +2,7 @@
 // 2-Definir función para obtener recompensas
 // 3-Definir función para reclamar recompensas
 // 4-Definir función para obtener tiempo del siguiente bloque
+// 5-Definir función para obtener potencia de minado total
 
 //# 1-Definir función para obtener redes
 import api from '../../api';
@@ -26,5 +27,11 @@ export const claimRewardApi = async (id: string, userId: string) => {
 //# 4-Definir función para obtener tiempo del siguiente bloque
 export const getNextBlockTimeApi = async (networkId: string) => {
     const response = await api.get(`/blockchain/network/${networkId}/next-time`);
+    return response.data;
+};
+
+//# 5-Definir función para obtener potencia de minado total
+export const getMiningPowerApi = async () => {
+    const response = await api.get('/blockchain/network/mining-power');
     return response.data;
 };

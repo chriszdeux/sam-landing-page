@@ -16,7 +16,6 @@ import { openModal } from '../../lib/features/uiSlice';
 
 //# 1-Obtención del despachador para emitir acciones al store
 import { useAppDispatch } from '../../lib/hooks';
-// import { cyan } from '@mui/material/colors';
 import { EnvVariables } from '@/lib/constants/variables';
 import { TaoIcon } from '../ui/TaoIcon';
 
@@ -27,7 +26,6 @@ export const HeroSection = () => {
   //# 2-Obtención del despachador para emitir acciones al store
   const dispatch = useAppDispatch();
   const container = useRef<HTMLElement | null>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
   const { project } = EnvVariables;
 
   useGSAP(() => {
@@ -53,12 +51,6 @@ export const HeroSection = () => {
       stagger: 0.2,
       ease: 'expo.out'
     });
-
-    gsap.from('.hero-video-container', {
-      opacity: 0,
-      duration: 2,
-      ease: 'power2.inOut'
-    });
   }, { scope: container });
 
   
@@ -66,57 +58,16 @@ export const HeroSection = () => {
   //# 3-Estructuración y renderizado visual del componente UI
   return (
     <Section id="home" className="relative min-h-[90vh] flex items-center overflow-hidden">
-      {/* Cyberpunk Video Background */}
-      <Box className="hero-video-container" sx={{
+      {/* Background with radial gradient instead of video */}
+      <Box className="hero-background-container" sx={{
         position: 'absolute',
         top: 0,
         left: 0,
         width: '100%',
         height: '100%',
         zIndex: 0,
-        overflow: 'hidden',
-        '&::after': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          background: 'radial-gradient(circle at 20% 50%, rgba(0, 243, 255, 0.15) 0%, rgba(5, 10, 20, 0.8) 70%, #050a14 100%)',
-          zIndex: 1
-        }
-      }}>
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="/assets/images/universe_expansion/beyond.jpg"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            filter: 'brightness(0.6) contrast(1.2) saturate(1.2)',
-          }}
-        >
-          <source src="/assets/videos/hero.mp4" type="video/mp4" />
-        </video>
-        
-        {/* Scanlines Effect */}
-        <Box sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundImage: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))',
-          backgroundSize: '100% 4px, 3px 100%',
-          zIndex: 2,
-          pointerEvents: 'none',
-          opacity: 0.3
-        }} />
-      </Box>
+        background: 'radial-gradient(circle at 20% 50%, rgba(0, 243, 255, 0.05) 0%, rgba(5, 10, 20, 0.9) 70%, #050a14 100%)',
+      }} />
 
       <Box ref={container} sx={{ position: 'relative', zIndex: 3, width: '100%' }}>
         <Grid container spacing={4} alignItems="center">
@@ -275,4 +226,3 @@ export const HeroSection = () => {
     </Section>
   );
 };
-

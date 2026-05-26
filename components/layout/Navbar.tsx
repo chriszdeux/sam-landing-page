@@ -1,7 +1,7 @@
 // 1-Importar dependencias y componentes de UI
 // 2-Definir componente y estados locales
 // 3-Obtener datos de Redux y hooks
-// 4-Efecto para sincronizar detalles de billetera
+// 4-Efecto para sincronizar detalles de billetera y polling de poder
 // 5-Funciones para manejar eventos de usuario
 // 6-Renderizar estructura principal de la barra
 
@@ -21,6 +21,7 @@ import {
 import {
   Menu as MenuIcon,
   Rocket,
+  Bolt,
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { Button } from "../ui/Button";
@@ -29,6 +30,7 @@ import { Button } from "../ui/Button";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { setCurrentSection } from "../../lib/features/uiSlice";
 import { fetchWalletDetails } from "../../lib/features/auth/actions";
+import { fetchMiningPower } from "../../lib/features/blockchain/actions";
 import { navItems } from "./navItems";
 import { NavbarDrawer } from "./NavbarDrawer";
 import { LogoutDialog } from "./LogoutDialog";
@@ -44,7 +46,7 @@ export const Navbar = () => {
   //# 3-Obtener datos de Redux y hooks
   const dispatch = useAppDispatch();
   const { userInfo, walletsInfo } = useAppSelector((state) => state.auth);
-  const { networks, selectedNetwork: selectedNetworkState } = useAppSelector((state) => state.blockchain);
+  const { networks, selectedNetwork: selectedNetworkState, totalPowerMinning } = useAppSelector((state) => state.blockchain);
 
   const pathname = usePathname();
   const router = useRouter();
@@ -53,7 +55,7 @@ export const Navbar = () => {
 
   
   
-  //# 4-Efecto para sincronizar detalles de la billetera
+  //# 4-Efecto para sincronizar detalles de la billetera y polling de poder
   React.useEffect(function syncWalletData() {
       if (userInfo && userInfo.wallets && userInfo.wallets.length > 0) {
           const primaryWallet = userInfo.wallets[0];
@@ -62,6 +64,18 @@ export const Navbar = () => {
           }
       }
   }, [userInfo, dispatch, walletsInfo]);
+
+  React.useEffect(() => {
+    // Initial fetch
+    dispatch(fetchMiningPower());
+
+    // Polling every 5 minutes (300,000 ms)
+    const interval = setInterval(() => {
+      dispatch(fetchMiningPower());
+    }, 300000);
+
+    return () => clearInterval(interval);
+  }, [dispatch]);
 
   if (
     pathname === '/auth/logging-in' || 
@@ -167,6 +181,18 @@ export const Navbar = () => {
                     SYSTEM ONLINE
                 </Typography>
             </Box>
+          </Box>
+
+          <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', gap: 1, mr: 4, px: 2, py: 0.5, borderRadius: '20px', border: '1px solid rgba(0, 243, 255, 0.2)', bgcolor: 'rgba(0, 243, 255, 0.05)' }}>
+              <Bolt sx={{ color: '#00f3ff', fontSize: 18 }} />
+              <Box>
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', lineHeight: 1, fontSize: '0.6rem', fontWeight: 'bold' }}>
+                      MINING POWER
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#00f3ff', fontWeight: 'bold', lineHeight: 1 }}>
+                      {(totalPowerMinning || 0).toLocaleString()} GH/s
+                  </Typography>
+              </Box>
           </Box>
 
           <Box

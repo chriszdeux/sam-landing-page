@@ -3,10 +3,11 @@
 // 3-Acción asíncrona para obtener recompensas
 // 4-Acción asíncrona para reclamar recompensa
 // 5-Acción asíncrona para obtener tiempo del próximo bloque
+// 6-Acción asíncrona para obtener potencia total de minado
 
 //# 1-Importar dependencias y APIs del módulo
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { getNetworksApi, getRewardsApi, claimRewardApi, getNextBlockTimeApi } from './api';
+import { getNetworksApi, getRewardsApi, claimRewardApi, getNextBlockTimeApi, getMiningPowerApi } from './api';
 import { getProfileApi } from '../auth/api'; 
 import { setUserInfo, updateBalance } from '../auth/reducer';
 import { RootState } from '../../store';
@@ -83,3 +84,16 @@ export const fetchNextBlockTime = createAsyncThunk(
     }
 );
 
+//# 6-Acción asíncrona para obtener potencia total de minado
+export const fetchMiningPower = createAsyncThunk(
+    'blockchain/fetchMiningPower',
+    async (_, { rejectWithValue }) => {
+        try {
+            const data = await getMiningPowerApi();
+            return data;
+        } catch (err: unknown) {
+             const errorObj = err as { response?: { data?: { message?: string } } };
+            return rejectWithValue(errorObj.response?.data?.message || 'Failed to fetch mining power');
+        }
+    }
+);
