@@ -27,7 +27,7 @@ export function LaboratorioNetworkSection({ labData, currentEnergy, onEnergyChan
   const dispatch = useAppDispatch();
   const { selectedNetwork } = useAppSelector((state) => state.blockchain);
   const blockchainId = selectedNetwork?.id ?? null;
-  const totalPowerMinning = selectedNetwork?.blockchainProps?.totalPowerMinning || 0;
+  const totalPowerMining = selectedNetwork?.blockchainProps?.totalPowerMining || 0;
   const [transactions] = useState<Transaction[]>([]);
   const [isClaiming, setIsClaiming] = useState(false);
   const [showClaimParticles, setShowClaimParticles] = useState(false);
@@ -56,9 +56,9 @@ export function LaboratorioNetworkSection({ labData, currentEnergy, onEnergyChan
       if (labState) onEnergyChange(labState.energy);
       
       // Update blockchain store with new total power immediately
-      const newPower = res.data?.totalPowerMinning ?? res.data?.labState?.totalPowerMinning ?? res.data?.blockchainProps?.totalPowerMinning ?? res.data?.networkPower ?? res.data?.data?.totalPowerMinning;
+      const newPower = res.data?.totalPowerMining ?? res.data?.labState?.totalPowerMining ?? res.data?.blockchainProps?.totalPowerMining ?? res.data?.networkPower ?? res.data?.data?.totalPowerMining;
       if (newPower !== undefined && newPower !== null) {
-          dispatch(updateNetworkPower({ id: blockchainId, totalPowerMinning: Number(newPower) }));
+          dispatch(updateNetworkPower({ id: blockchainId, totalPowerMining: Number(newPower) }));
       }
 
       if (tokensEarned) {
@@ -136,7 +136,7 @@ export function LaboratorioNetworkSection({ labData, currentEnergy, onEnergyChan
                 </Typography>
                 <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
                     <Typography variant="h4" sx={{ color: "#fff", fontWeight: 900, letterSpacing: -1, textShadow: "0 0 20px rgba(0, 243, 255, 0.5)" }}>
-                        {(totalPowerMinning || 0).toLocaleString('en-US')}
+                        {(totalPowerMining || 0).toLocaleString('en-US')}
                     </Typography>
                     <Typography variant="h6" sx={{ color: "#00f3ff", fontWeight: "bold", opacity: 0.8 }}>
                         GH/s

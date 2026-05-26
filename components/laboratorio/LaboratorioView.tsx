@@ -49,7 +49,7 @@ export function LaboratorioView() {
           const data = res.data.laboratory || res.data;
           setLabData({
             id: data.id,
-            type: data.type || 'MINNING', // Default to MINNING for prototype if missing
+            type: data.type || 'MINING', // Default to MINING for prototype if missing
             powerMining: data.powerMining || 1500,
             energy: data.energy || 0,
             maxEnergy: data.maxEnergy || 100
@@ -57,7 +57,7 @@ export function LaboratorioView() {
         })
         .catch(() => {
           // Fallback mock for UI visualization if backend is offline or unlinked
-          setLabData({ id: labId, type: 'MINNING', powerMining: 5000, energy: 0, maxEnergy: 100 });
+          setLabData({ id: labId, type: 'MINING', powerMining: 5000, energy: 0, maxEnergy: 100 });
         });
     }
   }, [hasLab, labId]);
@@ -92,9 +92,9 @@ export function LaboratorioView() {
       if (res.data?.labState) {
         setLabData(prev => prev ? { ...prev, energy: res.data.labState.energy } : prev);
       }
-      const newPower = res.data?.totalPowerMinning ?? res.data?.labState?.totalPowerMinning ?? res.data?.blockchainProps?.totalPowerMinning ?? res.data?.networkPower ?? res.data?.data?.totalPowerMinning;
+      const newPower = res.data?.totalPowerMining ?? res.data?.labState?.totalPowerMining ?? res.data?.blockchainProps?.totalPowerMining ?? res.data?.networkPower ?? res.data?.data?.totalPowerMining;
       if (newPower !== undefined && newPower !== null) {
-          dispatch(updateNetworkPower({ id: selectedNetwork.id, totalPowerMinning: Number(newPower) }));
+          dispatch(updateNetworkPower({ id: selectedNetwork.id, totalPowerMining: Number(newPower) }));
       }
     } catch (error) {
       console.error('Failed to inject power', error);
@@ -161,7 +161,7 @@ export function LaboratorioView() {
 
       <Box display="flex" flexDirection="column" gap={3}>
         {/* Helios-1 Mining Power UI */}
-        {labData?.type === 'MINNING' && (
+        {labData?.type === 'MINING' && (
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <Paper
               elevation={0}
