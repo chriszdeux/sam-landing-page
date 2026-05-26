@@ -5,7 +5,7 @@
 
 //# 1-Importar tipos y acciones
 import { createSlice } from '@reduxjs/toolkit';
-import { TransactionsState } from './types';
+import { TransactionsState, TransactionsInterface } from './types';
 import { fetchTransactions } from './actions';
 
 //# 2-Definir estado inicial de transacciones
@@ -48,7 +48,7 @@ const transactionsSlice = createSlice({
                 }
 
                 if (!data || data === false) {
-                    console.warn(`[TRANSACTIONS_REDUCER] No data received for storeId: ${storeId}`);
+                    console.warn('[TRANSACTIONS_REDUCER] No data received for storeId: ' + storeId);
                     return;
                 }
                 
@@ -60,8 +60,8 @@ const transactionsSlice = createSlice({
                 } else {
                     const existing = state.byStoreBoxId[storeId].transactions;
                     // Evitar duplicados por ID
-                    const existingIds = new Set(existing.map((t: any) => t.id));
-                    const uniqueNew = newTransactions.filter((t: any) => !existingIds.has(t.id));
+                    const existingIds = new Set(existing.map((t: TransactionsInterface) => t.id));
+                    const uniqueNew = newTransactions.filter((t: TransactionsInterface) => !existingIds.has(t.id));
                     state.byStoreBoxId[storeId].transactions = [...existing, ...uniqueNew];
                 }
                 
