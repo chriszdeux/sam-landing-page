@@ -3,7 +3,8 @@ import { Box, Typography, Stack, Paper, CircularProgress, LinearProgress, Button
 import { motion, AnimatePresence } from "framer-motion";
 import { Hub, ElectricBolt, ReceiptLong, AccountTree, Savings, Bolt } from "@mui/icons-material";
 import { LabDataInterface } from "./LaboratorioMetersSection";
-import { useAppSelector } from "../../lib/hooks";
+import { useAppSelector, useAppDispatch } from "../../lib/hooks";
+import { updateNetworkPower } from "../../lib/features/blockchain/reducer";
 import api from "../../lib/api";
 
 interface NetworkSectionProps {
@@ -23,6 +24,7 @@ interface Transaction {
 }
 
 export function LaboratorioNetworkSection({ labData, currentEnergy, onEnergyChange, onRefetch }: NetworkSectionProps) {
+  const dispatch = useAppDispatch();
   const { selectedNetwork } = useAppSelector((state) => state.blockchain);
   const blockchainId = selectedNetwork?.id ?? null;
   const totalPowerMinning = selectedNetwork?.blockchainProps?.totalPowerMinning || 0;
@@ -52,6 +54,12 @@ export function LaboratorioNetworkSection({ labData, currentEnergy, onEnergyChan
       const { tokensEarned, confirmedTxCount, labState } = res.data;
 
       if (labState) onEnergyChange(labState.energy);
+      
+      // Update blockchain store with new total power immediately
+      const newPower = res.data?.totalPowerMinning ?? res.data?.labState?.totalPowerMinning ?? res.data?.blockchainProps?.totalPowerMinning ?? res.data?.networkPower ?? res.data?.data?.totalPowerMinning;
+      if (newPower !== undefined && newPower !== null) {
+          dispatch(updateNetworkPower({ id: blockchainId, totalPowerMinning: Number(newPower) }));
+      }
 
       if (tokensEarned) {
         setShowGoldenPulse(true);
@@ -128,7 +136,7 @@ export function LaboratorioNetworkSection({ labData, currentEnergy, onEnergyChan
                 </Typography>
                 <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
                     <Typography variant="h4" sx={{ color: "#fff", fontWeight: 900, letterSpacing: -1, textShadow: "0 0 20px rgba(0, 243, 255, 0.5)" }}>
-                        {(totalPowerMinning || 0).toLocaleString()}
+                        {(totalPowerMinning || 0).toLocaleString('en-US')}
                     </Typography>
                     <Typography variant="h6" sx={{ color: "#00f3ff", fontWeight: "bold", opacity: 0.8 }}>
                         GH/s
