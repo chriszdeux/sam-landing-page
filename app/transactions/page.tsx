@@ -13,7 +13,7 @@
 
 //# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useEffect } from 'react';
-import { Container, CircularProgress, Box } from '@mui/material';
+import { Container, CircularProgress, Box, Paper, Stack, Typography } from '@mui/material';
 import { Background } from '../../components/layout/Background';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
@@ -27,6 +27,8 @@ import { transactionsPageColumns } from '../../components/market/transactionsPag
 import { TransactionsInterface } from '../../lib/features/transactions/types';
 import { TechFrame } from '../../components/ui/TechFrame';
 import { PageHeader } from '../../components/ui/PageHeader';
+import { Sensors } from "@mui/icons-material";
+import { motion } from "framer-motion";
 
 export default function TransactionsPage() {
     
@@ -34,7 +36,7 @@ export default function TransactionsPage() {
     const dispatch = useAppDispatch();
     
     //# 4-Selección de datos desde el estado global de Redux
-    const { selectedNetwork, networks } = useAppSelector((state) => state.blockchain);
+    const { selectedNetwork, networks, totalPowerMinning } = useAppSelector((state) => state.blockchain);
     
     //# 5-Selección de datos desde el estado global de Redux
     const { byStoreBoxId, isLoading: loading, error } = useAppSelector((state) => state.transactions);
@@ -116,6 +118,63 @@ export default function TransactionsPage() {
                     subtitle={`Red: ${currentNetwork?.identification?.name || selectedNetwork?.identification?.name || selectedNetwork.id} | Store ID: ${selectedNetwork?.storeTransactions?.transactionStoreID}`}
                 />
 
+                <Box sx={{ mb: 4, display: "flex", justifyContent: "center" }}>
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <Paper sx={{
+                            p: 3,
+                            background: "rgba(0, 243, 255, 0.05)",
+                            border: "1px solid rgba(0, 243, 255, 0.2)",
+                            borderRadius: "16px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 3,
+                            position: "relative",
+                            overflow: "hidden",
+                            boxShadow: "0 0 30px rgba(0, 243, 255, 0.1)",
+                        }}>
+                            <Box sx={{ 
+                                p: 1.5, 
+                                bgcolor: "rgba(0, 243, 255, 0.1)", 
+                                borderRadius: "12px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                border: "1px solid rgba(0, 243, 255, 0.3)"
+                            }}>
+                                <Sensors sx={{ color: "#00f3ff", fontSize: 32 }} className="pulse-animation" />
+                            </Box>
+                            <Box>
+                                <Typography variant="overline" sx={{ color: "#00f3ff", fontWeight: "bold", letterSpacing: 2, display: "block", lineHeight: 1, mb: 0.5 }}>
+                                    NETWORK MINING POWER
+                                </Typography>
+                                <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
+                                    <Typography variant="h3" sx={{ color: "#fff", fontWeight: 900, letterSpacing: -1, textShadow: "0 0 20px rgba(0, 243, 255, 0.5)" }}>
+                                        {(totalPowerMinning || 0).toLocaleString()}
+                                    </Typography>
+                                    <Typography variant="h5" sx={{ color: "#00f3ff", fontWeight: "bold", opacity: 0.8 }}>
+                                        GH/s
+                                    </Typography>
+                                </Box>
+                            </Box>
+                            <Box sx={{ ml: "auto", display: { xs: "none", md: "block" } }}>
+                                <Stack direction="row" spacing={2}>
+                                    <Box sx={{ textAlign: "right" }}>
+                                        <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.4)", display: "block" }}>STATUS</Typography>
+                                        <Typography variant="body2" sx={{ color: "#00ff88", fontWeight: "bold", display: "flex", alignItems: "center", gap: 0.5 }}>
+                                            <Box component="span" sx={{ width: 8, height: 8, bgcolor: "#00ff88", borderRadius: "50%", display: "inline-block" }} />
+                                            ACTIVE
+                                        </Typography>
+                                    </Box>
+                                </Stack>
+                            </Box>
+                        </Paper>
+                    </motion.div>
+                </Box>
+
                 <TechFrame color="#00f3ff">
                     <Box sx={{ p: 2, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, alignItems: 'center', borderBottom: '1px solid rgba(0, 243, 255, 0.1)' }}>
                         <Input 
@@ -158,6 +217,16 @@ export default function TransactionsPage() {
                     </div>
                 </TechFrame>
             </Container>
+            <style jsx global>{`
+                @keyframes pulse { 
+                    0% { opacity: 1; transform: scale(1); } 
+                    50% { opacity: 0.5; transform: scale(0.95); } 
+                    100% { opacity: 1; transform: scale(1); } 
+                }
+                .pulse-animation {
+                    animation: pulse 2s infinite ease-in-out;
+                }
+            `}</style>
         </main>
     );
 }
