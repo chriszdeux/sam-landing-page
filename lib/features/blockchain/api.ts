@@ -32,6 +32,7 @@ export const getNextBlockTimeApi = async (networkId: string) => {
 
 //# 5-Definir función para obtener potencia de minado total
 export const getMiningPowerApi = async () => {
-    const response = await api.get('/blockchain/network/mining-power');
+    // Endpoint actualizado según reporte de BACK (12:00)
+    const response = await api.get('/blockchain/total-power');
     return response.data;
 };

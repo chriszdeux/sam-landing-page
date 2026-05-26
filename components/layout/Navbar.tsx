@@ -66,10 +66,7 @@ export const Navbar = () => {
   }, [userInfo, dispatch, walletsInfo]);
 
   React.useEffect(() => {
-    // Initial fetch
-    dispatch(fetchMiningPower());
-
-    // Polling every 5 minutes (300,000 ms)
+    // Polling every 5 minutes (300,000 ms) - No initial call as per PM requirement
     const interval = setInterval(() => {
       dispatch(fetchMiningPower());
     }, 300000);
