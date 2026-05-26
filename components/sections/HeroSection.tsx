@@ -59,7 +59,6 @@ export const HeroSection = () => {
   return (
     <Section id="home" className="relative min-h-[90vh] flex items-center overflow-hidden">
       {/* Background with radial gradient instead of video */}
-      }} />
 
       <Box ref={container} sx={{ position: 'relative', zIndex: 3, width: '100%' }}>
         <Grid container spacing={4} alignItems="center">
