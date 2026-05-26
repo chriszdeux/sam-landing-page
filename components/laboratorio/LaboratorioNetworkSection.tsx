@@ -3,7 +3,8 @@ import { Box, Typography, Stack, Paper, CircularProgress, LinearProgress, Button
 import { motion, AnimatePresence } from "framer-motion";
 import { Hub, ElectricBolt, ReceiptLong, AccountTree, Savings, Bolt } from "@mui/icons-material";
 import { LabDataInterface } from "./LaboratorioMetersSection";
-import { useAppSelector } from "../../lib/hooks";
+import { useAppSelector, useAppDispatch } from "../../lib/hooks";
+import { updateNetworkPower } from "../../lib/features/blockchain/reducer";
 import api from "../../lib/api";
 
 interface NetworkSectionProps {
@@ -23,6 +24,7 @@ interface Transaction {
 }
 
 export function LaboratorioNetworkSection({ labData, currentEnergy, onEnergyChange, onRefetch }: NetworkSectionProps) {
+  const dispatch = useAppDispatch();
   const { selectedNetwork } = useAppSelector((state) => state.blockchain);
   const blockchainId = selectedNetwork?.id ?? null;
   const totalPowerMinning = selectedNetwork?.blockchainProps?.totalPowerMinning || 0;
@@ -52,6 +54,11 @@ export function LaboratorioNetworkSection({ labData, currentEnergy, onEnergyChan
       const { tokensEarned, confirmedTxCount, labState } = res.data;
 
       if (labState) onEnergyChange(labState.energy);
+      
+      // Update blockchain store with new total power immediately
+      if (res.data.totalPowerMinning !== undefined) {
+          dispatch(updateNetworkPower({ id: blockchainId, totalPowerMinning: res.data.totalPowerMinning }));
+      }
 
       if (tokensEarned) {
         setShowGoldenPulse(true);
