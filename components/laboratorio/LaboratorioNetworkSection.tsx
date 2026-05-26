@@ -56,8 +56,9 @@ export function LaboratorioNetworkSection({ labData, currentEnergy, onEnergyChan
       if (labState) onEnergyChange(labState.energy);
       
       // Update blockchain store with new total power immediately
-      if (res.data.totalPowerMinning !== undefined) {
-          dispatch(updateNetworkPower({ id: blockchainId, totalPowerMinning: res.data.totalPowerMinning }));
+      const newPower = res.data?.totalPowerMinning ?? res.data?.labState?.totalPowerMinning ?? res.data?.blockchainProps?.totalPowerMinning ?? res.data?.networkPower ?? res.data?.data?.totalPowerMinning;
+      if (newPower !== undefined && newPower !== null) {
+          dispatch(updateNetworkPower({ id: blockchainId, totalPowerMinning: Number(newPower) }));
       }
 
       if (tokensEarned) {
