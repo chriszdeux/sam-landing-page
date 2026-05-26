@@ -89,8 +89,16 @@ export const fetchMiningPower = createAsyncThunk(
     'blockchain/fetchMiningPower',
     async (_, { rejectWithValue }) => {
         try {
-            const data = await getMiningPowerApi();
-            return data;
+            const response = await getMiningPowerApi();
+            
+            // Extraer valor de forma ultra-robusta según los nuevos formatos del BACK
+            const powerValue = response?.totalPowerMinning ?? 
+                               response?.data?.totalPowerMinning ?? 
+                               response?.blockchainProps?.totalPowerMinning ??
+                               response?.power ?? 
+                               0;
+                               
+            return { totalPowerMinning: Number(powerValue) };
         } catch (err: unknown) {
              const errorObj = err as { response?: { data?: { message?: string } } };
             return rejectWithValue(errorObj.response?.data?.message || 'Failed to fetch mining power');
