@@ -124,7 +124,7 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
 
                         <Box sx={{ textAlign: { xs: 'left', md: 'right' } }}>
                             <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 1 }}>
-                                {crypto.financial.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
+                                {crypto.financial.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
                                 <TaoIcon size={32} />
                             </Typography>
                             <Stack direction="row" alignItems="center" spacing={1} justifyContent={{ xs: 'flex-start', md: 'flex-end' }}>
@@ -250,7 +250,7 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                                             <Stack direction="row" alignItems="center" spacing={1}>
                                                 <AccessTime fontSize="small" sx={{ color: crypto.additionalInfo?.sColor || 'text.secondary' }} />
                                                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                                    <Box component="span" sx={{ color: 'text.primary', fontWeight: 'bold' }}>Actualizado:</Box> {new Date(crypto.updatedAt).toLocaleString()}
+                                                    <Box component="span" sx={{ color: 'text.primary', fontWeight: 'bold' }}>Actualizado:</Box> {new Date(crypto.updatedAt).toLocaleString('en-US')}
                                                 </Typography>
                                             </Stack>
                                         )}
