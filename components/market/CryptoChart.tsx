@@ -71,13 +71,7 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
     const chartData = historicalData[cryptoId || '']?.data;
     const isDataLoaded = !!chartData && historicalData[cryptoId || '']?.range === range;
 
-    if (isLoading && !isDataLoaded) {
-        return (
-            <Box sx={{ width: '100%', height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 4 }}>
-                <CircularProgress color="primary" />
-            </Box>
-        );
-    }
+
 
     const labels = React.useMemo(() => {
         if (!isDataLoaded || !Array.isArray(chartData)) return Array.from({ length: 24 }, (_, i) => `${i}:00`);
@@ -94,6 +88,16 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
         }
         return chartData.map(d => d.price);
     }, [chartData, isDataLoaded]);
+
+    const tooltipRef = React.useRef<HTMLDivElement>(null);
+
+    if (isLoading && !isDataLoaded) {
+        return (
+            <Box sx={{ width: '100%', height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 4 }}>
+                <CircularProgress color="primary" />
+            </Box>
+        );
+    }
 
     const data = {
         labels,
@@ -119,7 +123,6 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
         ],
     };
 
-    const tooltipRef = React.useRef<HTMLDivElement>(null);
 
     const options = {
         responsive: true,
