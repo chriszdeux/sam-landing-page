@@ -170,6 +170,8 @@ export function GenericTable<T>({
             borderRadius: '8px',
             overflow: 'hidden',
             boxShadow: '0 4px 30px rgba(0, 0, 0, 0.5)',
+            backgroundImage: 'linear-gradient(rgba(0, 243, 255, 0.02) 1px, transparent 1px)',
+            backgroundSize: '100% 40px',
             position: 'relative',
             '&::before': {
                 content: '""',
@@ -237,15 +239,6 @@ export function GenericTable<T>({
             </TableRow>
           </TableHead>
           <TableBody sx={{ position: 'relative' }}>
-             {/* Background Pattern for Body */}
-             <Box sx={{ 
-                position: 'absolute', 
-                inset: 0, 
-                backgroundImage: 'linear-gradient(rgba(0, 243, 255, 0.02) 1px, transparent 1px)',
-                backgroundSize: '100% 40px',
-                pointerEvents: 'none'
-             }} />
-
             {paginatedData.length > 0 ? (
                 paginatedData.map((row, rowIndex) => (
                 <motion.tr 
