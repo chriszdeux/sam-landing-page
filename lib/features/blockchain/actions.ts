@@ -7,7 +7,7 @@
 
 //# 1-Importar dependencias y APIs del módulo
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { getNetworksApi, getRewardsApi, claimRewardApi, getNextBlockTimeApi, getMiningPowerApi } from './api';
+import { getNetworksApi, getRewardsApi, claimRewardApi, getNextBlockTimeApi, getMiningPowerApi, getNetworkSpecificPowerApi } from './api';
 import { getProfileApi } from '../auth/api'; 
 import { setUserInfo, updateBalance } from '../auth/reducer';
 import { RootState } from '../../store';
@@ -102,6 +102,24 @@ export const fetchMiningPower = createAsyncThunk(
         } catch (err: unknown) {
              const errorObj = err as { response?: { data?: { message?: string } } };
             return rejectWithValue(errorObj.response?.data?.message || 'Failed to fetch mining power');
+        }
+    }
+);
+
+//# 7-Acción asíncrona para obtener potencia y energía específica de una red
+export const fetchNetworkSpecificPower = createAsyncThunk(
+    'blockchain/fetchNetworkSpecificPower',
+    async (networkId: string, { rejectWithValue }) => {
+        try {
+            const response = await getNetworkSpecificPowerApi(networkId);
+            // Extraer la energía y la potencia del endpoint específico
+            const energyValue = response?.energy ?? response?.data?.energy ?? response?.blockchainProps?.energy ?? 0;
+            const powerValue = response?.totalPowerMinning ?? response?.data?.totalPowerMinning ?? response?.blockchainProps?.totalPowerMinning ?? response?.power ?? 0;
+            
+            return { id: networkId, energy: Number(energyValue), totalPowerMinning: Number(powerValue) };
+        } catch (err: unknown) {
+             const errorObj = err as { response?: { data?: { message?: string } } };
+            return rejectWithValue(errorObj.response?.data?.message || 'Failed to fetch network specific power and energy');
         }
     }
 );

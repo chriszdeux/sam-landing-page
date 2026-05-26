@@ -30,7 +30,7 @@ import { Button } from "../ui/Button";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { setCurrentSection } from "../../lib/features/uiSlice";
 import { fetchWalletDetails } from "../../lib/features/auth/actions";
-import { fetchMiningPower } from "../../lib/features/blockchain/actions";
+import { fetchMiningPower, fetchNetworkSpecificPower } from "../../lib/features/blockchain/actions";
 import { navItems } from "./navItems";
 import { NavbarDrawer } from "./NavbarDrawer";
 import { LogoutDialog } from "./LogoutDialog";
@@ -69,10 +69,13 @@ export const Navbar = () => {
     // Polling every 5 minutes (300,000 ms) - No initial call as per PM requirement
     const interval = setInterval(() => {
       dispatch(fetchMiningPower());
+      if (userInfo && selectedNetworkState?.id) {
+          dispatch(fetchNetworkSpecificPower(selectedNetworkState.id));
+      }
     }, 300000);
 
     return () => clearInterval(interval);
-  }, [dispatch]);
+  }, [dispatch, userInfo, selectedNetworkState?.id]);
 
   if (
     pathname === '/auth/logging-in' || 

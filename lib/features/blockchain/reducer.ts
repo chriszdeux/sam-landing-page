@@ -9,7 +9,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { BlockchainState, Reward } from './types';
 import { BlockchainInterface } from '../../types/blockchain';
-import { fetchNetworks, fetchRewards, claimReward, fetchNextBlockTime, fetchMiningPower } from './actions';
+import { fetchNetworks, fetchRewards, claimReward, fetchNextBlockTime, fetchMiningPower, fetchNetworkSpecificPower } from './actions';
 
 //# 2-Definir estado inicial de blockchain
 const initialState: BlockchainState = {
@@ -99,6 +99,19 @@ const blockchainSlice = createSlice({
             .addCase(fetchMiningPower.fulfilled, (state, action) => {
                 if (state.selectedNetwork && state.selectedNetwork.blockchainProps) {
                     state.selectedNetwork.blockchainProps.totalPowerMinning = action.payload.totalPowerMinning;
+                }
+            })
+            // Specific Power/Energy Polling
+            .addCase(fetchNetworkSpecificPower.fulfilled, (state, action) => {
+                const { id, energy, totalPowerMinning } = action.payload;
+                const network = state.networks.find(n => n.id === id);
+                if (network && network.blockchainProps) {
+                    network.blockchainProps.energy = energy;
+                    network.blockchainProps.totalPowerMinning = totalPowerMinning;
+                }
+                if (state.selectedNetwork && state.selectedNetwork.id === id && state.selectedNetwork.blockchainProps) {
+                    state.selectedNetwork.blockchainProps.energy = energy;
+                    state.selectedNetwork.blockchainProps.totalPowerMinning = totalPowerMinning;
                 }
             });
 
