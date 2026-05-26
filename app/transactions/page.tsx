@@ -154,7 +154,7 @@ export default function TransactionsPage() {
                                 </Typography>
                                 <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
                                     <Typography variant="h3" sx={{ color: "#fff", fontWeight: 900, letterSpacing: -1, textShadow: "0 0 20px rgba(0, 243, 255, 0.5)" }}>
-                                        {(totalPowerMinning || 0).toLocaleString()}
+                                        {(totalPowerMinning || 0).toLocaleString('en-US')}
                                     </Typography>
                                     <Typography variant="h5" sx={{ color: "#00f3ff", fontWeight: "bold", opacity: 0.8 }}>
                                         GH/s
