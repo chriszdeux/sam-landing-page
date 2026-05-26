@@ -14,7 +14,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Typography, Grid, Container, Paper, IconButton, Tooltip as MuiTooltip } from '@mui/material';
+import { Box, Typography, Grid, Container, IconButton, Tooltip as MuiTooltip, Stack, Divider } from '@mui/material';
 import { Background } from '../../components/layout/Background';
 
 //# 1-Selección de datos desde el estado global de Redux
@@ -29,11 +29,12 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../lib/store';
 import { fetchCryptos } from '../../lib/features/market/actions';
 import { refreshUserInfo } from '../../lib/features/auth/actions';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Zap, TrendingUp, Wallet, PieChart, Activity } from 'lucide-react';
 import { Asset } from '../../lib/types/portfolio';
 import { PortfolioChart } from '../../components/portfolio/PortfolioChart';
 import { AssetList } from '../../components/portfolio/AssetList';
 import { TransactionsTable } from '../../components/portfolio/TransactionsTable';
+import { PageHeader } from '../../components/ui/PageHeader';
 
 export default function PortfolioPage() {
     
@@ -61,7 +62,7 @@ export default function PortfolioPage() {
         if (selectedNetwork?.id && cryptos.length === 0) {
             dispatch(fetchCryptos(selectedNetwork.id));
         }
-    }, [dispatch, selectedNetwork?.id, cryptos.length]);
+    }, [selectedNetwork?.id, cryptos.length]);
 
     
     
@@ -134,11 +135,10 @@ export default function PortfolioPage() {
         });
     }
 
-    if (assets.length === 0 && walletsInfo) {
-         assets = []; 
-    }
-
     const totalValue = assets.reduce((acc, curr) => acc + curr.value, 0);
+    const totalPowerMining = selectedNetwork?.blockchainProps?.totalPowerMining || 0;
+    const marketCap = selectedNetwork?.blockchainProps?.marketCap || 0;
+    const circulatingSupply = selectedNetwork?.blockchainProps?.circulatingSupply || 0;
 
   //# 12-Estructuración y renderizado visual del componente UI
   return (
@@ -152,28 +152,17 @@ export default function PortfolioPage() {
                     flexDirection: { xs: 'column', sm: 'row' },
                     justifyContent: 'space-between', 
                     alignItems: { xs: 'flex-start', sm: 'center' }, 
-                    mb: 4,
+                    mb: 6,
                     gap: 2
                 }}>
-                    <Box>
-                         <Typography variant="h3" sx={{ 
-                             fontWeight: 'bold', 
-                             color: 'white', 
-                             letterSpacing: 1,
-                             fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' }
-                         }}>
-                            PORTAFOLIO
-                        </Typography>
-                        <Typography variant="subtitle1" sx={{ 
-                            color: 'rgba(255,255,255,0.5)', 
-                            letterSpacing: 1,
-                            fontSize: { xs: '0.8rem', sm: '1rem' }
-                        }}>
-                            VISTA GENERAL DE ACTIVOS
-                        </Typography>
-                    </Box>
+                    <PageHeader 
+                        title="MI PORTAFOLIO" 
+                        subtitle="CENTRO DE OPERACIONES FINANCIERAS Y MINERÍA"
+                        color="#00f3ff"
+                        sx={{ mb: 0, pt: 0 }}
+                    />
                     <Box sx={{ display: 'flex', gap: 2 }}>
-                         <MuiTooltip title="Actualizar datos">
+                         <MuiTooltip title="Sincronizar con la Red">
                             <IconButton 
                                 onClick={handleRefresh} 
                                 disabled={isRefreshing}
@@ -181,66 +170,97 @@ export default function PortfolioPage() {
                                     color: '#00f3ff', 
                                     border: '1px solid rgba(0, 243, 255, 0.3)',
                                     bgcolor: 'rgba(0, 243, 255, 0.05)',
-                                    '&:hover': { bgcolor: 'rgba(0, 243, 255, 0.1)' }
+                                    p: 1.5,
+                                    '&:hover': { bgcolor: 'rgba(0, 243, 255, 0.1)', transform: 'rotate(180deg)' },
+                                    transition: 'all 0.5s ease'
                                 }}
                             >
-                                <RefreshCw className={isRefreshing ? 'animate-spin' : ''} size={20} />
+                                <RefreshCw className={isRefreshing ? 'animate-spin' : ''} size={24} />
                             </IconButton>
                         </MuiTooltip>
                     </Box>
                 </Box>
 
-                <Grid container spacing={3} sx={{ mb: 4 }}>
+                <Grid container spacing={3} sx={{ mb: 6 }}>
                     {/* Stat Card 1: Total Balance */}
-                    <Grid size={{ xs: 12, md: 4 }}>
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                         <TechFrame color="#00f3ff">
-                            <Box sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <Box>
-                                    <Typography variant="caption" sx={{ color: 'rgba(0, 243, 255, 0.7)', letterSpacing: 1 }}>BALANCE TOTAL</Typography>
-                                    <Typography variant="h4" sx={{ color: 'white', fontWeight: 'bold', mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        {totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                         <TaoIcon size={24} color="#00f3ff" />
+                            <Box sx={{ p: 3 }}>
+                                <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 2 }}>
+                                    <Typography variant="caption" sx={{ color: 'rgba(0, 243, 255, 0.7)', letterSpacing: 2, fontWeight: 'bold' }}>
+                                        VALOR TOTAL
                                     </Typography>
-                                </Box>
-                                <Box sx={{ p: 1.5, borderRadius: '50%', bgcolor: 'rgba(0, 243, 255, 0.1)', color: '#00f3ff' }}>
-                                    <TaoIcon size={32} />
-                                </Box>
+                                    <PieChart size={18} color="#00f3ff" style={{ opacity: 0.7 }} />
+                                </Stack>
+                                <Typography variant="h4" sx={{ color: 'white', fontWeight: 900, display: 'flex', alignItems: 'center', gap: 1, textShadow: '0 0 15px rgba(0, 243, 255, 0.3)' }}>
+                                    {totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                     <TaoIcon size={24} color="#00f3ff" />
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', mt: 1, display: 'block' }}>
+                                    ACTIVOS TOTALES: {assets.length}
+                                </Typography>
                             </Box>
                         </TechFrame>
                     </Grid>
-                     {/* Stat Card 2: Asset Count */}
-                     <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                        <TechFrame color="#ce93d8">
-                            <Box sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <Box>
-                                    <Typography variant="caption" sx={{ color: 'rgba(206, 147, 216, 0.7)', letterSpacing: 1 }}>ACTIVOS DISTINTOS</Typography>
-                                    <Typography variant="h4" sx={{ color: 'white', fontWeight: 'bold', mt: 1 }}>
-                                        {assets.length}
+
+                    {/* Stat Card 2: Mining Power */}
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <TechFrame color="#00ff9d">
+                            <Box sx={{ p: 3 }}>
+                                <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 2 }}>
+                                    <Typography variant="caption" sx={{ color: 'rgba(0, 255, 157, 0.7)', letterSpacing: 2, fontWeight: 'bold' }}>
+                                        POTENCIA RED
                                     </Typography>
-                                </Box>
-                                <Box sx={{ opacity: 0.5 }}>
-                                    {/* Icon placeholder or mini chart */}
-                                    <Box sx={{ width: 48, height: 48, borderRadius: '50%', border: '2px solid #ce93d8', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ce93d8', fontWeight: 'bold' }}>
-                                        %
-                                    </Box>
-                                </Box>
+                                    <Zap size={18} color="#00ff9d" style={{ opacity: 0.7 }} />
+                                </Stack>
+                                <Typography variant="h4" sx={{ color: 'white', fontWeight: 900, display: 'flex', alignItems: 'baseline', gap: 1 }}>
+                                    {totalPowerMining.toLocaleString()}
+                                    <Typography component="span" variant="caption" sx={{ color: '#00ff9d', fontWeight: 'bold' }}>GH/s</Typography>
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', mt: 1, display: 'block' }}>
+                                    ESTADO: {selectedNetwork?.isActive ? 'OPERATIVO' : 'DESCONECTADO'}
+                                </Typography>
                             </Box>
                         </TechFrame>
                     </Grid>
-                     {/* Stat Card 3: Wallet Count */}
-                     <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                        <TechFrame color="#ffff00">
-                            <Box sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <Box>
-                                    <Typography variant="caption" sx={{ color: 'rgba(255, 255, 0, 0.7)', letterSpacing: 1 }}>WALLETS ACTIVAS</Typography>
-                                    <Typography variant="h4" sx={{ color: 'white', fontWeight: 'bold', mt: 1 }}>
-                                        {userInfo?.wallets?.length || 0}
+
+                    {/* Stat Card 3: Market Cap */}
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <TechFrame color="#ffb700">
+                            <Box sx={{ p: 3 }}>
+                                <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 2 }}>
+                                    <Typography variant="caption" sx={{ color: 'rgba(255, 183, 0, 0.7)', letterSpacing: 2, fontWeight: 'bold' }}>
+                                        CAP. MERCADO
                                     </Typography>
-                                </Box>
-                                <Box sx={{ p: 1.5, borderRadius: '50%', bgcolor: 'rgba(255, 255, 0, 0.1)', color: '#ffff00' }}>
-                                   {/* Wallet Icon */}
-                                   <Box sx={{ width: 32, height: 32, border: '2px solid currentColor', borderRadius: 1 }} />
-                                </Box>
+                                    <TrendingUp size={18} color="#ffb700" style={{ opacity: 0.7 }} />
+                                </Stack>
+                                <Typography variant="h4" sx={{ color: 'white', fontWeight: 900, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    {marketCap.toLocaleString()}
+                                    <TaoIcon size={24} color="#ffb700" />
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', mt: 1, display: 'block', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                    SUPPLY: {circulatingSupply.toLocaleString()}
+                                </Typography>
+                            </Box>
+                        </TechFrame>
+                    </Grid>
+
+                    {/* Stat Card 4: Wallets */}
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <TechFrame color="#ef9a9a">
+                            <Box sx={{ p: 3 }}>
+                                <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 2 }}>
+                                    <Typography variant="caption" sx={{ color: 'rgba(239, 154, 154, 0.7)', letterSpacing: 2, fontWeight: 'bold' }}>
+                                        BILLETERAS
+                                    </Typography>
+                                    <Wallet size={18} color="#ef9a9a" style={{ opacity: 0.7 }} />
+                                </Stack>
+                                <Typography variant="h4" sx={{ color: 'white', fontWeight: 900 }}>
+                                    {userInfo?.wallets?.length || 0}
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', mt: 1, display: 'block' }}>
+                                    GUARDADAS: {userInfo?.walletsSaved?.length || 0}
+                                </Typography>
                             </Box>
                         </TechFrame>
                     </Grid>
@@ -248,33 +268,45 @@ export default function PortfolioPage() {
             </motion.div>
 
             <Grid container spacing={4}>
-                {/* Left Column: Wallets & Transactions (2/3 width) */}
-                <Grid size={{ xs: 12, lg: 8 }}>
-                    <Box sx={{ mb: 4 }}>
-                        <WalletManager />
-                    </Box>
-                    
-                    {selectedNetwork?.id && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
-                             <Typography variant="overline" sx={{ color: '#00f3ff', fontWeight: 'bold', mb: 2, display: 'block', letterSpacing: 4 }}>
-                                {'// HISTORIAL_TRANSACCIONES'}
-                            </Typography>
-                            <TransactionsTable 
-                                storeId={selectedNetwork?.id} 
-                                walletId={userInfo?.wallets && userInfo.wallets.length > 0 ? userInfo.wallets[0].walletAddress : undefined}
-                            />
-                        </motion.div>
-                    )}
+                {/* Left Section: Operational Data */}
+                <Grid size={{ xs: 12, xl: 8 }}>
+                    <Stack spacing={4}>
+                        <Box>
+                            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
+                                <Activity size={20} color="#00f3ff" />
+                                <Typography variant="overline" sx={{ color: '#00f3ff', fontWeight: 'bold', letterSpacing: 3 }}>
+                                    {'// GESTOR_DE_IDENTIDADES_CRIPTO'}
+                                </Typography>
+                            </Stack>
+                            <WalletManager />
+                        </Box>
+                        
+                        {selectedNetwork?.id && (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
+                                <Divider sx={{ mb: 4, borderColor: 'rgba(0, 243, 255, 0.1)' }} />
+                                <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
+                                    <TrendingUp size={20} color="#00f3ff" />
+                                    <Typography variant="overline" sx={{ color: '#00f3ff', fontWeight: 'bold', letterSpacing: 3 }}>
+                                        {'// REGISTRO_INTERESTELAR_DE_TRANSACCIONES'}
+                                    </Typography>
+                                </Stack>
+                                <TransactionsTable 
+                                    storeId={selectedNetwork?.id} 
+                                    walletId={userInfo?.wallets && userInfo.wallets.length > 0 ? userInfo.wallets[0].walletAddress : undefined}
+                                />
+                            </motion.div>
+                        )}
+                    </Stack>
                 </Grid>
 
-                {/* Right Column: Charts & Assets (1/3 width) */}
-                <Grid size={{ xs: 12, lg: 4 }}>
-                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {/* Right Section: Analytics & Assets */}
+                <Grid size={{ xs: 12, xl: 4 }}>
+                     <Stack spacing={4}>
                         {assets.length > 0 ? (
                             <>
                                 <Box>
-                                    <Typography variant="overline" sx={{ color: 'white', fontWeight: 'bold', mb: 2, display: 'block', letterSpacing: 2 }}>
-                                        ANÁLISIS GRÁFICO
+                                    <Typography variant="overline" sx={{ color: 'white', fontWeight: 'bold', mb: 3, display: 'flex', alignItems: 'center', gap: 1, letterSpacing: 2 }}>
+                                        <PieChart size={16} /> DISTRIBUCIÓN DE ACTIVOS
                                     </Typography>
                                     <TechFrame>
                                         <Box sx={{ p: 2 }}>
@@ -283,19 +315,21 @@ export default function PortfolioPage() {
                                     </TechFrame>
                                 </Box>
                                 <Box>
-                                    <Typography variant="overline" sx={{ color: 'white', fontWeight: 'bold', mb: 2, display: 'block', letterSpacing: 2 }}>
-                                        LISTADO DE ACTIVOS
+                                    <Typography variant="overline" sx={{ color: 'white', fontWeight: 'bold', mb: 3, display: 'flex', alignItems: 'center', gap: 1, letterSpacing: 2 }}>
+                                        <PieChart size={16} /> DETALLE DE TOKENS
                                     </Typography>
                                     <AssetList assets={assets} totalValue={totalValue} />
                                 </Box>
                             </>
                         ) : (
-                            <Paper sx={{ p: 4, bgcolor: 'rgba(255,255,255,0.05)', textAlign: 'center' }}>
-                                <Typography variant="h6" color="text.secondary">Sin activos</Typography>
-                                <Typography variant="caption" color="text.secondary">Explora el mercado para comenzar.</Typography>
-                            </Paper>
+                            <TechFrame color="rgba(255,255,255,0.1)">
+                                <Box sx={{ p: 6, textAlign: 'center' }}>
+                                    <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>MÓDULO VACÍO</Typography>
+                                    <Typography variant="caption" color="text.secondary" display="block">No se detectaron activos en la red seleccionada.</Typography>
+                                </Box>
+                            </TechFrame>
                         )}
-                     </Box>
+                     </Stack>
                 </Grid>
             </Grid>
         </Container>
