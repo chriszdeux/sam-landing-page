@@ -92,13 +92,13 @@ export const fetchMiningPower = createAsyncThunk(
             const response = await getMiningPowerApi();
             
             // Extraer valor de forma ultra-robusta según los nuevos formatos del BACK
-            const powerValue = response?.totalPowerMinning ?? 
-                               response?.data?.totalPowerMinning ?? 
-                               response?.blockchainProps?.totalPowerMinning ??
+            const powerValue = response?.totalPowerMining ?? 
+                               response?.data?.totalPowerMining ?? 
+                               response?.blockchainProps?.totalPowerMining ??
                                response?.power ?? 
                                0;
                                
-            return { totalPowerMinning: Number(powerValue) };
+            return { totalPowerMining: Number(powerValue) };
         } catch (err: unknown) {
              const errorObj = err as { response?: { data?: { message?: string } } };
             return rejectWithValue(errorObj.response?.data?.message || 'Failed to fetch mining power');
@@ -114,9 +114,9 @@ export const fetchNetworkSpecificPower = createAsyncThunk(
             const response = await getNetworkSpecificPowerApi(networkId);
             // Extraer la energía y la potencia del endpoint específico
             const energyValue = response?.energy ?? response?.data?.energy ?? response?.blockchainProps?.energy ?? 0;
-            const powerValue = response?.totalPowerMinning ?? response?.data?.totalPowerMinning ?? response?.blockchainProps?.totalPowerMinning ?? response?.power ?? 0;
+            const powerValue = response?.totalPowerMining ?? response?.data?.totalPowerMining ?? response?.blockchainProps?.totalPowerMining ?? response?.power ?? 0;
             
-            return { id: networkId, energy: Number(energyValue), totalPowerMinning: Number(powerValue) };
+            return { id: networkId, energy: Number(energyValue), totalPowerMining: Number(powerValue) };
         } catch (err: unknown) {
              const errorObj = err as { response?: { data?: { message?: string } } };
             return rejectWithValue(errorObj.response?.data?.message || 'Failed to fetch network specific power and energy');

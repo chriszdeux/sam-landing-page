@@ -65,7 +65,7 @@ export interface BlockchainProps {
   marketCap: number;
   status?: BlockchainStatus;
   operationStatus?: NetworkLoadLevel; 
-  totalPowerMinning?: number;
+  totalPowerMining?: number;
   energy?: number;
   maxEnergy?: number;
 }
