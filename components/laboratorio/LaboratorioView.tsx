@@ -38,7 +38,7 @@ export function LaboratorioView() {
       setIsInitializing(false);
     }
     // Fail-safe timeout in case status stays idle for some reason
-    const timer = setTimeout(() => setIsInitializing(false), 100);
+    const timer = setTimeout(() => setIsInitializing(false), 1);
     return () => clearTimeout(timer);
   }, [status]);
 
@@ -73,7 +73,7 @@ export function LaboratorioView() {
         }
         return { ...prev, energy: currentEnergy + 1 };
       });
-    }, 500);
+    }, 50);
 
     return () => clearInterval(timer);
   }, []);
@@ -94,7 +94,7 @@ export function LaboratorioView() {
       }
       const newPower = res.data?.totalPowerMinning ?? res.data?.labState?.totalPowerMinning ?? res.data?.blockchainProps?.totalPowerMinning ?? res.data?.networkPower ?? res.data?.data?.totalPowerMinning;
       if (newPower !== undefined && newPower !== null) {
-        dispatch(updateNetworkPower({ id: selectedNetwork.id, totalPowerMinning: Number(newPower) }));
+          dispatch(updateNetworkPower({ id: selectedNetwork.id, totalPowerMinning: Number(newPower) }));
       }
     } catch (error) {
       console.error('Failed to inject power', error);
