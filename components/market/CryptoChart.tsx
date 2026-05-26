@@ -71,6 +71,8 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
     const chartData = historicalData[cryptoId || '']?.data;
     const isDataLoaded = !!chartData && historicalData[cryptoId || '']?.range === range;
 
+
+
     const labels = React.useMemo(() => {
         if (!isDataLoaded || !Array.isArray(chartData)) return Array.from({ length: 24 }, (_, i) => `${i}:00`);
         return chartData.map(d => new Date(d.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
@@ -120,6 +122,7 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
             },
         ],
     };
+
 
     const options = {
         responsive: true,

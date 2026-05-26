@@ -6,7 +6,8 @@ import { PowerSettingsNew, Bolt, WarningAmber } from "@mui/icons-material";
 
 const MIN_INJECT_EP = 12; // powerRequired mínimo para que flushTransactionsQueue procese
 import { MiningBackground } from "./MiningBackground";
-import { useAppSelector } from "../../lib/hooks";
+import { useAppSelector, useAppDispatch } from "../../lib/hooks";
+import { updateNetworkPower } from "../../lib/features/blockchain/reducer";
 import { LaboratorioRegistration } from "./LaboratorioRegistration";
 import { LaboratorioInventory } from "./LaboratorioInventory";
 import { CoreModulesSimulator } from "../core_modules/CoreModulesSimulator";
@@ -22,6 +23,7 @@ interface LabBasicData {
 }
 
 export function LaboratorioView() {
+  const dispatch = useAppDispatch();
   const { userInfo, status } = useAppSelector((state) => state.auth);
   const selectedNetwork = useAppSelector((state: any) => state.blockchain?.selectedNetwork);
   const [labData, setLabData] = useState<LabBasicData | null>(null);
@@ -36,7 +38,7 @@ export function LaboratorioView() {
       setIsInitializing(false);
     }
     // Fail-safe timeout in case status stays idle for some reason
-    const timer = setTimeout(() => setIsInitializing(false), 2000);
+    const timer = setTimeout(() => setIsInitializing(false), 1);
     return () => clearTimeout(timer);
   }, [status]);
 
@@ -71,7 +73,7 @@ export function LaboratorioView() {
         }
         return { ...prev, energy: currentEnergy + 1 };
       });
-    }, 5000);
+    }, 50);
 
     return () => clearInterval(timer);
   }, []);
@@ -89,6 +91,10 @@ export function LaboratorioView() {
       });
       if (res.data?.labState) {
         setLabData(prev => prev ? { ...prev, energy: res.data.labState.energy } : prev);
+      }
+      const newPower = res.data?.totalPowerMinning ?? res.data?.labState?.totalPowerMinning ?? res.data?.blockchainProps?.totalPowerMinning ?? res.data?.networkPower ?? res.data?.data?.totalPowerMinning;
+      if (newPower !== undefined && newPower !== null) {
+          dispatch(updateNetworkPower({ id: selectedNetwork.id, totalPowerMinning: Number(newPower) }));
       }
     } catch (error) {
       console.error('Failed to inject power', error);
@@ -109,13 +115,13 @@ export function LaboratorioView() {
     return (
       <Box sx={{ minHeight: '100vh', pt: 12, display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: '#0a0c10', position: 'relative' }}>
         <MiningBackground />
-        <Paper 
+        <Paper
           elevation={0}
-          sx={{ 
-            p: 6, 
-            bgcolor: 'rgba(10,12,16,0.8)', 
-            border: '1px solid #ff0055', 
-            textAlign: 'center', 
+          sx={{
+            p: 6,
+            bgcolor: 'rgba(10,12,16,0.8)',
+            border: '1px solid #ff0055',
+            textAlign: 'center',
             zIndex: 1,
             backdropFilter: 'blur(10px)',
             borderRadius: 4,
@@ -123,8 +129,8 @@ export function LaboratorioView() {
           }}
         >
           <PowerSettingsNew sx={{ fontSize: 60, color: '#ff0055', mb: 2 }} />
-          <Typography 
-            variant="h4" 
+          <Typography
+            variant="h4"
             sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}
           >
             ACCESO DENEGADO
@@ -140,15 +146,15 @@ export function LaboratorioView() {
   if (!hasLab) return <LaboratorioRegistration userInfo={userInfo} />;
 
   return (
-    <Box 
-      sx={{ 
-        minHeight: '100vh', 
-        pt: 15, 
-        pb: 6, 
-        px: { xs: 2, sm: 3, lg: 4 }, 
-        maxWidth: 1600, 
-        mx: 'auto', 
-        position: 'relative' 
+    <Box
+      sx={{
+        minHeight: '100vh',
+        pt: 15,
+        pb: 6,
+        px: { xs: 2, sm: 3, lg: 4 },
+        maxWidth: 1600,
+        mx: 'auto',
+        position: 'relative'
       }}
     >
       <MiningBackground />
@@ -193,7 +199,7 @@ export function LaboratorioView() {
                   )}
                 </Box>
               </Box>
-              
+
               <Tooltip title={!canInject ? `Necesitas al menos ${MIN_INJECT_EP} EP para procesar transacciones` : ''} arrow>
                 <span>
                   <Button
@@ -221,9 +227,9 @@ export function LaboratorioView() {
           </motion.div>
         )}
 
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.98 }} 
-          animate={{ opacity: 1, scale: 1 }} 
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
           <CoreModulesSimulator />
