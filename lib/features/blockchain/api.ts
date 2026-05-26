@@ -33,14 +33,14 @@ export const getNextBlockTimeApi = async (networkId: string) => {
 
 //# 5-Definir función para obtener potencia de minado total
 export const getMiningPowerApi = async () => {
-    // Endpoint corregido: debe estar bajo /network/ según el ruteo del backend
-    const response = await api.get('/blockchain/network/total-power');
+    // Según recomendación de BACK (17:15), usamos el endpoint de redes que ya trae la potencia
+    const response = await api.get('/blockchain/network');
     return response.data;
 };
 
 //# 6-Definir función para obtener potencia y energía específica de una red (Requiere Auth)
 export const getNetworkSpecificPowerApi = async (id: string) => {
-    // Endpoint corregido: debe estar bajo /network/ según el ruteo del backend
+    // Según auditoría de ruteo, se encuentra bajo /network/
     const response = await api.get(`/blockchain/network/${id}/total-power`);
     return response.data;
 };

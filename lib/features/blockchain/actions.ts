@@ -91,12 +91,19 @@ export const fetchMiningPower = createAsyncThunk(
         try {
             const response = await getMiningPowerApi();
             
-            // Extraer valor de forma ultra-robusta según los nuevos formatos del BACK
-            const powerValue = response?.totalPowerMining ?? 
-                               response?.data?.totalPowerMining ?? 
-                               response?.blockchainProps?.totalPowerMining ??
-                               response?.power ?? 
-                               0;
+            // Si el response es un array (lista de redes), buscamos la activa
+            let powerValue = 0;
+            if (Array.isArray(response)) {
+                const activeNetwork = response.find((n: any) => n.isActive);
+                powerValue = activeNetwork?.blockchainProps?.totalPowerMining ?? 0;
+            } else {
+                // Fallback por si devuelve objeto directo
+                powerValue = response?.totalPowerMining ?? 
+                             response?.data?.totalPowerMining ?? 
+                             response?.blockchainProps?.totalPowerMining ??
+                             response?.power ?? 
+                             0;
+            }
                                
             return { totalPowerMining: Number(powerValue) };
         } catch (err: unknown) {
