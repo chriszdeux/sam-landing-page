@@ -17,7 +17,6 @@ const initialState: BlockchainState = {
     selectedNetwork: null,
     rewards: [],
     nextBlockTime: null,
-    totalPowerMinning: 0,
     isLoading: false,
     error: null,
 };
@@ -96,7 +95,9 @@ const blockchainSlice = createSlice({
 
             // Power Mining Polling
             .addCase(fetchMiningPower.fulfilled, (state, action) => {
-                state.totalPowerMinning = action.payload.totalPowerMinning || action.payload.power || 0;
+                if (state.selectedNetwork && state.selectedNetwork.blockchainProps) {
+                    state.selectedNetwork.blockchainProps.totalPowerMinning = action.payload.totalPowerMinning;
+                }
             });
 
     },

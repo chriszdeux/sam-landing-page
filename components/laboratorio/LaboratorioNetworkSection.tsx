@@ -23,7 +23,9 @@ interface Transaction {
 }
 
 export function LaboratorioNetworkSection({ labData, currentEnergy, onEnergyChange, onRefetch }: NetworkSectionProps) {
-  const blockchainId = useAppSelector((state) => state.blockchain.selectedNetwork?.id ?? null);
+  const { selectedNetwork } = useAppSelector((state) => state.blockchain);
+  const blockchainId = selectedNetwork?.id ?? null;
+  const totalPowerMinning = selectedNetwork?.blockchainProps?.totalPowerMinning || 0;
   const [transactions] = useState<Transaction[]>([]);
   const [isClaiming, setIsClaiming] = useState(false);
   const [showClaimParticles, setShowClaimParticles] = useState(false);
@@ -96,19 +98,46 @@ export function LaboratorioNetworkSection({ labData, currentEnergy, onEnergyChan
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, height: '100%', opacity: labData ? 1 : 0.6 }}>
 
       {/* Network Stats Cards */}
-      <Stack direction="row" spacing={2}>
-        <Paper
-          component={motion.div}
-          animate={{ boxShadow: ["0 0 0px #00f3ff00", "0 0 20px #00f3ff40", "0 0 0px #00f3ff00"] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          sx={{ flex: 1, p: 2, bgcolor: 'rgba(0, 243, 255, 0.05)', border: '1px solid rgba(0, 243, 255, 0.1)', borderRadius: 3, textAlign: 'center' }}
-        >
-          <ElectricBolt sx={{ color: '#00f3ff', mb: 1 }} />
-          <Typography variant="caption" display="block" color="rgba(255,255,255,0.5)">Poder Global</Typography>
-          <Typography variant="h6" color="#fff" fontWeight="bold">{networkPower} GH/s</Typography>
+      <Stack direction="column" spacing={2}>
+        <Paper sx={{
+            p: 3,
+            background: "rgba(0, 243, 255, 0.05)",
+            border: "1px solid rgba(0, 243, 255, 0.2)",
+            borderRadius: "16px",
+            display: "flex",
+            alignItems: "center",
+            gap: 3,
+            position: "relative",
+            overflow: "hidden",
+            boxShadow: "0 0 30px rgba(0, 243, 255, 0.1)",
+        }}>
+            <Box sx={{ 
+                p: 1.5, 
+                bgcolor: "rgba(0, 243, 255, 0.1)", 
+                borderRadius: "12px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                border: "1px solid rgba(0, 243, 255, 0.3)"
+            }}>
+                <ElectricBolt sx={{ color: "#00f3ff", fontSize: 32 }} className="pulse-animation" />
+            </Box>
+            <Box>
+                <Typography variant="overline" sx={{ color: "#00f3ff", fontWeight: "bold", letterSpacing: 2, display: "block", lineHeight: 1, mb: 0.5 }}>
+                    NETWORK MINING POWER
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
+                    <Typography variant="h4" sx={{ color: "#fff", fontWeight: 900, letterSpacing: -1, textShadow: "0 0 20px rgba(0, 243, 255, 0.5)" }}>
+                        {(totalPowerMinning || 0).toLocaleString()}
+                    </Typography>
+                    <Typography variant="h6" sx={{ color: "#00f3ff", fontWeight: "bold", opacity: 0.8 }}>
+                        GH/s
+                    </Typography>
+                </Box>
+            </Box>
         </Paper>
-
-        <Paper sx={{ flex: 1, p: 2, bgcolor: 'rgba(176, 0, 255, 0.05)', border: '1px solid rgba(176, 0, 255, 0.1)', borderRadius: 3, textAlign: 'center' }}>
+        
+        <Paper sx={{ p: 2, bgcolor: 'rgba(176, 0, 255, 0.05)', border: '1px solid rgba(176, 0, 255, 0.1)', borderRadius: 3, textAlign: 'center' }}>
           <ReceiptLong sx={{ color: '#b000ff', mb: 1 }} />
           <Typography variant="caption" display="block" color="rgba(255,255,255,0.5)">Fees Históricos</Typography>
           <Typography variant="h6" color="#fff" fontWeight="bold">+{totalFees} SAMT</Typography>

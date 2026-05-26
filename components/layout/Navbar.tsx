@@ -46,7 +46,7 @@ export const Navbar = () => {
   //# 3-Obtener datos de Redux y hooks
   const dispatch = useAppDispatch();
   const { userInfo, walletsInfo } = useAppSelector((state) => state.auth);
-  const { networks, selectedNetwork: selectedNetworkState, totalPowerMinning } = useAppSelector((state) => state.blockchain);
+  const { networks, selectedNetwork: selectedNetworkState } = useAppSelector((state) => state.blockchain);
 
   const pathname = usePathname();
   const router = useRouter();
@@ -180,17 +180,7 @@ export const Navbar = () => {
             </Box>
           </Box>
 
-          <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', gap: 1, mr: 4, px: 2, py: 0.5, borderRadius: '20px', border: '1px solid rgba(0, 243, 255, 0.2)', bgcolor: 'rgba(0, 243, 255, 0.05)' }}>
-              <Bolt sx={{ color: '#00f3ff', fontSize: 18 }} />
-              <Box>
-                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', lineHeight: 1, fontSize: '0.6rem', fontWeight: 'bold' }}>
-                      MINING POWER
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: '#00f3ff', fontWeight: 'bold', lineHeight: 1 }}>
-                      {(totalPowerMinning || 0).toLocaleString()} GH/s
-                  </Typography>
-              </Box>
-          </Box>
+
 
           <Box
             sx={{

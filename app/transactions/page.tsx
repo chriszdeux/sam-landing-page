@@ -36,7 +36,8 @@ export default function TransactionsPage() {
     const dispatch = useAppDispatch();
     
     //# 4-Selección de datos desde el estado global de Redux
-    const { selectedNetwork, networks, totalPowerMinning } = useAppSelector((state) => state.blockchain);
+    const { selectedNetwork, networks } = useAppSelector((state) => state.blockchain);
+    const totalPowerMinning = selectedNetwork?.blockchainProps?.totalPowerMinning || 0;
     
     //# 5-Selección de datos desde el estado global de Redux
     const { byStoreBoxId, isLoading: loading, error } = useAppSelector((state) => state.transactions);
