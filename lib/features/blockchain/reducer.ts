@@ -30,16 +30,16 @@ const blockchainSlice = createSlice({
             state.selectedNetwork = action.payload; 
         },
         updateNetworkPower: (state, action) => {
-            const { id, totalPowerMinning, energy } = action.payload;
+            const { id, totalPowerMining, energy } = action.payload;
             const network = state.networks.find(n => n.id === id);
             if (network) {
                 if (!network.blockchainProps) network.blockchainProps = {} as any;
-                if (totalPowerMinning !== undefined) network.blockchainProps.totalPowerMinning = totalPowerMinning;
+                if (totalPowerMining !== undefined) network.blockchainProps.totalPowerMining = totalPowerMining;
                 if (energy !== undefined) network.blockchainProps.energy = energy;
             }
             if (state.selectedNetwork && state.selectedNetwork.id === id) {
                 if (!state.selectedNetwork.blockchainProps) state.selectedNetwork.blockchainProps = {} as any;
-                if (totalPowerMinning !== undefined) state.selectedNetwork.blockchainProps.totalPowerMinning = totalPowerMinning;
+                if (totalPowerMining !== undefined) state.selectedNetwork.blockchainProps.totalPowerMining = totalPowerMining;
                 if (energy !== undefined) state.selectedNetwork.blockchainProps.energy = energy;
             }
         }
@@ -113,22 +113,22 @@ const blockchainSlice = createSlice({
             .addCase(fetchMiningPower.fulfilled, (state, action) => {
                 if (state.selectedNetwork) {
                     if (!state.selectedNetwork.blockchainProps) state.selectedNetwork.blockchainProps = {} as any;
-                    state.selectedNetwork.blockchainProps.totalPowerMinning = action.payload.totalPowerMinning;
+                    state.selectedNetwork.blockchainProps.totalPowerMining = action.payload.totalPowerMining;
                 }
             })
             // Specific Power/Energy Polling
             .addCase(fetchNetworkSpecificPower.fulfilled, (state, action) => {
-                const { id, energy, totalPowerMinning } = action.payload;
+                const { id, energy, totalPowerMining } = action.payload;
                 const network = state.networks.find(n => n.id === id);
                 if (network) {
                     if (!network.blockchainProps) network.blockchainProps = {} as any;
                     network.blockchainProps.energy = energy;
-                    network.blockchainProps.totalPowerMinning = totalPowerMinning;
+                    network.blockchainProps.totalPowerMining = totalPowerMining;
                 }
                 if (state.selectedNetwork && state.selectedNetwork.id === id) {
                     if (!state.selectedNetwork.blockchainProps) state.selectedNetwork.blockchainProps = {} as any;
                     state.selectedNetwork.blockchainProps.energy = energy;
-                    state.selectedNetwork.blockchainProps.totalPowerMinning = totalPowerMinning;
+                    state.selectedNetwork.blockchainProps.totalPowerMining = totalPowerMining;
                 }
             });
 
