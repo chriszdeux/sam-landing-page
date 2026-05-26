@@ -28,6 +28,20 @@ const blockchainSlice = createSlice({
     reducers: {
         setSelectedNetwork: (state, action) => {
             state.selectedNetwork = action.payload; 
+        },
+        updateNetworkPower: (state, action) => {
+            const { id, totalPowerMinning, energy } = action.payload;
+            const network = state.networks.find(n => n.id === id);
+            if (network) {
+                if (!network.blockchainProps) network.blockchainProps = {} as any;
+                if (totalPowerMinning !== undefined) network.blockchainProps.totalPowerMinning = totalPowerMinning;
+                if (energy !== undefined) network.blockchainProps.energy = energy;
+            }
+            if (state.selectedNetwork && state.selectedNetwork.id === id) {
+                if (!state.selectedNetwork.blockchainProps) state.selectedNetwork.blockchainProps = {} as any;
+                if (totalPowerMinning !== undefined) state.selectedNetwork.blockchainProps.totalPowerMinning = totalPowerMinning;
+                if (energy !== undefined) state.selectedNetwork.blockchainProps.energy = energy;
+            }
         }
     },
     extraReducers: (builder) => {
@@ -97,7 +111,8 @@ const blockchainSlice = createSlice({
 
             // Power Mining Polling
             .addCase(fetchMiningPower.fulfilled, (state, action) => {
-                if (state.selectedNetwork && state.selectedNetwork.blockchainProps) {
+                if (state.selectedNetwork) {
+                    if (!state.selectedNetwork.blockchainProps) state.selectedNetwork.blockchainProps = {} as any;
                     state.selectedNetwork.blockchainProps.totalPowerMinning = action.payload.totalPowerMinning;
                 }
             })
@@ -105,11 +120,13 @@ const blockchainSlice = createSlice({
             .addCase(fetchNetworkSpecificPower.fulfilled, (state, action) => {
                 const { id, energy, totalPowerMinning } = action.payload;
                 const network = state.networks.find(n => n.id === id);
-                if (network && network.blockchainProps) {
+                if (network) {
+                    if (!network.blockchainProps) network.blockchainProps = {} as any;
                     network.blockchainProps.energy = energy;
                     network.blockchainProps.totalPowerMinning = totalPowerMinning;
                 }
-                if (state.selectedNetwork && state.selectedNetwork.id === id && state.selectedNetwork.blockchainProps) {
+                if (state.selectedNetwork && state.selectedNetwork.id === id) {
+                    if (!state.selectedNetwork.blockchainProps) state.selectedNetwork.blockchainProps = {} as any;
                     state.selectedNetwork.blockchainProps.energy = energy;
                     state.selectedNetwork.blockchainProps.totalPowerMinning = totalPowerMinning;
                 }
@@ -119,5 +136,5 @@ const blockchainSlice = createSlice({
 });
 
 //# 6-Exportar acciones y reducer por defecto
-export const { setSelectedNetwork } = blockchainSlice.actions;
+export const { setSelectedNetwork, updateNetworkPower } = blockchainSlice.actions;
 export default blockchainSlice.reducer;
