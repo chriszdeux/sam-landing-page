@@ -36,3 +36,9 @@ export const getMiningPowerApi = async () => {
     const response = await api.get('/blockchain/total-power');
     return response.data;
 };
+
+//# 6-Definir función para obtener potencia y energía específica de una red (Requiere Auth)
+export const getNetworkSpecificPowerApi = async (id: string) => {
+    const response = await api.get(`/blockchain/${id}/total-power`);
+    return response.data;
+};
