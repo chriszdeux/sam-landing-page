@@ -100,12 +100,9 @@ export interface BlockchainInterface {
   id: string;
   identification: BlockchainInfo;
   additionalInfo: AdditionalInfo;
-  blockchainProps: BlockchainProps;
-  poolNetwork?: BlockchainPoolNetwork[];
-  poolNetworkQueue?: BlockchainPoolNetwork[];
   cryptoGenesis: CryptoGenesis;
   tokensSupported?: TokensSupported;
-  storeTransactions: TransactionsProps;
   isActive: boolean;
   chain?: string;
+  storeTransactionId: string;
 }

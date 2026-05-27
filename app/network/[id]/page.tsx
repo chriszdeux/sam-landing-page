@@ -93,8 +93,8 @@ export default function NetworkDetailPage({ params }: { params: Promise<{ id: st
                              <Stack spacing={3}>
                                  <Box>
                                      <Chip 
-                                        label={network.blockchainProps.status || 'Active'} 
-                                        color={network.blockchainProps.status === 'Active' ? 'success' : 'default'} 
+                                        label={'Active'} 
+                                        color={'success'} 
                                         size="small" 
                                         sx={{ mb: 2 }} 
                                      />
@@ -118,7 +118,7 @@ export default function NetworkDetailPage({ params }: { params: Promise<{ id: st
                                          <Box>
                                              <Typography variant="caption" color="text.secondary">Circulating Supply</Typography>
                                              <Typography variant="body1" color="white">
-                                                 {network.blockchainProps.circulatingSupply.toLocaleString()}
+                                                 0
                                              </Typography>
                                          </Box>
                                      </Stack>
@@ -128,7 +128,7 @@ export default function NetworkDetailPage({ params }: { params: Promise<{ id: st
                                          <Box>
                                              <Typography variant="caption" color="text.secondary">Market Cap</Typography>
                                              <Typography variant="body1" color="white" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                {network.blockchainProps.marketCap.toLocaleString()} <TaoIcon size={16} />
+                                                0 <TaoIcon size={16} />
                                             </Typography>
                                          </Box>
                                      </Stack>

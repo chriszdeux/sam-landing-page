@@ -56,6 +56,7 @@ export interface TransactionBucket {
   startDate: string; 
   endDate: string | null; 
   currentTransactionBlock: number;
+  fee: number;
 }
 
 //# 3-Definir interfaces para recompensas y estado

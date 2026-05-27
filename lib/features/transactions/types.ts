@@ -61,6 +61,7 @@ export interface TransactionBucket {
   startDate: string; 
   endDate: string | null; 
   currentTransactionBlock: number;
+  fee: number;
 }
 
 //# 4-Definir estado global de transacciones

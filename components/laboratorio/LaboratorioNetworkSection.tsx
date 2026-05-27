@@ -27,7 +27,7 @@ export function LaboratorioNetworkSection({ labData, currentEnergy, onEnergyChan
   const dispatch = useAppDispatch();
   const { selectedNetwork } = useAppSelector((state) => state.blockchain);
   const blockchainId = selectedNetwork?.id ?? null;
-  const totalPowerMining = selectedNetwork?.blockchainProps?.totalPowerMining || 0;
+  const totalPowerMining = 0 || 0;
   const [transactions] = useState<Transaction[]>([]);
   const [isClaiming, setIsClaiming] = useState(false);
   const [showClaimParticles, setShowClaimParticles] = useState(false);
@@ -56,7 +56,7 @@ export function LaboratorioNetworkSection({ labData, currentEnergy, onEnergyChan
       if (labState) onEnergyChange(labState.energy);
       
       // Update blockchain store with new total power immediately
-      const newPower = res.data?.totalPowerMining ?? res.data?.labState?.totalPowerMining ?? res.data?.blockchainProps?.totalPowerMining ?? res.data?.networkPower ?? res.data?.data?.totalPowerMining;
+      const newPower = res.data?.totalPowerMining ?? res.data?.labState?.totalPowerMining ?? 0 ?? res.data?.networkPower ?? res.data?.data?.totalPowerMining;
       if (newPower !== undefined && newPower !== null) {
           dispatch(updateNetworkPower({ id: blockchainId, totalPowerMining: Number(newPower) }));
       }

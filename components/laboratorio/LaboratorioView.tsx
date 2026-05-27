@@ -92,7 +92,7 @@ export function LaboratorioView() {
       if (res.data?.labState) {
         setLabData(prev => prev ? { ...prev, energy: res.data.labState.energy } : prev);
       }
-      const newPower = res.data?.totalPowerMining ?? res.data?.labState?.totalPowerMining ?? res.data?.blockchainProps?.totalPowerMining ?? res.data?.networkPower ?? res.data?.data?.totalPowerMining;
+      const newPower = res.data?.totalPowerMining ?? res.data?.labState?.totalPowerMining ?? 0 ?? res.data?.networkPower ?? res.data?.data?.totalPowerMining;
       if (newPower !== undefined && newPower !== null) {
           dispatch(updateNetworkPower({ id: selectedNetwork.id, totalPowerMining: Number(newPower) }));
       }

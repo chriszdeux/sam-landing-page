@@ -113,29 +113,19 @@ export const transactionsPageColumns: Column<TransactionsInterface>[] = [
         )
     },
     {
-        Header: "Monto (Fiat)",
-        accessor: (row) => row.financialInfo?.amount,
-        sortable: true,
-        Cell: ({ value }) => (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span>{(value as number)?.toLocaleString()}</span> <TaoIcon size={14} />
-            </div>
-        )
-    },
-    {
         Header: "Cantidad",
         accessor: (row) => row.financialInfo?.quantity,
         sortable: true
     },
     {
-        Header: "Origen",
-        accessor: (row) => row.addresses?.senderWalletAddress,
+        Header: "Tarifa (Fee)",
+        accessor: (row) => row.financialInfo?.fee,
         sortable: true,
-    },
-    {
-        Header: "Destino",
-        accessor: (row) => row.addresses?.recipientWalletAddress,
-        sortable: true,
+        Cell: ({ value }) => (
+            <Box sx={{ color: '#00f3ff', fontWeight: 'bold' }}>
+                {(value as number)?.toLocaleString()} GH
+            </Box>
+        )
     },
     {
         Header: "Estado",

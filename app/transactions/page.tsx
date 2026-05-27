@@ -37,14 +37,16 @@ export default function TransactionsPage() {
     
     //# 4-Selección de datos desde el estado global de Redux
     const { selectedNetwork, networks } = useAppSelector((state) => state.blockchain);
-    const totalPowerMining = selectedNetwork?.blockchainProps?.totalPowerMining || 0;
+    // Se remueve la referencia a blockchainProps según la nueva estructura simplificada
+    const totalPowerMining = 0; 
     
     //# 5-Selección de datos desde el estado global de Redux
     const { byStoreBoxId, isLoading: loading, error } = useAppSelector((state) => state.transactions);
 
     const currentNetwork = networks.find(n => n.id === selectedNetwork?.id);
     
-    const storeId = selectedNetwork?.storeTransactions?.transactionStoreID || currentNetwork?.storeTransactions?.transactionStoreID;
+    // Se utiliza storeTransactionId en lugar de storeTransactions.transactionStoreID
+    const storeId = selectedNetwork?.storeTransactionId || currentNetwork?.storeTransactionId;
     const rawData = storeId ? byStoreBoxId[storeId] : null;
     let transactionData: TransactionsInterface[] = [];
     
@@ -116,7 +118,7 @@ export default function TransactionsPage() {
                 
                 <PageHeader 
                     title="Historial de Transacciones" 
-                    subtitle={`Red: ${currentNetwork?.identification?.name || selectedNetwork?.identification?.name || selectedNetwork.id} | Store ID: ${selectedNetwork?.storeTransactions?.transactionStoreID}`}
+                    subtitle={`Red: ${currentNetwork?.identification?.name || selectedNetwork?.identification?.name || selectedNetwork.id} | Store ID: ${selectedNetwork?.storeTransactionId || 'N/A'}`}
                 />
 
                 <Box sx={{ mb: 4, display: "flex", justifyContent: "center" }}>

@@ -155,7 +155,7 @@ export default function NetworkSelectionPage() {
                                                 <Box sx={{ textAlign: 'center', p: 1, bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 1 }}>
                                                     <Typography variant="caption" display="block" color="text.secondary" sx={{ fontSize: '0.65rem' }}>MARKET CAP</Typography>
                                                     <Typography variant="body2" color="white" fontWeight="bold">
-                                                        ${((network as any).blockchainProps?.marketCap || 0).toLocaleString()}
+                                                        ${0.toLocaleString()}
                                                     </Typography>
                                                 </Box>
                                             </Grid>
@@ -163,7 +163,7 @@ export default function NetworkSelectionPage() {
                                                 <Box sx={{ textAlign: 'center', p: 1, bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 1 }}>
                                                     <Typography variant="caption" display="block" color="text.secondary" sx={{ fontSize: '0.65rem' }}>SUPPLY</Typography>
                                                     <Typography variant="body2" color="white" fontWeight="bold">
-                                                       {((network as any).blockchainProps?.circulatingSupply || 0).toLocaleString()}
+                                                       {0.toLocaleString()}
                                                     </Typography>
                                                 </Box>
                                             </Grid>

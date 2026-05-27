@@ -136,9 +136,9 @@ export default function PortfolioPage() {
     }
 
     const totalValue = assets.reduce((acc, curr) => acc + curr.value, 0);
-    const totalPowerMining = selectedNetwork?.blockchainProps?.totalPowerMining || 0;
-    const marketCap = selectedNetwork?.blockchainProps?.marketCap || 0;
-    const circulatingSupply = selectedNetwork?.blockchainProps?.circulatingSupply || 0;
+    const totalPowerMining = 0 || 0;
+    const marketCap = 0 || 0;
+    const circulatingSupply = 0 || 0;
 
   //# 12-Estructuración y renderizado visual del componente UI
   return (
@@ -291,7 +291,7 @@ export default function PortfolioPage() {
                                     </Typography>
                                 </Stack>
                                 <TransactionsTable 
-                                    storeId={selectedNetwork?.id} 
+                                    storeId={selectedNetwork?.storeTransactionId || selectedNetwork?.id} 
                                     walletId={userInfo?.wallets && userInfo.wallets.length > 0 ? userInfo.wallets[0].walletAddress : undefined}
                                 />
                             </motion.div>

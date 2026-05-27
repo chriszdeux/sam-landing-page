@@ -109,9 +109,10 @@ export const fetchMiningPower = createAsyncThunk(
 //# 7-Acción asíncrona para obtener potencia y energía específica de una red
 export const fetchNetworkSpecificPower = createAsyncThunk(
     'blockchain/fetchNetworkSpecificPower',
-    async (networkId: string, { rejectWithValue }) => {
+    async ({ networkId, chain }: { networkId: string; chain: string }, { rejectWithValue }) => {
         try {
-            const response = await getNetworkSpecificPowerApi(networkId);
+            // Se utiliza el chain ID para consultar el poder requerido del bloque
+            const response = await getNetworkSpecificPowerApi(chain);
             // Extraer la energía y la potencia del endpoint específico
             const energyValue = response?.energy ?? response?.data?.energy ?? response?.blockchainProps?.energy ?? 0;
             const powerValue = response?.totalPowerMining ?? response?.data?.totalPowerMining ?? response?.blockchainProps?.totalPowerMining ?? response?.power ?? 0;

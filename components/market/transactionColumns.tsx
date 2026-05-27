@@ -4,7 +4,7 @@
 //# 1-Definir columnas para la tabla de transacciones simplificada
 import React from 'react';
 import { TaoIcon } from '../ui/TaoIcon';
-import { Chip, Typography } from '@mui/material';
+import { Chip, Typography, Box } from '@mui/material';
 import { 
     ArrowUpward, 
     ArrowDownward, 
@@ -89,6 +89,16 @@ export const transactionColumns: Column<TransactionsInterface>[] = [
         Header: "Cantidad",
         accessor: (row) => `${row.financialInfo?.quantity || 0} ${row.financialInfo?.symbol || ''}`,
         sortable: true
+    },
+    {
+        Header: "Fee",
+        accessor: (row) => row.financialInfo?.fee || 0,
+        sortable: true,
+        Cell: ({ value }) => (
+            <Box sx={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'monospace' }}>
+                {value as number} GH
+            </Box>
+        )
     },
     {
         Header: "Precio",
