@@ -1,19 +1,35 @@
 "use client";
 
 import React from 'react';
-import { Box, Typography, Stack, Button as MuiButton } from '@mui/material';
+import { Box, Typography, Stack, Button as MuiButton, Divider } from '@mui/material';
 import { TechFrame } from '../ui/TechFrame';
 import { TaoIcon } from '../ui/TaoIcon';
-import { ArrowUpRight, Wallet } from 'lucide-react';
+import { ArrowUpRight, Wallet, Copy } from 'lucide-react';
 
 interface BalancesPanelProps {
     thaoBalance: number;
     cryptoBalance: number;
+    activeWallet?: {
+        label: string;
+        walletAddress: string;
+    };
     onBuy?: () => void;
     onSell?: () => void;
 }
 
-export const BalancesPanel: React.FC<BalancesPanelProps> = ({ thaoBalance, cryptoBalance, onBuy, onSell }) => {
+export const BalancesPanel: React.FC<BalancesPanelProps> = ({ 
+    thaoBalance, 
+    cryptoBalance, 
+    activeWallet,
+    onBuy, 
+    onSell 
+}) => {
+    const handleCopy = () => {
+        if (activeWallet?.walletAddress) {
+            navigator.clipboard.writeText(activeWallet.walletAddress);
+        }
+    };
+
     return (
         <Stack spacing={3}>
             {/* Balance Principal THAO */}
@@ -53,7 +69,45 @@ export const BalancesPanel: React.FC<BalancesPanelProps> = ({ thaoBalance, crypt
                 </Box>
             </Box>
 
-            {/* Equivalente en THAOS (Segunda Card) */}
+            {/* Wallet Info Section */}
+            <Box sx={{ 
+                p: 3, 
+                borderRadius: 4, 
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                bgcolor: 'rgba(5, 10, 15, 0.4)',
+                backdropFilter: 'blur(10px)'
+            }}>
+                <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 2 }}>
+                    <Box sx={{ p: 1, borderRadius: 1, bgcolor: 'rgba(255,255,255,0.05)', color: 'white' }}>
+                        <Wallet size={18} />
+                    </Box>
+                    <Box>
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 900, display: 'block', lineHeight: 1 }}>
+                            BILLETERA ACTIVA
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'white', fontWeight: 900 }}>
+                            {activeWallet?.label || 'SIN NOMBRE'}
+                        </Typography>
+                    </Box>
+                </Stack>
+                
+                <Box 
+                    onClick={handleCopy}
+                    sx={{ 
+                        p: 1.5, borderRadius: 2, bgcolor: 'rgba(0,0,0,0.3)', 
+                        border: '1px solid rgba(255,255,255,0.05)',
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                        cursor: 'pointer', '&:hover': { bgcolor: 'rgba(255,255,255,0.02)' }
+                    }}
+                >
+                    <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#00f3ff', opacity: 0.7 }}>
+                        {activeWallet?.walletAddress ? (activeWallet.walletAddress.substring(0, 12) + '...') : '0x000...'}
+                    </Typography>
+                    <Copy size={14} color="rgba(255,255,255,0.3)" />
+                </Box>
+            </Box>
+
+            {/* Equivalente en THAOS */}
             <Box sx={{ 
                 p: 3, 
                 borderRadius: 4, 
@@ -69,7 +123,7 @@ export const BalancesPanel: React.FC<BalancesPanelProps> = ({ thaoBalance, crypt
                     EQUIVALENTE EN THAOS
                 </Typography>
                 
-                <Stack direction="row" alignItems="baseline" spacing={1} sx={{ mt: 2 }}>
+                <Stack direction="row" alignItems="baseline" spacing={1} sx={{ mt: 1 }}>
                     <Typography variant="h4" sx={{ color: 'white', fontWeight: 900 }}>
                         {cryptoBalance.toLocaleString()}
                     </Typography>

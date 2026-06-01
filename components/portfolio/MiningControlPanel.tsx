@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { Box, Typography, Stack, Grid, CircularProgress, LinearProgress, Button as MuiButton } from '@mui/material';
-import { Zap, Activity, Thermometer, Clock } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Zap, Activity, Thermometer, Clock, Coins, CheckCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const CircularGauge = ({ value, maxValue, label, color, icon }: any) => {
     const percentage = Math.min((value / maxValue) * 100, 100);
@@ -33,7 +33,7 @@ const CircularGauge = ({ value, maxValue, label, color, icon }: any) => {
                 </Box>
             </Box>
             <Typography variant="h6" sx={{ color: 'white', fontWeight: 900, lineHeight: 1, mb: 0.5 }}>{Math.round(value)}%</Typography>
-            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 900, fontSize: '0.65rem', letterSpacing: 1 }}>{label.toUpperCase()}</Typography>
+            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 900, fontSize: '0.6rem', letterSpacing: 1, textAlign: 'center' }}>{label.toUpperCase()}</Typography>
         </Box>
     );
 };
@@ -46,6 +46,8 @@ export const MiningControlPanel = ({
     uptime, 
     energyAvailable,
     maxEnergy,
+    tokensEarned = 0,
+    confirmedTxCount = 0,
     onInjectPower, 
     isInjecting 
 }: any) => {
@@ -63,24 +65,24 @@ export const MiningControlPanel = ({
                 boxShadow: '0 15px 35px rgba(0, 0, 0, 0.4)'
             }}>
                 <Typography variant="overline" sx={{ color: '#00ff88', letterSpacing: 3, fontWeight: 900, display: 'block', mb: 4, opacity: 0.8 }}>
-                    MINERÍA // OPERACIONES
+                    MINERÍA // TELEMETRÍA
                 </Typography>
                 
-                <Grid container spacing={2} justifyContent="center">
+                <Grid container spacing={1} justifyContent="center">
                     <Grid size={{ xs: 4 }} sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <CircularGauge value={efficiency} maxValue={100} label="Eficiencia" color="#00f3ff" icon={<Activity size={20} />} />
+                        <CircularGauge value={efficiency} maxValue={100} label="Vida" color="#00f3ff" icon={<Activity size={20} />} />
                     </Grid>
                     <Grid size={{ xs: 4 }} sx={{ display: 'flex', justifyContent: 'center' }}>
                         <CircularGauge value={temperature} maxValue={100} label="Temp" color="#ff0055" icon={<Thermometer size={20} />} />
                     </Grid>
                     <Grid size={{ xs: 4 }} sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <CircularGauge value={uptime} maxValue={100} label="Uptime" color="#ffaa00" icon={<Clock size={20} />} />
+                        <CircularGauge value={uptime} maxValue={100} label="Tiempo Activo" color="#ffaa00" icon={<Clock size={20} />} />
                     </Grid>
                 </Grid>
                 
                 <Box sx={{ mt: 4 }}>
                     <Stack direction="row" justifyContent="space-between" sx={{ mb: 1.5 }}>
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 900, letterSpacing: 1 }}>POTENCIA ACTIVA</Typography>
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 900, letterSpacing: 1 }}>TASA DE HASH</Typography>
                         <Typography variant="caption" sx={{ color: '#00ff88', fontWeight: 900 }}>{Math.round(powerMining)} / {maxPower} GH/s</Typography>
                     </Stack>
                     <LinearProgress 
@@ -100,6 +102,36 @@ export const MiningControlPanel = ({
                 </Box>
             </Box>
 
+            {/* Resultados de Última Operación */}
+            <Box sx={{ 
+                p: 2, 
+                borderRadius: 4, 
+                bgcolor: 'rgba(0, 243, 255, 0.05)', 
+                border: '1px solid rgba(0, 243, 255, 0.1)' 
+            }}>
+                <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 900, mb: 1.5, display: 'block' }}>ÚLTIMA OPERACIÓN</Typography>
+                <Grid container spacing={2}>
+                    <Grid size={{ xs: 6 }}>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <Coins size={16} color="#ffd700" />
+                            <Box>
+                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', display: 'block', fontSize: '0.6rem' }}>GANADO</Typography>
+                                <Typography variant="body2" sx={{ fontWeight: 900, color: '#ffd700', fontSize: '0.8rem' }}>+{tokensEarned} SAM-G</Typography>
+                            </Box>
+                        </Stack>
+                    </Grid>
+                    <Grid size={{ xs: 6 }}>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <CheckCircle size={16} color="#00ff88" />
+                            <Box>
+                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', display: 'block', fontSize: '0.6rem' }}>TX CONF.</Typography>
+                                <Typography variant="body2" sx={{ fontWeight: 900, color: '#00ff88', fontSize: '0.8rem' }}>{confirmedTxCount}</Typography>
+                            </Box>
+                        </Stack>
+                    </Grid>
+                </Grid>
+            </Box>
+
             {/* Módulo de Energía e Inyección */}
             <Box sx={{ 
                 p: 3, 
@@ -111,7 +143,7 @@ export const MiningControlPanel = ({
                 <Stack spacing={2}>
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <Typography variant="caption" sx={{ color: '#ffb700', fontWeight: 900, letterSpacing: 1 }}>ENERGÍA ACUMULADA</Typography>
-                        <Typography variant="body2" sx={{ color: 'white', fontWeight: 900 }}>{Math.floor(energyAvailable)}%</Typography>
+                        <Typography variant="body2" sx={{ color: 'white', fontWeight: 900 }}>{Math.floor(energyAvailable)} / {maxEnergy} EP</Typography>
                     </Stack>
                     
                     <Box sx={{ position: 'relative', height: 40, bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 2, overflow: 'hidden', border: '1px solid rgba(255, 183, 0, 0.1)' }}>
@@ -124,11 +156,6 @@ export const MiningControlPanel = ({
                                 boxShadow: '0 0 20px rgba(255, 183, 0, 0.2)'
                             }}
                         />
-                        <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <Typography variant="caption" sx={{ color: 'white', fontWeight: 900, textShadow: '0 0 10px rgba(0,0,0,0.5)' }}>
-                                {Math.floor(energyAvailable)} / {maxEnergy} EP
-                            </Typography>
-                        </Box>
                     </Box>
 
                     <Box sx={{ position: 'relative' }}>

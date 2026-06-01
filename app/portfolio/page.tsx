@@ -21,8 +21,8 @@ import { CandlestickChart } from '../../components/portfolio/CandlestickChart';
 import { MiningControlPanel } from '../../components/portfolio/MiningControlPanel';
 import { TransactionsTable } from '../../components/portfolio/TransactionsTable';
 import { TaoIcon } from '../../components/ui/TaoIcon';
-
 import { PageHeader } from '../../components/ui/PageHeader';
+
 export default function FusionDashboard() {
     const dispatch = useAppDispatch();
     const router = useRouter();
@@ -41,6 +41,7 @@ export default function FusionDashboard() {
     const [energy, setEnergy] = useState(0);
     const [maxEnergy, setMaxEnergy] = useState(100);
     const [labStats, setLabStats] = useState({ efficiency: 82, temperature: 38, uptime: 99.9 });
+    const [lastOpResults, setLastOpResults] = useState({ tokensEarned: 0, confirmedTxCount: 0 });
     const energyRef = useRef(0);
 
     // Inicialización de Datos
@@ -67,7 +68,7 @@ export default function FusionDashboard() {
         }
     }, [selectedCryptoId, dispatch]);
 
-    // Bucle de Recarga de Energía (Sincronizado con LaboratorioView)
+    // Bucle de Recarga de Energía
     useEffect(() => {
         const labId = userInfo?.idLabs?.[0];
         if (labId) {
@@ -77,7 +78,7 @@ export default function FusionDashboard() {
                 energyRef.current = data.energy || 0;
                 setMaxEnergy(data.maxEnergy || 100);
                 setLabStats({
-                    efficiency: data.efficiency || 82,
+                    efficiency: data.efficiency || data.currentLife || 82,
                     temperature: data.temperature || 38,
                     uptime: data.uptime || 99.9
                 });
@@ -91,11 +92,11 @@ export default function FusionDashboard() {
     useEffect(() => {
         const timer = setInterval(() => {
             if (energyRef.current < maxEnergy) {
-                const nextEnergy = energyRef.current + 0.5; // Incremento suave
+                const nextEnergy = energyRef.current + 0.5;
                 energyRef.current = nextEnergy;
                 setEnergy(nextEnergy);
             }
-        }, 100); // 500ms para notar el progreso
+        }, 100);
 
         return () => clearInterval(timer);
     }, [maxEnergy]);
@@ -123,13 +124,23 @@ export default function FusionDashboard() {
                 energyAmount: amountToInject
             });
             
-            // Reiniciar energía local tras inyección exitosa
-            setEnergy(0);
-            energyRef.current = 0;
-            
-            const newPower = res.data?.totalPowerMining || res.data?.networkPower || res.data?.data?.totalPowerMining;
-            if (newPower) {
-                dispatch(updateNetworkPower({ id: selectedNetwork.id, totalPowerMining: Number(newPower) }));
+            const data = res.data;
+            if (data.ok) {
+                setEnergy(data.labState.energy);
+                energyRef.current = data.labState.energy;
+                setLabStats({
+                    efficiency: data.labState.currentLife,
+                    temperature: data.labState.temperature,
+                    uptime: 99.9
+                });
+                setLastOpResults({
+                    tokensEarned: data.tokensEarned,
+                    confirmedTxCount: data.confirmedTxCount
+                });
+                
+                if (data.availablePower) {
+                    dispatch(updateNetworkPower({ id: selectedNetwork.id, totalPowerMining: data.availablePower }));
+                }
             }
         } catch (error) {
             console.error('Error al inyectar poder', error);
@@ -157,37 +168,39 @@ export default function FusionDashboard() {
         return acc + (Number(item.quantity) * priceInThaos);
     }, 0) || 0;
 
+    const activeWallet = userInfo?.wallets?.[0] || { label: 'BILLETERA 01', walletAddress: '0x...' };
+
     return (
-        <Box sx={{ minHeight: '100vh', bgcolor: '#000', position: 'relative', overflow: 'hidden' }}>
+        <Box sx={{ minHeight: '100vh', bgcolor: '#000', position: 'relative', overflow: 'hidden', pt: '80px' }}>
             <ParticleBackground />
             
-            {/* Header de la Vista - Integrado en el flujo */}
-            <Box sx={{ mb: 8 }}>
-                <PageHeader 
-                    title="PANEL DE FUSIÓN" 
-                    subtitle="SISTEMA OPERACIONAL // PORTAFOLIO & LABORATORIO"
-                />
+            <Container maxWidth="xl" sx={{ pt: 2, pb: 8, position: 'relative', zIndex: 1 }}>
                 
-                <Stack direction="row" spacing={2} justifyContent="center" alignItems="center" sx={{ mt: -4, mb: 4 }}>
-                    <Box sx={{ textAlign: "right", display: { xs: "none", sm: "block" } }}>
-                        <Typography variant="caption" sx={{ color: "#00ff88", fontWeight: 900, display: "block" }}>NODO ACTIVO</Typography>
-                        <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.3)", fontWeight: 900 }}>SINCRO_OK</Typography>
-                    </Box>
-                    <IconButton 
-                        onClick={handleSync} 
-                        disabled={isSyncing}
-                        sx={{ 
-                            bgcolor: "rgba(0, 243, 255, 0.1)", color: "#00f3ff", 
-                            border: "1px solid rgba(0, 243, 255, 0.2)",
-                            "&:hover": { bgcolor: "rgba(0, 243, 255, 0.2)" }
-                        }}
-                    >
-                        <RefreshCw size={20} className={isSyncing ? "animate-spin" : ""} />
-                    </IconButton>
-                </Stack>
-            </Box>
+                <Box sx={{ mb: 8 }}>
+                    <PageHeader 
+                        title="PANEL DE FUSIÓN" 
+                        subtitle="SISTEMA OPERACIONAL // PORTAFOLIO & LABORATORIO"
+                    />
+                    
+                    <Stack direction="row" spacing={2} justifyContent="center" alignItems="center" sx={{ mt: -4, mb: 4 }}>
+                        <Box sx={{ textAlign: 'right', display: { xs: 'none', sm: 'block' } }}>
+                            <Typography variant="caption" sx={{ color: '#00ff88', fontWeight: 900, display: 'block' }}>NODO ACTIVO</Typography>
+                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontWeight: 900 }}>SINCRO_OK</Typography>
+                        </Box>
+                        <IconButton 
+                            onClick={handleSync} 
+                            disabled={isSyncing}
+                            sx={{ 
+                                bgcolor: 'rgba(0, 243, 255, 0.1)', color: '#00f3ff', 
+                                border: '1px solid rgba(0, 243, 255, 0.2)',
+                                '&:hover': { bgcolor: 'rgba(0, 243, 255, 0.2)' }
+                            }}
+                        >
+                            <RefreshCw size={20} className={isSyncing ? 'animate-spin' : ''} />
+                        </IconButton>
+                    </Stack>
+                </Box>
 
-            <Container maxWidth="xl" sx={{ pt: 2, pb: 8, position: "relative", zIndex: 1 }}>
                 <Grid container spacing={4} justifyContent="center" sx={{ maxWidth: 1600, mx: "auto" }}>
                     
                     {/* COLUMNA IZQUIERDA: FINANZAS */}
@@ -196,6 +209,7 @@ export default function FusionDashboard() {
                             <BalancesPanel 
                                 thaoBalance={thaoBalance} 
                                 cryptoBalance={cryptoBalanceInThaos}
+                                activeWallet={activeWallet}
                                 onBuy={() => handleTradeRedirect('BUY')}
                                 onSell={() => handleTradeRedirect('SELL')}
                             />
@@ -260,6 +274,8 @@ export default function FusionDashboard() {
                                     uptime={labStats.uptime}
                                     energyAvailable={energy}
                                     maxEnergy={maxEnergy}
+                                    tokensEarned={lastOpResults.tokensEarned}
+                                    confirmedTxCount={lastOpResults.confirmedTxCount}
                                     onInjectPower={handleInjectPower}
                                     isInjecting={isInjecting}
                                 />
@@ -278,7 +294,7 @@ export default function FusionDashboard() {
                                 </Box>
                             </Stack>
                         </motion.div>
-                </Grid>
+                    </Grid>
                 </Grid>
             </Container>
         </Box>
