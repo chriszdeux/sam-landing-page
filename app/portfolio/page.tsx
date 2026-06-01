@@ -278,7 +278,6 @@ export default function FusionDashboard() {
                                 </Box>
                             </Stack>
                         </motion.div>
-                    </Grid>
                 </Grid>
                 </Grid>
             </Container>
