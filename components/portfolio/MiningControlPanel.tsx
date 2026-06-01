@@ -67,13 +67,13 @@ export const MiningControlPanel = ({
                 </Typography>
                 
                 <Grid container spacing={2} justifyContent="center">
-                    <Grid item xs={4} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Grid size={{ xs: 4 }} sx={{ display: 'flex', justifyContent: 'center' }}>
                         <CircularGauge value={efficiency} maxValue={100} label="Eficiencia" color="#00f3ff" icon={<Activity size={20} />} />
                     </Grid>
-                    <Grid item xs={4} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Grid size={{ xs: 4 }} sx={{ display: 'flex', justifyContent: 'center' }}>
                         <CircularGauge value={temperature} maxValue={100} label="Temp" color="#ff0055" icon={<Thermometer size={20} />} />
                     </Grid>
-                    <Grid item xs={4} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Grid size={{ xs: 4 }} sx={{ display: 'flex', justifyContent: 'center' }}>
                         <CircularGauge value={uptime} maxValue={100} label="Uptime" color="#ffaa00" icon={<Clock size={20} />} />
                     </Grid>
                 </Grid>

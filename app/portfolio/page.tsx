@@ -22,6 +22,7 @@ import { MiningControlPanel } from '../../components/portfolio/MiningControlPane
 import { TransactionsTable } from '../../components/portfolio/TransactionsTable';
 import { TaoIcon } from '../../components/ui/TaoIcon';
 
+import { PageHeader } from '../../components/ui/PageHeader';
 export default function FusionDashboard() {
     const dispatch = useAppDispatch();
     const router = useRouter();
@@ -160,31 +161,37 @@ export default function FusionDashboard() {
         <Box sx={{ minHeight: '100vh', bgcolor: '#000', position: 'relative', overflow: 'hidden' }}>
             <ParticleBackground />
             
-            {/* Header / Navbar Integrada */}
-            <Box sx={{ 
-                position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1200,
-                background: 'linear-gradient(180deg, rgba(5, 10, 20, 0.9) 0%, rgba(5, 10, 20, 0) 100%)',
-                backdropFilter: 'blur(10px)', px: 4, py: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-            }}>
-                <Stack direction="row" alignItems="center" spacing={2}>
-                    <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(0, 243, 255, 0.1)', border: '1px solid rgba(0, 243, 255, 0.3)' }}>
-                        <LayoutDashboard size={20} color="#00f3ff" />
+            {/* Header de la Vista - Integrado en el flujo */}
+            <Box sx={{ mb: 8 }}>
+                <PageHeader 
+                    title="PANEL DE FUSIÓN" 
+                    subtitle="SISTEMA OPERACIONAL // PORTAFOLIO & LABORATORIO"
+                />
+                
+                <Stack direction="row" spacing={2} justifyContent="center" alignItems="center" sx={{ mt: -4, mb: 4 }}>
+                    <Box sx={{ textAlign: "right", display: { xs: "none", sm: "block" } }}>
+                        <Typography variant="caption" sx={{ color: "#00ff88", fontWeight: 900, display: "block" }}>NODO ACTIVO</Typography>
+                        <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.3)", fontWeight: 900 }}>SINCRO_OK</Typography>
                     </Box>
-                    <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: 4, color: 'white', textTransform: 'uppercase' }}>
-                        FUSIÓN // DASHBOARD
-                    </Typography>
+                    <IconButton 
+                        onClick={handleSync} 
+                        disabled={isSyncing}
+                        sx={{ 
+                            bgcolor: "rgba(0, 243, 255, 0.1)", color: "#00f3ff", 
+                            border: "1px solid rgba(0, 243, 255, 0.2)",
+                            "&:hover": { bgcolor: "rgba(0, 243, 255, 0.2)" }
+                        }}
+                    >
+                        <RefreshCw size={20} className={isSyncing ? "animate-spin" : ""} />
+                    </IconButton>
                 </Stack>
-                <IconButton onClick={handleSync} disabled={isSyncing} sx={{ color: '#00f3ff', border: '1px solid rgba(0, 243, 255, 0.2)' }}>
-                    <RefreshCw size={20} className={isSyncing ? 'animate-spin' : ''} />
-                </IconButton>
             </Box>
 
-            {/* Layout Centrado con max-width */}
-            <Container maxWidth="xl" sx={{ pt: 14, pb: 8, position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'center' }}>
-                <Grid container spacing={4} sx={{ maxWidth: 1600 }}>
+            <Container maxWidth="xl" sx={{ pt: 2, pb: 8, position: "relative", zIndex: 1 }}>
+                <Grid container spacing={4} justifyContent="center" sx={{ maxWidth: 1600, mx: "auto" }}>
                     
                     {/* COLUMNA IZQUIERDA: FINANZAS */}
-                    <Grid item xs={12} lg={3}>
+                    <Grid size={{ xs: 12, lg: 3 }}>
                         <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
                             <BalancesPanel 
                                 thaoBalance={thaoBalance} 
@@ -196,7 +203,7 @@ export default function FusionDashboard() {
                     </Grid>
 
                     {/* COLUMNA CENTRAL: MERCADO */}
-                    <Grid item xs={12} lg={6}>
+                    <Grid size={{ xs: 12, lg: 6 }}>
                         <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, delay: 0.2 }}>
                             <Box sx={{ 
                                 bgcolor: 'rgba(10, 15, 25, 0.6)', borderRadius: 4, p: 4, 
@@ -242,7 +249,7 @@ export default function FusionDashboard() {
                     </Grid>
 
                     {/* COLUMNA DERECHA: MINERÍA */}
-                    <Grid item xs={12} lg={3}>
+                    <Grid size={{ xs: 12, lg: 3 }}>
                         <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.4 }}>
                             <Stack spacing={4}>
                                 <MiningControlPanel 
@@ -272,6 +279,7 @@ export default function FusionDashboard() {
                             </Stack>
                         </motion.div>
                     </Grid>
+                </Grid>
                 </Grid>
             </Container>
         </Box>
