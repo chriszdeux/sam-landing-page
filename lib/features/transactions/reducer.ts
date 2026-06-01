@@ -19,11 +19,16 @@ const initialState: TransactionsState = {
 const transactionsSlice = createSlice({
     name: 'transactions',
     initialState,
-    reducers: {},
+    reducers: {
+        clearTransactionsError: (state) => {
+            state.error = null;
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchTransactions.pending, (state) => {
                  state.isLoading = true;
+                 state.error = null;
             })
             .addCase(fetchTransactions.fulfilled, (state, action) => {
                 state.isLoading = false;
@@ -31,7 +36,6 @@ const transactionsSlice = createSlice({
                 state.lastArgs = JSON.stringify(action.meta.arg);
                 const { storeId, data, page } = action.payload;
 
-                // Ensure the store object is initialized even if data is null
                 if (!state.byStoreBoxId[storeId]) {
                     state.byStoreBoxId[storeId] = {
                         id: storeId,
@@ -43,37 +47,44 @@ const transactionsSlice = createSlice({
                         transactionsTransferQueue: [],
                         startDate: new Date().toISOString(),
                         endDate: null,
-                        currentTransactionBlock: 0
+                        currentTransactionBlock: 0,
+                        fee: 0
                     };
                 }
 
-                if (!data || data === false) {
+                if (!data) {
                     console.warn('[TRANSACTIONS_REDUCER] No data received for storeId: ' + storeId);
                     return;
                 }
                 
-                // El backend devuelve { message: string, data: [] }
-                const newTransactions = Array.isArray(data?.data) ? data.data : [];
+                // Mapeo robusto: puede venir en data.data, data.transactions o ser el array directamente
+                let newTransactions: TransactionsInterface[] = [];
+                if (Array.isArray(data)) {
+                    newTransactions = data;
+                } else if (data && Array.isArray(data.data)) {
+                    newTransactions = data.data;
+                } else if (data && Array.isArray(data.transactions)) {
+                    newTransactions = data.transactions;
+                }
                 
                 if (page === 1) {
                     state.byStoreBoxId[storeId].transactions = newTransactions;
                 } else {
                     const existing = state.byStoreBoxId[storeId].transactions;
-                    // Evitar duplicados por ID
                     const existingIds = new Set(existing.map((t: TransactionsInterface) => t.id));
                     const uniqueNew = newTransactions.filter((t: TransactionsInterface) => !existingIds.has(t.id));
                     state.byStoreBoxId[storeId].transactions = [...existing, ...uniqueNew];
                 }
                 
                 state.byStoreBoxId[storeId].count = state.byStoreBoxId[storeId].transactions.length;
-
             })
             .addCase(fetchTransactions.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.payload as string;
+                state.error = action.payload as string || 'Error al obtener transacciones';
             });
     },
 });
 
 //# 4-Exportar reducer por defecto
+export const { clearTransactionsError } = transactionsSlice.actions;
 export default transactionsSlice.reducer;

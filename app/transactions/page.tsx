@@ -1,63 +1,44 @@
-// 1-Efecto secundario para sincronización del ciclo de vida
-// 2-Obtención del despachador para emitir acciones al store
-// 3-Obtención del despachador para emitir acciones al store
-// 4-Selección de datos desde el estado global de Redux
-// 5-Selección de datos desde el estado global de Redux
-// 6-Gestión de estado local para page
-// 7-Manejo de cambios en el input page
-// 8-Efecto secundario para sincronización del ciclo de vida
-// 9-Estructuración y renderizado visual del componente UI
-// 10-Estructuración y renderizado visual del componente UI
+"use client";
 
-'use client';
+import React, { useEffect, useState } from 'react';
+import { Container, CircularProgress, Box, Paper, Stack, Typography, IconButton } from '@mui/material';
+import { motion } from 'framer-motion';
+import { RefreshCw, Sensors, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
-//# 1-Efecto secundario para sincronización del ciclo de vida
-import React, { useEffect } from 'react';
-import { Container, CircularProgress, Box, Paper, Stack, Typography } from '@mui/material';
+// Hooks y Redux
+import { useAppDispatch, useAppSelector } from '../../lib/hooks';
+import { fetchTransactions } from '../../lib/features/transactions/actions';
+
+// Componentes
 import { Background } from '../../components/layout/Background';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import SearchIcon from '@mui/icons-material/Search';
-
-//# 2-Obtención del despachador para emitir acciones al store
-import { useAppDispatch, useAppSelector } from '../../lib/hooks';
-import { fetchTransactions } from '../../lib/features/transactions/actions';
 import { GenericTable } from '../../components/ui/GenericTable';
 import { transactionsPageColumns } from '../../components/market/transactionsPageColumns';
-import { TransactionsInterface } from '../../lib/features/transactions/types';
 import { TechFrame } from '../../components/ui/TechFrame';
 import { PageHeader } from '../../components/ui/PageHeader';
-import { Sensors } from "@mui/icons-material";
-import { motion } from "framer-motion";
 
 export default function TransactionsPage() {
-    
-    //# 3-Obtención del despachador para emitir acciones al store
     const dispatch = useAppDispatch();
+    const router = useRouter();
     
-    //# 4-Selección de datos desde el estado global de Redux
+    // Selectores de Estado
     const { selectedNetwork, networks } = useAppSelector((state) => state.blockchain);
-    const totalPowerMining = selectedNetwork?.blockchainProps?.totalPowerMining || 0;
-    
-    //# 5-Selección de datos desde el estado global de Redux
     const { byStoreBoxId, isLoading: loading, error } = useAppSelector((state) => state.transactions);
 
     const currentNetwork = networks.find(n => n.id === selectedNetwork?.id);
+    const storeId = selectedNetwork?.storeTransactionId || currentNetwork?.storeTransactionId;
     
-    const storeId = selectedNetwork?.storeTransactions?.transactionStoreID || currentNetwork?.storeTransactions?.transactionStoreID;
-    const rawData = storeId ? byStoreBoxId[storeId] : null;
-    let transactionData: TransactionsInterface[] = [];
-    
-    if (rawData?.transactions && Array.isArray(rawData.transactions)) {
-        transactionData = rawData.transactions;
-    }
-
-    
-    //# 6-Gestión de estado local para page
-    const [page, setPage] = React.useState(0);
-    const [walletSearch, setWalletSearch] = React.useState('');
-    const [appliedWalletFilter, setAppliedWalletFilter] = React.useState('');
+    // Estado Local
+    const [page, setPage] = useState(0);
+    const [walletSearch, setWalletSearch] = useState('');
+    const [appliedWalletFilter, setAppliedWalletFilter] = useState('');
     const pageSize = 10;
+
+    const rawData = storeId ? byStoreBoxId[storeId] : null;
+    const transactionData = rawData?.transactions || [];
 
     const handleSearch = () => {
         setAppliedWalletFilter(walletSearch);
@@ -67,9 +48,6 @@ export default function TransactionsPage() {
         }
     };
 
-    
-    
-    //# 7-Manejo de cambios en el input page
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -82,98 +60,42 @@ export default function TransactionsPage() {
     const hasMoreStats = transactionData.length >= (page + 1) * pageSize;
     const totalRows = hasMoreStats ? transactionData.length + pageSize : transactionData.length;
 
-    
-    
-    //# 8-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         if (storeId) {
             dispatch(fetchTransactions({ storeId, walletId: appliedWalletFilter, page: 1, limit: pageSize }));
         }
-    }, [storeId, dispatch, appliedWalletFilter, pageSize]);
+    }, [storeId, dispatch, appliedWalletFilter]);
 
     if (!selectedNetwork) {
-         
-         
-         //# 9-Estructuración y renderizado visual del componente UI
          return (
             <main className="min-h-screen relative w-full overflow-hidden flex items-center justify-center">
                 <Background />
                 <div className="relative z-10 text-center px-4">
-                     <h2 className="text-2xl font-bold text-gray-400">Por favor seleccione una red para ver las transacciones.</h2>
+                     <Typography variant="h5" sx={{ fontWeight: 900, color: 'rgba(255,255,255,0.3)', letterSpacing: 2 }}>
+                        POR FAVOR SELECCIONE UNA RED PARA VER LAS TRANSACCIONES
+                     </Typography>
+                     <Button variant="outlined" sx={{ mt: 4, color: '#00f3ff', borderColor: '#00f3ff' }} onClick={() => router.push('/portfolio')}>
+                        VOLVER AL PORTAFOLIO
+                     </Button>
                 </div>
             </main>
         );
     }
 
-    
-    
-    //# 10-Estructuración y renderizado visual del componente UI
     return (
-        <main className="min-h-screen relative w-full overflow-hidden">
+        <main className="min-h-screen relative w-full overflow-hidden pt-12 pb-10">
             <Background />
             
-            <Container maxWidth="xl" sx={{ pt: 16, pb: 10, position: 'relative', zIndex: 1 }}>
+            <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
                 
-                <PageHeader 
-                    title="Historial de Transacciones" 
-                    subtitle={`Red: ${currentNetwork?.identification?.name || selectedNetwork?.identification?.name || selectedNetwork.id} | Store ID: ${selectedNetwork?.storeTransactions?.transactionStoreID}`}
-                />
-
-                <Box sx={{ mb: 4, display: "flex", justifyContent: "center" }}>
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        <Paper sx={{
-                            p: 3,
-                            background: "rgba(0, 243, 255, 0.05)",
-                            border: "1px solid rgba(0, 243, 255, 0.2)",
-                            borderRadius: "16px",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 3,
-                            position: "relative",
-                            overflow: "hidden",
-                            boxShadow: "0 0 30px rgba(0, 243, 255, 0.1)",
-                        }}>
-                            <Box sx={{ 
-                                p: 1.5, 
-                                bgcolor: "rgba(0, 243, 255, 0.1)", 
-                                borderRadius: "12px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                border: "1px solid rgba(0, 243, 255, 0.3)"
-                            }}>
-                                <Sensors sx={{ color: "#00f3ff", fontSize: 32 }} className="pulse-animation" />
-                            </Box>
-                            <Box>
-                                <Typography variant="overline" sx={{ color: "#00f3ff", fontWeight: "bold", letterSpacing: 2, display: "block", lineHeight: 1, mb: 0.5 }}>
-                                    NETWORK MINING POWER
-                                </Typography>
-                                <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
-                                    <Typography variant="h3" sx={{ color: "#fff", fontWeight: 900, letterSpacing: -1, textShadow: "0 0 20px rgba(0, 243, 255, 0.5)" }}>
-                                        {(totalPowerMining || 0).toLocaleString('en-US')}
-                                    </Typography>
-                                    <Typography variant="h5" sx={{ color: "#00f3ff", fontWeight: "bold", opacity: 0.8 }}>
-                                        GH/s
-                                    </Typography>
-                                </Box>
-                            </Box>
-                            <Box sx={{ ml: "auto", display: { xs: "none", md: "block" } }}>
-                                <Stack direction="row" spacing={2}>
-                                    <Box sx={{ textAlign: "right" }}>
-                                        <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.4)", display: "block" }}>STATUS</Typography>
-                                        <Typography variant="body2" sx={{ color: "#00ff88", fontWeight: "bold", display: "flex", alignItems: "center", gap: 0.5 }}>
-                                            <Box component="span" sx={{ width: 8, height: 8, bgcolor: "#00ff88", borderRadius: "50%", display: "inline-block" }} />
-                                            ACTIVE
-                                        </Typography>
-                                    </Box>
-                                </Stack>
-                            </Box>
-                        </Paper>
-                    </motion.div>
+                <Box sx={{ mb: 6, display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <IconButton onClick={() => router.back()} sx={{ color: 'rgba(255,255,255,0.5)' }}>
+                        <ArrowLeft />
+                    </IconButton>
+                    <PageHeader 
+                        title="HISTORIAL DE TRANSACCIONES" 
+                        subtitle={"Red: " + (selectedNetwork.identification.name) + " | Store: " + (storeId || 'N/A')}
+                    />
                 </Box>
 
                 <TechFrame color="#00f3ff">
@@ -181,7 +103,7 @@ export default function TransactionsPage() {
                         <Input 
                             placeholder="Buscar por Wallet Address..." 
                             value={walletSearch}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWalletSearch(e.target.value)}
+                            onChange={(e: any) => setWalletSearch(e.target.value)}
                             fullWidth
                             sx={{ mb: 0 }}
                         />
@@ -189,20 +111,22 @@ export default function TransactionsPage() {
                             variant="contained" 
                             onClick={handleSearch}
                             startIcon={<SearchIcon />}
-                            sx={{ height: 48, minWidth: 120 }}
+                            sx={{ height: 48, minWidth: 140, fontWeight: 900 }}
                         >
                             BUSCAR
                         </Button>
                     </Box>
-                    <div className="w-full overflow-x-auto p-4">
+                    
+                    <Box sx={{ p: 2 }}>
                         {loading && transactionData.length === 0 ? (
-                             <div className="flex justify-center p-10">
+                             <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
                                  <CircularProgress color="primary" />
-                             </div>
+                             </Box>
                          ) : error ? (
-                             <div className="p-10 text-center">
-                                 <p className="text-red-500">{error}</p>
-                             </div>
+                             <Box sx={{ py: 10, textAlign: 'center' }}>
+                                 <Typography color="error">{error}</Typography>
+                                 <Button onClick={handleSearch} sx={{ mt: 2 }}>REINTENTAR</Button>
+                             </Box>
                          ) : (
                              <GenericTable 
                                 columns={transactionsPageColumns} 
@@ -215,19 +139,9 @@ export default function TransactionsPage() {
                                 totalRows={totalRows}
                              />
                          )}
-                    </div>
+                    </Box>
                 </TechFrame>
             </Container>
-            <style jsx global>{`
-                @keyframes pulse { 
-                    0% { opacity: 1; transform: scale(1); } 
-                    50% { opacity: 0.5; transform: scale(0.95); } 
-                    100% { opacity: 1; transform: scale(1); } 
-                }
-                .pulse-animation {
-                    animation: pulse 2s infinite ease-in-out;
-                }
-            `}</style>
         </main>
     );
 }

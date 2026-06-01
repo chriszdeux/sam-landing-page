@@ -1,9 +1,8 @@
 // 1-Definir propiedades de minería e información básica
 // 2-Definir información adicional y rangos de tarifas
 // 3-Definir estados y niveles de carga de la red
-// 4-Definir propiedades detalladas de la blockchain
-// 5-Definir interfaces para tokens, transacciones y pools
-// 6-Definir interfaz principal de la blockchain
+// 4-Definir interfaces para tokens y transacciones
+// 5-Definir interfaz principal de la blockchain
 
 //# 1-Definir propiedades de minería e información básica
 export interface MiningProps {
@@ -46,31 +45,7 @@ export enum NetworkLoadLevel {
   Congested = 'Congested'
 }
 
-//# 4-Definir propiedades detalladas de la blockchain
-export interface BlockchainProps {
-  miningProps?: MiningProps;
-  initialNodeCount: number;
-  nodeCount?: number;
-  blockCount?: number;
-  blockInterval: number;
-  runningProcess: boolean;
-  lastRunDate: string; 
-  difficulty: number;
-  fees?: FeeRange;
-  feeBase: number;
-  supportedAssets?: number;
-  circulatingSupply: number;
-  totalSupply: number;
-  maxSupply: number;
-  marketCap: number;
-  status?: BlockchainStatus;
-  operationStatus?: NetworkLoadLevel; 
-  totalPowerMining?: number;
-  energy?: number;
-  maxEnergy?: number;
-}
-
-//# 5-Definir interfaces para tokens, transacciones y pools
+//# 4-Definir interfaces para tokens y transacciones
 export interface CryptoGenesis {
   id: string;
   name: string;
@@ -86,26 +61,14 @@ export interface TokensSupported {
   tokens: TokenList[];
 }
 
-export interface TransactionsProps {
-  transactionStoreID: string;
-}
-
-export interface BlockchainPoolNetwork {
-    poolID: string;
-    
-}
-
-//# 6-Definir interfaz principal de la blockchain
+//# 5-Definir interfaz principal de la blockchain
 export interface BlockchainInterface {
   id: string;
   identification: BlockchainInfo;
   additionalInfo: AdditionalInfo;
-  blockchainProps: BlockchainProps;
-  poolNetwork?: BlockchainPoolNetwork[];
-  poolNetworkQueue?: BlockchainPoolNetwork[];
   cryptoGenesis: CryptoGenesis;
   tokensSupported?: TokensSupported;
-  storeTransactions: TransactionsProps;
   isActive: boolean;
   chain?: string;
+  storeTransactionId: string;
 }

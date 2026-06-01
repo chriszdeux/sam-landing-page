@@ -41,6 +41,7 @@ export default function FusionDashboard() {
     const [energy, setEnergy] = useState(0);
     const [maxEnergy, setMaxEnergy] = useState(100);
     const [labStats, setLabStats] = useState({ efficiency: 82, temperature: 38, uptime: 99.9 });
+    const [lastOpResults, setLastOpResults] = useState({ tokensEarned: 0, confirmedTxCount: 0 });
     const energyRef = useRef(0);
 
     // Inicialización de Datos
@@ -118,21 +119,32 @@ export default function FusionDashboard() {
         setIsInjecting(true);
         try {
             const amountToInject = Math.floor(energy);
-            const res = await api.post('/labs/' + labId + '/inject-power', {
+            const res = await api.post("/labs/" + labId + "/inject-power", {
                 blockchainId: selectedNetwork.id,
                 energyAmount: amountToInject
             });
             
-            // Reiniciar energía local tras inyección exitosa
-            setEnergy(0);
-            energyRef.current = 0;
-            
-            const newPower = res.data?.totalPowerMining || res.data?.networkPower || res.data?.data?.totalPowerMining;
-            if (newPower) {
-                dispatch(updateNetworkPower({ id: selectedNetwork.id, totalPowerMining: Number(newPower) }));
+            const data = res.data;
+            if (data.ok) {
+                // Actualizar estados con la respuesta real del servidor
+                setEnergy(data.labState.energy);
+                energyRef.current = data.labState.energy;
+                setLabStats({
+                    efficiency: data.labState.currentLife,
+                    temperature: data.labState.temperature,
+                    uptime: 99.9
+                });
+                setLastOpResults({
+                    tokensEarned: data.tokensEarned,
+                    confirmedTxCount: data.confirmedTxCount
+                });
+                
+                if (data.availablePower) {
+                    dispatch(updateNetworkPower({ id: selectedNetwork.id, totalPowerMining: data.availablePower }));
+                }
             }
         } catch (error) {
-            console.error('Error al inyectar poder', error);
+            console.error("Error al inyectar poder", error);
         } finally {
             setTimeout(() => setIsInjecting(false), 1000);
         }
@@ -257,11 +269,13 @@ export default function FusionDashboard() {
                                     maxPower={10000} 
                                     efficiency={labStats.efficiency} 
                                     temperature={labStats.temperature} 
-                                    uptime={labStats.uptime}
-                                    energyAvailable={energy}
-                                    maxEnergy={maxEnergy}
-                                    onInjectPower={handleInjectPower}
-                                    isInjecting={isInjecting}
+                                    uptime={labStats.uptime} 
+                                    energyAvailable={energy} 
+                                    maxEnergy={maxEnergy} 
+                                    tokensEarned={lastOpResults.tokensEarned} 
+                                    confirmedTxCount={lastOpResults.confirmedTxCount} 
+                                    onInjectPower={handleInjectPower} 
+                                    isInjecting={isInjecting} 
                                 />
                                 
                                 <Box>
