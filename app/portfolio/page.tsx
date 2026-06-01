@@ -215,7 +215,7 @@ export default function FusionDashboard() {
                                     <Box sx={{ maxWidth: '65%' }}>
                                         <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 900, letterSpacing: 2 }}>ACTIVO SELECCIONADO</Typography>
                                         <Tabs 
-                                            value={selectedCryptoId} 
+                                            value={selectedCryptoId || false} 
                                             onChange={(e, v) => setSelectedCryptoId(v)}
                                             variant="scrollable"
                                             scrollButtons="auto"
