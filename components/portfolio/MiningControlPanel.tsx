@@ -7,13 +7,20 @@ import { motion } from 'framer-motion';
 
 const CircularGauge = ({ value, maxValue, label, color, icon }: any) => {
     const percentage = Math.min((value / maxValue) * 100, 100);
+    const isHighPower = label === "Poder" && percentage > 90;
+
     return (
         <Box sx={{ position: 'relative', display: 'inline-flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Box sx={{ position: 'relative', mb: 1.5 }}>
+            <Box 
+                component={motion.div}
+                animate={isHighPower ? { x: [0, -1, 1, -1, 1, 0], y: [0, 1, -1, 1, -1, 0] } : {}}
+                transition={{ duration: 0.2, repeat: Infinity }}
+                sx={{ position: 'relative', mb: 1.5 }}
+            >
                 <CircularProgress variant="determinate" value={100} size={80} thickness={2} sx={{ color: 'rgba(255,255,255,0.05)' }} />
                 <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: -90, opacity: 1 }}
                     style={{ position: 'absolute', top: 0, left: 0 }}
                 >
                     <CircularProgress 
@@ -23,8 +30,10 @@ const CircularGauge = ({ value, maxValue, label, color, icon }: any) => {
                         thickness={3} 
                         sx={{ 
                             color: color, 
-                            filter: 'drop-shadow(0 0 8px ' + color + '44)',
-                            transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
+                            filter: 'drop-shadow(0 0 8px ' + color + '66)',
+                            '& .MuiCircularProgress-circle': {
+                                transition: 'stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
+                            }
                         }} 
                     />
                 </motion.div>
@@ -95,7 +104,7 @@ export const MiningControlPanel = ({
                             '& .MuiLinearProgress-bar': {
                                 bgcolor: '#00ff88',
                                 boxShadow: '0 0 15px #00ff8866',
-                                transition: 'transform 0.5s linear'
+                                transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
                             }
                         }} 
                     />
@@ -103,34 +112,42 @@ export const MiningControlPanel = ({
             </Box>
 
             {/* Resultados de Última Operación */}
-            <Box sx={{ 
-                p: 2, 
-                borderRadius: 4, 
-                bgcolor: 'rgba(0, 243, 255, 0.05)', 
-                border: '1px solid rgba(0, 243, 255, 0.1)' 
-            }}>
-                <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 900, mb: 1.5, display: 'block' }}>ÚLTIMA OPERACIÓN</Typography>
-                <Grid container spacing={2}>
-                    <Grid size={{ xs: 6 }}>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                            <Coins size={16} color="#ffd700" />
-                            <Box>
-                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', display: 'block', fontSize: '0.6rem' }}>GANADO</Typography>
-                                <Typography variant="body2" sx={{ fontWeight: 900, color: '#ffd700', fontSize: '0.8rem' }}>+{tokensEarned} SAM-G</Typography>
-                            </Box>
-                        </Stack>
+            <AnimatePresence mode="wait">
+                <Box 
+                    key={tokensEarned + confirmedTxCount}
+                    component={motion.div}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    sx={{ 
+                        p: 2, 
+                        borderRadius: 4, 
+                        bgcolor: 'rgba(0, 243, 255, 0.05)', 
+                        border: '1px solid rgba(0, 243, 255, 0.1)' 
+                    }}
+                >
+                    <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 900, mb: 1.5, display: 'block' }}>ÚLTIMA OPERACIÓN</Typography>
+                    <Grid container spacing={2}>
+                        <Grid size={{ xs: 6 }}>
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <Coins size={16} color="#ffd700" />
+                                <Box>
+                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', display: 'block', fontSize: '0.6rem' }}>GANADO</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 900, color: '#ffd700', fontSize: '0.8rem' }}>+{tokensEarned} SAM-G</Typography>
+                                </Box>
+                            </Stack>
+                        </Grid>
+                        <Grid size={{ xs: 6 }}>
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <CheckCircle size={16} color="#00ff88" />
+                                <Box>
+                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', display: 'block', fontSize: '0.6rem' }}>TX CONF.</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 900, color: '#00ff88', fontSize: '0.8rem' }}>{confirmedTxCount}</Typography>
+                                </Box>
+                            </Stack>
+                        </Grid>
                     </Grid>
-                    <Grid size={{ xs: 6 }}>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                            <CheckCircle size={16} color="#00ff88" />
-                            <Box>
-                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', display: 'block', fontSize: '0.6rem' }}>TX CONF.</Typography>
-                                <Typography variant="body2" sx={{ fontWeight: 900, color: '#00ff88', fontSize: '0.8rem' }}>{confirmedTxCount}</Typography>
-                            </Box>
-                        </Stack>
-                    </Grid>
-                </Grid>
-            </Box>
+                </Box>
+            </AnimatePresence>
 
             {/* Módulo de Energía e Inyección */}
             <Box sx={{ 
@@ -148,18 +165,32 @@ export const MiningControlPanel = ({
                     
                     <Box sx={{ position: 'relative', height: 40, bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 2, overflow: 'hidden', border: '1px solid rgba(255, 183, 0, 0.1)' }}>
                         <motion.div
-                            initial={{ width: 0 }}
                             animate={{ width: energyPercentage + '%' }}
+                            transition={{ duration: 0.3 }}
                             style={{ 
                                 height: '100%', 
                                 background: 'linear-gradient(90deg, rgba(255, 183, 0, 0.2) 0%, rgba(255, 183, 0, 0.6) 100%)',
                                 boxShadow: '0 0 20px rgba(255, 183, 0, 0.2)'
                             }}
                         />
+                        {energyPercentage > 0 && !isInjecting && (
+                            <motion.div
+                                animate={{ left: ['-100%', '100%'] }}
+                                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                style={{
+                                    position: 'absolute', top: 0, width: '30%', height: '100%',
+                                    background: 'linear-gradient(90deg, transparent, rgba(255, 183, 0, 0.4), transparent)',
+                                    pointerEvents: 'none'
+                                }}
+                            />
+                        )}
                     </Box>
 
                     <Box sx={{ position: 'relative' }}>
                         <MuiButton 
+                            component={motion.button}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.95 }}
                             fullWidth 
                             variant="contained"
                             onClick={onInjectPower}
@@ -173,10 +204,10 @@ export const MiningControlPanel = ({
                                 borderRadius: 3,
                                 bgcolor: 'rgba(255, 183, 0, 0.9)',
                                 color: 'black',
-                                '&:hover': { bgcolor: '#ffb700', transform: 'translateY(-2px)' },
+                                '&:hover': { bgcolor: '#ffb700' },
                                 '&:disabled': { bgcolor: 'rgba(255, 183, 0, 0.3)', color: 'rgba(0,0,0,0.5)' },
                                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                boxShadow: '0 0 20px rgba(255, 183, 0, 0.4)'
+                                boxShadow: energyAvailable >= 10 ? '0 0 20px rgba(255, 183, 0, 0.4)' : 'none'
                             }}
                         >
                             {isInjecting ? 'INYECTANDO...' : energyAvailable < 10 ? 'CARGANDO...' : 'INYECTAR PODER'}
@@ -184,7 +215,7 @@ export const MiningControlPanel = ({
                         {!isInjecting && energyAvailable >= 10 && (
                             <Box 
                                 component={motion.div}
-                                animate={{ opacity: [0.4, 0.8, 0.4], scale: [1, 1.02, 1] }}
+                                animate={{ opacity: [0.4, 0.8, 0.4], scale: [1, 1.05, 1] }}
                                 transition={{ duration: 2, repeat: Infinity }}
                                 sx={{ 
                                     position: 'absolute', top: -4, left: -4, right: -4, bottom: -4, 

@@ -1,10 +1,10 @@
 "use client";
 
-import React from 'react';
-import { Box, Typography, Stack, Button as MuiButton, Divider } from '@mui/material';
-import { TechFrame } from '../ui/TechFrame';
+import React, { useEffect, useState, useRef } from 'react';
+import { Box, Typography, Stack, Button as MuiButton } from '@mui/material';
 import { TaoIcon } from '../ui/TaoIcon';
 import { ArrowUpRight, Wallet, Copy } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface BalancesPanelProps {
     thaoBalance: number;
@@ -16,6 +16,33 @@ interface BalancesPanelProps {
     onBuy?: () => void;
     onSell?: () => void;
 }
+
+const AnimatedNumber = ({ value }: { value: number }) => {
+    const [displayValue, setDisplayValue] = useState(value);
+    const prevValueRef = useRef(value);
+
+    useEffect(() => {
+        const start = prevValueRef.current;
+        const end = value;
+        const duration = 1000;
+        let startTime: number | null = null;
+
+        const animate = (timestamp: number) => {
+            if (!startTime) startTime = timestamp;
+            const progress = Math.min((timestamp - startTime) / duration, 1);
+            const current = start + (end - start) * progress;
+            setDisplayValue(current);
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            }
+        };
+
+        requestAnimationFrame(animate);
+        prevValueRef.current = value;
+    }, [value]);
+
+    return <span>{displayValue.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 })}</span>;
+};
 
 export const BalancesPanel: React.FC<BalancesPanelProps> = ({ 
     thaoBalance, 
@@ -55,7 +82,7 @@ export const BalancesPanel: React.FC<BalancesPanelProps> = ({
                 
                 <Stack direction="row" alignItems="baseline" spacing={1} sx={{ mt: 2 }}>
                     <Typography variant="h3" sx={{ color: 'white', fontWeight: 900, textShadow: '0 0 15px rgba(0, 243, 255, 0.5)' }}>
-                        {thaoBalance.toLocaleString()}
+                        <AnimatedNumber value={thaoBalance} />
                     </Typography>
                     <TaoIcon size={24} color="#00f3ff" />
                 </Stack>
@@ -92,6 +119,9 @@ export const BalancesPanel: React.FC<BalancesPanelProps> = ({
                 </Stack>
                 
                 <Box 
+                    component={motion.div}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={handleCopy}
                     sx={{ 
                         p: 1.5, borderRadius: 2, bgcolor: 'rgba(0,0,0,0.3)', 
@@ -125,7 +155,7 @@ export const BalancesPanel: React.FC<BalancesPanelProps> = ({
                 
                 <Stack direction="row" alignItems="baseline" spacing={1} sx={{ mt: 1 }}>
                     <Typography variant="h4" sx={{ color: 'white', fontWeight: 900 }}>
-                        {cryptoBalance.toLocaleString()}
+                        <AnimatedNumber value={cryptoBalance} />
                     </Typography>
                     <TaoIcon size={20} color="#ffd700" />
                 </Stack>
@@ -139,6 +169,9 @@ export const BalancesPanel: React.FC<BalancesPanelProps> = ({
                 
                 <Stack spacing={2}>
                     <MuiButton 
+                        component={motion.button}
+                        whileHover={{ scale: 1.02, translateY: -2 }}
+                        whileTap={{ scale: 0.98 }}
                         fullWidth 
                         onClick={onBuy}
                         sx={{ 
@@ -156,6 +189,9 @@ export const BalancesPanel: React.FC<BalancesPanelProps> = ({
                         COMPRAR ACTIVOS
                     </MuiButton>
                     <MuiButton 
+                        component={motion.button}
+                        whileHover={{ scale: 1.02, translateY: -2 }}
+                        whileTap={{ scale: 0.98 }}
                         fullWidth 
                         onClick={onSell}
                         sx={{ 

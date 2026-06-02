@@ -31,7 +31,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({ storeId, w
     }, [storeId, walletId, dispatch]);
 
     const getStatusInfo = (status: string) => {
-        const s = status.toUpperCase();
+        const s = status?.toUpperCase() || '';
         if (s === 'CONFIRMED') return { color: '#00ff88', label: 'CONFIRMADO' };
         if (s === 'PENDING') return { color: '#ffd700', label: 'PENDIENTE' };
         return { color: '#ff0055', label: 'FALLIDO' };
@@ -57,7 +57,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({ storeId, w
     return (
         <Box sx={{ maxHeight: 400, overflowY: 'auto', p: 1 }}>
             <Stack spacing={1}>
-                <AnimatePresence>
+                <AnimatePresence initial={false}>
                     {transactionsData.map((tx: any, idx: number) => {
                         const isBuy = tx.transactionType === TransactionType.BUY || tx.transactionType === 'BUY';
                         const status = getStatusInfo(tx.status);
@@ -65,9 +65,14 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({ storeId, w
                         return (
                             <motion.div
                                 key={tx.id || idx}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: idx * 0.05 }}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ 
+                                    type: "spring",
+                                    stiffness: 100,
+                                    damping: 15,
+                                    delay: idx * 0.05 
+                                }}
                             >
                                 <Box sx={{ 
                                     p: 2, 
@@ -87,20 +92,20 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({ storeId, w
                                                 {isBuy ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
                                             </Box>
                                             <Box>
-                                                <Typography variant="body2" sx={{ fontWeight: 900, color: 'white' }}>
-                                                    {isBuy ? 'COMPRA' : 'VENTA'} {tx.financialInfo?.symbol}
+                                                <Typography variant="body2" sx={{ color: 'white', fontWeight: 900 }}>
+                                                    {isBuy ? 'COMPRA' : 'VENTA'}
                                                 </Typography>
-                                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>
-                                                    {tx.id?.substring(0, 8)}...
+                                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontWeight: 'bold' }}>
+                                                    {new Date(tx.timestamp || tx.dateCreated).toLocaleDateString()}
                                                 </Typography>
                                             </Box>
                                         </Stack>
                                         
                                         <Box sx={{ textAlign: 'right' }}>
-                                            <Typography variant="body2" sx={{ fontWeight: 900, color: isBuy ? '#00ff88' : '#ff0055' }}>
-                                                {isBuy ? '+' : '-'}{tx.financialInfo?.quantity.toLocaleString()}
+                                            <Typography variant="body2" sx={{ color: isBuy ? '#00ff88' : '#ff0055', fontWeight: 900 }}>
+                                                {isBuy ? '+' : '-'}{tx.amount || tx.quantity} THAO
                                             </Typography>
-                                            <Typography variant="caption" sx={{ color: status.color, fontWeight: 'bold', fontSize: '0.6rem' }}>
+                                            <Typography variant="caption" sx={{ color: status.color, fontWeight: 900, fontSize: '0.65rem' }}>
                                                 {status.label}
                                             </Typography>
                                         </Box>
@@ -110,12 +115,6 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({ storeId, w
                         );
                     })}
                 </AnimatePresence>
-                
-                {transactionsData.length === 0 && (
-                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.2)', textAlign: 'center', py: 4, display: 'block' }}>
-                        NO SE DETECTARON TRANSACCIONES RECIENTES
-                    </Typography>
-                )}
             </Stack>
         </Box>
     );
