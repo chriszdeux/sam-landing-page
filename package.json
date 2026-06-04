@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest"
+    "test": "vitest",
+    "ia": "npx tsx scripts/ia_orchestrator.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
