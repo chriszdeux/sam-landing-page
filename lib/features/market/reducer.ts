@@ -93,8 +93,9 @@ const marketSlice = createSlice({
 
             .addCase(fetchCryptoHistory.rejected, (state, action) => {
                  state.isLoading = false;
-                 state.error = action.payload as string;
-                 console.error('History fetch failed', action.payload);
+                 if (action.meta.aborted || action.error.name === "AbortError" || action.error.name === "CanceledError") return;
+                 state.error = (action.payload as string) || action.error.message || "History fetch failed";
+                 console.warn("History fetch failed:", state.error);
             });
     },
 });
