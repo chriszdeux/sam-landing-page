@@ -1,4 +1,4 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import uiReducer from './features/uiSlice';
 import gameReducer from './features/gameSlice';
 import authReducer from './features/auth/reducer';
@@ -7,21 +7,26 @@ import marketReducer from './features/market/reducer';
 import blockchainReducer from './features/blockchain/reducer';
 import transactionsReducer from './features/transactions/reducer';
 import spaceReducer from './features/space/reducer';
+import labsReducer from './features/labs/reducer';
+
+const rootReducer = combineReducers({
+  ui: uiReducer,
+  game: gameReducer,
+  auth: authReducer,
+  economy: economyReducer,
+  market: marketReducer,
+  blockchain: blockchainReducer,
+  transactions: transactionsReducer,
+  space: spaceReducer,
+  reducerLabs: labsReducer,
+});
 
 export const makeStore = (preloadedState?: any) => {
   return configureStore({
-    reducer: {
-      ui: uiReducer,
-      game: gameReducer,
-      auth: authReducer,
-      economy: economyReducer,
-      market: marketReducer,
-      blockchain: blockchainReducer,
-      transactions: transactionsReducer,
-      space: spaceReducer,
-    },
+    reducer: rootReducer,
     preloadedState,
     devTools: {
+
         actionSanitizer: (action) => {
             const typedAction = action as { type: string; payload?: unknown };
             return (typedAction.type === 'auth/login/fulfilled' && typedAction.payload 
