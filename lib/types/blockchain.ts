@@ -7,9 +7,9 @@
 
 //# 1-Definir propiedades de minería e información básica
 export interface MiningProps {
-  baseWorkRequired: number; 
-  workIncreaseFactor: number; 
-  rewardReductionFactor: number; 
+  baseWorkRequired: number;
+  workIncreaseFactor: number;
+  rewardReductionFactor: number;
 }
 
 export interface BlockchainInfo {
@@ -22,8 +22,8 @@ export interface BlockchainInfo {
 export interface AdditionalInfo {
   description: string[];
   color: string;
-  dateCreated: string; 
-  lastUpdated?: string; 
+  dateCreated: string;
+  lastUpdated?: string;
   developers: string[];
 }
 
@@ -54,7 +54,7 @@ export interface BlockchainProps {
   blockCount?: number;
   blockInterval: number;
   runningProcess: boolean;
-  lastRunDate: string; 
+  lastRunDate: string;
   difficulty: number;
   fees?: FeeRange;
   feeBase: number;
@@ -64,7 +64,7 @@ export interface BlockchainProps {
   maxSupply: number;
   marketCap: number;
   status?: BlockchainStatus;
-  operationStatus?: NetworkLoadLevel; 
+  operationStatus?: NetworkLoadLevel;
   totalPowerMining?: number;
   energy?: number;
   maxEnergy?: number;
@@ -87,12 +87,12 @@ export interface TokensSupported {
 }
 
 export interface TransactionsProps {
-  transactionStoreID: string;
+  storeTransactionId: string;
 }
 
 export interface BlockchainPoolNetwork {
-    poolID: string;
-    
+  poolID: string;
+
 }
 
 //# 6-Definir interfaz principal de la blockchain
@@ -104,7 +104,7 @@ export interface BlockchainInterface {
   poolNetwork?: BlockchainPoolNetwork[];
   poolNetworkQueue?: BlockchainPoolNetwork[];
   cryptoGenesis: CryptoGenesis;
-  tokensSupported?: TokensSupported;
+  storeTransactionId: string;
   storeTransactions: TransactionsProps;
   isActive: boolean;
   chain?: string;
