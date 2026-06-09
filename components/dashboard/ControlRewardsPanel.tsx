@@ -3,30 +3,22 @@
 import React, { useEffect } from 'react';
 import { Box, Typography, Switch, Stack, Button } from '@mui/material';
 import { motion } from 'framer-motion';
-import { PowerSettingsNew, History, CardGiftcard } from '@mui/icons-material';
+import { PowerSettingsNew, History, CardGiftcard, Bolt } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
-import { toggleLabStatus } from '../../lib/features/labs/actions';
+import { toggleLabStatus, injectPower, fetchLabData } from '../../lib/features/labs/actions';
 import { toggleLaboratoryPower } from '../../lib/features/labs/reducer';
 import { TechFrame } from '../ui/TechFrame';
 import { RootState } from '../../lib/store';
 import { fetchTransactions } from '../../lib/features/transactions/actions';
 import { useRouter } from 'next/navigation';
 
-interface Transaction {
-    transactionType: string;
-    dateCreated: string;
-    financialInfo: {
-        amount: number;
-    };
-}
-
 export const ControlRewardsPanel = () => {
     const dispatch = useAppDispatch();
     const router = useRouter();
     const { userInfo } = useAppSelector((state) => state.auth);
     const { currentLab, isPoweredOn } = useAppSelector((state: RootState) => state.reducerLabs);
-    const { byStoreBoxId } = useAppSelector((state) => state.transactions);
-    const { selectedNetwork, networks } = useAppSelector((state) => state.blockchain);
+    const { transactions } = useAppSelector((state: RootState) => state.transactions);
+    const { selectedNetwork, networks } = useAppSelector((state: RootState) => state.blockchain);
     
     const isActive = isPoweredOn;
     const energy = currentLab?.energy || 0;
@@ -34,17 +26,16 @@ export const ControlRewardsPanel = () => {
     const energyPercentage = (energy / maxEnergy) * 100;
 
     const currentNetwork = networks.find(n => n.id === selectedNetwork?.id);
-    const storeId = selectedNetwork?.storeTransactions?.transactionStoreID || currentNetwork?.storeTransactions?.transactionStoreID;
+    const storeId = selectedNetwork?.storeTransactions?.storeTransactionId || selectedNetwork?.storeTransactionId || currentNetwork?.storeTransactionId;
     const walletId = userInfo?.wallets?.[0]?.walletAddress;
 
     useEffect(() => {
         if (storeId) {
-            dispatch(fetchTransactions({ storeId, walletId, limit: 5 }));
+            dispatch(fetchTransactions({ storeId, walletId, transactionIds: userInfo?.transactionsIDs, limit: 5 }));
         }
-    }, [dispatch, storeId, walletId]);
+    }, [dispatch, storeId, walletId, userInfo?.transactionsIDs]);
 
-    const transactions = (storeId ? byStoreBoxId[storeId]?.transactions : []) || [];
-    const recentTransactions = transactions.slice(0, 5) as Transaction[];
+    const recentTransactions = transactions.slice(0, 5);
 
     const handleToggle = () => {
         dispatch(toggleLaboratoryPower());
@@ -53,6 +44,26 @@ export const ControlRewardsPanel = () => {
                 labId: currentLab.id, 
                 status: !isPoweredOn ? 'ACTIVE' : 'INACTIVE' 
             }));
+        }
+    };
+
+    const handleInjectPower = async () => {
+        const labId = currentLab?.id || userInfo?.idLabs?.[0];
+        const blockchainId = selectedNetwork?.id || networks[0]?.id;
+
+        if (labId && blockchainId) {
+            const result = await dispatch(injectPower({
+                labId,
+                blockchainId,
+                energyAmount: 10
+            }));
+            
+            if (injectPower.fulfilled.match(result)) {
+                // Refresh lab data to show updated energy/temperature
+                dispatch(fetchLabData(labId));
+            }
+        } else {
+            console.warn("[ControlRewardsPanel] Missing IDs for power injection:", { labId, blockchainId });
         }
     };
 
@@ -92,7 +103,7 @@ export const ControlRewardsPanel = () => {
                         />
                     </Box>
 
-                    <Box>
+                    <Box sx={{ mb: 2 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 'bold' }}>
                                 RESERVA DE ENERGÍA
@@ -119,6 +130,27 @@ export const ControlRewardsPanel = () => {
                             />
                         </Box>
                     </Box>
+
+                    <Button
+                        variant="outlined"
+                        fullWidth
+                        size="small"
+                        startIcon={<Bolt />}
+                        onClick={handleInjectPower}
+                        disabled={energy < 10}
+                        sx={{
+                            color: '#ffd700',
+                            borderColor: 'rgba(255, 215, 0, 0.3)',
+                            fontWeight: 'bold',
+                            fontSize: '0.7rem',
+                            '&:hover': {
+                                borderColor: '#ffd700',
+                                bgcolor: 'rgba(255, 215, 0, 0.05)'
+                            }
+                        }}
+                    >
+                        INYECTAR ENERGÍA (10 EP)
+                    </Button>
                 </Box>
             </TechFrame>
 
@@ -135,7 +167,7 @@ export const ControlRewardsPanel = () => {
                     <Stack spacing={1}>
                         {recentTransactions.length > 0 ? (
                             recentTransactions.map((tx, i) => (
-                                <Box key={i} sx={{ 
+                                <Box key={tx.id || i} sx={{ 
                                     p: 1.5, 
                                     bgcolor: 'rgba(255,255,255,0.02)', 
                                     borderRadius: 1,
