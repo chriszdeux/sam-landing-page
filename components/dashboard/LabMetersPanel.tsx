@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useAppSelector } from '../../lib/hooks';
 import { TechFrame } from '../ui/TechFrame';
@@ -17,17 +17,16 @@ interface MeterProps {
 }
 
 const Meter = ({ label, value, max, unit = '', color, description }: MeterProps) => {
-    const [displayValue, setDisplayValue] = React.useState(0);
+    const [displayValue, setDisplayValue] = useState(0);
     const percentage = Math.min(Math.max((displayValue / max) * 100, 0), 100);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const controls = animate(displayValue, value, {
             duration: 2,
             ease: "easeOut",
             onUpdate: (latest) => setDisplayValue(latest)
         });
         return () => controls.stop();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [value]);
     
     return (
@@ -79,6 +78,7 @@ const Meter = ({ label, value, max, unit = '', color, description }: MeterProps)
 export const LabMetersPanel = () => {
     const { currentLab, isPoweredOn } = useAppSelector((state: RootState) => state.reducerLabs);
     
+    // Values are 0 if powered off
     const temperature = isPoweredOn ? (currentLab?.temperature || 0) : 0;
     const maxTemp = currentLab?.maxTemperature || 80;
     const efficiency = isPoweredOn ? (currentLab?.efficiency || 0) : 0;

@@ -33,11 +33,19 @@ export const fetchWalletDetails = createAsyncThunk(
   'auth/fetchWalletDetails',
   async (walletId: string, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/blockchain/wallets/${walletId}`);
+      const response = await api.get('/blockchain/wallets/' + walletId);
       return { walletId, data: response.data };
     } catch (err: unknown) {
       const message = (err as { message?: string })?.message || 'Failed to fetch wallet details';
       return rejectWithValue(message);
+    }
+  },
+  {
+    condition: (walletId, { getState }) => {
+      const { auth } = getState() as { auth: { status: string; walletsInfo: any } };
+      if (auth.status === 'loading' || (auth.walletsInfo && auth.walletsInfo.walletAddress === walletId)) {
+        return false;
+      }
     }
   }
 );
@@ -51,7 +59,7 @@ export const login = createAsyncThunk(
         localStorage.setItem('token', data.token);
         
         
-        const encoded = btoa(`${credentials.email}:${credentials.password}`);
+        const encoded = btoa(credentials.email + ':' + credentials.password);
         localStorage.setItem('_c', encoded);
       }
       return data;
@@ -87,7 +95,7 @@ export const checkAuth = createAsyncThunk(
                 }
                 return data;
             } catch (e) {
-                console.error("Auto-login failed", e);
+                console.error('Auto-login failed', e);
                 
                 return rejectWithValue('Auto-login failed');
             }
@@ -128,47 +136,28 @@ export const validateAccount = createAsyncThunk(
   }
 );
 
-export const connectWallet = createAsyncThunk(
-  'auth/connectWallet',
-  async (_, { rejectWithValue }) => {
-    try {
-      if (typeof window.ethereum !== 'undefined') {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        return accounts[0];
-      } else {
-        return rejectWithValue('MetaMask is not installed');
-      }
-    } catch (err: unknown) {
-      const message = (err as { message?: string })?.message || 'Failed to connect wallet';
-      return rejectWithValue(message);
-    }
-  }
-);
-
 export const addWallet = createAsyncThunk(
   'auth/addWallet',
-  async (walletData: { userId: string; label: string; walletAddress: string }, { rejectWithValue }) => {
-    const { userId, ...data } = walletData;
+  async (data: { walletAddress: string, blockchainId: string }, { rejectWithValue }) => {
     try {
-      const response = await api.put(`/users/${userId}/add-wallet`, data);
-      return { ...data, message: response.data?.message || 'Wallet added successfully' };
+      const response = await api.post('/blockchain/wallets', data);
+      return response.data;
     } catch (err: unknown) {
-      const errorMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to add wallet';
-      return rejectWithValue(errorMsg);
+      const message = (err as { message?: string })?.message || 'Failed to add wallet';
+      return rejectWithValue(message);
     }
   }
 );
 
 export const removeWallet = createAsyncThunk(
   'auth/removeWallet',
-  async (walletData: { userId: string; walletAddress: string }, { rejectWithValue }) => {
-    const { userId, walletAddress } = walletData;
+  async (walletId: string, { rejectWithValue }) => {
     try {
-      const response = await api.put(`/users/${userId}/remove-wallet`, { walletAddress });
-      return { walletAddress, message: response.data?.message || 'Wallet removed successfully' };
+      await api.delete('/blockchain/wallets/' + walletId);
+      return walletId;
     } catch (err: unknown) {
-      const errorMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to remove wallet';
-      return rejectWithValue(errorMsg);
+      const message = (err as { message?: string })?.message || 'Failed to remove wallet';
+      return rejectWithValue(message);
     }
   }
 );

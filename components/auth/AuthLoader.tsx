@@ -25,16 +25,14 @@ export const AuthLoader = ({ children }: { children: React.ReactNode }) => {
     }, [dispatch]);
 
     //# 4-Efecto para sincronizar detalles de la billetera
+    const firstWalletAddress = userInfo?.wallets?.[0]?.walletAddress;
+    const hasDetails = !!userInfo?.wallets?.[0]?.details;
+
     useEffect(function syncWalletDetails() {
-        if (userInfo) {
-            if (userInfo.wallets && userInfo.wallets.length > 0) {
-               const primaryWallet = userInfo.wallets[0];
-               if (!primaryWallet.details) {
-                    dispatch(fetchWalletDetails(primaryWallet.walletAddress));
-               }
-           }
+        if (firstWalletAddress && !hasDetails) {
+            dispatch(fetchWalletDetails(firstWalletAddress));
         }
-    }, [userInfo, dispatch]);
+    }, [firstWalletAddress, hasDetails, dispatch]);
 
     //# 5-Renderizar los componentes hijos contenidos
     return <>{children}</>;

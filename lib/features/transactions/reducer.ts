@@ -1,25 +1,41 @@
-// 1-Importar tipos y acciones
-// 2-Definir estado inicial de transacciones
-// 3-Crear slice con reducers para manejo de datos
-// 4-Exportar reducer por defecto
-
-//# 1-Importar tipos y acciones
 import { createSlice } from '@reduxjs/toolkit';
-import { TransactionsState, TransactionsInterface } from './types';
+import { TransactionsInterface } from './types';
 import { fetchTransactions } from './actions';
 
-//# 2-Definir estado inicial de transacciones
+export interface TransactionsState {
+    transactions: TransactionsInterface[];
+    isLoading: boolean;
+    error: string | null;
+    total: number;
+    cache: Record<number, TransactionsInterface[]>;
+    lastFetch?: number;
+    lastArgs?: string;
+}
+
 const initialState: TransactionsState = {
-    byStoreBoxId: {},
+    transactions: [],
     isLoading: false,
     error: null,
+    total: 0,
+    cache: {},
 };
 
-//# 3-Crear slice con reducers para manejo de datos
 const transactionsSlice = createSlice({
     name: 'transactions',
     initialState,
-    reducers: {},
+    reducers: {
+        clearTransactions: (state) => {
+            state.transactions = [];
+            state.cache = {};
+            state.total = 0;
+        },
+        setTransactionsFromCache: (state, action) => {
+            const page = action.payload;
+            if (state.cache[page]) {
+                state.transactions = state.cache[page];
+            }
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchTransactions.pending, (state) => {
@@ -29,44 +45,19 @@ const transactionsSlice = createSlice({
                 state.isLoading = false;
                 state.lastFetch = Date.now();
                 state.lastArgs = JSON.stringify(action.meta.arg);
-                const { storeId, data, page } = action.payload;
-
-                // Ensure the store object is initialized even if data is null
-                if (!state.byStoreBoxId[storeId]) {
-                    state.byStoreBoxId[storeId] = {
-                        id: storeId,
-                        blockchainID: 'unknown',
-                        transactions: [],
-                        count: 0,
-                        transactionsBuyQueue: [],
-                        transactionsSellQueue: [],
-                        transactionsTransferQueue: [],
-                        startDate: new Date().toISOString(),
-                        endDate: null,
-                        currentTransactionBlock: 0
-                    };
-                }
+                const { data, page } = action.payload;
 
                 if (!data || data === false) {
-                    console.warn('[TRANSACTIONS_REDUCER] No data received for storeId: ' + storeId);
+                    console.warn('[TRANSACTIONS_REDUCER] No data received');
                     return;
                 }
                 
-                // El backend devuelve { message: string, data: [] }
                 const newTransactions = Array.isArray(data?.data) ? data.data : [];
+                state.total = data?.pagination?.total || 0;
                 
-                if (page === 1) {
-                    state.byStoreBoxId[storeId].transactions = newTransactions;
-                } else {
-                    const existing = state.byStoreBoxId[storeId].transactions;
-                    // Evitar duplicados por ID
-                    const existingIds = new Set(existing.map((t: TransactionsInterface) => t.id));
-                    const uniqueNew = newTransactions.filter((t: TransactionsInterface) => !existingIds.has(t.id));
-                    state.byStoreBoxId[storeId].transactions = [...existing, ...uniqueNew];
-                }
-                
-                state.byStoreBoxId[storeId].count = state.byStoreBoxId[storeId].transactions.length;
-
+                // Store in cache and update current transactions
+                state.cache[page] = newTransactions;
+                state.transactions = newTransactions;
             })
             .addCase(fetchTransactions.rejected, (state, action) => {
                 state.isLoading = false;
@@ -75,5 +66,5 @@ const transactionsSlice = createSlice({
     },
 });
 
-//# 4-Exportar reducer por defecto
+export const { clearTransactions, setTransactionsFromCache } = transactionsSlice.actions;
 export default transactionsSlice.reducer;

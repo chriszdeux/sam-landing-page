@@ -56,14 +56,7 @@ export const Navbar = () => {
   
   
   //# 4-Efecto para sincronizar detalles de la billetera y polling de poder
-  React.useEffect(function syncWalletData() {
-      if (userInfo && userInfo.wallets && userInfo.wallets.length > 0) {
-          const primaryWallet = userInfo.wallets[0];
-          if (!walletsInfo) {
-               dispatch(fetchWalletDetails(primaryWallet.walletAddress));
-          }
-      }
-  }, [userInfo, dispatch, walletsInfo]);
+
 
   React.useEffect(() => {
     // Polling every 5 minutes (300,000 ms) - No initial call as per PM requirement
