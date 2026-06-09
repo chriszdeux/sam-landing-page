@@ -36,7 +36,15 @@ export default function DashboardPage() {
         <main className="min-h-screen relative flex items-center justify-center overflow-hidden bg-[#0a0a0a]">
             <Background />
             
-            <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 10 }}>
+            <Container maxWidth="xl" sx={{ 
+                position: 'relative', 
+                zIndex: 10,
+                py: { xs: 12, md: 8 },
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                minHeight: '100vh'
+            }}>
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}

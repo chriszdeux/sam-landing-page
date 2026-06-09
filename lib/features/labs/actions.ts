@@ -11,6 +11,14 @@ export const fetchLabData = createAsyncThunk(
       const error = err as { response?: { data?: { message?: string } } };
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch lab data');
     }
+  },
+  {
+    condition: (labId, { getState }) => {
+      const { reducerLabs } = getState() as { reducerLabs: { status: string; currentLab: any } };
+      if (reducerLabs.status === 'loading' || (reducerLabs.currentLab && reducerLabs.currentLab.id === labId)) {
+        return false;
+      }
+    }
   }
 );
 

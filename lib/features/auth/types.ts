@@ -40,7 +40,8 @@ export interface User {
   birthday: string;
   confirmedAccount: boolean;
   isBanned: boolean;
-  transactions: unknown[]; 
+  transactions: unknown[];
+  transactionsIDs?: string[]; 
   idLabs?: string[];
   wallets: Wallet[];
   walletsSaved: Wallet[];
