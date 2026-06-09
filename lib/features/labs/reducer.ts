@@ -36,8 +36,6 @@ const labsSlice = createSlice({
       .addCase(fetchLabData.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.currentLab = action.payload;
-        // Sync isPoweredOn with operationStatus from server if needed, 
-        // but prompt implies manual toggle. Let's keep it manual as requested.
         if (action.payload.operationStatus === 'ACTIVE') {
           state.isPoweredOn = true;
         }
@@ -54,8 +52,15 @@ const labsSlice = createSlice({
         }
       })
       .addCase(injectPower.fulfilled, (state, action) => {
-        if (state.currentLab && action.payload.labState) {
-          state.currentLab = { ...state.currentLab, ...action.payload.labState };
+        // More flexible payload handling
+        const labData = action.payload.laboratory || action.payload.labState || action.payload;
+        if (state.currentLab && labData) {
+          // If the payload is just the energy number (some APIs do this)
+          if (typeof labData === 'number') {
+            state.currentLab.energy = labData;
+          } else if (typeof labData === 'object') {
+            state.currentLab = { ...state.currentLab, ...labData };
+          }
         }
       });
   },
