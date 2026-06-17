@@ -63,7 +63,6 @@ export const TransactionForm = ({
                         value={form.cryptoId}
                         onChange={onChange}
                         fullWidth
-                        disabled
                         containerSx={{
                             '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
                             mb: 3
@@ -189,6 +188,9 @@ export const TransactionForm = ({
                                 + {(form.quantity * (selectedCrypto?.financial.price || 0)).toLocaleString()} <TaoIcon size={20} />
                             </Typography>
                         )}
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'block', mt: 1, fontStyle: 'italic' }}>
+                            * Costo de Hash estimado por dificultad
+                        </Typography>
                     </Box>
                 </Box>
             </Box>

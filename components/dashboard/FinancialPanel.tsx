@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Box, Typography, Stack, Avatar, Button } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -8,20 +8,26 @@ import { useAppSelector } from '../../lib/hooks';
 import { TechFrame } from '../ui/TechFrame';
 import { CryptoHoldings } from '../../lib/features/auth/types';
 
-export const FinancialPanel = () => {
-    const { userInfo, walletsInfo } = useAppSelector((state) => state.auth);
+export const FinancialPanel = React.memo(() => {
+    const authData = useAppSelector((state) => {
+        return {
+            balance: state.auth.userInfo?.balance || 0,
+            assets: state.auth.walletsInfo?.store || []
+        };
+    }, (prev, next) => {
+        return prev.balance === next.balance && prev.assets === next.assets;
+    });
+    const { balance, assets } = authData;
     const router = useRouter();
 
-    const balance = userInfo?.balance || 0;
-    const assets: CryptoHoldings[] = walletsInfo?.store || [];
-
-    // Sort by quantity descending and take top 5
-    const topAssets = [...assets]
-        .sort((a, b) => b.quantity - a.quantity)
-        .slice(0, 5);
+    // Memoize sort + slice to avoid creating new arrays every render
+    const topAssets = useMemo(() => 
+        [...assets].sort((a, b) => b.quantity - a.quantity).slice(0, 5),
+        [assets]
+    );
 
     const handleAction = (type: 'buy' | 'sell') => {
-        router.push(`/market/trade?type=${type.toUpperCase()}`);
+        router.push(`/market`);
     };
 
     return (
@@ -44,38 +50,22 @@ export const FinancialPanel = () => {
             </TechFrame>
 
             {/* Operations Block */}
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-                <Button
-                    variant="contained"
-                    fullWidth
-                    onClick={() => handleAction('buy')}
-                    sx={{
-                        py: 1.5,
-                        bgcolor: 'rgba(0, 230, 118, 0.1)',
-                        color: '#00e676',
-                        border: '1px solid #00e676',
-                        fontWeight: 'bold',
-                        '&:hover': { bgcolor: 'rgba(0, 230, 118, 0.2)', borderColor: '#00e676' }
-                    }}
-                >
-                    COMPRAR
-                </Button>
-                <Button
-                    variant="contained"
-                    fullWidth
-                    onClick={() => handleAction('sell')}
-                    sx={{
-                        py: 1.5,
-                        bgcolor: 'rgba(255, 23, 68, 0.1)',
-                        color: '#ff1744',
-                        border: '1px solid #ff1744',
-                        fontWeight: 'bold',
-                        '&:hover': { bgcolor: 'rgba(255, 23, 68, 0.2)', borderColor: '#ff1744' }
-                    }}
-                >
-                    VENDER
-                </Button>
-            </Box>
+            <Button
+                variant="contained"
+                fullWidth
+                onClick={() => router.push('/market')}
+                sx={{
+                    py: 1.5,
+                    bgcolor: 'rgba(0, 243, 255, 0.1)',
+                    color: '#00f3ff',
+                    border: '1px solid #00f3ff',
+                    fontWeight: 'bold',
+                    letterSpacing: 1.5,
+                    '&:hover': { bgcolor: 'rgba(0, 243, 255, 0.2)', borderColor: '#00f3ff' }
+                }}
+            >
+                Ir al Mercado
+            </Button>
 
             {/* Assets List Block */}
             <TechFrame color="rgba(255,255,255,0.1)">
@@ -103,15 +93,24 @@ export const FinancialPanel = () => {
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: index * 0.1 }}
                                 >
-                                    <Box sx={{ 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
-                                        justifyContent: 'space-between',
-                                        p: 1.5,
-                                        bgcolor: 'rgba(255,255,255,0.03)',
-                                        borderRadius: 2,
-                                        border: '1px solid rgba(255,255,255,0.05)'
-                                    }}>
+                                    <Box 
+                                        onClick={() => router.push(`/market/${asset.id}`)}
+                                        sx={{ 
+                                            display: 'flex', 
+                                            alignItems: 'center', 
+                                            justifyContent: 'space-between',
+                                            p: 1.5,
+                                            bgcolor: 'rgba(255,255,255,0.03)',
+                                            borderRadius: 2,
+                                            border: '1px solid rgba(255,255,255,0.05)',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease',
+                                            '&:hover': {
+                                                bgcolor: 'rgba(255,255,255,0.08)',
+                                                borderColor: 'rgba(0, 243, 255, 0.3)'
+                                            }
+                                        }}
+                                    >
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                             <Avatar sx={{ 
                                                 width: 32, 
@@ -148,4 +147,4 @@ export const FinancialPanel = () => {
             </TechFrame>
         </Box>
     );
-};
+});

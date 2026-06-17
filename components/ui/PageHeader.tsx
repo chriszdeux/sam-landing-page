@@ -8,11 +8,12 @@ import { motion } from 'framer-motion';
 
 interface PageHeaderProps {
   title: string;
+  highlight?: string;
   subtitle: string;
   color?: string;
 }
 
-export const PageHeader = ({ title, subtitle, color = '#00f3ff' }: PageHeaderProps) => {
+export const PageHeader = ({ title, highlight, subtitle, color = '#00f3ff' }: PageHeaderProps) => {
   
   //# 2-Renderizar encabezado con título animado
   return (
@@ -49,7 +50,7 @@ export const PageHeader = ({ title, subtitle, color = '#00f3ff' }: PageHeaderPro
                 fontSize: { xs: '2rem', md: '3.5rem' }
             }}
         >
-          {title}
+          {title} {highlight && <Box component="span" sx={{ color: color, WebkitTextFillColor: 'initial' }}>{highlight}</Box>}
         </Typography>
 
         <Box sx={{ 

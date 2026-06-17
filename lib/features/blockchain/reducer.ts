@@ -9,16 +9,21 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { BlockchainState, Reward } from './types';
 import { BlockchainInterface } from '../../types/blockchain';
-import { fetchNetworks, fetchRewards, claimReward, fetchNextBlockTime, fetchMiningPower, fetchNetworkSpecificPower } from './actions';
+import { fetchNetworks, fetchRewards, claimReward, fetchNextBlockTime, fetchBlocksHistory, fetchProcessingFrequencies } from './actions';
+import { injectPower } from '../labs/actions';
 
 //# 2-Definir estado inicial de blockchain
 const initialState: BlockchainState = {
     networks: [],
     selectedNetwork: null,
+    activeBlock: null,
+    blocksHistory: [],
     rewards: [],
     nextBlockTime: null,
     isLoading: false,
     error: null,
+    chronoBurstFreqTypes: null,
+    lastBlocksFetch: null,
 };
 
 //# 3-Crear slice con reducers síncronos
@@ -109,27 +114,40 @@ const blockchainSlice = createSlice({
                 }
             })
 
-            // Power Mining Polling
-            .addCase(fetchMiningPower.fulfilled, (state, action) => {
-                if (state.selectedNetwork) {
-                    if (!state.selectedNetwork.blockchainProps) state.selectedNetwork.blockchainProps = {} as any;
-                    state.selectedNetwork.blockchainProps.totalPowerMining = action.payload.totalPowerMining;
+
+            // Listen to Power Injection to update block rewards
+            .addCase(injectPower.fulfilled, (state, action) => {
+                const { block, minerRewards, totalPowerMining, totalEnergyAccumulatedInBlockchain } = action.payload;
+                if (block) {
+                    state.activeBlock = block;
+                } else if (minerRewards !== undefined && state.activeBlock) {
+                    state.activeBlock.minerRewards = minerRewards;
                 }
-            })
-            // Specific Power/Energy Polling
-            .addCase(fetchNetworkSpecificPower.fulfilled, (state, action) => {
-                const { id, energy, totalPowerMining } = action.payload;
-                const network = state.networks.find(n => n.id === id);
-                if (network) {
-                    if (!network.blockchainProps) network.blockchainProps = {} as any;
-                    network.blockchainProps.energy = energy;
-                    network.blockchainProps.totalPowerMining = totalPowerMining;
-                }
-                if (state.selectedNetwork && state.selectedNetwork.id === id) {
+
+                if (totalPowerMining !== undefined && state.selectedNetwork) {
                     if (!state.selectedNetwork.blockchainProps) state.selectedNetwork.blockchainProps = {} as any;
-                    state.selectedNetwork.blockchainProps.energy = energy;
                     state.selectedNetwork.blockchainProps.totalPowerMining = totalPowerMining;
                 }
+
+                if (totalEnergyAccumulatedInBlockchain !== undefined) {
+                    if (state.selectedNetwork) {
+                        state.selectedNetwork.energyAccumulated = totalEnergyAccumulatedInBlockchain;
+                    }
+                    const networkId = state.selectedNetwork?.id;
+                    if (networkId) {
+                        const net = state.networks.find(n => n.id === networkId);
+                        if (net) {
+                            net.energyAccumulated = totalEnergyAccumulatedInBlockchain;
+                        }
+                    }
+                }
+            })
+            .addCase(fetchBlocksHistory.fulfilled, (state, action) => {
+                state.blocksHistory = action.payload || [];
+                state.lastBlocksFetch = Date.now();
+            })
+            .addCase(fetchProcessingFrequencies.fulfilled, (state, action) => {
+                state.chronoBurstFreqTypes = action.payload || null;
             });
 
     },

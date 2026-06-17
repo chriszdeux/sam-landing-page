@@ -128,7 +128,7 @@ export function LaboratorioMarketDrawer({ open, onClose, buyingSlotIndex, onBuy 
 
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
                     <Typography variant="body1" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <LocalOffer sx={{ fontSize: 16, color: 'text.secondary' }} /> {hw.priceTokens} USDT
+                      <LocalOffer sx={{ fontSize: 16, color: 'text.secondary' }} /> {hw.priceUSD.toLocaleString()} CR
                     </Typography>
                     <Button 
                       variant="contained" 
