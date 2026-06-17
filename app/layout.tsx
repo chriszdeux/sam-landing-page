@@ -9,6 +9,7 @@ import { Navbar } from "../components/layout/Navbar";
 import { AuthLoader } from "../components/auth/AuthLoader";
 import { Modal } from "../components/ui/Modal";
 import { ToastStack } from "../components/ui/ToastStack";
+import { LabSimulationManager } from "../components/labs/LabSimulationManager";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({
           <ThemeRegistry>
             <AuthLoader>
                 <Navbar />
+                <LabSimulationManager />
                 <Modal />
                 <ToastStack />
                 {children}

@@ -30,11 +30,11 @@ import { Button } from "../ui/Button";
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
 import { setCurrentSection } from "../../lib/features/uiSlice";
 import { fetchWalletDetails } from "../../lib/features/auth/actions";
-import { fetchMiningPower, fetchNetworkSpecificPower } from "../../lib/features/blockchain/actions";
 import { navItems } from "./navItems";
 import { NavbarDrawer } from "./NavbarDrawer";
 import { LogoutDialog } from "./LogoutDialog";
 import { NavbarUserMenu } from "./NavbarUserMenu";
+import { LabNavbarIndicator } from "./LabNavbarIndicator";
 import { EnvVariables } from "@/lib/constants/variables";
 
 export const Navbar = () => {
@@ -58,17 +58,6 @@ export const Navbar = () => {
   //# 4-Efecto para sincronizar detalles de la billetera y polling de poder
 
 
-  React.useEffect(() => {
-    // Polling every 5 minutes (300,000 ms) - No initial call as per PM requirement
-    const interval = setInterval(() => {
-      dispatch(fetchMiningPower());
-      if (userInfo && selectedNetworkState?.id) {
-          dispatch(fetchNetworkSpecificPower(selectedNetworkState.id));
-      }
-    }, 300000);
-
-    return () => clearInterval(interval);
-  }, [dispatch, userInfo, selectedNetworkState?.id]);
 
   if (
     pathname === '/auth/logging-in' || 
@@ -244,6 +233,7 @@ export const Navbar = () => {
             }} />
 
             <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 2 }}>
+                {userInfo && <LabNavbarIndicator />}
                 <NavbarUserMenu 
                     userInfo={userInfo}
                     onLogoutClick={() => setLogoutConfirmOpen(true)}

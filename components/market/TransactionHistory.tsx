@@ -26,10 +26,10 @@ export const TransactionHistory = ({ walletId }: TransactionHistoryProps) => {
   //# 2-Obtener despachador y datos de Redux
   const dispatch = useAppDispatch();
   const { selectedNetwork, networks } = useAppSelector((state) => state.blockchain);
-  const { byStoreBoxId: transactions } = useAppSelector((state) => state.transactions);
+  const { transactions } = useAppSelector((state) => state.transactions);
 
   const currentNetwork = networks.find(n => n.id === selectedNetwork?.id);
-  const storeId = selectedNetwork?.storeTransactions?.transactionStoreID || currentNetwork?.storeTransactions?.transactionStoreID;
+  const storeId = selectedNetwork?.storeTransactions?.storeTransactionId || selectedNetwork?.storeTransactionId || currentNetwork?.storeTransactionId;
 
   //# 3-Efecto para cargar transacciones
   React.useEffect(() => {
@@ -39,12 +39,7 @@ export const TransactionHistory = ({ walletId }: TransactionHistoryProps) => {
   }, [storeId, walletId, dispatch]);
 
   //# 4-Preparar datos para la tabla
-  const rawData = storeId ? transactions[storeId] : null;
-  let transactionData: TransactionsInterface[] = [];
-  
-  if (rawData?.transactions && Array.isArray(rawData.transactions)) {
-      transactionData = rawData.transactions;
-  }
+  const transactionData: TransactionsInterface[] = transactions || [];
   
   //# 5-Renderizar tabla de transacciones
   return (

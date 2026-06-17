@@ -3,11 +3,11 @@
 // 3-Acción asíncrona para obtener recompensas
 // 4-Acción asíncrona para reclamar recompensa
 // 5-Acción asíncrona para obtener tiempo del próximo bloque
-// 6-Acción asíncrona para obtener potencia total de minado
+
 
 //# 1-Importar dependencias y APIs del módulo
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { getNetworksApi, getRewardsApi, claimRewardApi, getNextBlockTimeApi, getMiningPowerApi, getNetworkSpecificPowerApi } from './api';
+import { getNetworksApi, getRewardsApi, claimRewardApi, getNextBlockTimeApi, getBlocksHistoryApi, getProcessingFrequenciesApi } from './api';
 import { getProfileApi } from '../auth/api'; 
 import { setUserInfo, updateBalance } from '../auth/reducer';
 import { RootState } from '../../store';
@@ -84,42 +84,64 @@ export const fetchNextBlockTime = createAsyncThunk(
     }
 );
 
-//# 6-Acción asíncrona para obtener potencia total de minado
-export const fetchMiningPower = createAsyncThunk(
-    'blockchain/fetchMiningPower',
-    async (_, { rejectWithValue }) => {
+const pendingBlocksHistoryFetches = new Set<string>();
+
+//# 6-Acción asíncrona para obtener historial de bloques
+export const fetchBlocksHistory = createAsyncThunk(
+    'blockchain/fetchBlocksHistory',
+    async (arg: string | { blockchainId: string; thresholdMinutes?: number }, { rejectWithValue }) => {
+        const blockchainId = typeof arg === 'string' ? arg : arg.blockchainId;
+        pendingBlocksHistoryFetches.add(blockchainId);
         try {
-            const response = await getMiningPowerApi();
-            
-            // Extraer valor de forma ultra-robusta según los nuevos formatos del BACK
-            const powerValue = response?.totalPowerMining ?? 
-                               response?.data?.totalPowerMining ?? 
-                               response?.blockchainProps?.totalPowerMining ??
-                               response?.power ?? 
-                               0;
-                               
-            return { totalPowerMining: Number(powerValue) };
+            const data = await getBlocksHistoryApi(blockchainId);
+            return data;
         } catch (err: unknown) {
-             const errorObj = err as { response?: { data?: { message?: string } } };
-            return rejectWithValue(errorObj.response?.data?.message || 'Failed to fetch mining power');
+            const errorObj = err as { response?: { data?: { message?: string } } };
+            return rejectWithValue(errorObj.response?.data?.message || 'Failed to fetch blocks history');
+        } finally {
+            pendingBlocksHistoryFetches.delete(blockchainId);
+        }
+    },
+    {
+        condition: (arg, { getState }) => {
+            const blockchainId = typeof arg === 'string' ? arg : arg.blockchainId;
+            if (pendingBlocksHistoryFetches.has(blockchainId)) {
+                return false;
+            }
+            const { blockchain } = getState() as RootState;
+            const thresholdMinutes = typeof arg === 'string' ? undefined : arg.thresholdMinutes;
+            
+            if (thresholdMinutes !== undefined && blockchain.lastBlocksFetch !== null) {
+                const limitMs = thresholdMinutes * 60 * 1000;
+                const elapsed = Date.now() - blockchain.lastBlocksFetch;
+                if (elapsed < limitMs) {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 );
 
-//# 7-Acción asíncrona para obtener potencia y energía específica de una red
-export const fetchNetworkSpecificPower = createAsyncThunk(
-    'blockchain/fetchNetworkSpecificPower',
-    async (networkId: string, { rejectWithValue }) => {
+export const fetchProcessingFrequencies = createAsyncThunk(
+    'blockchain/fetchProcessingFrequencies',
+    async (_, { rejectWithValue }) => {
         try {
-            const response = await getNetworkSpecificPowerApi(networkId);
-            // Extraer la energía y la potencia del endpoint específico
-            const energyValue = response?.energy ?? response?.data?.energy ?? response?.blockchainProps?.energy ?? 0;
-            const powerValue = response?.totalPowerMining ?? response?.data?.totalPowerMining ?? response?.blockchainProps?.totalPowerMining ?? response?.power ?? 0;
-            
-            return { id: networkId, energy: Number(energyValue), totalPowerMining: Number(powerValue) };
+            const data = await getProcessingFrequenciesApi();
+            return data;
         } catch (err: unknown) {
-             const errorObj = err as { response?: { data?: { message?: string } } };
-            return rejectWithValue(errorObj.response?.data?.message || 'Failed to fetch network specific power and energy');
+            const errorObj = err as { response?: { data?: { message?: string } } };
+            return rejectWithValue(errorObj.response?.data?.message || 'Failed to fetch processing frequencies');
+        }
+    },
+    {
+        condition: (_, { getState }) => {
+            const { blockchain } = getState() as RootState;
+            if (blockchain.chronoBurstFreqTypes && Object.keys(blockchain.chronoBurstFreqTypes).length > 0) {
+                return false;
+            }
+            return true;
         }
     }
 );
+

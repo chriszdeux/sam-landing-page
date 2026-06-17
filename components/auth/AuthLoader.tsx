@@ -10,7 +10,7 @@
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { checkAuth, fetchWalletDetails } from '../../lib/features/auth';
-import { fetchNetworks } from '../../lib/features/blockchain/actions';
+import { fetchNetworks, fetchProcessingFrequencies } from '../../lib/features/blockchain/actions';
 
 export const AuthLoader = ({ children }: { children: React.ReactNode }) => {
 
@@ -22,6 +22,7 @@ export const AuthLoader = ({ children }: { children: React.ReactNode }) => {
     useEffect(function loadInitialData() {
         dispatch(checkAuth());
         dispatch(fetchNetworks());
+        dispatch(fetchProcessingFrequencies());
     }, [dispatch]);
 
     //# 4-Efecto para sincronizar detalles de la billetera
