@@ -90,6 +90,7 @@ const TradeContent = () => {
   
   //# 9-Selección de datos desde el estado global de Redux
   const { userInfo, walletsInfo } = useAppSelector((state) => state.auth);
+  const displayCryptos = React.useMemo(() => { if (transactionType === "SELL" && walletsInfo?.store) { return cryptos.filter(c => walletsInfo.store.some(a => a.id === c.id || a.symbol === c.identification.symbol)); } return cryptos; }, [cryptos, transactionType, walletsInfo?.store]);
   
   //# 10-Selección de datos desde el estado global de Redux
   const { selectedNetwork } = useAppSelector((state) => state.blockchain);
@@ -357,7 +358,7 @@ const TradeContent = () => {
                             transactionType={transactionType}
                             form={form}
                             onChange={handleChange}
-                            cryptos={cryptos}
+                            cryptos={displayCryptos}
                             selectedCrypto={selectedCrypto}
                             onSubmit={handlePreSubmit}
                             isProcessing={false}

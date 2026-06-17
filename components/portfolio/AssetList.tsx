@@ -21,7 +21,7 @@ export const AssetList: React.FC<AssetListProps> = ({ assets, totalValue }) => {
     
     //# 1-Manejo de lógica de usuario para handleTransaction
     const handleTransaction = (assetId: string, type: 'BUY' | 'SELL') => {
-        router.push(`/market/trade?type=${type}&cryptoId=${assetId}`);
+        router.push(`/market/${assetId}`);
     };
 
     

@@ -1,8 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { getLabApi, updateLabStatusApi, injectPowerApi } from './api';
 
-export const fetchLabData = createAsyncThunk(
-  'labs/fetchLabData',
+export const fetchLaboratoryInterface = createAsyncThunk(
+  'labs/fetchLaboratoryInterface',
   async (labId: string, { rejectWithValue }) => {
     try {
       const data = await getLabApi(labId);
@@ -37,13 +37,13 @@ export const toggleLabStatus = createAsyncThunk(
 
 export const injectPower = createAsyncThunk(
   'labs/injectPower',
-  async ({ labId, blockchainId, energyAmount }: { labId: string; blockchainId: string; energyAmount: number }, { rejectWithValue }) => {
+  async ({ labId, blockchainId, hashAmount }: { labId: string; blockchainId: string; hashAmount: number }, { rejectWithValue }) => {
     try {
-      const data = await injectPowerApi(labId, blockchainId, energyAmount);
+      const data = await injectPowerApi(labId, blockchainId, hashAmount);
       return data;
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
-      return rejectWithValue(error.response?.data?.message || 'Failed to inject power');
+      return rejectWithValue(error.response?.data?.message || 'Failed to inject hash');
     }
   }
 );

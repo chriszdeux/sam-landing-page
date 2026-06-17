@@ -1,11 +1,12 @@
 import React from "react";
 import { Box, Paper, Typography } from "@mui/material";
 import { motion } from "framer-motion";
-import { DeveloperBoard, AddCircleOutline } from "@mui/icons-material";
-import { LabDataInterface } from "./LaboratorioMetersSection";
+import { DeveloperBoard, AddCircleOutline, Thermostat } from "@mui/icons-material";
+import { LaboratoryInterface, SlotMachine } from "./LaboratorioMetersSection";
+import { getCBUnit, getCBDivisor } from "../../lib/constants/blockchainFrequencies";
 
 interface LaboratorioSlotsGridProps {
-  labData: LabDataInterface | null;
+  labData: LaboratoryInterface | null;
   selectedSlot: number | string | null;
   onOpenMarket: (index: number) => void;
   onOpenDetail: (index: number) => void;
@@ -16,18 +17,17 @@ export function LaboratorioSlotsGrid({ labData, selectedSlot, onOpenMarket, onOp
   return (
     <Box display="flex" justifyContent="space-between" alignItems="flex-start" gap={3} flexWrap="wrap" 
          sx={{ p: 4, bgcolor: 'rgba(0,0,0,0.2)', borderRadius: 4, border: '1px solid rgba(255,255,255,0.05)' }}>
-      {Array.from({ length: labData?.capacity || 6 }).map((_, index) => {
+      {Array.from({ length: labData?.slotsCapacity || 6 }).map((_, index) => {
         const currentSlots = labData?.slots || [];
         // Backend can return null for empty slots
         const rawSlot = index < currentSlots.length ? currentSlots[index] : null;
-        const slot = rawSlot ?? { id: `empty-${index}`, name: '', performance: '', color: '#ffffff', currentLife: 100, lifeLimit: 100 };
-        const slotId = slot.id || `slot-${index}`;
+        const slot = rawSlot as SlotMachine | null;
+        const slotId = slot?.id || `slot-${index}`;
         const isSelected = selectedSlot === slotId;
-        // A slot is active if it has a name or a hashRate (real data from backend)
-        const hasData = !!(slot.name || slot.hashRate);
-        const slotColor = slot.color || '#00f3ff';
-        const displayPerf = slot.performance || (slot.hashRate ? `${slot.hashRate} TH/s` : '');
-        const lifePercent = slot.currentLife && slot.lifeLimit ? (slot.currentLife / slot.lifeLimit) * 100 : 100;
+        const hasData = !!slot;
+        const slotColor = '#00f3ff';
+        const displayPerf = slot?.hashRate ? `${(slot.hashRate / getCBDivisor(slot.hashRate)).toFixed(1)} ${getCBUnit(slot.hashRate)}` : '';
+        const lifePercent = slot?.currentUsage ? (1 - slot.currentUsage / slot.lifeLimit) * 100 : 100;
         const isLowLife = hasData && lifePercent < 20;
 
         return (
@@ -82,26 +82,14 @@ export function LaboratorioSlotsGrid({ labData, selectedSlot, onOpenMarket, onOp
                   overflow: 'hidden'
                 }}
               >
-                {hasData ? (
-                  <DeveloperBoard sx={{ 
-                    fontSize: 40, 
-                    color: isSelected ? slotColor : (isLowLife ? '#ff0055' : 'text.secondary'), 
-                    opacity: 1,
-                    filter: isSelected ? `drop-shadow(0 0 8px ${slotColor}80)` : (isLowLife ? 'drop-shadow(0 0 5px #ff005590)' : 'none'),
-                    transition: 'all 0.3s'
-                  }} />
+                {!hasData ? (
+                  <AddCircleOutline sx={{ fontSize: 40, color: 'rgba(255,255,255,0.1)' }} />
                 ) : (
-                  <Box sx={{ 
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
-                    opacity: 0.5, transition: 'all 0.3s',
-                    '&:hover': { opacity: 1 }
-                  }}>
-                    <AddCircleOutline sx={{ fontSize: 40, color: 'rgba(255,255,255,0.7)', transition: 'all 0.2s', '&:hover': { color: '#00f3ff', filter: 'drop-shadow(0 0 8px #00f3ff)' } }} />
-                  </Box>
+                  <DeveloperBoard sx={{ fontSize: 40, color: slotColor }} />
                 )}
                 
                 <Typography variant="caption" sx={{ mt: 1, color: isSelected ? '#fff' : 'rgba(255,255,255,0.5)', fontWeight: 600 }}>
-                  {slot.name || 'SLOT VACÍO'}
+                  {slot?.name || 'SLOT VACÍO'}
                 </Typography>
 
                 <Typography variant="h6" sx={{ 
@@ -112,6 +100,15 @@ export function LaboratorioSlotsGrid({ labData, selectedSlot, onOpenMarket, onOp
                 }}>
                   {displayPerf || '-'}
                 </Typography>
+
+                {hasData && slot.temperature !== undefined && (
+                  <Box display="flex" alignItems="center" gap={0.5} mt={0.5}>
+                    <Thermostat sx={{ fontSize: 12, color: slot.temperature > 70 ? '#ff0055' : '#00f3ff' }} />
+                    <Typography variant="caption" sx={{ color: slot.temperature > 70 ? '#ff0055' : '#00f3ff', fontWeight: 'bold' }}>
+                      {slot.temperature.toFixed(1)}°C
+                    </Typography>
+                  </Box>
+                )}
 
                 {/* Power Injection Animation (Particles) */}
                 {hasData && (

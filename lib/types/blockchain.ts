@@ -108,4 +108,7 @@ export interface BlockchainInterface {
   storeTransactions: TransactionsProps;
   isActive: boolean;
   chain?: string;
+  tokensSupported?: TokensSupported;
+  energyAccumulated?: number;
+  hashAvailable?: number;
 }

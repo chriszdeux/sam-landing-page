@@ -8,5 +8,6 @@ export const navItems = [
   { name: "Mercado Galáctico", id: "galactic-market", path: "/galactic-market", auth: true },
   { name: "Mercado", id: "market", path: "/market", auth: true },
   { name: "Transacciones", id: "transactions", path: "/transactions", auth: true },
+  { name: "Bloques", id: "blocks", path: "/dashboard/blocks", auth: true },
   { name: "Roadmap", id: "roadmap", path: "/roadmap", auth: false },
 ];
