@@ -4,24 +4,28 @@ import React, { useEffect } from 'react';
 import { Box, Container, Grid, Typography, CircularProgress } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
-import { fetchLabData } from '../../lib/features/labs/actions';
+import { fetchLaboratoryInterface } from '../../lib/features/labs/actions';
+import { fetchProcessingFrequencies } from '../../lib/features/blockchain/actions';
 import { FinancialPanel } from '../../components/dashboard/FinancialPanel';
 import { LabMetersPanel } from '../../components/dashboard/LabMetersPanel';
 import { ControlRewardsPanel } from '../../components/dashboard/ControlRewardsPanel';
+import { OperationsCanvasBg } from "../../components/dashboard/OperationsCanvasBg";
 import { Background } from '../../components/layout/Background';
 import { RootState } from '../../lib/store';
 
 export default function DashboardPage() {
     const dispatch = useAppDispatch();
-    const { userInfo, status: authStatus } = useAppSelector((state) => state.auth);
-    const { status: labStatus } = useAppSelector((state: RootState) => state.reducerLabs);
+    const userInfo = useAppSelector((state) => state.auth.userInfo);
+    const authStatus = useAppSelector((state) => state.auth.status);
+    const labStatus = useAppSelector((state: RootState) => state.reducerLabs.status);
 
     const labId = userInfo?.idLabs?.[0];
 
     useEffect(() => {
         if (labId) {
-            dispatch(fetchLabData(labId));
+            dispatch(fetchLaboratoryInterface(labId));
         }
+        dispatch(fetchProcessingFrequencies());
     }, [dispatch, labId]);
 
     if (authStatus === 'loading' || (labId && labStatus === 'loading')) {
@@ -35,6 +39,7 @@ export default function DashboardPage() {
     return (
         <main className="min-h-screen relative flex items-center justify-center overflow-hidden bg-[#0a0a0a]">
             <Background />
+            <OperationsCanvasBg />
             
             <Container maxWidth="xl" sx={{ 
                 position: 'relative', 
@@ -67,17 +72,17 @@ export default function DashboardPage() {
 
                     <Grid container spacing={4}>
                         {/* Column 1: Financial */}
-                        <Grid size={{ xs: 12, lg: 4 }}>
+                        <Grid size={{ xs: 12, lg: 4 }} sx={{ order: { xs: 2, lg: 1 } }}>
                             <FinancialPanel />
                         </Grid>
 
                         {/* Column 2: Laboratory State */}
-                        <Grid size={{ xs: 12, lg: 4 }}>
+                        <Grid size={{ xs: 12, lg: 4 }} sx={{ order: { xs: 3, lg: 2 } }}>
                             <LabMetersPanel />
                         </Grid>
 
                         {/* Column 3: Control & Rewards */}
-                        <Grid size={{ xs: 12, lg: 4 }}>
+                        <Grid size={{ xs: 12, lg: 4 }} sx={{ order: { xs: 1, lg: 3 } }}>
                             <ControlRewardsPanel />
                         </Grid>
                     </Grid>

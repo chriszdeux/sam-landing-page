@@ -53,7 +53,8 @@ export const ParticleBackground = () => {
 
     const initParticles = () => {
       particles = [];
-      const count = Math.min(200, Math.floor((width * height) / 8000));
+      // Capped lower for performance; still visually rich
+      const count = Math.min(80, Math.floor((width * height) / 15000));
       for (let i = 0; i < count; i++) {
         particles.push({
           x: Math.random() * width,
@@ -66,15 +67,31 @@ export const ParticleBackground = () => {
       }
     };
 
+    // Spatial grid for O(n*k) connection lookups instead of O(n²)
+    const buildGrid = (cellSize: number) => {
+      const grid: Map<string, number[]> = new Map();
+      for (let i = 0; i < particles.length; i++) {
+        const cx = Math.floor(particles[i].x / cellSize);
+        const cy = Math.floor(particles[i].y / cellSize);
+        const key = `${cx},${cy}`;
+        let cell = grid.get(key);
+        if (!cell) { cell = []; grid.set(key, cell); }
+        cell.push(i);
+      }
+      return grid;
+    };
+
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
 
-      particles.forEach((p) => {
+      // Update positions
+      for (const p of particles) {
         const dxMouse = mouse.x - p.x;
         const dyMouse = mouse.y - p.y;
-        const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
+        const distMouseSq = dxMouse * dxMouse + dyMouse * dyMouse;
         
-        if (distMouse < 200) {
+        if (distMouseSq < 40000) { // 200²
+            const distMouse = Math.sqrt(distMouseSq);
             const force = (200 - distMouse) / 200;
             p.vx -= (dxMouse / distMouse) * force * 0.05;
             p.vy -= (dyMouse / distMouse) * force * 0.05;
@@ -82,30 +99,47 @@ export const ParticleBackground = () => {
 
         p.vx *= 0.98;
         p.vy *= 0.98;
-
         p.x += p.vx;
         p.y += p.vy;
 
         if (p.x < 0 || p.x > width) p.vx *= -1;
         if (p.y < 0 || p.y > height) p.vy *= -1;
+      }
+
+      // Build spatial grid for connections
+      const grid = buildGrid(connectionDistance);
+      const drawnPairs = new Set<string>();
+
+      // Draw particles and connections
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        
         ctx.fillStyle = p.color;
-        ctx.shadowBlur = 0;
-        
         ctx.fill();
 
-        for (let j = 0; j < particles.length; j++) {
-            const p2 = particles[j];
-            if (p === p2) continue;
+        // Check only neighboring grid cells
+        const cx = Math.floor(p.x / connectionDistance);
+        const cy = Math.floor(p.y / connectionDistance);
+        for (let gx = cx - 1; gx <= cx + 1; gx++) {
+          for (let gy = cy - 1; gy <= cy + 1; gy++) {
+            const cell = grid.get(`${gx},${gy}`);
+            if (!cell) continue;
+            for (const j of cell) {
+              if (j <= i) continue;
+              const pairKey = i < j ? `${i}-${j}` : `${j}-${i}`;
+              if (drawnPairs.has(pairKey)) continue;
 
-            const dx = p.x - p2.x;
-            const dy = p.y - p2.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+              const p2 = particles[j];
+              const dx = p.x - p2.x;
+              const dy = p.y - p2.y;
+              const distSq = dx * dx + dy * dy;
+              const connDistSq = connectionDistance * connectionDistance;
 
-            if (distance < connectionDistance) {
+              if (distSq < connDistSq) {
+                drawnPairs.add(pairKey);
+                const distance = Math.sqrt(distSq);
                 ctx.beginPath();
                 ctx.strokeStyle = p.color;
                 ctx.globalAlpha = 1 - distance / connectionDistance;
@@ -114,9 +148,11 @@ export const ParticleBackground = () => {
                 ctx.lineTo(p2.x, p2.y);
                 ctx.stroke();
                 ctx.globalAlpha = 1;
+              }
             }
+          }
         }
-      });
+      }
 
       if (Math.random() < 0.05) {
         const startIdx = Math.floor(Math.random() * particles.length);

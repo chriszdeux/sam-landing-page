@@ -3,17 +3,16 @@
 
 'use client';
 
-import React from 'react';
+import React, { use } from 'react';
 import { Box, Typography, Container, Button } from '@mui/material';
 import { Background } from '../../../components/layout/Background';
 import { Card } from '../../../components/ui/Card';
 import { newsData } from '../../../lib/data/news';
 import { ArrowBack } from '@mui/icons-material';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
 
-export default function NewsArticlePage() {
-    const { slug } = useParams();
+export default function NewsArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = use(params);
     const article = newsData.find(n => n.slug === slug);
 
     if (!article) {

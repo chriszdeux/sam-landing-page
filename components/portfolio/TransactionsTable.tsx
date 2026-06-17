@@ -27,10 +27,10 @@ interface TransactionsTableProps {
 
 export const TransactionsTable: React.FC<TransactionsTableProps> = ({ storeId, walletId = '' }) => {
     const dispatch = useAppDispatch();
-    const { byStoreBoxId, isLoading, error } = useAppSelector((state) => state.transactions);
+    const { transactions, isLoading, error } = useAppSelector((state) => state.transactions);
     
     // Get transactions for this specific store from Redux state
-    const transactionsData = byStoreBoxId[storeId]?.transactions || [];
+    const transactionsData = transactions || [];
 
     useEffect(() => {
         if (storeId) {
@@ -47,7 +47,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({ storeId, w
         }
     };
 
-    if (!byStoreBoxId[storeId] && isLoading) {
+    if (transactionsData.length === 0 && isLoading) {
         return (
             <TechFrame>
                 <Box sx={{ display: 'flex', justifyContent: 'center', p: 4, bgcolor: 'rgba(0,0,0,0.2)' }}>
@@ -120,7 +120,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({ storeId, w
                                         {tx.financialInfo.quantity}
                                     </TableCell>
                                     <TableCell align="center" sx={{ color: 'rgba(255,255,255,0.8)', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace', fontSize: '0.85rem' }}>
-                                        {tx.confirmedBy || '-'}
+                                        {tx.confirmedByLabId || '-'}
                                     </TableCell>
                                     <TableCell align="center" sx={{ color: 'white', borderColor: 'rgba(0, 243, 255, 0.1)' }}>
                                          <Chip 
@@ -200,7 +200,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({ storeId, w
                                             }} 
                                         />
                                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', fontSize: '0.7rem' }}>
-                                            VAL: {tx.confirmedBy || '---'}
+                                            VAL: {tx.confirmedByLabId || '---'}
                                         </Typography>
                                     </Box>
                                     <Box sx={{ textAlign: 'right' }}>
