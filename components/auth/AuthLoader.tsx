@@ -7,7 +7,7 @@
 'use client';
 
 //# 1-Importar dependencias y acciones de Redux
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { checkAuth, fetchWalletDetails } from '../../lib/features/auth';
 import { fetchNetworks, fetchProcessingFrequencies } from '../../lib/features/blockchain/actions';
@@ -19,10 +19,15 @@ export const AuthLoader = ({ children }: { children: React.ReactNode }) => {
     const { userInfo } = useAppSelector((state) => state.auth);
 
     //# 3-Efecto para verificar autenticación y redes
+    const initialized = useRef(false);
+
     useEffect(function loadInitialData() {
-        dispatch(checkAuth());
-        dispatch(fetchNetworks());
-        dispatch(fetchProcessingFrequencies());
+        if (!initialized.current) {
+            initialized.current = true;
+            dispatch(checkAuth());
+            dispatch(fetchNetworks());
+            dispatch(fetchProcessingFrequencies());
+        }
     }, [dispatch]);
 
     //# 4-Efecto para sincronizar detalles de la billetera

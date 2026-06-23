@@ -12,8 +12,7 @@ import { Close as CloseIcon } from '@mui/icons-material';
 
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { closeModal } from '../../lib/features/uiSlice';
-import { LoginForm } from '../auth/LoginForm';
-import { RegisterForm } from '../auth/RegisterForm';
+import { AuthModal } from '../auth/AuthModal';
 import { ValidateAccountForm } from '../auth/ValidateAccountForm';
 import { RewardsModal } from '../rewards/RewardsModal';
 
@@ -41,21 +40,21 @@ export const Modal = ({ children }: { children?: React.ReactNode }) => {
   const dispatch = useAppDispatch();
   const { isModalOpen, activeModalContent } = useAppSelector((state) => state.ui);
 
-  const isWideModal = ['login', 'register'].includes(activeModalContent || '');
+  const isAuthModal = ['login', 'register'].includes(activeModalContent || '');
 
   const dynamicStyle = {
     ...style,
-    maxWidth: isWideModal ? 900 : 500,
-    p: isWideModal ? 0 : 4,
+    maxWidth: isAuthModal ? 900 : 500,
+    p: isAuthModal ? 0 : 4,
   };
 
   //# 3-Renderizar contenido dinámico según tipo
   const renderContent = () => {
     switch (activeModalContent) {
       case 'login':
-        return <LoginForm />;
+        return <AuthModal initialMode="login" />;
       case 'register':
-        return <RegisterForm />;
+        return <AuthModal initialMode="register" />;
       case 'validate':
         return <ValidateAccountForm />;
       case 'rewards':
