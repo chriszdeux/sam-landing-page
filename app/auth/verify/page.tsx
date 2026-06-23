@@ -46,8 +46,11 @@ export default function VerifyPage() {
 
 
     //# 7-Efecto secundario para sincronización del ciclo de vida
+    const hasRegistered = React.useRef(false);
+
     useEffect(() => {
-        if (step === 'registering' && registrationData) {
+        if (step === 'registering' && registrationData && !hasRegistered.current) {
+            hasRegistered.current = true;
             const performRegister = async () => {
                 const result = await dispatch(registerUser(registrationData));
                 if (registerUser.fulfilled.match(result)) {
@@ -61,7 +64,7 @@ export default function VerifyPage() {
 
             setTimeout(() => setStep('verifying'), 0);
         }
-    }, [step, registrationData]);
+    }, [step, registrationData, dispatch]);
 
 
 
