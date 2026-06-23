@@ -35,11 +35,11 @@ const registerSchema = z.object({
 type RegisterFormInputs = z.infer<typeof registerSchema>;
 
 export const RegisterForm = () => {
-  
+
   //# 2-Obtención del despachador y router
   const dispatch = useAppDispatch();
   const router = useRouter();
-  
+
   //# 3-Selección de datos desde el estado global de Redux
   const { status, error } = useAppSelector((state) => state.auth);
 
@@ -59,76 +59,76 @@ export const RegisterForm = () => {
     dispatch(closeModal());
     router.push('/auth/verify');
   };
-  
+
   //# 4-Renderizar formulario con validación Zod
   return (
     <form onSubmit={handleSubmit(onSubmit)} style={{ height: '100%' }}>
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} style={{ height: '100%' }}>
-        
+
 
         <Box sx={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            
 
-            <Box sx={{ position: 'relative', zIndex: 1, flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <TechFrame color="#ff0055">
-                     <Box sx={{ p: 4, bgcolor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)' }}>
-                        <Box sx={{ mb: 4, textAlign: 'center' }}>
-                            <Typography variant="overline" sx={{ color: '#ff0055', letterSpacing: 3, display: 'block', mb: 1 }}>
-                                {'// NEW USER REGISTRATION'}
-                            </Typography>
-                            <Typography variant="h4" gutterBottom sx={{ 
-                                color: 'white', 
-                                textTransform: 'uppercase', 
-                                fontWeight: 'bold',
-                                textShadow: '0 0 20px rgba(255, 0, 85, 0.5)', 
-                            }}>
-                                REGISTRO
-                            </Typography>
-                        </Box>
 
-                        <Grid container spacing={2}>
-                            <Grid size={{ xs: 12, md: 6 }}>
-                            <Input label="Nombre" error={!!errors.name} helperText={errors.name?.message} fullWidth {...register('name')} />
-                            </Grid>
-                            <Grid size={{ xs: 12, md: 6 }}>
-                            <Input label="Apellido" error={!!errors.lastName} helperText={errors.lastName?.message} fullWidth {...register('lastName')} />
-                            </Grid>
-                            <Grid size={{ xs: 12 }}>
-                            <Input label="Usuario" error={!!errors.username} helperText={errors.username?.message} fullWidth {...register('username')} />
-                            </Grid>
-                            <Grid size={{ xs: 12 }}>
-                            <Input label="Email" type="email" error={!!errors.email} helperText={errors.email?.message} fullWidth {...register('email')} />
-                            </Grid>
-                            <Grid size={{ xs: 12 }}>
-                            <Input label="Contraseña" type="password" error={!!errors.password} helperText={errors.password?.message} fullWidth {...register('password')} />
-                            </Grid>
-                            <Grid size={{ xs: 12 }}>
-                            <Input label="Fecha de Nacimiento" type="date" error={!!errors.birthday} helperText={errors.birthday?.message} fullWidth {...register('birthday')} />
-                            </Grid>
-                            <Grid size={{ xs: 12 }}>
-                                <Input label="Código de Referencia (Opcional)" error={!!errors.referralCode} helperText={errors.referralCode?.message} fullWidth {...register('referralCode')} />
-                            </Grid>
-                        </Grid>
+          <Box sx={{ position: 'relative', zIndex: 1, flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <TechFrame color="#ff0055">
+              <Box sx={{ p: 4, bgcolor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)' }}>
+                <Box sx={{ mb: 4, textAlign: 'center' }}>
+                  <Typography variant="overline" sx={{ color: '#ff0055', letterSpacing: 3, display: 'block', mb: 1 }}>
+                    {'// NEW USER REGISTRATION'}
+                  </Typography>
+                  <Typography variant="h4" gutterBottom sx={{
+                    color: 'white',
+                    textTransform: 'uppercase',
+                    fontWeight: 'bold',
+                    textShadow: '0 0 20px rgba(255, 0, 85, 0.5)',
+                  }}>
+                    REGISTRO
+                  </Typography>
+                </Box>
 
-                        {error && <Alert severity="error" sx={{ mt: 3, bgcolor: 'rgba(255, 0, 85, 0.1)', border: '1px solid #ff0055', color: '#ffcdd2' }}>{error}</Alert>}
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <Input label="Nombre" error={!!errors.name} helperText={errors.name?.message} fullWidth {...register('name')} />
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <Input label="Apellido" error={!!errors.lastName} helperText={errors.lastName?.message} fullWidth {...register('lastName')} />
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <Input label="Usuario" error={!!errors.username} helperText={errors.username?.message} fullWidth {...register('username')} />
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <Input label="Email" type="email" error={!!errors.email} helperText={errors.email?.message} fullWidth {...register('email')} />
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <Input label="Contraseña" type="password" error={!!errors.password} helperText={errors.password?.message} fullWidth {...register('password')} />
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <Input label="Fecha de Nacimiento" type="date" error={!!errors.birthday} helperText={errors.birthday?.message} fullWidth {...register('birthday')} />
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <Input label="Código de Referencia (Opcional)" error={!!errors.referralCode} helperText={errors.referralCode?.message} fullWidth {...register('referralCode')} />
+                  </Grid>
+                </Grid>
 
-                        <Button type="submit" variant="contained" fullWidth glow sx={{ 
-                            mt: 4,
-                            bgcolor: '#ff0055',
-                            color: 'white',
-                            fontWeight: 'bold',
-                             fontSize: '1.1rem',
-                             py: 1.5,
-                            '&:hover': {
-                                bgcolor: '#cc0044',
-                                boxShadow: '0 0 20px rgba(255, 0, 85, 0.6)'
-                            }
-                        }} disabled={status === 'loading'}>
-                            {status === 'loading' ? <CircularProgress size={24} color="inherit" /> : 'CONFIRMAR REGISTRO'}
-                        </Button>
-                    </Box>
-                </TechFrame>
-            </Box>
+                {error && <Alert severity="error" sx={{ mt: 3, bgcolor: 'rgba(255, 0, 85, 0.1)', border: '1px solid #ff0055', color: '#ffcdd2' }}>{error}</Alert>}
+
+                <Button type="submit" variant="contained" fullWidth glow sx={{
+                  mt: 4,
+                  bgcolor: '#ff0055',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  fontSize: '1.1rem',
+                  py: 1.5,
+                  '&:hover': {
+                    bgcolor: '#cc0044',
+                    boxShadow: '0 0 20px rgba(255, 0, 85, 0.6)'
+                  }
+                }} disabled={status === 'loading'}>
+                  {status === 'loading' ? <CircularProgress size={24} color="inherit" /> : 'CONFIRMAR REGISTRO'}
+                </Button>
+              </Box>
+            </TechFrame>
+          </Box>
         </Box>
       </motion.div>
     </form>
