@@ -18,3 +18,8 @@ export const injectPowerApi = async (labId: string, blockchainId: string, hashAm
   });
   return response.data;
 };
+
+export const createLabApi = async (payload: { slotsCapacity?: number; userId?: string } = {}) => {
+  const response = await api.post('/labs/create', payload);
+  return response.data;
+};

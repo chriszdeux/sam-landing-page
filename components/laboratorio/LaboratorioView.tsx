@@ -24,8 +24,8 @@ export function LaboratorioView() {
   
   const [isInitializing, setIsInitializing] = useState(true);
 
-  const hasLab = userInfo?.idLabs && userInfo.idLabs.length > 0;
-  const labId = userInfo?.idLabs?.[0];
+  const hasLab = !!userInfo?.idLab;
+  const labId = userInfo?.idLab;
 
   useEffect(() => {
     if (status !== 'idle' && status !== 'loading') {

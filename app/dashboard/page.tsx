@@ -10,6 +10,7 @@ import { FinancialPanel } from '../../components/dashboard/FinancialPanel';
 import { LabMetersPanel } from '../../components/dashboard/LabMetersPanel';
 import { ControlRewardsPanel } from '../../components/dashboard/ControlRewardsPanel';
 import { OperationsCanvasBg } from "../../components/dashboard/OperationsCanvasBg";
+import { EmptyLabState } from '../../components/dashboard/EmptyLabState';
 import { Background } from '../../components/layout/Background';
 import { RootState } from '../../lib/store';
 
@@ -19,7 +20,7 @@ export default function DashboardPage() {
     const authStatus = useAppSelector((state) => state.auth.status);
     const labStatus = useAppSelector((state: RootState) => state.reducerLabs.status);
 
-    const labId = userInfo?.idLabs?.[0];
+    const labId = userInfo?.idLab;
 
     useEffect(() => {
         if (labId) {
@@ -40,9 +41,9 @@ export default function DashboardPage() {
         <main className="min-h-screen relative flex items-center justify-center overflow-hidden bg-[#0a0a0a]">
             <Background />
             <OperationsCanvasBg />
-            
-            <Container maxWidth="xl" sx={{ 
-                position: 'relative', 
+
+            <Container maxWidth="xl" sx={{
+                position: 'relative',
                 zIndex: 10,
                 py: { xs: 12, md: 8 },
                 display: 'flex',
@@ -56,10 +57,10 @@ export default function DashboardPage() {
                     transition={{ duration: 0.8, ease: "easeOut" }}
                 >
                     <Box sx={{ mb: 6 }}>
-                        <Typography variant="h3" sx={{ 
-                            color: '#fff', 
-                            fontWeight: 900, 
-                            textTransform: 'uppercase', 
+                        <Typography variant="h3" sx={{
+                            color: '#fff',
+                            fontWeight: 900,
+                            textTransform: 'uppercase',
                             letterSpacing: 4,
                             mb: 1
                         }}>
@@ -70,22 +71,26 @@ export default function DashboardPage() {
                         </Typography>
                     </Box>
 
-                    <Grid container spacing={4}>
-                        {/* Column 1: Financial */}
-                        <Grid size={{ xs: 12, lg: 4 }} sx={{ order: { xs: 2, lg: 1 } }}>
-                            <FinancialPanel />
-                        </Grid>
+                    {!labId ? (
+                        <EmptyLabState />
+                    ) : (
+                        <Grid container spacing={4}>
+                            {/* Column 1: Financial */}
+                            <Grid size={{ xs: 12, lg: 4 }} sx={{ order: { xs: 2, lg: 1 } }}>
+                                <FinancialPanel />
+                            </Grid>
 
-                        {/* Column 2: Laboratory State */}
-                        <Grid size={{ xs: 12, lg: 4 }} sx={{ order: { xs: 3, lg: 2 } }}>
-                            <LabMetersPanel />
-                        </Grid>
+                            {/* Column 2: Laboratory State */}
+                            <Grid size={{ xs: 12, lg: 4 }} sx={{ order: { xs: 3, lg: 2 } }}>
+                                <LabMetersPanel />
+                            </Grid>
 
-                        {/* Column 3: Control & Rewards */}
-                        <Grid size={{ xs: 12, lg: 4 }} sx={{ order: { xs: 1, lg: 3 } }}>
-                            <ControlRewardsPanel />
+                            {/* Column 3: Control & Rewards */}
+                            <Grid size={{ xs: 12, lg: 4 }} sx={{ order: { xs: 1, lg: 3 } }}>
+                                <ControlRewardsPanel />
+                            </Grid>
                         </Grid>
-                    </Grid>
+                    )}
                 </motion.div>
             </Container>
         </main>
