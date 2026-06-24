@@ -23,7 +23,7 @@ export interface WalletInterface {
 export interface Wallet {
   label: string;
   walletAddress: string;
-  details?: WalletInterface; 
+  details?: WalletInterface;
 }
 
 export interface Reward {
@@ -41,8 +41,8 @@ export interface User {
   confirmedAccount: boolean;
   isBanned: boolean;
   transactions: unknown[];
-  transactionsIDs?: string[]; 
-  idLabs?: string[];
+  transactionsIDs?: string[];
+  idLab?: string;
   wallets: Wallet[];
   walletsSaved: Wallet[];
   wallet?: Wallet;
@@ -70,5 +70,5 @@ export interface AuthState {
   error: string | null;
   walletsInfo: WalletInterface | null;
   lastRefresh?: number;
-  registrationData?: RegistrationData; 
+  registrationData?: RegistrationData;
 }
