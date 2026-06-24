@@ -171,7 +171,7 @@ export default function NetworkSelectionPage() {
                                                 <Box sx={{ textAlign: 'center', p: 1, bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 1 }}>
                                                     <Typography variant="caption" display="block" color="text.secondary" sx={{ fontSize: '0.65rem' }}>TOKENS</Typography>
                                                     <Typography variant="body2" color="white" fontWeight="bold">
-                                                        {(network as any).tokensSupported?.total || 0}
+                                                        {network.tokensSupported?.total || 0}
                                                     </Typography>
                                                 </Box>
                                             </Grid>
