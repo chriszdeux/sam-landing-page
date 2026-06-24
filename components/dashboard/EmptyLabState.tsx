@@ -44,7 +44,7 @@ export const EmptyLabState = () => {
                 if (userInfo && labResult?.laboratory?.id) {
                     dispatch(setUserInfo({
                         ...userInfo,
-                        idLabs: [...(userInfo.idLabs || []), labResult.laboratory.id]
+                        idLab: labResult.laboratory.id
                     }));
                 }
             }, remainingTime);
