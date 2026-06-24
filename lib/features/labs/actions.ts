@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { getLabApi, updateLabStatusApi, injectPowerApi } from './api';
+import { getLabApi, updateLabStatusApi, injectPowerApi, createLabApi } from './api';
 
 export const fetchLaboratoryInterface = createAsyncThunk(
   'labs/fetchLaboratoryInterface',
@@ -44,6 +44,19 @@ export const injectPower = createAsyncThunk(
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       return rejectWithValue(error.response?.data?.message || 'Failed to inject hash');
+    }
+  }
+);
+
+export const createLaboratory = createAsyncThunk(
+  'labs/createLaboratory',
+  async (payload: { slotsCapacity?: number; userId?: string } = {}, { rejectWithValue }) => {
+    try {
+      const data = await createLabApi(payload);
+      return data;
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(error.response?.data?.message || 'Failed to create laboratory');
     }
   }
 );
