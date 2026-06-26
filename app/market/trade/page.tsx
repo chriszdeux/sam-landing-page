@@ -210,6 +210,14 @@ const TradeContent = () => {
             setStatus('ERROR');
             return;
         }
+        
+        const buyQuantity = form.amount / (selectedCrypto?.financial.price || 1);
+        const maxSupply = selectedCrypto?.financial.supplyToTrade || 0;
+        if (buyQuantity > maxSupply) {
+            setErrorMsg(`Liquidez insuficiente en el mercado. Intentas adquirir ${buyQuantity.toLocaleString(undefined, {maximumFractionDigits:4})} pero solo hay ${maxSupply.toLocaleString()} disponibles.`);
+            setStatus('ERROR');
+            return;
+        }
     } else if (transactionType === 'SELL') {
         if (form.quantity > availableQuantity) {
              setErrorMsg(`Fondos insuficientes. Tienes ${availableQuantity} ${selectedCrypto?.identification.symbol} pero intentas vender ${form.quantity}.`);

@@ -22,9 +22,7 @@ export const refreshUserInfo = createAsyncThunk(
           if (auth.status === 'loading') {
               return false;
           }
-          if (auth.lastRefresh && Date.now() - auth.lastRefresh < 240000) { // 4 minutes
-              return false;
-          }
+          // The 30s UI cooldown handles rate limiting now
       }
   }
 );

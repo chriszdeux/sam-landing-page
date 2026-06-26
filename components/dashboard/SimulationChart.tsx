@@ -5,6 +5,7 @@ import { Box, Typography } from '@mui/material';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { useAppSelector } from '../../lib/hooks';
 import { RootState } from '../../lib/store';
+import { formatHash } from '../../lib/utils/formatHash';
 
 export const SimulationChart = React.memo(() => {
     const chartData = useAppSelector((state: RootState) => {
@@ -23,6 +24,8 @@ export const SimulationChart = React.memo(() => {
             prev.maxTemperature === next.maxTemperature
         );
     });
+
+    const chronoBurstFreqTypes = useAppSelector((state: RootState) => state.blockchain.chronoBurstFreqTypes);
 
     const { simulationHistory, isPoweredOn, isOverheated, maxTemperature } = chartData;
     
@@ -77,6 +80,12 @@ export const SimulationChart = React.memo(() => {
                         domain={[0, maxTemperature]} 
                     />
                     <Tooltip 
+                        formatter={(value: number, name: string) => {
+                            if (name === "Procesamiento (Hash Rate)") {
+                                return [formatHash(value, chronoBurstFreqTypes), name];
+                            }
+                            return [`${value.toFixed(1)}°C`, name];
+                        }}
                         contentStyle={{ 
                             backgroundColor: 'rgba(10, 10, 10, 0.9)', 
                             border: '1px solid rgba(255,255,255,0.1)',
