@@ -1,8 +1,8 @@
 export enum processingFrequencies {
-  MEGA_CB = 10,
-  GIGA_CB = 100,
-  TERA_CB = 1000,
-  PETA_CB = 10000
+  MEGA_CB = 1000000,
+  GIGA_CB = 1000000000,
+  TERA_CB = 1000000000000,
+  PETA_CB = 1000000000000000
 }
 
 export const chronoBurstFreqTypes = {

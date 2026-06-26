@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Box, Typography, Grid, Paper, Stack, Tooltip, CircularProgress, Chip, Avatar } from '@mui/material';
+import { Box, Typography, Grid, Paper, Stack, Tooltip, CircularProgress, Chip, Avatar, Tabs, Tab, Button } from '@mui/material';
 import { motion } from 'framer-motion';
 import { 
     Layers, 
@@ -12,11 +12,16 @@ import {
     Star, 
     Timer,
     CheckCircle,
-    PlayCircle
+    PlayCircle,
+    Refresh
 } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../../lib/hooks';
 import { fetchBlocksHistory } from '../../../lib/features/blockchain/actions';
+import { fetchTransactions } from '../../../lib/features/transactions/actions';
 import { RootState } from '../../../lib/store';
+import { CustomTable } from '../../ui/CustomTable';
+import { transactionsPageColumns } from '../../market/transactionsPageColumns';
+import { useRefreshCooldown } from '../../../lib/useRefreshCooldown';
 
 export const BlocksModule = () => {
     const dispatch = useAppDispatch();
@@ -25,11 +30,34 @@ export const BlocksModule = () => {
     const networkColor = selectedNetwork?.additionalInfo?.color || '#00f3ff';
     const blockchainId = selectedNetwork?.id;
 
+    const [activeTab, setActiveTab] = React.useState<'blocks' | 'miner'>('blocks');
+    const { transactions, isLoading: isTxLoading } = useAppSelector((state: RootState) => state.transactions);
+    
+    const { isCooldownActive, cooldownRemaining, triggerRefresh } = useRefreshCooldown();
+
+    const storeId = selectedNetwork?.storeTransactions?.storeTransactionId || selectedNetwork?.storeTransactionId;
+
     useEffect(() => {
         if (blockchainId) {
             dispatch(fetchBlocksHistory({ blockchainId, thresholdMinutes: 2 }));
         }
     }, [dispatch, blockchainId]);
+
+    useEffect(() => {
+        if (activeTab === 'miner' && storeId) {
+            dispatch(fetchTransactions({ storeId, filter: 'MINER', page: 1, limit: 50 }));
+        }
+    }, [activeTab, storeId, dispatch]);
+
+    const handleRefresh = () => {
+        if (triggerRefresh()) {
+            if (activeTab === 'blocks' && blockchainId) {
+                dispatch(fetchBlocksHistory({ blockchainId, thresholdMinutes: 2 }));
+            } else if (activeTab === 'miner' && storeId) {
+                dispatch(fetchTransactions({ storeId, filter: 'MINER', page: 1, limit: 50 }));
+            }
+        }
+    };
 
     if (!selectedNetwork) {
         return (
@@ -90,13 +118,38 @@ export const BlocksModule = () => {
                 </Box>
             </Paper>
 
-            {/* Blocks Grid / List */}
-            <Box>
-                <Typography variant="h5" sx={{ color: '#white', fontWeight: 'bold', mb: 3, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Layers sx={{ color: networkColor }} /> Bloques Minados & Ledger
-                </Typography>
+            {/* Tabs & Refresh */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, borderBottom: 1, borderColor: 'rgba(0, 243, 255, 0.2)' }}>
+                <Tabs 
+                    value={activeTab} 
+                    onChange={(_, val) => setActiveTab(val)} 
+                    textColor="inherit"
+                    sx={{
+                        '& .MuiTab-root': { color: 'rgba(255,255,255,0.6)', fontWeight: 'bold' },
+                        '& .Mui-selected': { color: networkColor },
+                        '& .MuiTabs-indicator': { backgroundColor: networkColor }
+                    }}
+                >
+                    <Tab label="Bloques" value="blocks" />
+                    <Tab label="Transacciones Miner" value="miner" />
+                </Tabs>
+                
+                <Button
+                    variant="outlined"
+                    onClick={handleRefresh}
+                    disabled={isCooldownActive || isLoading || isTxLoading}
+                    startIcon={<Refresh />}
+                    sx={{ borderColor: networkColor, color: networkColor }}
+                    size="small"
+                >
+                    {isCooldownActive ? `${cooldownRemaining}s` : 'Refrescar'}
+                </Button>
+            </Box>
 
-                {isLoading && sortedBlocks.length === 0 ? (
+            {/* Content area */}
+            <Box>
+                {activeTab === 'blocks' ? (
+                    isLoading && sortedBlocks.length === 0 ? (
                     <Box display="flex" justifyContent="center" py={8}>
                         <CircularProgress sx={{ color: networkColor }} />
                     </Box>
@@ -267,6 +320,14 @@ export const BlocksModule = () => {
                             );
                         })}
                     </Grid>
+                    )
+                ) : (
+                    <CustomTable 
+                        columns={transactionsPageColumns}
+                        data={transactions || []}
+                        loading={isTxLoading}
+                        pageSize={10}
+                    />
                 )}
             </Box>
         </Box>

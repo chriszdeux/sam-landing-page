@@ -11,10 +11,11 @@ export const updateLabStatusApi = async (labId: string, status: 'ACTIVE' | 'INAC
   return response.data;
 };
 
-export const injectPowerApi = async (labId: string, blockchainId: string, hashAmount: number) => {
+export const injectPowerApi = async (labId: string, blockchainId: string, hashAmount: number, currentLife: number) => {
   const response = await api.put(`/labs/${labId}/inject-hash`, {
     blockchainId,
-    hashAmount
+    hashAmount,
+    currentLife
   });
   return response.data;
 };

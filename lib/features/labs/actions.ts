@@ -37,9 +37,9 @@ export const toggleLabStatus = createAsyncThunk(
 
 export const injectPower = createAsyncThunk(
   'labs/injectPower',
-  async ({ labId, blockchainId, hashAmount }: { labId: string; blockchainId: string; hashAmount: number }, { rejectWithValue }) => {
+  async ({ labId, blockchainId, hashAmount, currentLife }: { labId: string; blockchainId: string; hashAmount: number; currentLife: number }, { rejectWithValue }) => {
     try {
-      const data = await injectPowerApi(labId, blockchainId, hashAmount);
+      const data = await injectPowerApi(labId, blockchainId, hashAmount, currentLife);
       return data;
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
