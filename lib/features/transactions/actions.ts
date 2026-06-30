@@ -9,9 +9,9 @@ import { getTransactionsApi } from './api';
 //# 2-Crear acción para obtener listado de transacciones
 export const fetchTransactions = createAsyncThunk(
     'transactions/fetchTransactions',
-    async ({ storeId, walletId, transactionIds, page = 1, limit = 10 }: { storeId: string; walletId?: string; transactionIds?: string[]; page?: number; limit?: number }, { rejectWithValue }) => {
+    async ({ storeId, walletId, transactionIds, filter, page = 1, limit = 10 }: { storeId: string; walletId?: string; transactionIds?: string[]; filter?: string; page?: number; limit?: number }, { rejectWithValue }) => {
         try {
-            const data = await getTransactionsApi(storeId, walletId || '', page, limit, transactionIds);
+            const data = await getTransactionsApi(storeId, walletId || '', page, limit, transactionIds, filter);
             return { storeId, data, page };
         } catch (err: unknown) {
              const errorObj = err as { response?: { data?: { message?: string } } };

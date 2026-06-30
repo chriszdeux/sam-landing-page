@@ -26,6 +26,7 @@ export interface LaboratoryInterface {
   operationStatus: 'ACTIVE' | 'INACTIVE';
   pendingRewards: number;
   maxEnergy?: number;
+  networkHash?: number;
 }
 
 export interface LabsState {
@@ -38,4 +39,6 @@ export interface LabsState {
   currentRound: number;
   lastInjectionTime: number;
   isOverclockActive?: boolean;
+  startingTemp?: number | null;
 }
+

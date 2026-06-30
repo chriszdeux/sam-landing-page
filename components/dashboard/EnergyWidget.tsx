@@ -12,8 +12,8 @@ import { formatHash } from '../../lib/utils/formatHash';
 export const EnergyWidget = () => {
     const pathname = usePathname();
     
-    // Solo realizar selección y suscripción si NO estamos en la vista de operaciones (/dashboard)
-    const isDashboard = pathname === '/dashboard';
+    // Solo realizar selección y suscripción si NO estamos en la vista de operaciones (/operaciones)
+    const isDashboard = pathname === '/operaciones';
     const widgetData = useAppSelector((state: RootState) => {
         if (isDashboard) return null;
         const lab = state.reducerLabs.currentLab;

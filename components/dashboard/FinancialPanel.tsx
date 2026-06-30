@@ -7,6 +7,10 @@ import { useRouter } from 'next/navigation';
 import { useAppSelector } from '../../lib/hooks';
 import { TechFrame } from '../ui/TechFrame';
 import { CryptoHoldings } from '../../lib/features/auth/types';
+import { useAppDispatch } from '../../lib/hooks';
+import { refreshUserInfo } from '../../lib/features/auth/actions';
+import { useRefreshCooldown } from '../../lib/useRefreshCooldown';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 export const FinancialPanel = React.memo(() => {
     const authData = useAppSelector((state) => {
@@ -19,6 +23,15 @@ export const FinancialPanel = React.memo(() => {
     });
     const { balance, assets } = authData;
     const router = useRouter();
+    const dispatch = useAppDispatch();
+    
+    const { isCooldownActive, cooldownRemaining, triggerRefresh } = useRefreshCooldown();
+
+    const handleRefresh = () => {
+        if (triggerRefresh()) {
+            dispatch(refreshUserInfo());
+        }
+    };
 
     // Memoize sort + slice to avoid creating new arrays every render
     const topAssets = useMemo(() => 
@@ -74,14 +87,26 @@ export const FinancialPanel = React.memo(() => {
                         <Typography variant="h6" sx={{ color: '#fff', fontWeight: 'bold' }}>
                             ACTIVOS PRINCIPALES
                         </Typography>
-                        <Button 
-                            variant="text" 
-                            size="small" 
-                            onClick={() => router.push('/dashboard/assets')}
-                            sx={{ color: '#00f3ff', '&:hover': { bgcolor: 'rgba(0, 243, 255, 0.05)' } }}
-                        >
-                            Ver todo
-                        </Button>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                            <Button 
+                                variant="text" 
+                                size="small" 
+                                onClick={handleRefresh}
+                                disabled={isCooldownActive}
+                                startIcon={<RefreshIcon />}
+                                sx={{ color: '#00f3ff', '&:hover': { bgcolor: 'rgba(0, 243, 255, 0.05)' } }}
+                            >
+                                {isCooldownActive ? `${cooldownRemaining}s` : 'Refrescar'}
+                            </Button>
+                            <Button 
+                                variant="text" 
+                                size="small" 
+                                onClick={() => router.push('/operaciones/assets')}
+                                sx={{ color: '#00f3ff', '&:hover': { bgcolor: 'rgba(0, 243, 255, 0.05)' } }}
+                            >
+                                Ver todo
+                            </Button>
+                        </Box>
                     </Box>
 
                     <Stack spacing={2}>

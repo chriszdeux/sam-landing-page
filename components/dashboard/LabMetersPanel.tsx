@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Typography, Divider, Grid } from '@mui/material';
-import { useAppSelector } from '../../lib/hooks';
+import { Box, Typography, Divider, Grid, Button, Stack, Switch, FormControlLabel } from '@mui/material';
+import { useAppSelector, useAppDispatch } from '../../lib/hooks';
 import { TechFrame } from '../ui/TechFrame';
 import { RootState } from '../../lib/store';
 import { animate } from 'framer-motion';
 import { SimulationChart } from './SimulationChart';
 import { getCBUnit, getCBDivisor, processingFrequencies } from '../../lib/constants/blockchainFrequencies';
+import { updateSimulationData, setCooldownState, toggleLaboratoryPower, toggleOverclock } from '../../lib/features/labs/reducer';
 
 interface MeterProps {
     label: string;
@@ -34,7 +35,7 @@ const Meter = React.memo(({ label, value, max, unit = '', color, description, co
         });
         return () => controls.stop();
     }, [value]);
-    
+
     return (
         <Box sx={{ mb: compact ? 2 : 4 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', mb: 0.5 }}>
@@ -45,12 +46,12 @@ const Meter = React.memo(({ label, value, max, unit = '', color, description, co
                     {(unit === '%' || unit === '°C') ? displayValue.toFixed(2) : Math.round(displayValue)}{unit} {!compact && <Typography component="span" variant="caption" sx={{ color: 'rgba(255,255,255,0.3)' }}>/ {max}{unit}</Typography>}
                 </Typography>
             </Box>
-            
-            <Box sx={{ 
-                height: compact ? 6 : 12, 
-                bgcolor: 'rgba(255,255,255,0.05)', 
-                borderRadius: 1, 
-                overflow: 'hidden', 
+
+            <Box sx={{
+                height: compact ? 6 : 12,
+                bgcolor: 'rgba(255,255,255,0.05)',
+                borderRadius: 1,
+                overflow: 'hidden',
                 border: '1px solid rgba(255,255,255,0.1)',
                 display: 'flex',
                 gap: 0.5,
@@ -59,17 +60,17 @@ const Meter = React.memo(({ label, value, max, unit = '', color, description, co
                 {Array.from({ length: compact ? 10 : 20 }).map((_, i) => {
                     const isActive = (i + 1) * (compact ? 10 : 5) <= percentage;
                     return (
-                        <Box 
+                        <Box
                             key={i}
-                            sx={{ 
-                                flex: 1, 
-                                height: '100%', 
+                            sx={{
+                                flex: 1,
+                                height: '100%',
                                 bgcolor: isActive ? color : 'transparent',
                                 borderRadius: '1px',
                                 boxShadow: isActive ? `0 0 10px ${color}` : 'none',
                                 opacity: isActive ? 1 : 0.1,
                                 transition: 'all 0.3s ease'
-                            }} 
+                            }}
                         />
                     );
                 })}
@@ -84,6 +85,7 @@ const Meter = React.memo(({ label, value, max, unit = '', color, description, co
 });
 
 export const LabMetersPanel = React.memo(() => {
+    const dispatch = useAppDispatch();
     const labMetersData = useAppSelector((state: RootState) => {
         const lab = state.reducerLabs.currentLab;
         return {
@@ -92,7 +94,10 @@ export const LabMetersPanel = React.memo(() => {
             efficiency: lab?.efficiency || 0,
             currentLife: lab?.currentLife || 0,
             hashRate: lab?.hashRate || 0,
+            networkHash: lab?.networkHash || lab?.hashRate || 5.0,
             isPoweredOn: state.reducerLabs.isPoweredOn,
+            isOverclockActive: state.reducerLabs.isOverclockActive || false,
+            isOverheated: state.reducerLabs.isOverheated,
             slots: lab?.slots || []
         };
     }, (prev, next) => {
@@ -102,7 +107,10 @@ export const LabMetersPanel = React.memo(() => {
             prev.efficiency !== next.efficiency ||
             prev.currentLife !== next.currentLife ||
             prev.hashRate !== next.hashRate ||
+            prev.networkHash !== next.networkHash ||
             prev.isPoweredOn !== next.isPoweredOn ||
+            prev.isOverclockActive !== next.isOverclockActive ||
+            prev.isOverheated !== next.isOverheated ||
             prev.slots.length !== next.slots.length
         ) {
             return false;
@@ -120,47 +128,75 @@ export const LabMetersPanel = React.memo(() => {
         return true;
     });
 
-    const { temperature, maxTemperature: maxTemp, efficiency, currentLife, hashRate, isPoweredOn, slots } = labMetersData;
-    
+    const { temperature, maxTemperature: maxTemp, efficiency, currentLife, hashRate, networkHash, isPoweredOn, isOverclockActive, isOverheated, slots } = labMetersData;
+
+    const [emergencyMode, setEmergencyMode] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (temperature > maxTemp * 0.9 && isPoweredOn) {
+            setEmergencyMode(true);
+        } else {
+            setEmergencyMode(false);
+        }
+    }, [temperature, maxTemp, isPoweredOn]);
+
     const labFrequency = slots.length > 0
         ? slots.reduce((acc, s) => Math.max(acc, s.hashRate || processingFrequencies.MEGA_CB), processingFrequencies.MEGA_CB)
         : processingFrequencies.MEGA_CB;
     const frequencyMultiplier = labFrequency / processingFrequencies.MEGA_CB;
-    const totalPowerMiningVal = isPoweredOn ? (hashRate * frequencyMultiplier) : 0;
     const labUnit = getCBUnit(labFrequency);
 
-    const tempColor = temperature > maxTemp * 0.8 ? '#ff1744' : '#ffb700';
+    const tempColor = temperature > maxTemp * 0.9 ? '#ff1744' : temperature > maxTemp * 0.8 ? '#ffb700' : '#00e676';
     const effColor = efficiency < 50 && isPoweredOn ? '#ffb700' : '#00f3ff';
     const lifeColor = currentLife < 30 ? '#ff1744' : '#00e676';
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {/* Global Telemetry */}
-            <TechFrame color={isPoweredOn ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.08)"}>
-                <Box sx={{ p: 3, bgcolor: '#18181b' }}>
+            <TechFrame color={emergencyMode ? "#ff1744" : isPoweredOn ? "rgba(0, 243, 255, 0.3)" : "rgba(255,255,255,0.08)"}>
+                <Box sx={{ p: 3, bgcolor: '#18181b', position: 'relative' }}>
+                    {emergencyMode && (
+                        <Box sx={{
+                            position: 'absolute',
+                            top: 0, left: 0, right: 0,
+                            height: '3px',
+                            bgcolor: '#ff1744',
+                            animation: 'pulse 1s infinite',
+                            zIndex: 10
+                        }} />
+                    )}
+
                     <Typography variant="h6" sx={{ color: isPoweredOn ? '#fff' : 'rgba(255,255,255,0.3)', fontWeight: 'bold', mb: 4, textTransform: 'uppercase', letterSpacing: 2 }}>
-                        Telemetría Global {!isPoweredOn && '(OFFLINE)'}
+                        Telemetría Global {isOverheated ? '(COOLDOWN)' : !isPoweredOn && '(OFFLINE)'}
                     </Typography>
 
-                    <Meter 
+                    <style>{`
+                        @keyframes pulse {
+                            0% { opacity: 0.5; }
+                            50% { opacity: 1; }
+                            100% { opacity: 0.5; }
+                        }
+                    `}</style>
+
+                    <Meter
                         label="TEMPERATURA NÚCLEO"
                         value={temperature}
                         max={maxTemp}
                         unit="°C"
                         color={tempColor}
-                        description={temperature > maxTemp * 0.8 ? "ALERTA: Temperatura crítica" : "Estabilidad térmica controlada"}
+                        description={temperature >= maxTemp ? "CRÍTICO: Sobrecalentamiento extremo (-0.73 Vida/5s, -2.67% Rend/min)" : temperature > maxTemp * 0.9 ? "ALERTA: Modo de Caída activo (-0.33 Vida/5s, -1.33% Rend/min)" : "Estabilidad térmica controlada"}
                     />
 
-                    <Meter 
+                    <Meter
                         label="EFICIENCIA SISTEMA"
                         value={efficiency}
                         max={100}
                         unit="%"
                         color={effColor}
-                        description={efficiency < 50 ? "Rendimiento bajo: requiere enfriamiento" : "Optimización de ciclo activa"}
+                        description={isPoweredOn ? "Optimización de ciclo activa" : "Sistema inactivo: rendimiento colapsado a 0%"}
                     />
 
-                    <Meter 
+                    <Meter
                         label="VIDA ÚTIL ESTRUCTURAL"
                         value={currentLife}
                         max={100}
@@ -169,17 +205,19 @@ export const LabMetersPanel = React.memo(() => {
                         description={currentLife < 30 ? "CRÍTICO: Desgaste avanzado detectado" : "Integridad estructural óptima"}
                     />
 
-                    <Meter 
-                        label="POTENCIA TOTAL"
-                        value={totalPowerMiningVal}
-                        max={10 * frequencyMultiplier}
+                    <Meter
+                        label="HASH DEL LABORATORIO"
+                        value={networkHash}
+                        max={Math.max(10 * frequencyMultiplier, networkHash)}
                         unit={` ${labUnit}`}
                         color="#b000ff"
-                        description="Capacidad de cómputo agregada (Base + Slots)"
+                        description="Métrica viva de procesamiento entregada por la red (networkHash)"
                     />
+
+
                 </Box>
             </TechFrame>
-            
+
             {/* Slots Telemetry (Dual Thermal Management) */}
             {slots && slots.length > 0 && (
                 <TechFrame color="rgba(0, 243, 255, 0.2)">
@@ -187,7 +225,7 @@ export const LabMetersPanel = React.memo(() => {
                         <Typography variant="overline" sx={{ color: '#00f3ff', fontWeight: 'bold', mb: 3, display: 'block', letterSpacing: 2 }}>
                             Componentes de Hardware (Slots)
                         </Typography>
-                        
+
                         <Grid container spacing={3}>
                             {slots.map((slot) => {
                                 const sTemp = slot.temperature || 0;
@@ -198,7 +236,7 @@ export const LabMetersPanel = React.memo(() => {
                                             <Typography variant="caption" sx={{ color: '#fff', fontWeight: 'bold', mb: 1, display: 'block' }}>
                                                 {slot.name.toUpperCase()}
                                             </Typography>
-                                            <Meter 
+                                            <Meter
                                                 label="TEMP. COMPONENTE"
                                                 value={sTemp}
                                                 max={slot.maxTemperature}
