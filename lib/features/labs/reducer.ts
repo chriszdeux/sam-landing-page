@@ -12,6 +12,7 @@ const initialState: LabsState = {
   currentRound: 1,
   lastInjectionTime: 0,
   isOverclockActive: false,
+  startingTemp: null,
 };
 
 const labsSlice = createSlice({
@@ -27,6 +28,7 @@ const labsSlice = createSlice({
       state.simulationHistory = [];
       state.currentRound = 1;
       state.isOverclockActive = false;
+      state.startingTemp = null;
     },
     updateLocalEnergy: (state, action: PayloadAction<number>) => {
       if (state.currentLab) {
@@ -34,20 +36,16 @@ const labsSlice = createSlice({
       }
     },
     toggleLaboratoryPower: (state) => {
-      if (state.isOverheated && !state.isPoweredOn) return; 
+      if (state.isOverheated && !state.isPoweredOn) return;
       state.isPoweredOn = !state.isPoweredOn;
       if (!state.isPoweredOn) {
         state.isOverclockActive = false;
+        state.startingTemp = null;
+      } else {
+        state.startingTemp = state.currentLab?.temperature !== undefined ? state.currentLab.temperature : 0.0;
       }
       if (state.isPoweredOn && state.currentLab) {
-        state.currentLab.temperature = 0;
         state.currentLab.efficiency = 0;
-        if (state.currentLab.slots) {
-          state.currentLab.slots = state.currentLab.slots.map(slot => ({
-            ...slot,
-            temperature: 0
-          }));
-        }
       }
     },
     toggleOverclock: (state) => {
@@ -61,8 +59,12 @@ const labsSlice = createSlice({
     setCooldownState: (state, action: PayloadAction<boolean>) => {
       state.isOverheated = action.payload;
       if (action.payload) {
-          state.isPoweredOn = false;
-          state.isOverclockActive = false;
+        state.isPoweredOn = false;
+        state.isOverclockActive = false;
+        state.startingTemp = null;
+      } else {
+        state.isPoweredOn = true;
+        state.startingTemp = state.currentLab?.temperature !== undefined ? state.currentLab.temperature : 0.0;
       }
     },
     addHistoryPoint: (state, action: PayloadAction<{ timestamp: number; temperature: number; power: number }>) => {
@@ -85,18 +87,28 @@ const labsSlice = createSlice({
       })
       .addCase(fetchLaboratoryInterface.fulfilled, (state, action) => {
         state.status = 'succeeded';
+        let savedTemp = 0;
+        let savedLife = (action.payload && action.payload.currentLife !== undefined) ? action.payload.currentLife : 100;
+        if (typeof window !== 'undefined') {
+          // const t = localStorage.getItem('lab_current_temperature');
+          // if (t !== null) savedTemp = Number(t);
+          const l = localStorage.getItem('lab_current_life');
+          if (l !== null) savedLife = Number(l);
+        }
         state.currentLab = {
           ...action.payload,
-          temperature: 0,
+          hashRate: (action.payload && action.payload.hashRate && action.payload.hashRate >= 5) ? action.payload.hashRate : 5.0,
+          temperature: savedTemp,
           efficiency: 0,
+          currentLife: savedLife,
+          networkHash: action.payload.networkHash || action.payload.hashRate || 5.0,
           slots: (action.payload.slots || []).map((slot: SlotItem) => ({
             ...slot,
             temperature: 0
           }))
         };
-        if (action.payload.operationStatus === 'ACTIVE') {
-          state.isPoweredOn = true;
-        }
+        state.isPoweredOn = false;
+        state.startingTemp = null;
       })
       .addCase(fetchLaboratoryInterface.rejected, (state, action) => {
         state.status = 'failed';
@@ -109,16 +121,12 @@ const labsSlice = createSlice({
           state.isPoweredOn = newStatus === 'ACTIVE';
           if (!state.isPoweredOn) {
             state.isOverclockActive = false;
+            state.startingTemp = null;
+          } else {
+            state.startingTemp = state.currentLab.temperature !== undefined ? state.currentLab.temperature : 0.0;
           }
           if (state.isPoweredOn) {
-            state.currentLab.temperature = 0;
             state.currentLab.efficiency = 0;
-            if (state.currentLab.slots) {
-              state.currentLab.slots = state.currentLab.slots.map(slot => ({
-                ...slot,
-                temperature: 0
-              }));
-            }
           }
         }
       })
@@ -127,22 +135,26 @@ const labsSlice = createSlice({
         const labData = action.payload.laboratory || action.payload.labState || action.payload;
         if (state.currentLab && labData) {
           if (typeof labData === 'object') {
-            state.currentLab = { ...state.currentLab, ...labData };
+            state.currentLab = {
+              ...state.currentLab,
+              ...labData,
+              hashRate: (labData.hashRate && labData.hashRate >= 5) ? labData.hashRate : (state.currentLab.hashRate >= 5 ? state.currentLab.hashRate : 5.0)
+            };
           }
         }
       });
   },
 });
 
-export const { 
-    resetLabState, 
-    updateLocalEnergy, 
-    toggleLaboratoryPower, 
-    toggleOverclock,
-    updateSimulationData,
-    setCooldownState,
-    addHistoryPoint,
-    updateRound,
-    updateLastInjectionTime
+export const {
+  resetLabState,
+  updateLocalEnergy,
+  toggleLaboratoryPower,
+  toggleOverclock,
+  updateSimulationData,
+  setCooldownState,
+  addHistoryPoint,
+  updateRound,
+  updateLastInjectionTime
 } = labsSlice.actions;
 export default labsSlice.reducer;

@@ -21,6 +21,7 @@ interface UiState {
   activeModalContent: string | null;
   currentSection: string;
   notifications: Notification[];
+  lastRefreshTime: number | null;
 }
 
 //# 2-Establecer el estado inicial para modales y alertas
@@ -29,6 +30,7 @@ const initialState: UiState = {
   activeModalContent: null,
   currentSection: 'home',
   notifications: [],
+  lastRefreshTime: null,
 };
 
 //# 3-Crear slice de Redux y configuracion de reducers
@@ -57,12 +59,15 @@ const uiSlice = createSlice({
     },
     removeNotification: (state, action: PayloadAction<string>) => {
         state.notifications = state.notifications.filter(n => n.id !== action.payload);
+    },
+    triggerGlobalRefresh: (state) => {
+        state.lastRefreshTime = Date.now();
     }
   },
 });
 
 //# 4-Exportar acciones para manipular el estado
-export const { openModal, closeModal, setCurrentSection, addNotification, removeNotification } = uiSlice.actions;
+export const { openModal, closeModal, setCurrentSection, addNotification, removeNotification, triggerGlobalRefresh } = uiSlice.actions;
 
 //# 5-Exportar reducer para integracion en store
 export default uiSlice.reducer;

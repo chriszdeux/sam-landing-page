@@ -1,16 +1,17 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Container, Box, Typography, Stack } from '@mui/material';
+import { Container, Box, Typography, Stack, Tabs, Tab } from '@mui/material';
 import { Background } from '../../components/layout/Background';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import SearchIcon from '@mui/icons-material/Search';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 import { fetchTransactions } from '../../lib/features/transactions/actions';
 import { fetchBlocksHistory } from '../../lib/features/blockchain/actions';
 import { setTransactionsFromCache, clearTransactions } from '../../lib/features/transactions/reducer';
-import { GenericTable } from '../../components/ui/GenericTable';
+import { CustomTable } from '../../components/ui/CustomTable';
 import { transactionsPageColumns } from '../../components/market/transactionsPageColumns';
 import { RootState } from '../../lib/store';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
@@ -18,6 +19,7 @@ import { PageHeader } from '../../components/ui/PageHeader';
 import { motion } from 'framer-motion';
 import { BlockchainBlocksHistory } from '../../components/blockchain/BlockchainBlocksHistory';
 import { formatHash } from '../../lib/utils/formatHash';
+import { useRefreshCooldown } from '../../lib/useRefreshCooldown';
 
 export default function TransactionsPage() {
     const dispatch = useAppDispatch();
@@ -31,7 +33,22 @@ export default function TransactionsPage() {
     const [page, setPage] = useState(0);
     const [walletSearch, setWalletSearch] = useState('');
     const [appliedWalletFilter, setAppliedWalletFilter] = useState('');
+    const [filterType, setFilterType] = useState(''); // '' for Market, 'MINER' for Mining
     const pageSize = 10;
+
+    const { isCooldownActive, cooldownRemaining, triggerRefresh } = useRefreshCooldown();
+
+    const handleRefresh = () => {
+        if (triggerRefresh() && storeId) {
+            dispatch(fetchTransactions({
+                storeId,
+                page,
+                pageSize,
+                walletId: appliedWalletFilter || undefined,
+                filter: filterType || undefined
+            }));
+        }
+    };
 
     // Get queues from activeBlock or fallback to the latest block from blocksHistory
     const latestBlock = activeBlock || [...blocksHistory].sort((a, b) => b.index - a.index)[0];
@@ -65,7 +82,16 @@ export default function TransactionsPage() {
         setAppliedWalletFilter(walletSearch);
         setPage(0);
         if (storeId) {
-            dispatch(fetchTransactions({ storeId, walletId: walletSearch, page: 1, limit: pageSize }));
+            dispatch(fetchTransactions({ storeId, walletId: walletSearch, filter: filterType, page: 1, limit: pageSize }));
+        }
+    };
+
+    const handleFilterChange = (event: React.SyntheticEvent, newValue: string) => {
+        setFilterType(newValue);
+        setPage(0);
+        dispatch(clearTransactions());
+        if (storeId) {
+            dispatch(fetchTransactions({ storeId, walletId: appliedWalletFilter, filter: newValue, page: 1, limit: pageSize }));
         }
     };
 
@@ -77,15 +103,15 @@ export default function TransactionsPage() {
         if (cache[pageToFetch]) {
             dispatch(setTransactionsFromCache(pageToFetch));
         } else if (storeId) {
-            dispatch(fetchTransactions({ storeId, walletId: appliedWalletFilter, page: pageToFetch, limit: pageSize }));
+            dispatch(fetchTransactions({ storeId, walletId: appliedWalletFilter, filter: filterType, page: pageToFetch, limit: pageSize }));
         }
     };
 
     useEffect(() => {
         if (storeId && !cache[1]) {
-            dispatch(fetchTransactions({ storeId, walletId: appliedWalletFilter, page: 1, limit: pageSize }));
+            dispatch(fetchTransactions({ storeId, walletId: appliedWalletFilter, filter: filterType, page: 1, limit: pageSize }));
         }
-    }, [storeId, dispatch, appliedWalletFilter, cache]);
+    }, [storeId, dispatch, appliedWalletFilter, filterType, cache]);
 
     useEffect(() => {
         if (selectedNetwork?.id) {
@@ -207,9 +233,34 @@ export default function TransactionsPage() {
                         >
                             BUSCAR
                         </Button>
+                        <Button
+                            variant='outlined'
+                            onClick={handleRefresh}
+                            disabled={isCooldownActive}
+                            startIcon={<RefreshIcon />}
+                            sx={{ minWidth: 150, borderColor: '#00f3ff', color: '#00f3ff' }}
+                        >
+                            {isCooldownActive ? `ESPERE ${cooldownRemaining}s` : 'ACTUALIZAR'}
+                        </Button>
                     </Box>
 
-                    <GenericTable 
+                    <Box sx={{ borderBottom: 1, borderColor: 'rgba(0, 243, 255, 0.2)', mb: 3 }}>
+                        <Tabs 
+                            value={filterType} 
+                            onChange={handleFilterChange} 
+                            textColor="inherit"
+                            sx={{
+                                '& .MuiTab-root': { color: 'rgba(255,255,255,0.6)', fontWeight: 'bold' },
+                                '& .Mui-selected': { color: '#00f3ff' },
+                                '& .MuiTabs-indicator': { backgroundColor: '#00f3ff' }
+                            }}
+                        >
+                            <Tab label="Mercado (BUY/SELL)" value="" />
+                            <Tab label="Minería (MINE)" value="MINER" />
+                        </Tabs>
+                    </Box>
+
+                    <CustomTable 
                         columns={transactionsPageColumns}
                         data={transactionData}
                         loading={loading}

@@ -106,30 +106,37 @@ export const TransactionForm = ({
 
                 <Box>
                         {transactionType === 'BUY' && (
-                            <Input
-                            label="Monto a Invertir (CR)"
-                            name="amount"
-                            type="number"
-                            value={form.amount}
-                            onChange={onChange}
-                            fullWidth
-                            autoFocus
-                            inputProps={{ min: 0 }}
-                            containerSx={{
-                                '& .MuiInputLabel-root': { color: '#00f3ff' },
-                                mb: 2
-                            }}
-                            sx={{
-                                '& .MuiInputBase-input': { 
-                                    color: 'white', 
-                                    fontSize: '1.5rem',
-                                    borderColor: 'rgba(0, 243, 255, 0.3)',
-                                    '&:hover': { borderColor: '#00f3ff' },
-                                    '&:focus': { borderColor: '#00f3ff', boxShadow: '0 0 0 0.2rem rgba(0, 243, 255, 0.25)' }
-                                },
-                            }}
-                        />
-                    )}
+                            <Box>
+                                <Input
+                                    label="Monto a Invertir (CR)"
+                                    name="amount"
+                                    type="number"
+                                    value={form.amount}
+                                    onChange={onChange}
+                                    fullWidth
+                                    autoFocus
+                                    inputProps={{ min: 0 }}
+                                    containerSx={{
+                                        '& .MuiInputLabel-root': { color: '#00f3ff' },
+                                        mb: 2
+                                    }}
+                                    sx={{
+                                        '& .MuiInputBase-input': { 
+                                            color: 'white', 
+                                            fontSize: '1.5rem',
+                                            borderColor: 'rgba(0, 243, 255, 0.3)',
+                                            '&:hover': { borderColor: '#00f3ff' },
+                                            '&:focus': { borderColor: '#00f3ff', boxShadow: '0 0 0 0.2rem rgba(0, 243, 255, 0.25)' }
+                                        },
+                                    }}
+                                />
+                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mb: 2, gap: 1 }}>
+                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                        Liquidez Disponible: {selectedCrypto?.financial.supplyToTrade ? selectedCrypto.financial.supplyToTrade.toLocaleString() : '0'} {selectedCrypto?.identification.symbol}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        )}
 
                     {transactionType === 'SELL' && (
                         <Box>

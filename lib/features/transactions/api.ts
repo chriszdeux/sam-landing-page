@@ -13,7 +13,7 @@ export const resetTransactionsCheck = () => {
 };
 
 //# 3-Función para obtener historial de transacciones
-export const getTransactionsApi = async (storeId: string, wallet: string, page: number = 1, limit: number = 10, transactionIds?: string[]) => {
+export const getTransactionsApi = async (storeId: string, wallet: string, page: number = 1, limit: number = 10, transactionIds?: string[], filter?: string) => {
     let url = `/blockchain/transactions/${storeId}?page=${page}&limit=${limit}`;
     if (wallet) {
         url += `&walletId=${wallet}`;
@@ -21,6 +21,10 @@ export const getTransactionsApi = async (storeId: string, wallet: string, page: 
     
     if (transactionIds && transactionIds.length > 0) {
         url += `&transactionIds=${transactionIds.join(",")}`;
+    }
+    
+    if (filter) {
+        url += `&filter=${filter}`;
     }
     
     if (lastCheckDate) {

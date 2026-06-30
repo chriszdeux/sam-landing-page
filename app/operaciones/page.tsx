@@ -27,7 +27,7 @@ export default function DashboardPage() {
             dispatch(fetchLaboratoryInterface(labId));
         }
         dispatch(fetchProcessingFrequencies());
-    }, [dispatch, labId]);
+    }, [labId]);
 
     if (authStatus === 'loading' || (labId && labStatus === 'loading')) {
         return (

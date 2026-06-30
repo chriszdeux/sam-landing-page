@@ -11,6 +11,7 @@ import { LaboratorioRegistration } from "./LaboratorioRegistration";
 import { formatHash } from "../../lib/utils/formatHash";
 import { LaboratorioInventory } from "./LaboratorioInventory";
 import { CoreModulesSimulator } from "../core_modules/CoreModulesSimulator";
+import { LaboratorySimulation } from "./LaboratorySimulation";
 import { useEffect, useState } from "react";
 import { RootState } from "../../lib/store";
 import { fetchLaboratoryInterface } from "../../lib/features/labs/actions";
@@ -156,6 +157,14 @@ export function LaboratorioView() {
                 />
             </Box>
           </Paper>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <LaboratorySimulation />
         </motion.div>
 
         <motion.div

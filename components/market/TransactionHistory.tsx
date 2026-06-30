@@ -13,7 +13,7 @@ import { Box, Typography } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { fetchTransactions } from '../../lib/features/transactions/actions';
 
-import { GenericTable } from '../../components/ui/GenericTable';
+import { CustomTable } from '../../components/ui/CustomTable';
 import { TransactionsInterface } from '../../lib/features/transactions/types';
 import { transactionColumns } from './transactionColumns';
 
@@ -45,7 +45,7 @@ export const TransactionHistory = ({ walletId }: TransactionHistoryProps) => {
   return (
     <Box sx={{ width: '100%' }}>
       <Typography variant="h6" sx={{ mb: 2, color: 'text.secondary' }}>Últimas Transacciones</Typography>
-      <GenericTable 
+      <CustomTable 
          columns={transactionColumns} 
          data={transactionData} 
          pageSize={10} 
