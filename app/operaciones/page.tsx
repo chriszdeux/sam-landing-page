@@ -56,7 +56,7 @@ export default function DashboardPage() {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                 >
-                    <Box sx={{ mb: 6 }}>
+                    <Box sx={{ mb: 6, mt: 4 }}>
                         <Typography variant="h3" sx={{
                             color: '#fff',
                             fontWeight: 900,

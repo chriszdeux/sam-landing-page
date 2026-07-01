@@ -80,11 +80,12 @@ export const SimulationChart = React.memo(() => {
                         domain={[0, maxTemperature]} 
                     />
                     <Tooltip 
-                        formatter={(value: number, name: string) => {
+                        formatter={(value: any, name: any) => {
+                            const valNum = Number(value) || 0;
                             if (name === "Procesamiento (Hash Rate)") {
-                                return [formatHash(value, chronoBurstFreqTypes), name];
+                                return [formatHash(valNum, chronoBurstFreqTypes), name];
                             }
-                            return [`${value.toFixed(1)}°C`, name];
+                            return [`${valNum.toFixed(1)}°C`, name];
                         }}
                         contentStyle={{ 
                             backgroundColor: 'rgba(10, 10, 10, 0.9)', 
