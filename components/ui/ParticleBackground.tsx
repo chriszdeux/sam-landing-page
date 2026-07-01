@@ -17,6 +17,15 @@ interface Particle {
   color: string;
 }
 
+interface HexParticle {
+  x: number;
+  y: number;
+  vy: number;
+  text: string;
+  size: number;
+  opacity: number;
+}
+
 export const ParticleBackground = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -29,14 +38,17 @@ export const ParticleBackground = () => {
     if (!ctx) return;
 
     let particles: Particle[] = [];
+    let hexParticles: HexParticle[] = [];
     const electricPaths: { path: Particle[]; life: number }[] = [];
     let animationFrameId: number;
     let width = window.innerWidth;
     let height = window.innerHeight;
     const mouse = { x: -1000, y: -1000 };
+    let time = 0;
 
     const connectionDistance = 150;
     const colors = ['#00f3ff', '#ff0055'];
+    const hexChars = '0123456789ABCDEF';
 
     const handleMouseMove = (e: MouseEvent) => {
       mouse.x = e.clientX;
@@ -49,11 +61,11 @@ export const ParticleBackground = () => {
       canvas.width = width;
       canvas.height = height;
       initParticles();
+      initHexParticles();
     };
 
     const initParticles = () => {
       particles = [];
-      // Capped lower for performance; still visually rich
       const count = Math.min(80, Math.floor((width * height) / 15000));
       for (let i = 0; i < count; i++) {
         particles.push({
@@ -67,7 +79,22 @@ export const ParticleBackground = () => {
       }
     };
 
-    // Spatial grid for O(n*k) connection lookups instead of O(n²)
+    const initHexParticles = () => {
+      hexParticles = [];
+      const count = Math.min(35, Math.floor(width / 45));
+      for (let i = 0; i < count; i++) {
+        const hexVal = '0x' + hexChars[Math.floor(Math.random() * 16)] + hexChars[Math.floor(Math.random() * 16)];
+        hexParticles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vy: -(Math.random() * 0.4 + 0.15),
+          text: hexVal,
+          size: Math.random() * 8 + 9, // 9px to 17px
+          opacity: Math.random() * 0.05 + 0.02
+        });
+      }
+    };
+
     const buildGrid = (cellSize: number) => {
       const grid: Map<string, number[]> = new Map();
       for (let i = 0; i < particles.length; i++) {
@@ -82,15 +109,48 @@ export const ParticleBackground = () => {
     };
 
     const draw = () => {
+      time++;
       ctx.clearRect(0, 0, width, height);
 
-      // Update positions
+      // 1. Inyección de Malla de Datos Dinámica (Grid pulsante)
+      const gridSpacing = 120;
+      const pulse = Math.sin(time * 0.015) * 0.008 + 0.015;
+      ctx.strokeStyle = `rgba(0, 243, 255, ${pulse})`;
+      ctx.lineWidth = 0.5;
+
+      for (let x = 0; x < width; x += gridSpacing) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += gridSpacing) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      // 2. Flujo de Micro-Código Atenuado (Partículas Hexadecimales)
+      for (const hp of hexParticles) {
+        hp.y += hp.vy;
+        if (hp.y < -20) {
+          hp.y = height + 20;
+          hp.x = Math.random() * width;
+          hp.text = '0x' + hexChars[Math.floor(Math.random() * 16)] + hexChars[Math.floor(Math.random() * 16)];
+        }
+        ctx.fillStyle = `rgba(0, 243, 255, ${hp.opacity})`;
+        ctx.font = `bold ${hp.size}px monospace`;
+        ctx.fillText(hp.text, hp.x, hp.y);
+      }
+
+      // Update particles positions
       for (const p of particles) {
         const dxMouse = mouse.x - p.x;
         const dyMouse = mouse.y - p.y;
         const distMouseSq = dxMouse * dxMouse + dyMouse * dyMouse;
         
-        if (distMouseSq < 40000) { // 200²
+        if (distMouseSq < 40000) {
             const distMouse = Math.sqrt(distMouseSq);
             const force = (200 - distMouse) / 200;
             p.vx -= (dxMouse / distMouse) * force * 0.05;
@@ -119,7 +179,6 @@ export const ParticleBackground = () => {
         ctx.fillStyle = p.color;
         ctx.fill();
 
-        // Check only neighboring grid cells
         const cx = Math.floor(p.x / connectionDistance);
         const cy = Math.floor(p.y / connectionDistance);
         for (let gx = cx - 1; gx <= cx + 1; gx++) {
@@ -235,9 +294,7 @@ export const ParticleBackground = () => {
     };
   }, []);
 
-  
-  
-  //# 5-Estructuración y renderizado visual del componente UI
+  //# 3-Renderizar elemento canvas
   return (
     <>
     <Box
@@ -249,9 +306,10 @@ export const ParticleBackground = () => {
         left: 0,
         width: '100%',
         height: '100%',
-
         zIndex: -2,
-        bgcolor: '#0a0a1a', 
+        bgcolor: '#05050f',
+        willChange: 'transform',
+        transform: 'translate3d(0, 0, 0)',
       }}
     />
     <Box
@@ -261,7 +319,6 @@ export const ParticleBackground = () => {
           left: 0,
           width: '100%',
           height: '100%',
-
           zIndex: -1,
           backgroundColor: 'rgba(0, 0, 0, 0.7)',
           pointerEvents: 'none',

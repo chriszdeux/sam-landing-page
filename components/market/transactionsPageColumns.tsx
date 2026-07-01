@@ -16,6 +16,7 @@ import {
 } from '@mui/icons-material';
 import { Column } from '../ui/CustomTable';
 import { TransactionsInterface, TransactionType } from '../../lib/features/transactions/types';
+import { formatHashLocal } from '../../lib/utils/formatHash';
 
 export const transactionsPageColumns: Column<TransactionsInterface>[] = [
     {
@@ -126,6 +127,20 @@ export const transactionsPageColumns: Column<TransactionsInterface>[] = [
         label: "Cantidad",
         key: (row) => row.financialInfo?.quantity,
         sortable: true
+    },
+    {
+        label: "Potencia CB",
+        key: (row) => row.powerRequired ?? 0,
+        sortable: true,
+        render: ({ value }) => {
+            const raw = value as number;
+            if (!raw || raw === 0) return <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)' }}>—</Typography>;
+            return (
+                <Typography variant="caption" sx={{ color: '#00f3ff', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                    {formatHashLocal(raw * 1000000)}
+                </Typography>
+            );
+        }
     },
     {
         label: "Origen",

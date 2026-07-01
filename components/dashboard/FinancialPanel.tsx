@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Box, Typography, Stack, Avatar, Button } from '@mui/material';
+import { Box, Typography, Stack, Avatar } from '@mui/material';
+import { CustomButton } from '../ui/CustomButton';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '../../lib/hooks';
@@ -63,22 +64,15 @@ export const FinancialPanel = React.memo(() => {
             </TechFrame>
 
             {/* Operations Block */}
-            <Button
-                variant="contained"
+            <CustomButton
+                variant="info"
                 fullWidth
                 onClick={() => router.push('/market')}
-                sx={{
-                    py: 1.5,
-                    bgcolor: 'rgba(0, 243, 255, 0.1)',
-                    color: '#00f3ff',
-                    border: '1px solid #00f3ff',
-                    fontWeight: 'bold',
-                    letterSpacing: 1.5,
-                    '&:hover': { bgcolor: 'rgba(0, 243, 255, 0.2)', borderColor: '#00f3ff' }
-                }}
+                glow
+                sx={{ py: 1.25, fontSize: '0.85rem' }}
             >
                 Ir al Mercado
-            </Button>
+            </CustomButton>
 
             {/* Assets List Block */}
             <TechFrame color="rgba(255,255,255,0.1)">
@@ -88,24 +82,21 @@ export const FinancialPanel = React.memo(() => {
                             ACTIVOS PRINCIPALES
                         </Typography>
                         <Box sx={{ display: 'flex', gap: 1 }}>
-                            <Button 
-                                variant="text" 
-                                size="small" 
+                            <CustomButton 
+                                variant="info" 
                                 onClick={handleRefresh}
                                 disabled={isCooldownActive}
                                 startIcon={<RefreshIcon />}
-                                sx={{ color: '#00f3ff', '&:hover': { bgcolor: 'rgba(0, 243, 255, 0.05)' } }}
+                                glow
                             >
                                 {isCooldownActive ? `${cooldownRemaining}s` : 'Refrescar'}
-                            </Button>
-                            <Button 
-                                variant="text" 
-                                size="small" 
+                            </CustomButton>
+                            <CustomButton 
+                                variant="neutral" 
                                 onClick={() => router.push('/operaciones/assets')}
-                                sx={{ color: '#00f3ff', '&:hover': { bgcolor: 'rgba(0, 243, 255, 0.05)' } }}
                             >
                                 Ver todo
-                            </Button>
+                            </CustomButton>
                         </Box>
                     </Box>
 

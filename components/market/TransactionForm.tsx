@@ -4,6 +4,7 @@
 //# 1-Definir componente de formulario de transacción
 import React from 'react';
 import { Box, MenuItem, Paper, Typography, Button, CircularProgress, SelectChangeEvent, Alert, Chip } from '@mui/material';
+import { CustomButton } from '../ui/CustomButton';
 import { Input } from '../ui/Input';
 import { Cryptocurrency } from '../../lib/types/crypto';
 import { TaoIcon } from '../ui/TaoIcon';
@@ -245,36 +246,19 @@ export const TransactionForm = ({
                 </Box>
             </Box>
 
-            <Button
-                variant="contained"
-                size="large"
+            <CustomButton
+                variant={transactionType === 'BUY' ? 'success' : transactionType === 'SELL' ? 'error' : 'warning'}
                 onClick={onSubmit}
                 disabled={!form.walletId || isProcessing || fee === null}
-                startIcon={isProcessing ? <CircularProgress size={20} color="inherit" /> : null}
-                sx={{
-                    py: 2,
-                    fontSize: '1.1rem',
-                    fontWeight: 'bold',
-                    width: '100%',
-                    mt: 4,
-                    bgcolor: accentColor,
-                    color: transactionType === 'BUY' ? 'black' : 'white',
-                    boxShadow: `0 0 20px ${accentColor}40`,
-                    letterSpacing: 1.5,
-                    transition: 'all 0.25s ease',
-                    '&:hover': {
-                        bgcolor: transactionType === 'BUY' ? '#00c853' : transactionType === 'SELL' ? '#d50000' : '#e65100',
-                        transform: 'scale(1.01)',
-                        boxShadow: `0 0 35px ${accentColor}60`,
-                    },
-                    '&:disabled': { opacity: 0.5 },
-                    '&:active': { transform: 'scale(0.99)' },
-                }}
+                startIcon={isProcessing ? <CircularProgress size={14} color="inherit" /> : null}
+                glow
+                fullWidth
+                sx={{ mt: 4, py: 1.25, fontSize: '0.85rem' }}
             >
                 {isProcessing
                     ? 'Procesando Transacción...'
                     : `CONFIRMAR ${transactionType === 'BUY' ? 'COMPRA' : transactionType === 'SELL' ? 'VENTA' : 'TRANSFERENCIA'}`}
-            </Button>
+            </CustomButton>
         </Box>
     );
 };
