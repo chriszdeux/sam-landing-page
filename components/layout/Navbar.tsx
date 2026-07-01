@@ -17,6 +17,7 @@ import {
   Typography,
   Box,
   Drawer,
+  Tooltip,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
@@ -35,41 +36,46 @@ import { NavbarDrawer } from "./NavbarDrawer";
 import { LogoutDialog } from "./LogoutDialog";
 import { NavbarUserMenu } from "./NavbarUserMenu";
 import { LabNavbarIndicator } from "./LabNavbarIndicator";
+import { formatHash } from "../../lib/utils/formatHash";
 import { EnvVariables } from "@/lib/constants/variables";
 
 export const Navbar = () => {
-  
+
   //# 2-Definir componente y estados locales
   const [mobileOpen, setMobileOpen] = useState(false);
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
-  
+
   //# 3-Obtener datos de Redux y hooks
   const dispatch = useAppDispatch();
   const { userInfo, walletsInfo } = useAppSelector((state) => state.auth);
   const { networks, selectedNetwork: selectedNetworkState } = useAppSelector((state) => state.blockchain);
+  const isPoweredOn = useAppSelector((state) => state.reducerLabs.isPoweredOn);
+  const currentLab = useAppSelector((state) => state.reducerLabs.currentLab);
+  const chronoBurstFreqTypes = useAppSelector((state) => state.blockchain.chronoBurstFreqTypes);
+  const localHash = currentLab?.energy ?? 0;
 
   const pathname = usePathname();
   const router = useRouter();
 
   const selectedNetwork = networks.find(n => n.id === selectedNetworkState?.id) || networks[0];
 
-  
-  
+
+
   //# 4-Efecto para sincronizar detalles de la billetera y polling de poder
 
 
 
   if (
-    pathname === '/auth/logging-in' || 
-    pathname === '/auth/logging-out' || 
+    pathname === '/auth/logging-in' ||
+    pathname === '/auth/logging-out' ||
     pathname.includes('/connecting') ||
     pathname === '/exploracion-infinita'
   ) {
     return null;
   }
 
-  
-  
+
+
   //# 5-Funciones para manejar eventos de usuario
   const handleNavClick = (item: (typeof navItems)[0]) => {
     if (item.path === "/") {
@@ -89,35 +95,35 @@ export const Navbar = () => {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
-    
+
   const handleNetworkClick = () => {
-      if (selectedNetwork) {
-          router.push(`/network`);
-          setMobileOpen(false);
-      }
+    if (selectedNetwork) {
+      router.push(`/network`);
+      setMobileOpen(false);
+    }
   };
 
-  
-  
+
+
   //# 6-Renderizar estructura principal de la barra
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
         position="fixed"
         sx={{
-          bgcolor: "rgba(5, 5, 12, 0.8)", 
+          bgcolor: "rgba(5, 5, 12, 0.8)",
           backdropFilter: "blur(16px)",
           borderBottom: "1px solid rgba(0, 243, 255, 0.1)",
-          boxShadow: "0 10px 30px -10px rgba(0, 0, 0, 0.8)", 
-          height: '80px', 
+          boxShadow: "0 10px 30px -10px rgba(0, 0, 0, 0.8)",
+          height: '80px',
           justifyContent: 'center',
           backgroundImage: 'linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px)',
           backgroundSize: '30px 30px',
         }}
       >
-        {}
+        { }
         <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent, #00f3ff, transparent)', opacity: 1, boxShadow: '0 0 15px #00f3ff' }} />
-        
+
         <Toolbar sx={{ px: { xs: 2, md: 4 } }}>
 
           <Box
@@ -129,39 +135,39 @@ export const Navbar = () => {
             }}
             onClick={() => handleNavClick(navItems[0])}
           >
-            <Box sx={{ 
-                mr: 2, 
-                p: 1, 
-                border: '1px solid rgba(0, 243, 255, 0.3)', 
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 0 15px rgba(0, 243, 255, 0.15)',
-                bgcolor: 'rgba(0, 243, 255, 0.05)'
+            <Box sx={{
+              mr: 2,
+              p: 1,
+              border: '1px solid rgba(0, 243, 255, 0.3)',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 0 15px rgba(0, 243, 255, 0.15)',
+              bgcolor: 'rgba(0, 243, 255, 0.05)'
             }}>
-                <Rocket sx={{ color: "primary.main", fontSize: 24, filter: 'drop-shadow(0 0 5px #00f3ff)' }} />
+              <Rocket sx={{ color: "primary.main", fontSize: 24, filter: 'drop-shadow(0 0 5px #00f3ff)' }} />
             </Box>
             <Box>
-                <Typography
+              <Typography
                 variant="h6"
                 component="div"
-                sx={{ 
-                    fontWeight: "900", 
-                    letterSpacing: 2, 
-                    lineHeight: 1,
-                    background: 'linear-gradient(90deg, #fff, #00f3ff)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    mb: 0.5
+                sx={{
+                  fontWeight: "900",
+                  letterSpacing: 2,
+                  lineHeight: 1,
+                  background: 'linear-gradient(90deg, #fff, #00f3ff)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  mb: 0.5
                 }}
-                >
+              >
                 {EnvVariables.project.toUpperCase()}
-                </Typography>
-                <Typography variant="caption" sx={{ color: 'rgba(0, 243, 255, 0.7)', letterSpacing: 3, fontSize: '0.6rem', display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Box component="span" sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#00f3ff', boxShadow: '0 0 5px #00f3ff' }} />
-                    SYSTEM ONLINE
-                </Typography>
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'rgba(0, 243, 255, 0.7)', letterSpacing: 3, fontSize: '0.6rem', display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box component="span" sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#00f3ff', boxShadow: '0 0 5px #00f3ff' }} />
+                SYSTEM ONLINE
+              </Typography>
             </Box>
           </Box>
 
@@ -182,63 +188,120 @@ export const Navbar = () => {
           >
             {navItems.filter(item => !item.auth || userInfo).map((item) => {
               const isActive = pathname === item.path;
-              
-              
+              const isOperations = item.id === 'dashboard';
+              const formattedHash = formatHash(localHash, chronoBurstFreqTypes);
+              const tooltipText = `Hash Acumulado Local: ${formattedHash}`;
+
+              const buttonSx = {
+                color: isActive ? "primary.main" : "rgba(255,255,255,0.6)",
+                fontWeight: isActive ? 'bold' : 'normal',
+                "&:hover": { color: "primary.main" },
+                position: 'relative',
+                zIndex: 1,
+                borderBottom: 'none',
+                borderRadius: 2,
+                minWidth: 'auto',
+                px: 3,
+                py: 1,
+                letterSpacing: 1,
+                ...(isOperations && isPoweredOn ? {
+                  '@keyframes pulseGold': {
+                    '0%': {
+                      boxShadow: '0 0 0 0 rgba(212, 163, 115, 0.5)',
+                      borderColor: 'rgba(212, 163, 115, 0.5)',
+                    },
+                    '70%': {
+                      boxShadow: '0 0 0 8px rgba(212, 163, 115, 0)',
+                      borderColor: 'rgba(230, 197, 148, 0.8)',
+                    },
+                    '100%': {
+                      boxShadow: '0 0 0 0 rgba(212, 163, 115, 0)',
+                      borderColor: 'rgba(212, 163, 115, 0.5)',
+                    }
+                  },
+                  animation: 'pulseGold 2s infinite ease-in-out',
+                  border: '1px solid #D4A373',
+                  background: 'linear-gradient(45deg, rgba(212, 163, 115, 0.1), rgba(230, 197, 148, 0.15))',
+                  color: '#E6C594',
+                  '&:hover': {
+                    color: '#fff',
+                    borderColor: '#E6C594',
+                    background: 'linear-gradient(45deg, rgba(212, 163, 115, 0.2), rgba(230, 197, 148, 0.25))',
+                  }
+                } : {})
+              };
+
+              const buttonContent = (
+                <Button
+                  variant="text"
+                  onClick={() => handleNavClick(item)}
+                  sx={buttonSx}
+                >
+                  {item.name}
+                </Button>
+              );
 
               return (
                 <Box key={item.id} sx={{ position: 'relative' }}>
-                    {isActive && (
-                        <motion.div
-                            layoutId="navbar-indicator"
-                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                            style={{
-                                position: 'absolute',
-                                inset: 0,
-                                background: 'rgba(0, 243, 255, 0.1)',
-                                borderRadius: '8px',
-                                border: '1px solid rgba(0, 243, 255, 0.3)',
-                            }}
-                        />
-                    )}
-                  <Button
-                    variant="text"
-                    onClick={() => handleNavClick(item)}
-                    sx={{
-                      color: isActive ? "primary.main" : "rgba(255,255,255,0.6)",
-                      fontWeight: isActive ? 'bold' : 'normal',
-                      "&:hover": { color: "primary.main" },
-                      position: 'relative',
-                      zIndex: 1,
-                      borderBottom: 'none',
-                      borderRadius: 2,
-                      minWidth: 'auto',
-                      px: 3,
-                      py: 1,
-                      letterSpacing: 1
-                    }}
-                  >
-                    {item.name}
-                  </Button>
+                  {isActive && (
+                    <motion.div
+                      layoutId="navbar-indicator"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'rgba(0, 243, 255, 0.1)',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(0, 243, 255, 0.3)',
+                      }}
+                    />
+                  )}
+                  {isOperations ? (
+                    <Tooltip
+                      title={tooltipText}
+                      arrow
+                      placement="bottom"
+                      componentsProps={{
+                        tooltip: {
+                          sx: {
+                            bgcolor: 'rgba(10, 10, 10, 0.95)',
+                            border: '1px solid rgba(212, 163, 115, 0.3)',
+                            color: '#E6C594',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.8)',
+                            fontWeight: 'bold',
+                            p: 1.5
+                          }
+                        },
+                        arrow: {
+                          sx: {
+                            color: 'rgba(10, 10, 10, 0.95)'
+                          }
+                        }
+                      }}
+                    >
+                      <span>{buttonContent}</span>
+                    </Tooltip>
+                  ) : buttonContent}
                 </Box>
               );
             })}
           </Box>
 
-            <Box sx={{ 
-                height: 30, 
-                width: '1px', 
-                bgcolor: 'rgba(255,255,255,0.1)', 
-                mx: 2,
-                display: { xs: "none", md: "block" }
-            }} />
+          <Box sx={{
+            height: 30,
+            width: '1px',
+            bgcolor: 'rgba(255,255,255,0.1)',
+            mx: 2,
+            display: { xs: "none", md: "block" }
+          }} />
 
-            <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 2 }}>
-                {userInfo && <LabNavbarIndicator />}
-                <NavbarUserMenu 
-                    userInfo={userInfo}
-                    onLogoutClick={() => setLogoutConfirmOpen(true)}
-                />
-            </Box>
+          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 2 }}>
+            {userInfo && <LabNavbarIndicator />}
+            <NavbarUserMenu
+              userInfo={userInfo}
+              onLogoutClick={() => setLogoutConfirmOpen(true)}
+            />
+          </Box>
 
           <IconButton
             color="inherit"
@@ -282,9 +345,9 @@ export const Navbar = () => {
         </Drawer>
       </Box>
 
-      <LogoutDialog 
-        open={logoutConfirmOpen} 
-        onClose={() => setLogoutConfirmOpen(false)} 
+      <LogoutDialog
+        open={logoutConfirmOpen}
+        onClose={() => setLogoutConfirmOpen(false)}
         onConfirm={() => router.push('/auth/logging-out')}
       />
     </Box>
