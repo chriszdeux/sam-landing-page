@@ -30,7 +30,6 @@ export const getTransactionsApi = async (storeId: string, wallet: string, page: 
     if (lastCheckDate) {
         url += `&lastCheck=${lastCheckDate}`;
     }
-    console.log("url", url)
     const response = await api.get(url);
 
     
