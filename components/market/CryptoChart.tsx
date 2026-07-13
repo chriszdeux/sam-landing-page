@@ -4,10 +4,10 @@
 // 4-Preparar datos y configuración del gráfico
 // 5-Renderizar gráfico con tooltip personalizado
 
-//# 1-Definir componente de gráfico de criptomonedas
+'use client';
 
 import React from 'react';
-import { Box, CircularProgress } from '@mui/material';
+import { Box, CircularProgress, Stack, Button, Typography } from '@mui/material';
 import { motion } from 'framer-motion';
 import {
   Chart as ChartJS,
@@ -34,7 +34,6 @@ ChartJS.register(
   Legend
 );
 
-//# 1-Obtención del despachador para emitir acciones al store
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { fetchCryptoHistory } from '../../lib/features/market/actions';
 
@@ -44,24 +43,210 @@ interface CryptoChartProps {
     range?: string;
 }
 
-export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps) => {
-    
-    //# 2-Obtención del despachador para emitir acciones al store
-    const dispatch = useAppDispatch();
-    
-    //# 3-Selección de datos desde el estado global de Redux
-    const { historicalData, isLoading } = useAppSelector((state) => state.market);
-    
+interface Candle {
+    timestamp: number;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+    label: string;
+}
 
-    
-    
-    //# 4-Efecto secundario para sincronización del ciclo de vida
+const CandlestickChart = ({ data, color }: { data: Candle[], color: string }) => {
+    const [hoveredCandle, setHoveredCandle] = React.useState<Candle | null>(null);
+    const [hoverX, setHoverX] = React.useState<number | null>(null);
+    const [hoverY, setHoverY] = React.useState<number | null>(null);
+    const svgRef = React.useRef<SVGSVGElement>(null);
+
+    const padding = { top: 20, right: 70, bottom: 30, left: 10 };
+    const width = 800;
+    const height = 350;
+
+    if (data.length === 0) return null;
+
+    const prices = data.flatMap(c => [c.high, c.low]);
+    const maxPrice = Math.max(...prices) * 1.002;
+    const minPrice = Math.min(...prices) * 0.998;
+    const priceRange = maxPrice - minPrice || 1;
+
+    const getY = (val: number) => {
+        return height - padding.bottom - ((val - minPrice) / priceRange) * (height - padding.top - padding.bottom);
+    };
+
+    const getX = (idx: number) => {
+        const chartWidth = width - padding.left - padding.right;
+        return padding.left + (idx / Math.max(1, data.length - 1)) * chartWidth;
+    };
+
+    const gridCount = 5;
+    const gridValues = Array.from({ length: gridCount }).map((_, i) => {
+        return minPrice + (priceRange / (gridCount - 1)) * i;
+    });
+
+    const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+        if (!svgRef.current) return;
+        const rect = svgRef.current.getBoundingClientRect();
+        const clientX = e.clientX - rect.left;
+        const clientY = e.clientY - rect.top;
+
+        const svgX = (clientX / rect.width) * width;
+        const svgY = (clientY / rect.height) * height;
+
+        const chartWidth = width - padding.left - padding.right;
+        const pct = (svgX - padding.left) / chartWidth;
+        const rawIdx = pct * (data.length - 1);
+        const idx = Math.max(0, Math.min(data.length - 1, Math.round(rawIdx)));
+
+        setHoveredCandle(data[idx]);
+        setHoverX(getX(idx));
+        setHoverY(svgY);
+    };
+
+    const handleMouseLeave = () => {
+        setHoveredCandle(null);
+        setHoverX(null);
+        setHoverY(null);
+    };
+
+    const candleWidth = Math.max(4, (width - padding.left - padding.right) / data.length * 0.6);
+
+    return (
+        <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+            <svg
+                ref={svgRef}
+                viewBox={`0 0 ${width} ${height}`}
+                width="100%"
+                height="100%"
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                style={{ overflow: 'visible', background: 'rgba(255,255,255,0.01)', borderRadius: '8px' }}
+            >
+                {/* Horizontal Grid Lines */}
+                {gridValues.map((val, i) => {
+                    const y = getY(val);
+                    return (
+                        <g key={i}>
+                            <line
+                                x1={padding.left}
+                                y1={y}
+                                x2={width - padding.right}
+                                y2={y}
+                                stroke="rgba(255, 255, 255, 0.05)"
+                                strokeDasharray="3 3"
+                            />
+                            <text
+                                x={width - padding.right + 5}
+                                y={y + 4}
+                                fill="rgba(255, 255, 255, 0.3)"
+                                fontSize="10"
+                                fontFamily="monospace"
+                            >
+                                {val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
+                            </text>
+                        </g>
+                    );
+                })}
+
+                {/* Candles */}
+                {data.map((candle, idx) => {
+                    const cx = getX(idx);
+                    const yOpen = getY(candle.open);
+                    const yClose = getY(candle.close);
+                    const yHigh = getY(candle.high);
+                    const yLow = getY(candle.low);
+                    
+                    const isBullish = candle.close >= candle.open;
+                    const candleColor = isBullish ? '#00ff88' : '#ff0055';
+
+                    return (
+                        <g key={idx}>
+                            {/* Wick */}
+                            <line
+                                x1={cx}
+                                y1={yHigh}
+                                x2={cx}
+                                y2={yLow}
+                                stroke={candleColor}
+                                strokeWidth="1.5"
+                            />
+                            {/* Body */}
+                            <rect
+                                x={cx - candleWidth / 2}
+                                y={Math.min(yOpen, yClose)}
+                                width={candleWidth}
+                                height={Math.max(2, Math.abs(yOpen - yClose))}
+                                fill={isBullish ? 'transparent' : candleColor}
+                                stroke={candleColor}
+                                strokeWidth="1.5"
+                            />
+                        </g>
+                    );
+                })}
+
+                {/* Crosshairs */}
+                {hoveredCandle && hoverX !== null && (
+                    <g>
+                        <line
+                            x1={hoverX}
+                            y1={padding.top}
+                            x2={hoverX}
+                            y2={height - padding.bottom}
+                            stroke="rgba(255, 255, 255, 0.15)"
+                            strokeDasharray="2 2"
+                        />
+                        <circle cx={hoverX} cy={getY(hoveredCandle.close)} r={4} fill="#00f3ff" />
+                    </g>
+                )}
+            </svg>
+
+            {/* Candlestick Tooltip */}
+            {hoveredCandle && hoverX !== null && (
+                <Box sx={{
+                    position: 'absolute',
+                    top: 10,
+                    left: hoverX > width / 2 ? '10px' : 'auto',
+                    right: hoverX <= width / 2 ? '10px' : 'auto',
+                    bgcolor: 'rgba(10, 10, 20, 0.9)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: 2,
+                    p: 1.5,
+                    color: '#fff',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                    fontSize: '0.75rem',
+                    pointerEvents: 'none',
+                    zIndex: 10,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 0.5,
+                    fontFamily: 'monospace',
+                    borderLeft: `3px solid ${hoveredCandle.close >= hoveredCandle.open ? '#00ff88' : '#ff0055'}`
+                }}>
+                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 'bold' }}>
+                        {hoveredCandle.label}
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                        <span style={{ color: '#00ff88' }}>O: {hoveredCandle.open.toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
+                        <span style={{ color: '#ff0055' }}>C: {hoveredCandle.close.toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                        <span>H: {hoveredCandle.high.toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
+                        <span>L: {hoveredCandle.low.toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
+                    </Box>
+                </Box>
+            )}
+        </Box>
+    );
+};
+
+export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps) => {
+    const dispatch = useAppDispatch();
+    const { historicalData, isLoading } = useAppSelector((state) => state.market);
+    const [chartType, setChartType] = React.useState<'line' | 'candles'>('candles');
+
     React.useEffect(() => {
         if (cryptoId) {
             const promise = dispatch(fetchCryptoHistory({ cryptoId, range }));
-            
-            
-            //# 5-Estructuración y renderizado visual del componente UI
             return () => {
                 promise.abort();
             };
@@ -70,8 +255,6 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
     
     const chartData = historicalData[cryptoId || '']?.data;
     const isDataLoaded = !!chartData && historicalData[cryptoId || '']?.range === range;
-
-
 
     const labels = React.useMemo(() => {
         if (!isDataLoaded || !Array.isArray(chartData)) return Array.from({ length: 24 }, (_, i) => `${i}:00`);
@@ -87,6 +270,27 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
             });
         }
         return chartData.map(d => d.price);
+    }, [chartData, isDataLoaded]);
+
+    const candles = React.useMemo(() => {
+        if (!isDataLoaded || !Array.isArray(chartData)) return [];
+        
+        return chartData.map((d, i) => {
+            const close = d.price;
+            const open = i > 0 ? (chartData[i - 1]?.price || d.price) : d.price * 0.998;
+            const diff = Math.abs(close - open) || d.price * 0.002;
+            const high = Math.max(open, close) + diff * (0.2 + Math.random() * 0.5);
+            const low = Math.min(open, close) - diff * (0.2 + Math.random() * 0.5);
+            
+            return {
+                timestamp: d.timestamp,
+                open,
+                high,
+                low,
+                close,
+                label: new Date(d.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+        });
     }, [chartData, isDataLoaded]);
 
     const tooltipRef = React.useRef<HTMLDivElement>(null);
@@ -123,7 +327,6 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
         ],
     };
 
-
     const options = {
         responsive: true,
         maintainAspectRatio: false,
@@ -140,7 +343,6 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
             },
             tooltip: {
                 enabled: false,
-                
                 external: (context: { chart: ChartJS; tooltip: any }) => {
                     const { chart, tooltip } = context;
                     const tooltipEl = tooltipRef.current;
@@ -154,7 +356,6 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
 
                     if (tooltip.body) {
                         const titleLines = tooltip.title || [];
-                        
                         const bodyLines = tooltip.body.map((b: { lines: string[] }) => b.lines);
 
                         let innerHtml = '<div style="margin-bottom: 8px;">';
@@ -178,8 +379,6 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
                     tooltipEl.style.left = positionX + tooltip.caretX + 'px';
                     tooltipEl.style.top = positionY + tooltip.caretY + 'px';
                     tooltipEl.style.fontFamily = 'Inter, sans-serif';
-                    
-                    
                     tooltipEl.style.transform = `translate(-50%, -120%) scale(1)`; 
                 }
             },
@@ -211,62 +410,108 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
         }
     };
 
-    
-    
-    //# 6-Estructuración y renderizado visual del componente UI
     return (
-        <Box sx={{ width: '100%', height: 400, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 4, border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden', position: 'relative' }}>
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1 }}
-                style={{ width: '100%', height: '100%' }}
-            >
-                <Line options={options} data={data} key={range} />
-            </motion.div>
-            
+        <Stack spacing={2} sx={{ width: '100%' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => setChartType('line')}
+                    sx={{
+                        color: chartType === 'line' ? '#00f3ff' : 'rgba(255,255,255,0.5)',
+                        borderColor: chartType === 'line' ? '#00f3ff' : 'rgba(255,255,255,0.1)',
+                        bgcolor: chartType === 'line' ? 'rgba(0, 243, 255, 0.05)' : 'transparent',
+                        fontWeight: 'bold',
+                        '&:hover': {
+                            borderColor: '#00f3ff',
+                            bgcolor: 'rgba(0, 243, 255, 0.1)'
+                        }
+                    }}
+                >
+                    LÍNEA
+                </Button>
+                <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => setChartType('candles')}
+                    sx={{
+                        color: chartType === 'candles' ? '#00f3ff' : 'rgba(255,255,255,0.5)',
+                        borderColor: chartType === 'candles' ? '#00f3ff' : 'rgba(255,255,255,0.1)',
+                        bgcolor: chartType === 'candles' ? 'rgba(0, 243, 255, 0.05)' : 'transparent',
+                        fontWeight: 'bold',
+                        '&:hover': {
+                            borderColor: '#00f3ff',
+                            bgcolor: 'rgba(0, 243, 255, 0.1)'
+                        }
+                    }}
+                >
+                    VELAS
+                </Button>
+            </Box>
 
-            <motion.div
-                animate={{ x: ['-100%', '200%'] }}
-                transition={{ 
-                    duration: 4, 
-                    repeat: Infinity, 
-                    ease: "linear",
-                    repeatDelay: 2
-                }}
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '40%',
-                    height: '100%',
-                    background: `linear-gradient(90deg, transparent 0%, ${color}10 50%, transparent 100%)`,
-                    pointerEvents: 'none',
-                    filter: 'blur(20px)',
-                    zIndex: 1
-                }}
-            />
-
-            <div
-                ref={tooltipRef}
-                style={{
-                    opacity: 0,
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    pointerEvents: 'none',
-                    transition: 'all 0.1s ease',
-                    zIndex: 100,
-                    background: 'rgba(10, 10, 20, 0.85)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '12px',
-                    padding: '16px',
-                    color: '#fff',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-                    minWidth: '150px'
-                }}
-            />
-        </Box>
+            <Box sx={{ width: '100%', height: 400, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 4, border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden', position: 'relative', p: 2 }}>
+                {chartType === 'line' ? (
+                    <Box sx={{ width: '100%', height: '100%' }}>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.5 }}
+                            style={{ width: '100%', height: '100%' }}
+                        >
+                            <Line options={options} data={data} key={range} />
+                        </motion.div>
+                        <motion.div
+                            animate={{ x: ['-100%', '200%'] }}
+                            transition={{ 
+                                duration: 4, 
+                                repeat: Infinity, 
+                                ease: "linear",
+                                repeatDelay: 2
+                            }}
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '40%',
+                                height: '100%',
+                                background: `linear-gradient(90deg, transparent 0%, ${color}10 50%, transparent 100%)`,
+                                pointerEvents: 'none',
+                                filter: 'blur(20px)',
+                                zIndex: 1
+                            }}
+                        />
+                        <div
+                            ref={tooltipRef}
+                            style={{
+                                opacity: 0,
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                pointerEvents: 'none',
+                                transition: 'all 0.1s ease',
+                                zIndex: 100,
+                                background: 'rgba(10, 10, 20, 0.85)',
+                                backdropFilter: 'blur(10px)',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                borderRadius: '12px',
+                                padding: '16px',
+                                color: '#fff',
+                                boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                                minWidth: '150px'
+                            }}
+                        />
+                    </Box>
+                ) : (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                        style={{ width: '100%', height: '100%' }}
+                    >
+                        <CandlestickChart data={candles} color={color} />
+                    </motion.div>
+                )}
+            </Box>
+        </Stack>
     );
 };
