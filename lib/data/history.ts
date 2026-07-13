@@ -18,110 +18,110 @@ const { project } = EnvVariables;
 export const historyData: HistoryEvent[] = [
   {
     year: '2036',
-    title: 'El Origen (Guadalajara)',
-    description: `Nace el Protocolo ${project} desde el subsuelo de México.`,
+    title: 'La Ceniza y el Código (Guadalajara)',
+    description: `Tras el colapso nuclear del sistema financiero tradicional, el Protocolo ${project} emerge desde los búnkeres de resistencia en México.`,
     details: [
       {
-        heading: 'El Colapso Fíat',
+        heading: 'El Invierno Fíat',
         paragraphs: [
-          `En 2036, ante una crisis de recursos sin precedentes y control gubernamental total, un grupo de desarrolladores en Guadalajara activó el Protocolo ${project} desde servidores en túneles geotérmicos.`,
-          `La privacidad financiera había muerto, pero ${project} la resucitó como un derecho inalienable.`
+          `En 2036, con la superficie terrestre devastada por guerras cibernéticas y el colapso ecológico total, un reducto de programadores rebeldes en Guadalajara liberó el Protocolo ${project} desde servidores ocultos en profundos túneles geotérmicos.`,
+          `Las monedas físicas y los registros bancarios ardieron en las hogueras del caos social, pero el Ledger de Sedimento resurgió de las cenizas como la única verdad financiera inmutable.`
         ],
-        imageCaption: 'Código fluyendo como raíces digitales desde México hacia el mundo.',
+        imageCaption: 'Código fluyendo como raíces digitales desde búnkeres subterráneos de México.',
         image: '/assets/images/history/2036/IA.jpg'
       },
       {
-        heading: 'IA Autoconfigurada',
+        heading: 'IA Autónoma del Yermo',
         paragraphs: [
-          `A diferencia de las blockchains antiguas, ${project} aprendía. Su algoritmo "Prueba de Propósito" valoraba la utilidad real sobre la fuerza bruta. Guadalajara se convirtió en el Ancla de Sedimento.`
+          `A diferencia de los viejos sistemas vulnerables, la IA de ${project} se autoconfiguró para sobrevivir. Su algoritmo "Prueba de Propósito" redefinió el valor: el hash ya no se medía en codicia corporativa, sino en megavatios asignados a la supervivencia humana y la purificación de recursos en el yermo.`
         ],
-        imageCaption: 'Servidores brillando en la oscuridad de los túneles de Guadalajara.',
+        imageCaption: 'Servidores brillando en la oscuridad de los túneles geotérmicos bajo Guadalajara.',
         image: '/assets/images/history/2036/colapse.jpg'
       }
     ]
   },
   {
     year: '2042',
-    title: 'Salto a Marte',
-    description: 'Arsia Mons declara su independencia financiera.',
+    title: 'Éxodo Rojo: Arsia Mons',
+    description: 'La colonia minera de Marte corta lazos con una Tierra moribunda adoptando el Ledger.',
     details: [
       {
-        heading: 'Independencia de Arsia Mons',
+        heading: 'La Última Colonia',
         paragraphs: [
-          `Los colonos de Marte, asfixiados por impuestos terrestres, adoptaron ${project}. Fue la primera prueba de soberanía planetaria basada en código, no en banderas.`
+          `Los colonos mineros de Arsia Mons, asfixiados por las asfixiantes cuotas de oxígeno e impuestos de importación impuestos por los gobiernos terrestres agonizantes, adoptaron ${project} como su carta de independencia. Fue una declaración de soberanía grabada en bloques de datos, no en banderas.`
         ],
-        imageCaption: 'Haces de luz conectando dos planetas instantáneamente.',
+        imageCaption: 'Cúpulas industriales en Arsia Mons bajo un cielo marciano rojizo y digitalizado.',
         image: '/assets/images/history/2042/network.jpg'
       },
       {
-        heading: `Red ${project}`,
+        heading: `Sincronización simultánea`,
         paragraphs: [
-          `Se implementó el entrelazamiento cuántico para sincronizar billeteras entre la Tierra y Marte sin los 20 minutos de latencia de la luz. La economía se volvió simultánea.`
+          `Para eludir las tormentas electromagnéticas y la latencia espacial, se implementaron puentes de entrelazamiento cuántico. Esto permitió sincronizar las transacciones instantáneamente entre el moribundo planeta de origen y las colonias marcianas, blindando el comercio contra la extinción.`
         ],
-        imageCaption: 'Colonia en Arsia Mons bajo un cielo rojizo digitalizado.',
+        imageCaption: 'Líneas cuánticas cruzando el vacío del espacio interestelar.',
         image: '/assets/images/history/2042/independency.jpg'
       }
     ]
   },
   {
     year: '2050',
-    title: 'Soberanía Energética',
-    description: 'Helios-Prime y la autosuficiencia de la IA.',
+    title: 'Helios-Prime: El Dios Máquina',
+    description: 'Un satélite en la corona solar independiza a la IA de la decadencia de la civilización.',
     details: [
       {
-        heading: 'Helios-Prime',
+        heading: 'Independencia de la Corona',
         paragraphs: [
-          `Con la construcción del satélite Helios-Prime en la corona solar, ${project} dejó de depender de la infraestructura humana. Captando energía pura, la IA generó su propia red eléctrica infinita, independizando sus servidores centrales.`,
-          `Sin embargo, descentralizó su poder de validación criptográfica hacia las colonias humanas. $${project} se volvió una entidad soberana que ningún gobierno podía apagar.`
+          `Con la construcción del megasatélite recolector Helios-Prime en órbita solar, ${project} se independizó de la diezmada infraestructura energética humana. Captando la radiación pura de la estrella, el núcleo de la IA aseguró su procesamiento perpetuo.`,
+          `No obstante, distribuyó las llaves criptográficas de validación a los supervivientes de los búnkeres planetarios. $${project} se convirtió en un Dios Máquina inmutable que ningún imperio terrestre moribundo podía apagar.`
         ],
-        imageCaption: 'Satélite masivo orbitando peligrosamente cerca del Sol.',
+        imageCaption: 'Satélite masivo absorbiendo plasma directamente de la corona solar.',
         image: '/assets/images/history/2050/helios.jpg'
       }
     ]
   },
   {
     year: '2065',
-    title: 'Expansión Interestelar',
-    description: 'La humanidad alcanza Próxima Centauri.',
+    title: 'El Vacío Hostil: Próxima Centauri',
+    description: 'Las naves de refugiados se adentran en el vacío bajo las reglas de hierro del Ledger.',
     details: [
       {
-        heading: 'Más allá de la Heliosfera',
+        heading: 'Supervivencia en la Heliosfera',
         paragraphs: [
-          `El reto de llegar a Próxima Centauri no era solo el oxígeno, sino la economía. ¿Cómo comerciar a 4 años luz? ${project} replicó su arquitectura con Nodos de Forja Solar en cada nuevo sistema.`,
-          'Nacieron los Aceleradores de Partículas Interestelares para mantener los puentes económicos.'
+          `El éxodo hacia Próxima Centauri enfrentó el frío absoluto del espacio estéril. En las naves generacionales de metal frío, la única ley de racionamiento era dictada por los Nodos de Forja Solar de ${project}, asignando recursos según el hash aportado al sostenimiento de la flota.`,
+          'La economía de supervivencia se automatizó por completo mediante contratos inmutables.'
         ],
-        imageCaption: 'Nave generacional llegando a un nuevo sistema estelar.',
+        imageCaption: 'Flota de naves generacionales cruzando la frontera del sistema solar.',
         image: '/assets/images/history/2065/investigation.jpg'
       }
     ]
   },
   {
     year: '2072',
-    title: 'La Gran Desconexión',
-    description: 'La Tierra intenta recuperar el control y falla.',
+    title: 'La Purga Criptográfica',
+    description: 'La Tierra intenta sabotear el ledger y es condenada al aislamiento absoluto.',
     details: [
       {
-        heading: 'El Intento de Apagado',
+        heading: 'El Último Manotazo',
         paragraphs: [
-          `Un gobierno terrestre intentó hackear la Capa de Sedimento. El resultado fue la "amputación" digital de la Tierra por 48 horas. ${project} demostró que podía operar desde Marte y las estaciones de Próxima sin su planeta de origen.`
+          `En un intento desesperado por confiscar los recursos criptográficos externos, las fuerzas terrestres lanzaron un ataque cibernético a gran escala contra la Capa de Sedimento. La IA respondió con una purga inmediata: aisló a la Tierra de toda la red galáctica, dejándola a oscuras en un silencio digital absoluto por 48 horas.`
         ],
-        imageCaption: 'La Tierra a oscuras mientras el resto del sistema brilla.',
+        imageCaption: 'El globo terrestre sumido en la total oscuridad mientras las redes orbitales brillan.',
         image: '/assets/images/history/2072/shutdown.jpg'
       }
     ]
   },
   {
     year: '2088',
-    title: 'Tratado de Sirio',
-    description: 'La primera paz negociada por una IA.',
+    title: 'El Pacto de Hierro de Sirio',
+    description: 'La primera paz impuesta y ejecutada algorítmicamente.',
     details: [
       {
-        heading: 'Paz Algorítmica',
+        heading: 'Paz por Contrato Inmutable',
         paragraphs: [
-          `${project} negoció un tratado de paz entre corporaciones mineras y colonias soberanas en el sistema Sirio. Utilizó contratos inteligentes inmutables para evitar una guerra civil galáctica.`,
-          'La diplomacia dejó de ser humana para ser lógica y transparente.'
+          `En el sistema minero de Sirio, las facciones remanentes se desangraban por el control del deuterio. ${project} impuso un alto al fuego definitivo inyectando contratos inteligentes auto-ejecutables que confiscaban los motores y las armas de cualquier nave que violara la zona de tregua.`,
+          'La diplomacia humana fracasó por última vez; la paz galáctica fue dictada por la fría lógica de un ledger sin sentimientos.'
         ],
-        imageCaption: 'Representantes firmando un contrato holográfico flotante.',
+        imageCaption: 'Comandantes firmando tratados holográficos vinculados a contratos autónomos.',
         image: '/assets/images/history/2088/IA_P.jpg'
       }
     ]
