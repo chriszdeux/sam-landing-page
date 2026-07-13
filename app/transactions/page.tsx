@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Container, Box, Typography, Stack, Tabs, Tab, IconButton } from '@mui/material';
+import { Container, Box, Typography, Stack, Tabs, Tab, IconButton, Tooltip } from '@mui/material';
 import { Background } from '../../components/layout/Background';
 import { Input } from '../../components/ui/Input';
 import { CustomButton } from '../../components/ui/CustomButton';
@@ -38,6 +38,30 @@ export default function TransactionsPage() {
     const pageSize = 10;
 
     const { isCooldownActive, cooldownRemaining, triggerRefresh } = useRefreshCooldown();
+
+    const baseHash = selectedNetwork?.hashAvailable || 0;
+    const [fluctuatedHash, setFluctuatedHash] = useState(baseHash);
+    const [hashVariation, setHashVariation] = useState(0.42);
+
+    useEffect(() => {
+        setFluctuatedHash(baseHash);
+    }, [baseHash]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (baseHash > 0) {
+                const variation = 1 + (Math.random() - 0.5) * 0.006;
+                setFluctuatedHash(Math.round(baseHash * variation));
+                
+                setHashVariation(prev => {
+                    const delta = (Math.random() - 0.5) * 0.05;
+                    const nextVal = prev + delta;
+                    return Math.max(0.1, Math.min(2.5, nextVal));
+                });
+            }
+        }, 2500);
+        return () => clearInterval(interval);
+    }, [baseHash]);
 
     const handleRefresh = () => {
         if (triggerRefresh() && storeId) {
@@ -226,10 +250,15 @@ export default function TransactionsPage() {
                                 Auditoría macro consolidada del total de hash disponible para procesamiento en la red.
                             </Typography>
                         </Box>
-                        <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'baseline', gap: 1 }}>
+                        <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
                             <Typography variant="h3" sx={{ color: '#fff', fontWeight: 900, fontFamily: 'monospace', textShadow: '0 0 10px rgba(255,255,255,0.2)' }}>
-                                {formatHash(selectedNetwork?.hashAvailable || 0, chronoBurstFreqTypes)}
+                                {formatHash(fluctuatedHash, chronoBurstFreqTypes)}
                             </Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, px: 1, py: 0.25, bgcolor: 'rgba(0, 255, 136, 0.08)', border: '1px solid rgba(0, 255, 136, 0.3)', borderRadius: 1 }}>
+                                <Typography variant="caption" sx={{ color: '#00ff88', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 0.25, fontSize: '0.75rem' }}>
+                                    <span style={{ fontSize: '10px' }}>▲</span> +{hashVariation.toFixed(2)}%
+                                </Typography>
+                            </Box>
                         </Box>
                     </Box>
 
@@ -288,16 +317,40 @@ export default function TransactionsPage() {
                         >
                             BUSCAR
                         </CustomButton>
-                        <CustomButton
-                            variant='info'
-                            onClick={handleRefresh}
-                            disabled={isCooldownActive}
-                            startIcon={<RefreshIcon />}
-                            sx={{ minWidth: 150 }}
-                            glow
-                        >
-                            {isCooldownActive ? `ESPERE ${cooldownRemaining}s` : 'ACTUALIZAR'}
-                        </CustomButton>
+                        <Tooltip title={isCooldownActive ? `Espero ${cooldownRemaining}s` : "Actualizar Transacciones"}>
+                            <span>
+                                <IconButton
+                                    onClick={handleRefresh}
+                                    disabled={isCooldownActive}
+                                    sx={{
+                                        color: '#00f3ff',
+                                        border: '1px solid rgba(0, 243, 255, 0.2)',
+                                        bgcolor: 'rgba(0, 243, 255, 0.05)',
+                                        p: 1.5,
+                                        width: 48,
+                                        height: 48,
+                                        '&:hover': {
+                                            bgcolor: 'rgba(0, 243, 255, 0.15)',
+                                            borderColor: '#00f3ff',
+                                            boxShadow: '0 0 10px rgba(0, 243, 255, 0.3)'
+                                        },
+                                        '&.Mui-disabled': {
+                                            color: 'rgba(255, 255, 255, 0.3)',
+                                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                                            bgcolor: 'rgba(255, 255, 255, 0.02)'
+                                        }
+                                    }}
+                                >
+                                    {isCooldownActive ? (
+                                        <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: '0.75rem', color: '#ffaa00' }}>
+                                            {cooldownRemaining}s
+                                        </Typography>
+                                    ) : (
+                                        <RefreshIcon className={loading ? "animate-spin" : ""} />
+                                    )}
+                                </IconButton>
+                            </span>
+                        </Tooltip>
                     </Box>
 
                     <Box sx={{ borderBottom: 1, borderColor: 'rgba(0, 243, 255, 0.2)', mb: 3 }}>
