@@ -11,7 +11,7 @@
 'use client';
 
 //# 1-Efecto secundario para sincronización del ciclo de vida
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, Grid, Container, Button, CircularProgress } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -20,6 +20,10 @@ import { TechFrame } from '../../components/ui/TechFrame';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { motion } from 'framer-motion';
 import { TaoIcon } from '../../components/ui/TaoIcon';
+import { GridView, ViewList } from '@mui/icons-material';
+import { CustomTable } from '../../components/ui/CustomTable';
+import { CustomButton } from '../../components/ui/CustomButton';
+import { Cryptocurrency } from '../../lib/types/crypto';
 
 //# 2-Obtención del despachador para emitir acciones al store
 import { useDispatch, useSelector } from 'react-redux';
@@ -45,9 +49,8 @@ export default function MarketPage() {
   
   //# 6-Selección de datos desde el estado global de Redux
   const { token } = useSelector((state: RootState) => state.auth);
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
-  
-  
   //# 7-Efecto secundario para sincronización del ciclo de vida
   useEffect(() => {
     if (selectedNetwork?.id) {
@@ -55,8 +58,6 @@ export default function MarketPage() {
     }
   }, [dispatch, selectedNetwork?.id]);
 
-  
-  
   //# 8-Manejo de lógica de usuario para handleTransaction
   const handleTransaction = (e: React.MouseEvent, type: 'BUY' | 'SELL' | 'TRANSFER', cryptoId: string) => {
     e.stopPropagation();
@@ -72,8 +73,106 @@ export default function MarketPage() {
     router.push(`/market/trade?type=${type}&cryptoId=${cryptoId}&redirect=market`);
   };
 
-  
-  
+  const tableColumns = [
+    {
+      label: 'Icono/Activo',
+      filterable: true,
+      key: (row: Cryptocurrency) => row.identification.name,
+      render: ({ row }: { row: Cryptocurrency }) => (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ position: 'relative', width: 32, height: 32, flexShrink: 0 }}>
+            {row.identification.image128 ? (
+              <Image 
+                src={row.identification.image128} 
+                alt={row.identification.name} 
+                fill
+                style={{ objectFit: 'contain' }} 
+              />
+            ) : (
+              <Box sx={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                bgcolor: row.additionalInfo?.pColor || '#00f3ff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.9rem',
+                fontWeight: 'bold',
+                color: '#fff',
+                boxShadow: `0 0 10px ${(row.additionalInfo?.pColor || '#00f3ff')}40`
+              }}>
+                {row.identification.symbol[0]}
+              </Box>
+            )}
+          </Box>
+          <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'white' }}>
+            {row.identification.name}
+          </Typography>
+        </Box>
+      )
+    },
+    {
+      label: 'Símbolo',
+      filterable: true,
+      key: (row: Cryptocurrency) => row.identification.symbol,
+      render: ({ value }: { value: unknown }) => (
+        <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'rgba(255, 255, 255, 0.7)' }}>
+          {String(value)}
+        </Typography>
+      )
+    },
+    {
+      label: 'Precio',
+      sortable: true,
+      key: (row: Cryptocurrency) => row.financial.price,
+      render: ({ value }: { value: unknown }) => (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Typography variant="body2" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: 'white' }}>
+            {Number(value || 0).toLocaleString(undefined, { maximumFractionDigits: 5 })}
+          </Typography>
+          <TaoIcon size={16} />
+        </Box>
+      )
+    },
+    {
+      label: 'Cambio de Red',
+      sortable: true,
+      key: (row: Cryptocurrency) => row.financial.change24h,
+      render: ({ value }: { value: unknown }) => {
+        const change = Number(value || 0);
+        const isPositive = change >= 0;
+        return (
+          <Box sx={{ 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              px: 1, 
+              py: 0.25, 
+              borderRadius: 1,
+              bgcolor: isPositive ? 'rgba(0, 255, 157, 0.08)' : 'rgba(255, 51, 51, 0.08)',
+              border: `1px solid ${isPositive ? 'rgba(0, 255, 157, 0.2)' : 'rgba(255, 51, 51, 0.2)'}`
+          }}>
+            <Typography variant="caption" sx={{ fontWeight: 'bold', fontFamily: 'monospace', color: isPositive ? '#00ff9d' : '#ff3333' }}>
+              {isPositive ? '+' : ''}{change.toFixed(2)}%
+            </Typography>
+          </Box>
+        );
+      }
+    },
+    {
+      label: 'Acciones',
+      render: ({ row }: { row: Cryptocurrency }) => (
+        <CustomButton
+          variant="info"
+          onClick={() => router.push(`/market/${row.id}`)}
+          sx={{ py: 0.5, px: 1.5, fontSize: '0.7rem' }}
+        >
+          DETALLE
+        </CustomButton>
+      )
+    }
+  ];
+
   //# 9-Estructuración y renderizado visual del componente UI
   return (
     <Box sx={{ minHeight: '100vh', position: 'relative' }}>
@@ -88,7 +187,55 @@ export default function MarketPage() {
 
         <BlockchainDataDisplay network={selectedNetwork} />
 
-        <Typography variant="h4" sx={{ mb: 4, color: 'white' }}>Activos Listados</Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+          <Typography variant="h4" sx={{ color: 'white', m: 0 }}>Activos Listados</Typography>
+          <Box sx={{ 
+            display: 'flex', 
+            gap: 1, 
+            bgcolor: 'rgba(255,255,255,0.02)', 
+            p: 0.5, 
+            borderRadius: '6px', 
+            border: '1px solid rgba(255,255,255,0.05)',
+            alignItems: 'center'
+          }}>
+            <CustomButton
+              variant="neutral"
+              onClick={() => setViewMode('grid')}
+              sx={{
+                py: 0.5,
+                px: 1.5,
+                minWidth: 'auto',
+                bgcolor: viewMode === 'grid' ? 'rgba(0, 243, 255, 0.15)' : 'transparent',
+                borderColor: viewMode === 'grid' ? '#00f3ff' : 'transparent',
+                color: viewMode === 'grid' ? '#00f3ff' : 'rgba(255, 255, 255, 0.6)',
+                '&:hover': {
+                  bgcolor: viewMode === 'grid' ? 'rgba(0, 243, 255, 0.25)' : 'rgba(255,255,255,0.05)',
+                  borderColor: viewMode === 'grid' ? '#00f3ff' : 'transparent',
+                }
+              }}
+            >
+              <GridView sx={{ fontSize: 18 }} />
+            </CustomButton>
+            <CustomButton
+              variant="neutral"
+              onClick={() => setViewMode('table')}
+              sx={{
+                py: 0.5,
+                px: 1.5,
+                minWidth: 'auto',
+                bgcolor: viewMode === 'table' ? 'rgba(0, 243, 255, 0.15)' : 'transparent',
+                borderColor: viewMode === 'table' ? '#00f3ff' : 'transparent',
+                color: viewMode === 'table' ? '#00f3ff' : 'rgba(255, 255, 255, 0.6)',
+                '&:hover': {
+                  bgcolor: viewMode === 'table' ? 'rgba(0, 243, 255, 0.25)' : 'rgba(255,255,255,0.05)',
+                  borderColor: viewMode === 'table' ? '#00f3ff' : 'transparent',
+                }
+              }}
+            >
+              <ViewList sx={{ fontSize: 18 }} />
+            </CustomButton>
+          </Box>
+        </Box>
         
         {isLoading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', my: 10 }}>
@@ -96,7 +243,7 @@ export default function MarketPage() {
             </Box>
         ) : error ? (
             <Typography align="center" color="error">Error al cargar datos: {error}</Typography>
-        ) : (
+        ) : viewMode === 'grid' ? (
             <Grid container spacing={4}>
             {cryptos.map((crypto, index) => (
                 <Grid size={{ xs: 12, sm: 6, md: 3 }} key={crypto.id}>
@@ -224,30 +371,26 @@ export default function MarketPage() {
                     </Box>
 
                     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, width: '100%', mt: 'auto', zIndex: 1 }}>
-                        <Button 
-                            variant="outlined" 
+                        <CustomButton 
+                            variant="success" 
                             size="small" 
                             onClick={(e) => handleTransaction(e, 'BUY', crypto.id)}
                             sx={{ 
-                                borderColor: 'rgba(0, 230, 118, 0.3)',
-                                color: '#00e676',
-                                '&:hover': { borderColor: '#00e676', bgcolor: 'rgba(0, 230, 118, 0.1)' }
+                                py: 1
                             }}
                         >
                             COMPRAR
-                        </Button>
-                        <Button 
-                            variant="outlined" 
+                        </CustomButton>
+                        <CustomButton 
+                            variant="error" 
                             size="small" 
                             onClick={(e) => handleTransaction(e, 'SELL', crypto.id)}
                             sx={{ 
-                                borderColor: 'rgba(255, 23, 68, 0.3)',
-                                color: '#ff1744',
-                                '&:hover': { borderColor: '#ff1744', bgcolor: 'rgba(255, 23, 68, 0.1)' }
+                                py: 1
                             }}
                         >
                             VENDER
-                        </Button>
+                        </CustomButton>
                     </Box>
                     </Box>
                 </TechFrame>
@@ -255,6 +398,10 @@ export default function MarketPage() {
                 </Grid>
             ))}
             </Grid>
+        ) : (
+            <Box sx={{ width: '100%' }}>
+                <CustomTable columns={tableColumns} data={cryptos} pageSize={10} />
+            </Box>
         )}
       </Container>
     </Box>
