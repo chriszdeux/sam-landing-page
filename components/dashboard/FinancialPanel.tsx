@@ -134,7 +134,8 @@ export const FinancialPanel = React.memo(() => {
                                                 fontSize: '0.8rem', 
                                                 bgcolor: 'rgba(0, 243, 255, 0.1)', 
                                                 color: '#00f3ff',
-                                                border: '1px solid rgba(0, 243, 255, 0.3)'
+                                                border: '1px solid rgba(0, 243, 255, 0.3)',
+                                                borderRadius: '24%'
                                             }}>
                                                 {asset.symbol[0]}
                                             </Avatar>

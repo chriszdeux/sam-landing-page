@@ -233,6 +233,28 @@ const TradeContent = () => {
   const selectedAsset = walletsInfo?.store?.find(a => a.id === form.cryptoId || a.symbol === selectedCrypto?.identification.symbol);
   const availableQuantity = selectedAsset ? Number(selectedAsset.quantity) : 0;
 
+  const validationError = React.useMemo(() => {
+    if (!form.walletId) return '';
+    if (mode === 'BUY') {
+      if (form.quantity <= 0) return 'La cantidad debe ser mayor a 0';
+      const userBalance = userInfo?.balance || 0;
+      const totalCost = form.quantity * customPrice;
+      if (totalCost > userBalance) {
+        return `Balance insuficiente. Máximo disponible: $${userBalance.toLocaleString()}`;
+      }
+      const maxSupply = selectedCrypto?.financial.supplyToTrade || 0;
+      if (form.quantity > maxSupply) {
+        return `Liquidez insuficiente en el mercado. Máximo: ${maxSupply.toLocaleString()} unidades`;
+      }
+    } else if (mode === 'SELL') {
+      if (form.quantity <= 0) return 'La cantidad debe ser mayor a 0';
+      if (form.quantity > availableQuantity) {
+        return `Balance de activo insuficiente. Tienes ${availableQuantity.toLocaleString()} ${selectedCrypto?.identification.symbol || ''}`;
+      }
+    }
+    return '';
+  }, [form.walletId, mode, form.quantity, customPrice, userInfo?.balance, selectedCrypto, availableQuantity]);
+
   
   
   //# 19-Manejo de lógica de usuario para handleSetMax
@@ -584,6 +606,11 @@ const TradeContent = () => {
                                         </Typography>
                                     )}
                                 </Box>
+                                {validationError && (
+                                    <Typography variant="caption" sx={{ color: '#ff1744', display: 'block', mt: 2, fontWeight: 'bold', fontSize: '0.75rem' }}>
+                                        ⚠️ {validationError}
+                                    </Typography>
+                                )}
                             </Box>
                         )}
 
@@ -605,7 +632,7 @@ const TradeContent = () => {
                         <CustomButton
                             variant={mode === 'BUY' ? 'success' : mode === 'SELL' ? 'error' : 'warning'}
                             onClick={handlePreSubmit}
-                            disabled={!form.walletId || status === 'PROCESSING' || status === 'SUCCESS' || networkFee === null}
+                            disabled={!form.walletId || status === 'PROCESSING' || status === 'SUCCESS' || networkFee === null || !!validationError}
                             startIcon={status === 'PROCESSING' ? <CircularProgress size={14} color="inherit" /> : null}
                             glow
                             fullWidth
@@ -651,7 +678,7 @@ const TradeContent = () => {
                             <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
                                 <Avatar 
                                     src={selectedCrypto?.identification.image256 || selectedCrypto?.identification.image128}
-                                    sx={{ width: 80, height: 80, border: '2px solid rgba(255,255,255,0.1)', bgcolor: 'rgba(255,255,255,0.05)' }}
+                                    sx={{ width: 80, height: 80, border: '2px solid rgba(255,255,255,0.1)', bgcolor: 'rgba(255,255,255,0.05)', borderRadius: '24%' }}
                                 >
                                     {selectedCrypto?.identification.symbol[0] || 'S'}
                                 </Avatar>
