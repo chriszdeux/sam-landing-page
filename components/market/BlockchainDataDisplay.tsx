@@ -92,7 +92,7 @@ export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ ne
                  >
                     <Avatar 
                         src={identification.image} 
-                        sx={{ width: 80, height: 80, border: `2px solid ${color}` }}
+                        sx={{ width: 80, height: 80, border: `2px solid ${color}`, borderRadius: '24%' }}
                     >
                         {identification.symbol[0]}
                     </Avatar>
