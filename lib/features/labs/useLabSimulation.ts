@@ -419,7 +419,6 @@ export const useLabSimulation = () => {
         const hashToSend = rawHash / divisor;
 
         try {
-          console.log(`[SIMULATION] Triggering Minute 5 Injection: ${hashToSend.toFixed(3)} HASH`);
           const result = await dispatch(injectPower({
             labId: lab.id,
             blockchainId,
@@ -433,7 +432,6 @@ export const useLabSimulation = () => {
             performanceHistoryRef.current = [];
             dispatch(updateSimulationData({ efficiency: 100 }));
             dispatch(updateLastInjectionTime(Date.now()));
-            console.log("[SIMULATION] Injection Successful. Local state reset.");
             dispatch(addNotification({
               message: '¡Inyección de hash realizada con éxito!',
               type: 'success',
