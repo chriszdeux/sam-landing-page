@@ -1,4 +1,4 @@
-// 1-Nuevo layout modular del Home: 4 bloques diferenciados con animaciones de scroll
+// 1-Nuevo layout modular del Home: 4 bloques diferenciados
 
 'use client';
 
@@ -8,30 +8,14 @@ import {
   Rocket, BarChart2, ShoppingCart, Blocks
 } from 'lucide-react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { Background } from '../components/layout/Background';
 import { Footer } from '../components/layout/Footer';
 import { Modal } from '../components/ui/Modal';
 import { Button } from '../components/ui/Button';
 import { openModal } from '../lib/features/uiSlice';
-import { useAppDispatch } from '../lib/hooks';
-
-// ——— Secciones anteriores desactivadas temporalmente (sprint UI reingeniería) ———
-// import { HeroSection } from '../components/sections/HeroSection';
-// import { HistorySection } from '../components/sections/HistorySection';
-// import { MechanicsSection } from '../components/sections/MechanicsSection';
-// import { UniverseSection } from '../components/sections/UniverseSection';
-// import { SectionNavigation } from '../components/ui/SectionNavigation';
-
-//# Variantes de animación por sección
-const sectionVariants = {
-  hidden: { opacity: 0, y: 48 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.75, ease: 'easeOut' as const },
-  },
-};
+import { useAppDispatch, useAppSelector } from '../lib/hooks';
+import { RootState } from '../lib/store';
 
 //# Componente de sección individual
 interface HomeSectionProps {
@@ -54,13 +38,10 @@ const HomeSection = ({
   id, accentColor, tag, Icon, title, titleHighlight, description, futureLine,
   actionLabel, actionHref, onAction, reverse = false, children
 }: HomeSectionProps) => (
-  <motion.section
+  <Box
     id={id}
-    initial="hidden"
-    whileInView="visible"
-    viewport={{ once: true, margin: '-80px' }}
-    variants={sectionVariants}
-    style={{ position: 'relative', borderTop: `1px solid ${accentColor}12` }}
+    component="section"
+    sx={{ position: 'relative', borderTop: `1px solid ${accentColor}12` }}
   >
     <Box sx={{
       minHeight: { xs: 'auto', md: '85vh' },
@@ -262,12 +243,14 @@ const HomeSection = ({
       </Box>
     </Container>
     </Box>
-  </motion.section>
+  </Box>
 );
 
 //# Página principal
 export default function Home() {
   const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { userInfo } = useAppSelector((state: RootState) => state.auth);
 
   return (
     <main style={{ minHeight: '100vh', position: 'relative', background: 'transparent' }}>
@@ -275,10 +258,6 @@ export default function Home() {
 
       {/* ——— HERO ——— */}
       <Box
-        component={motion.div}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
         sx={{
           minHeight: '100vh',
           display: 'flex',
@@ -292,7 +271,7 @@ export default function Home() {
         <Box sx={{ position: 'absolute', bottom: '20%', right: '10%', width: 300, height: 300, borderRadius: '50%', bgcolor: '#ff0055', filter: 'blur(100px)', opacity: 0.04 }} />
 
         <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2, pt: 12, pb: 8 }}>
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.2 }}>
+          <Box>
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2.5 }}>
               <Box sx={{ width: 32, height: 2, bgcolor: '#00f3ff', boxShadow: '0 0 10px #00f3ff' }} />
               <Typography variant="overline" sx={{ color: '#00f3ff', fontWeight: 'bold', letterSpacing: 4, fontSize: '0.65rem' }}>
@@ -331,13 +310,13 @@ export default function Home() {
               mueve la economía.
             </Typography>
 
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2.5}>
+            {userInfo ? (
               <Button
-                id="hero-register-btn"
+                id="hero-dashboard-btn"
                 variant="contained"
                 size="large"
                 glow
-                onClick={() => dispatch(openModal('register'))}
+                onClick={() => router.push('/dashboard')}
                 startIcon={<Rocket size={20} />}
                 sx={{
                   bgcolor: '#00f3ff', color: '#000', fontWeight: 'bold',
@@ -347,24 +326,44 @@ export default function Home() {
                   transition: 'all 0.25s ease',
                 }}
               >
-                Comenzar
+                Ir a Operaciones
               </Button>
-              <Button
-                id="hero-login-btn"
-                variant="outlined"
-                size="large"
-                onClick={() => dispatch(openModal('login'))}
-                sx={{
-                  px: 6, py: 1.8, fontSize: '1rem', color: '#fff',
-                  borderColor: 'rgba(255,255,255,0.2)',
-                  '&:hover': { borderColor: '#00f3ff', color: '#00f3ff', bgcolor: 'rgba(0,243,255,0.04)' },
-                  transition: 'all 0.25s ease',
-                }}
-              >
-                Ya tengo cuenta
-              </Button>
-            </Stack>
-          </motion.div>
+            ) : (
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2.5}>
+                <Button
+                  id="hero-register-btn"
+                  variant="contained"
+                  size="large"
+                  glow
+                  onClick={() => dispatch(openModal('register'))}
+                  startIcon={<Rocket size={20} />}
+                  sx={{
+                    bgcolor: '#00f3ff', color: '#000', fontWeight: 'bold',
+                    px: 6, py: 1.8, fontSize: '1rem', letterSpacing: 1.5,
+                    boxShadow: '0 0 30px rgba(0,243,255,0.35)',
+                    '&:hover': { boxShadow: '0 0 50px rgba(0,243,255,0.55)', transform: 'translateY(-2px)' },
+                    transition: 'all 0.25s ease',
+                  }}
+                >
+                  Comenzar
+                </Button>
+                <Button
+                  id="hero-login-btn"
+                  variant="outlined"
+                  size="large"
+                  onClick={() => dispatch(openModal('login'))}
+                  sx={{
+                    px: 6, py: 1.8, fontSize: '1rem', color: '#fff',
+                    borderColor: 'rgba(255,255,255,0.2)',
+                    '&:hover': { borderColor: '#00f3ff', color: '#00f3ff', bgcolor: 'rgba(0,243,255,0.04)' },
+                    transition: 'all 0.25s ease',
+                  }}
+                >
+                  Ya tengo cuenta
+                </Button>
+              </Stack>
+            )}
+          </Box>
         </Container>
       </Box>
 
@@ -378,8 +377,8 @@ export default function Home() {
         titleHighlight="The Lyncore"
         description="Un simulador blockchain interactivo donde compras y vendes activos criptográficos de forma gamificada. Las transacciones se agrupan en bloques elásticos que se sellan automáticamente al alcanzar su capacidad, expandiéndose un 25% por cada nuevo ciclo. Es un ledger real —no Web3—, diseñado para aprender las reglas de la economía descentralizada en un entorno controlado."
         futureLine="Próximamente: colonización de mapas interestelares, creación de estructuras de hardware y optimización de simuladores respaldados por el motor de la plataforma."
-        actionLabel="Comenzar Misión"
-        onAction={() => dispatch(openModal('register'))}
+        actionLabel={userInfo ? "Ir a Operaciones" : "Comenzar Misión"}
+        onAction={userInfo ? () => router.push('/dashboard') : () => dispatch(openModal('register'))}
       />
 
       {/* ——— BLOQUE 2: Operaciones ——— */}
