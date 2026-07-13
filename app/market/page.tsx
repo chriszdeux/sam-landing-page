@@ -178,13 +178,13 @@ export default function MarketPage() {
                                 src={crypto.identification.image128} 
                                 alt={crypto.identification.name} 
                                 fill
-                                style={{ objectFit: 'contain' }} 
+                                style={{ objectFit: 'contain', borderRadius: '24%' }} 
                             />
                         ) : (
                             <Box sx={{
                                 width: 120,
                                 height: 120,
-                                borderRadius: '50%',
+                                borderRadius: '24%',
                                 bgcolor: crypto.additionalInfo?.pColor || 'primary.main',
                                 display: 'flex',
                                 alignItems: 'center',
