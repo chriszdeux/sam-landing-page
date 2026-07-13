@@ -9,19 +9,23 @@ import { Box, Container, Typography, Button, Avatar, Grid, Chip } from '@mui/mat
 import { Background } from '../../components/layout/Background';
 
 //# 1-Selección de datos desde el estado global de Redux
-import { useAppSelector } from '../../lib/hooks';
+import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { TechFrame } from '../../components/ui/TechFrame';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { ContentCopy, Verified, GppBad } from '@mui/icons-material';
+import { addNotification } from '../../lib/features/uiSlice';
 
 export default function SettingsPage() {
-  
-  //# 2-Selección de datos desde el estado global de Redux
+  const dispatch = useAppDispatch();
   const { userInfo } = useAppSelector((state) => state.auth);
 
-  const copyToClipboard = (text: string) => {
+  const copyToClipboard = (text: string, label: string) => {
+    if (!text) return;
     navigator.clipboard.writeText(text);
-    
+    dispatch(addNotification({
+      type: 'success',
+      message: `${label} copiado al portapapeles`
+    }));
   };
 
   
@@ -107,7 +111,7 @@ export default function SettingsPage() {
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <Typography variant="caption" color="text.secondary">ID DE USUARIO</Typography>
                                     <Box 
-                                        onClick={() => copyToClipboard(userInfo?.id || '')}
+                                        onClick={() => copyToClipboard(userInfo?.id || '', 'ID de Usuario')}
                                         sx={{ 
                                             display: 'flex', 
                                             alignItems: 'center', 
@@ -125,7 +129,22 @@ export default function SettingsPage() {
                                 </Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <Typography variant="caption" color="text.secondary">CORREO ELECTRÓNICO</Typography>
-                                    <Typography variant="body1" color="white">{userInfo?.email}</Typography>
+                                    <Box 
+                                        onClick={() => copyToClipboard(userInfo?.email || '', 'Correo electrónico')}
+                                        sx={{ 
+                                            display: 'flex', 
+                                            alignItems: 'center', 
+                                            gap: 1, 
+                                            color: 'white', 
+                                            cursor: 'pointer',
+                                            '&:hover': { color: 'primary.main' }
+                                        }}
+                                    >
+                                        <Typography variant="body1">
+                                            {userInfo?.email || 'N/A'}
+                                        </Typography>
+                                        <ContentCopy fontSize="small" sx={{ opacity: 0.5 }} />
+                                    </Box>
                                 </Grid>
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <Typography variant="caption" color="text.secondary">FECHA DE NACIMIENTO</Typography>
@@ -134,7 +153,7 @@ export default function SettingsPage() {
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <Typography variant="caption" color="text.secondary">CÓDIGO DE REFERENCIA</Typography>
                                     <Box 
-                                        onClick={() => copyToClipboard(userInfo?.referralCode || '')}
+                                        onClick={() => copyToClipboard(userInfo?.referralCode || '', 'Código de Referencia')}
                                         sx={{ 
                                             display: 'flex', 
                                             alignItems: 'center', 
@@ -164,7 +183,6 @@ export default function SettingsPage() {
                                 {'// ZONA DE SEGURIDAD'}
                             </Typography>
                             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                                <Button variant="outlined" color="primary">Cambiar Contraseña</Button>
                                 <Button variant="outlined" color="error" startIcon={<GppBad />}>Cerrar Sesión en otros dispositivos</Button>
                             </Box>
                         </Box>
