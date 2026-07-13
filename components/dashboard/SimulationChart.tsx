@@ -64,6 +64,22 @@ export const SimulationChart = React.memo(() => {
  
             <ResponsiveContainer width="100%" height="85%">
                 <LineChart data={data}>
+                    <defs>
+                        <filter id="glow-power" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur stdDeviation="3" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                        <filter id="glow-temp" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur stdDeviation="3" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                     <XAxis 
                         dataKey="time" 
@@ -102,7 +118,21 @@ export const SimulationChart = React.memo(() => {
                         name="Procesamiento (Hash Rate)"
                         stroke="#00f3ff" 
                         strokeWidth={2} 
-                        dot={false} 
+                        filter="url(#glow-power)"
+                        dot={({ cx, cy, index }) => {
+                            if (index === data.length - 1) {
+                                return (
+                                    <g key="power-pulse">
+                                        <circle cx={cx} cy={cy} r={4} fill="#00f3ff" />
+                                        <circle cx={cx} cy={cy} r={4} fill="none" stroke="#00f3ff" strokeWidth={1.5}>
+                                            <animate attributeName="r" values="4;12;4" dur="2s" repeatCount="indefinite" />
+                                            <animate attributeName="opacity" values="1;0;1" dur="2s" repeatCount="indefinite" />
+                                        </circle>
+                                    </g>
+                                );
+                            }
+                            return null;
+                        }}
                         isAnimationActive={false}
                         animationDuration={300}
                     />
@@ -113,7 +143,21 @@ export const SimulationChart = React.memo(() => {
                         name="Temperatura"
                         stroke="#ff1744" 
                         strokeWidth={2} 
-                        dot={false} 
+                        filter="url(#glow-temp)"
+                        dot={({ cx, cy, index }) => {
+                            if (index === data.length - 1) {
+                                return (
+                                    <g key="temp-pulse">
+                                        <circle cx={cx} cy={cy} r={4} fill="#ff1744" />
+                                        <circle cx={cx} cy={cy} r={4} fill="none" stroke="#ff1744" strokeWidth={1.5}>
+                                            <animate attributeName="r" values="4;12;4" dur="2s" repeatCount="indefinite" />
+                                            <animate attributeName="opacity" values="1;0;1" dur="2s" repeatCount="indefinite" />
+                                        </circle>
+                                    </g>
+                                );
+                            }
+                            return null;
+                        }}
                         isAnimationActive={false}
                         animationDuration={300}
                     />
