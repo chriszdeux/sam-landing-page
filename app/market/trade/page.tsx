@@ -747,7 +747,7 @@ const TradeContent = () => {
                             </Typography>
                             
                             <Typography variant="body2" sx={{ color: 'text.secondary', mb: 4 }}>
-                                La operación se ha registrado y confirmado en la red Lyncore.
+                                La operación se ha registrado y confirmado en la red {EnvVariables.project}.
                             </Typography>
 
                             <Stack spacing={1.5} sx={{ width: '100%', bgcolor: 'rgba(0, 255, 136, 0.03)', p: 3, borderRadius: 2, border: '1px solid rgba(0, 255, 136, 0.1)', mb: 4, fontFamily: 'monospace' }}>

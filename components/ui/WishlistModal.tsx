@@ -13,6 +13,7 @@ import {
 import { Close as CloseIcon, CheckCircle as CheckCircleIcon } from "@mui/icons-material";
 import { Input } from "./Input";
 import { Button } from "./Button";
+import { EnvVariables } from "../../lib/constants/variables";
 
 interface WishlistModalProps {
   open: boolean;
@@ -81,7 +82,7 @@ export const WishlistModal: React.FC<WishlistModalProps> = ({ open, onClose }) =
       }}
     >
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h6" fontWeight="bold">Join Lyncore Wishlist</Typography>
+        <Typography variant="h6" fontWeight="bold">Join {EnvVariables.project} Wishlist</Typography>
         <IconButton onClick={onClose} sx={{ color: 'rgba(255,255,255,0.7)' }}>
           <CloseIcon />
         </IconButton>
@@ -99,7 +100,7 @@ export const WishlistModal: React.FC<WishlistModalProps> = ({ open, onClose }) =
           <form onSubmit={handleSubmit}>
             <Box sx={{ mt: 1 }}>
               <Typography variant="body2" sx={{ mb: 3, color: 'rgba(255,255,255,0.7)' }}>
-                Sé de los primeros en experimentar el poder de la economía Lyncore. ¡Regístrate ahora!
+                Sé de los primeros en experimentar el poder de la economía {EnvVariables.project}. ¡Regístrate ahora!
               </Typography>
               <Input
                 label="Nombre"

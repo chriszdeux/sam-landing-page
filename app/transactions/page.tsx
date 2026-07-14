@@ -20,6 +20,7 @@ import { PageHeader } from '../../components/ui/PageHeader';
 import { motion } from 'framer-motion';
 import { formatHash } from '../../lib/utils/formatHash';
 import { useRefreshCooldown } from '../../lib/useRefreshCooldown';
+import { EnvVariables } from '../../lib/constants/variables';
 
 export default function TransactionsPage() {
     const dispatch = useAppDispatch();
@@ -212,7 +213,7 @@ export default function TransactionsPage() {
                     <PageHeader
                         title='Explorador de'
                         highlight='Transacciones'
-                        subtitle='Historial técnico de operaciones en la red blockchain de LynCore.'
+                        subtitle={`Historial técnico de operaciones en la red blockchain de ${EnvVariables.project}.`}
                     />
 
                     {/* Blockchain Hash Metric Widget */}

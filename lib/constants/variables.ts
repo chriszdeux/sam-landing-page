@@ -10,7 +10,7 @@ interface EnvVariablesConfig {
 }
 
 export const EnvVariables: EnvVariablesConfig = {
-  project: process.env.NEXT_PUBLIC_PROJECT_NAME || '',
+  project: process.env.NEXT_PUBLIC_PROJECT_NAME || 'CORE',
   coin1: process.env.NEXT_PUBLIC_COIN1 || '',
   coin2: process.env.NEXT_PUBLIC_COIN2 || '',
   coin3: process.env.NEXT_PUBLIC_COIN3 || '',
