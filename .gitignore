@@ -43,6 +43,7 @@ next-env.d.ts
 # IA
 .ia/
 .agent
+.agents/
 .kiro
 .gemini/
 SKILL.md
