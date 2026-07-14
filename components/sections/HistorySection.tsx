@@ -1,88 +1,79 @@
-// 1-Estructuración y renderizado visual del componente UI
-// 2-Estructuración y renderizado visual del componente UI
-
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { Box, Typography, Divider, Grid } from '@mui/material';
-import Image from 'next/image';
+import { Box, Typography, Divider, Grid, Button } from '@mui/material';
+import { FileText, Play as PlayIcon } from 'lucide-react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Section } from '../ui/Section';
-import { Button } from '../ui/Button';
-import { PlayArrow as PlayIcon } from '@mui/icons-material';
 import { historyData } from '../../lib/data/history';
 import { EnvVariables } from '@/lib/constants/variables';
 import { CinematicStoryteller } from '../ui/CinematicStoryteller';
+import { LoreFileModal } from '../ui/LoreFileModal';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const TechFrame = ({ children, color = '#ff0055' }: { children: React.ReactNode; color?: string }) => (
-  <Box
-    sx={{
-      position: 'relative',
-      p: '4px',
-      background: `linear-gradient(45deg, transparent 5%, ${color} 5%, ${color} 10%, transparent 10%, transparent 90%, ${color} 90%, ${color} 95%, transparent 95%)`,
-      filter: `drop-shadow(0 0 5px ${color}80)`,
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        border: `1px solid ${color}40`,
-        clipPath: 'polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%)',
-        pointerEvents: 'none',
-      },
-    }}
-  >
-    <Box sx={{ 
-      position: 'relative', 
-      clipPath: 'polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%)',
-      bgcolor: 'rgba(0,0,0,0.7)',
-    }}>
-      {children}
-      <Box sx={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '100%',
-        background: `linear-gradient(to bottom, transparent 50%, ${color}10 50%)`,
-        backgroundSize: '100% 4px',
-        pointerEvents: 'none',
-        zIndex: 2,
-      }} />
-    </Box>
-  </Box>
-);
-
-const DataLog = ({ title, year, children, align = 'left' }: { title: string; year?: string; children: React.ReactNode; align?: 'left' | 'right' }) => (
+const DataLog = ({ 
+  title, 
+  year, 
+  children, 
+  color = '#00f3ff' 
+}: { 
+  title: string; 
+  year?: string; 
+  children: React.ReactNode; 
+  color?: string;
+}) => (
   <Box sx={{ 
-    textAlign: align, 
     position: 'relative',
-    p: { xs: 2, md: 4 },
-    borderLeft: align === 'left' ? '2px solid #ff0055' : 'none',
-    borderRight: align === 'right' ? '2px solid #00f3ff' : 'none',
-    background: 'linear-gradient(90deg, rgba(255, 0, 85, 0.05) 0%, rgba(0,0,0,0) 100%)',
-    backdropFilter: 'blur(5px)',
+    p: { xs: 3, md: 5 },
+    border: `1px solid rgba(255, 255, 255, 0.08)`,
+    borderLeft: `3px solid ${color}`,
+    bgcolor: 'rgba(5, 10, 15, 0.65)',
+    boxShadow: `0 0 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.01)`,
+    borderRadius: '4px',
+    overflow: 'hidden',
   }}>
-    <Typography variant="overline" sx={{ color: 'text.secondary', letterSpacing: 2, display: 'block', mb: 1, fontFamily: 'monospace' }}>
-      {'// ARCHIVE RECORD: '}{year || 'UNKNOWN'}
+    {/* Monospace overlay scanlines for CRT aesthetic */}
+    <Box sx={{
+      position: 'absolute',
+      inset: 0,
+      background: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%)',
+      backgroundSize: '100% 4px',
+      pointerEvents: 'none',
+      zIndex: 2
+    }} />
+
+    <Typography variant="overline" sx={{ 
+      color: 'rgba(255, 255, 255, 0.4)', 
+      letterSpacing: 3, 
+      display: 'block', 
+      mb: 1.5, 
+      fontFamily: 'monospace',
+      fontSize: '0.75rem'
+    }}>
+      {`// RECORD_ENTRY: `}{year || 'UNKNOWN'}
     </Typography>
-    <Typography variant="h3" sx={{ 
+    
+    <Typography variant="h4" sx={{ 
       mb: 3, 
-      color: 'white', 
+      color: '#fff', 
       textTransform: 'uppercase', 
-      fontWeight: 'bold',
-      textShadow: '0 0 10px rgba(255, 0, 85, 0.5)',
-      fontSize: { xs: '1.8rem', md: '2.5rem' }
+      fontWeight: 800,
+      fontFamily: 'monospace',
+      textShadow: `0 0 10px ${color}80`,
+      fontSize: { xs: '1.5rem', md: '2.2rem' }
     }}>
       {title}
     </Typography>
-    <Typography component="div" variant="body1" sx={{ fontSize: '1.1rem', color: 'gray', lineHeight: 1.8, fontFamily: 'monospace' }}>
+    
+    <Typography component="div" variant="body1" sx={{ 
+      fontSize: '1rem', 
+      color: 'rgba(255, 255, 255, 0.75)', 
+      lineHeight: 1.8, 
+      fontFamily: 'monospace' 
+    }}>
       {children}
     </Typography>
   </Box>
@@ -90,6 +81,7 @@ const DataLog = ({ title, year, children, align = 'left' }: { title: string; yea
 
 export const HistorySection = () => {
   const [isCinematicOpen, setIsCinematicOpen] = useState(false);
+  const [isLoreOpen, setIsLoreOpen] = useState(false);
   const container = useRef<HTMLElement | null>(null);
   const { project } = EnvVariables;
 
@@ -126,23 +118,8 @@ export const HistorySection = () => {
           trigger: block,
           start: 'top 85%',
         },
-        x: -50,
+        y: 30,
         opacity: 0,
-        duration: 0.8,
-        ease: 'power2.out'
-      });
-    });
-
-    const imageBlocks = gsap.utils.toArray<HTMLElement>('.history-image-block');
-    imageBlocks.forEach((block) => {
-      gsap.from(block, {
-        scrollTrigger: {
-          trigger: block,
-          start: 'top 85%',
-        },
-        x: 50,
-        opacity: 0,
-        scale: 0.9,
         duration: 0.8,
         ease: 'power2.out'
       });
@@ -150,25 +127,33 @@ export const HistorySection = () => {
 
   }, { scope: container });
 
-  
-  
-  //# 1-Estructuración y renderizado visual del componente UI
   return (
     <Section id="history" className="overflow-hidden">
-      <Box ref={container}>
+      {/* Dynamic Static & Flicker Animation Style */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes static-flicker {
+          0%, 100% { opacity: 0.98; }
+          50% { opacity: 1; }
+          95% { opacity: 0.97; }
+        }
+      `}} />
+
+      <Box ref={container} sx={{ animation: 'static-flicker 0.25s infinite' }}>
         <Box sx={{ mb: 12 }} className="history-main-title">
           <Typography variant="h2" align="center" gutterBottom sx={{ 
               color: 'white', 
               textTransform: 'uppercase', 
               fontWeight: 900,
+              fontFamily: 'monospace',
               textShadow: '0 0 20px rgba(0, 243, 255, 0.8)'    
           }}>
-            Cronología {project}
+            CRONOLOGÍA {project}
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap', mb: 2 }}>
             <Button
               variant="contained"
-              startIcon={<PlayIcon />}
+              startIcon={<PlayIcon size={18} />}
               onClick={() => setIsCinematicOpen(true)}
               sx={{ 
                 background: 'rgba(0, 243, 255, 0.05)',
@@ -177,6 +162,7 @@ export const HistorySection = () => {
                 color: '#fff', 
                 fontWeight: '900',
                 textTransform: 'uppercase',
+                fontFamily: 'monospace',
                 letterSpacing: 2,
                 px: 4,
                 py: 1.5,
@@ -191,125 +177,86 @@ export const HistorySection = () => {
             >
               Reproducir Historia
             </Button>
+
+            <Button
+              variant="outlined"
+              startIcon={<FileText size={18} />}
+              onClick={() => setIsLoreOpen(true)}
+              sx={{ 
+                borderColor: 'rgba(0, 243, 255, 0.4)',
+                color: '#00f3ff', 
+                fontWeight: '900',
+                textTransform: 'uppercase',
+                fontFamily: 'monospace',
+                letterSpacing: 2,
+                px: 4,
+                py: 1.5,
+                '&:hover': {
+                    borderColor: '#00f3ff',
+                    background: 'rgba(0, 243, 255, 0.05)',
+                    boxShadow: '0 0 20px rgba(0, 243, 255, 0.2)',
+                    transform: 'translateY(-2px)',
+                },
+                transition: 'all 0.3s ease'
+              }}
+            >
+              Leer Canon (lore.md)
+            </Button>
           </Box>
           <Divider sx={{ my: 4, borderColor: '#00f3ff', opacity: 0.3, maxWidth: '200px', mx: 'auto' }} />
         </Box>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {historyData.map((eventData, yearIndex) => (
             <Box key={eventData.year}>
 
-              <Box className="history-year-header" sx={{ textAlign: 'center', mb: 10 }}>
-                  <Typography variant="overline" sx={{ color: '#ffb700', letterSpacing: 8, fontSize: '1.2rem', display: 'block', mb: 2 }}>
-                      AÑO 
+              <Box className="history-year-header" sx={{ textAlign: 'center', mb: 8 }}>
+                  <Typography variant="overline" sx={{ color: '#ffb700', letterSpacing: 8, fontSize: '1.1rem', display: 'block', mb: 2, fontFamily: 'monospace' }}>
+                      AÑO {eventData.year}
                   </Typography>
                   <Typography variant="h3" sx={{ 
-                      fontSize: { xs: '1.8rem', md: '4rem' }, 
+                      fontSize: { xs: '1.8rem', md: '3.5rem' }, 
                       fontWeight: 'bold', 
                       mb: 3,
                       color: 'white',
                       textTransform: 'uppercase',
-                      hyphens: 'auto',
-                      wordBreak: 'break-word',
+                      fontFamily: 'monospace',
+                      letterSpacing: 1,
                   }}>
                       {eventData.title}
                   </Typography>
-                  <Typography variant="h5" color="text.secondary" sx={{ maxWidth: '800px', mx: 'auto', lineHeight: 1.6, fontFamily: 'monospace' }}>
+                  <Typography variant="h5" color="text.secondary" sx={{ maxWidth: '850px', mx: 'auto', lineHeight: 1.6, fontFamily: 'monospace', fontSize: '1.05rem' }}>
                       {eventData.description}
                   </Typography>
               </Box>
 
-                  <Grid container spacing={{ xs: 2, md: 8 }} alignItems="center">
-                  {eventData.details.map((detail, index) => {
-                      const isEven = index % 2 === 0;
-                      
-                      
-                      
-                      //# 2-Estructuración y renderizado visual del componente UI
-                      return (
-                          <React.Fragment key={`${eventData.year}-${index}`}>
-
-                              <Grid 
-                                size={{ xs: 12, md: 6 }} 
-                                sx={{ order: isEven ? { xs: 2, md: 1 } : { xs: 2, md: 2 } }}
-                                className="history-text-block"
-                              >
-                                  <DataLog 
-                                      title={detail.heading} 
-                                      year={`${eventData.year}.${index + 1}`} 
-                                      align={isEven ? 'left' : 'right'}
-                                  >
-                                      {detail.paragraphs.map((p, i) => (
-                                          <p key={i} style={{ marginBottom: i < detail.paragraphs.length - 1 ? '1em' : 0 }}>
-                                              {p}
-                                          </p>
-                                      ))}
-                                  </DataLog>
-                              </Grid>
-
-                              <Grid 
-                                size={{ xs: 12, md: 6 }} 
-                                sx={{ order: isEven ? { xs: 1, md: 2 } : { xs: 1, md: 1 } }}
-                                className="history-image-block"
-                              >
-                                  <TechFrame color={isEven ? '#00f3ff' : '#ffb700'}>
-                                      <Box className="glitch-effect" sx={{ 
-                                          position: 'relative', 
-                                          height: { xs: 300, md: 400 }, 
-                                          width: '100%',
-                                          overflow: 'hidden'
-                                      }}>
-                                          {detail.image ? (
-                                              <Image
-                                                  src={detail.image}
-                                                  alt={detail.imageCaption}
-                                                  fill
-                                                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                                  className="holo-image"
-                                                  style={{ 
-                                                      objectFit: 'cover',
-                                                      animationDelay: `${((yearIndex * 5 + index) * 0.7) % 5}s`
-                                                  }}
-                                              />
-                                          ) : (
-                                              <Box sx={{ 
-                                                  height: '100%', 
-                                                  width: '100%', 
-                                                  display: 'flex', 
-                                                  alignItems: 'center', 
-                                                  justifyContent: 'center',
-                                                  background: `radial-gradient(circle at center, ${isEven ? 'rgba(0, 243, 255, 0.1)' : 'rgba(255, 183, 0, 0.1)'} 0%, transparent 70%)`
-                                              }}>
-                                                  <Typography sx={{ color: 'text.disabled', fontStyle: 'italic', p: 2, textAlign: 'center' }}>
-                                                      [IMAGEN NO DISPONIBLE: {detail.imageCaption}]
-                                                  </Typography>
-                                              </Box>
-                                          )}
-
-                                          <Box sx={{
-                                              position: 'absolute',
-                                              bottom: 0,
-                                              left: 0,
-                                              right: 0,
-                                              p: 2,
-                                              background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)',
-                                              color: 'rgba(255,255,255,0.8)',
-                                              fontSize: '0.8rem',
-                                              fontFamily: 'monospace',
-                                              zIndex: 3,
-                                          }}>
-                                              IMG_REF: {detail.imageCaption}
-                                          </Box>
-                                      </Box>
-                                  </TechFrame>
-                              </Grid>
-                          </React.Fragment>
-                      );
-                  })}
+              <Grid container spacing={4}>
+                {eventData.details.map((detail, index) => {
+                  const isEven = index % 2 === 0;
+                  return (
+                    <Grid 
+                      key={`${eventData.year}-${index}`}
+                      size={{ xs: 12 }} 
+                      className="history-text-block"
+                    >
+                      <DataLog 
+                          title={detail.heading} 
+                          year={`${eventData.year}.${index + 1}`} 
+                          color={isEven ? '#00f3ff' : '#ffb700'}
+                      >
+                          {detail.paragraphs.map((p, i) => (
+                              <p key={i} style={{ marginBottom: i < detail.paragraphs.length - 1 ? '1.2em' : 0 }}>
+                                  {p}
+                              </p>
+                          ))}
+                      </DataLog>
+                    </Grid>
+                  );
+                })}
               </Grid>
 
               {yearIndex < historyData.length - 1 && (
-                   <Divider sx={{ mt: 16, borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+                   <Divider sx={{ mt: 12, borderColor: 'rgba(255, 255, 255, 0.08)' }} />
               )}
             </Box>
           ))}
@@ -320,6 +267,11 @@ export const HistorySection = () => {
         data={historyData} 
         isOpen={isCinematicOpen} 
         onClose={() => setIsCinematicOpen(false)} 
+      />
+
+      <LoreFileModal 
+        open={isLoreOpen} 
+        onClose={() => setIsLoreOpen(false)} 
       />
     </Section>
   );
