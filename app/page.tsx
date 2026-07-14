@@ -3,6 +3,7 @@
 'use client';
 
 import React from 'react';
+import { EnvVariables } from '../lib/constants/variables';
 import { Box, Container, Typography, Stack, Chip } from '@mui/material';
 import {
   Rocket, BarChart2, ShoppingCart, Blocks
@@ -294,7 +295,7 @@ export default function Home() {
               '@keyframes textShine': { to: { backgroundPosition: '200% center' } },
               filter: 'drop-shadow(0 0 20px rgba(0,243,255,0.2))',
             }}>
-              The Lyncore
+              The {EnvVariables.project}
             </Typography>
 
             <Typography variant="h4" sx={{
@@ -374,7 +375,7 @@ export default function Home() {
         tag="01 · EL NÚCLEO"
         Icon={Rocket}
         title="Qué es"
-        titleHighlight="The Lyncore"
+        titleHighlight={`The ${EnvVariables.project}`}
         description="Un simulador blockchain interactivo donde compras y vendes activos criptográficos de forma gamificada. Las transacciones se agrupan en bloques elásticos que se sellan automáticamente al alcanzar su capacidad, expandiéndose un 25% por cada nuevo ciclo. Es un ledger real —no Web3—, diseñado para aprender las reglas de la economía descentralizada en un entorno controlado."
         futureLine="Próximamente: colonización de mapas interestelares, creación de estructuras de hardware y optimización de simuladores respaldados por el motor de la plataforma."
         actionLabel={userInfo ? "Ir a Operaciones" : "Comenzar Misión"}

@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { ParticleBackground } from '@/components/ui/ParticleBackground';
 import { roadmapData } from '@/lib/data/roadmap';
 import { RoadmapNode } from '@/components/ui/RoadmapNode';
+import { EnvVariables } from '@/lib/constants/variables';
 
 export default function RoadmapPage() {
   return (
@@ -14,7 +15,7 @@ export default function RoadmapPage() {
       
       <Container maxWidth="md" sx={{ position: 'relative', zIndex: 10 }}>
         <PageHeader 
-          title="Lyncore Roadmap" 
+          title={`${EnvVariables.project} Roadmap`} 
           subtitle="Conoce el camino hacia la descentralización y la economía del futuro." 
         />
         

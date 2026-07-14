@@ -11,6 +11,7 @@ import { LabMetersPanel } from '../../components/dashboard/LabMetersPanel';
 import { ControlRewardsPanel } from '../../components/dashboard/ControlRewardsPanel';
 import { OperationsCanvasBg } from "../../components/dashboard/OperationsCanvasBg";
 import { EmptyLabState } from '../../components/dashboard/EmptyLabState';
+import { SecondaryTerminal } from '../../components/dashboard/SecondaryTerminal';
 import { Background } from '../../components/layout/Background';
 import { RootState } from '../../lib/store';
 
@@ -91,6 +92,7 @@ export default function DashboardPage() {
                             </Grid>
                         </Grid>
                     )}
+                    <SecondaryTerminal />
                 </motion.div>
             </Container>
         </main>

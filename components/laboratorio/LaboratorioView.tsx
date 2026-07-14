@@ -14,6 +14,7 @@ import { CoreModulesSimulator } from "../core_modules/CoreModulesSimulator";
 import { LaboratorySimulation } from "./LaboratorySimulation";
 import { useEffect, useState } from "react";
 import { RootState } from "../../lib/store";
+import { EnvVariables } from "../../lib/constants/variables";
 import { fetchLaboratoryInterface } from "../../lib/features/labs/actions";
 import { getCBUnit, processingFrequencies } from "../../lib/constants/blockchainFrequencies";
 
@@ -131,7 +132,7 @@ export function LaboratorioView() {
               <Bolt sx={{ color: isOverheated ? '#ff1744' : '#00f3ff', fontSize: 30 }} />
               <Box>
                 <Typography variant="overline" sx={{ color: isOverheated ? '#ff1744' : '#00f3ff', fontWeight: 'bold', display: 'block', lineHeight: 1 }}>
-                  {isOverheated ? 'SYSTEM OVERHEATED - EMERGENCY COOLDOWN' : 'LYNCORE NETWORK ACTIVE'}
+                  {isOverheated ? 'SYSTEM OVERHEATED - EMERGENCY COOLDOWN' : `${EnvVariables.project.toUpperCase()} NETWORK ACTIVE`}
                 </Typography>
                 <Typography variant="h6" sx={{ color: 'white', fontFamily: 'monospace' }}>
                   Poder Total: <span style={{ color: isOverheated ? '#ff1744' : '#00f3ff' }}>{isPoweredOn ? totalPower.toFixed(1) : '0.0'} {labUnit}</span>

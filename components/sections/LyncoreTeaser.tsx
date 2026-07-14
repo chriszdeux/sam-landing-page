@@ -2,6 +2,7 @@
 
 import { Box, Typography, Stack } from "@mui/material";
 import { motion } from "framer-motion";
+import { EnvVariables } from "../../lib/constants/variables";
 
 const floatingOrb = (color: string, top: string, left: string, size: number, delay: number) => (
   <motion.div
@@ -108,7 +109,7 @@ export function LyncoreTeaser() {
                 fontSize: { xs: "2.8rem", sm: "4rem" },
               }}
             >
-              Lyncore
+              {EnvVariables.project}
             </Typography>
           </motion.div>
 

@@ -18,6 +18,7 @@ import {
 } from "@mui/icons-material";
 import { HistoryEvent } from "../../lib/data/history";
 import Image from "next/image";
+import { EnvVariables } from "../../lib/constants/variables";
 
 interface Slide {
   type: "intro" | "detail";
@@ -136,7 +137,7 @@ export const CinematicStoryteller: React.FC<CinematicStorytellerProps> = ({
       {/* Header */}
       <Box sx={{ position: 'absolute', top: 0, width: '100%', p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 10 }}>
         <Typography variant="overline" sx={{ color: '#00f3ff', letterSpacing: 4, fontWeight: 'bold' }}>
-          LYNCORE ARCHIVE // {currentSlide.year}
+          {EnvVariables.project.toUpperCase()} ARCHIVE // {currentSlide.year}
         </Typography>
         <IconButton onClick={onClose} sx={{ color: 'white', '&:hover': { color: '#ff0055' } }}>
           <CloseIcon fontSize="large" />
