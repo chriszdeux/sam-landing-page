@@ -44,8 +44,8 @@ export const fetchCryptoHistory = createAsyncThunk(
         try {
             const data = await getCryptoHistoryApi(cryptoId, range, signal);
             return { cryptoId, range, data };
-        } catch (err: unknown) {
-            if (err.name === "AbortError" || err.code === "ERR_CANCELED") throw err;
+        } catch (err: any) {
+            if (err?.name === "AbortError" || err?.code === "ERR_CANCELED") throw err;
             const errorObj = err as { response?: { data?: { message?: string } } };
             return rejectWithValue(errorObj.response?.data?.message || 'Failed to fetch history');
         }

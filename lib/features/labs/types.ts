@@ -1,23 +1,44 @@
-export interface LabData {
+export interface SlotItem {
   id: string;
-  userId: string;
-  type?: string;
-  powerMining: number;
-  temperature: number;
+  name: string;
+  hashRate: number; // Replaced powerMining
   maxTemperature: number;
-  efficiency: number;
+  lifeLimit: number;
+  currentUsage: number;
+  temperature: number; // Dual thermal management
+}
+
+export interface LaboratoryInterface {
+  id: string;
+  type: "MINING";
+  lifeLimit: number;
+  currentLife: number;
+  maxTemperature: number;
+  slotsCapacity: number;
+  hashRate: number; // Replaced powerBase
   energy: number;
-  maxEnergy: number;
+  slots: SlotItem[];
+  createdAt: string | Date;
+  
+  // Client-side simulation properties
+  temperature: number; // Global lab temperature
+  efficiency: number;
   operationStatus: 'ACTIVE' | 'INACTIVE';
-  lastEnergyUpdate?: string;
-  lastProcessedAt?: string;
-  capacity?: number;
-  storage?: number;
+  pendingRewards: number;
+  maxEnergy?: number;
+  networkHash?: number;
 }
 
 export interface LabsState {
-  currentLab: LabData | null;
+  currentLab: LaboratoryInterface | null;
   isPoweredOn: boolean;
+  isOverheated: boolean;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
+  simulationHistory: { timestamp: number; temperature: number; power: number }[];
+  currentRound: number;
+  lastInjectionTime: number;
+  isOverclockActive?: boolean;
+  startingTemp?: number | null;
 }
+

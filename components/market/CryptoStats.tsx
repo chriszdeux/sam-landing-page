@@ -50,8 +50,8 @@ export const CryptoStats = ({ financial, color }: CryptoStatsProps) => {
             </Grid>
             <Grid size={{ xs: 6, md: 6 }}>
                 <StatItem
-                    label="Suministro Circulante"
-                    value={financial.circulatingSupply.toLocaleString()}
+                    label="Liquidez (Trading)"
+                    value={financial.supplyToTrade ? financial.supplyToTrade.toLocaleString() : '0'}
                 />
             </Grid>
             <Grid size={{ xs: 6, md: 6 }}>

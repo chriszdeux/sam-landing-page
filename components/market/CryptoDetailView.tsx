@@ -94,7 +94,7 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                             <Avatar 
                                 src={crypto.identification.image256 || crypto.identification.image128}
                                 alt={crypto.identification.name}
-                                sx={{ width: 64, height: 64, bgcolor: crypto.additionalInfo?.pColor || 'primary.main' }}
+                                sx={{ width: 64, height: 64, bgcolor: crypto.additionalInfo?.pColor || 'primary.main', borderRadius: '24%' }}
                             >
                                 {crypto.identification.symbol[0]}
                             </Avatar>

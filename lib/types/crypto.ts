@@ -7,6 +7,7 @@ export interface Financial {
   isInfiniteSupply?: boolean;
   totalSupply: number;
   circulatingSupply: number;
+  supplyToTrade: number;
   maxSupply: number;
   marketCap: number;
   limitMarketCap: number;

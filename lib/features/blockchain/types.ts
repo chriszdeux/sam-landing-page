@@ -1,5 +1,5 @@
 // 1-Definir enumeraciones para transacciones
-// 2-Definir interfaces para transacciones y bloques
+// 2-Definir interfaces para transacciones, bloques y baldes
 // 3-Definir interfaces para recompensas y estado
 
 //# 1-Definir enumeraciones para transacciones
@@ -17,7 +17,7 @@ export enum TransactionStatus {
     FAILED = 'FAILED'
 }
 
-//# 2-Definir interfaces para transacciones y bloques
+//# 2-Definir interfaces para transacciones, bloques y baldes
 export interface TransactionsInterface {
   id: string;
   transactionDocumentID?: string;
@@ -43,14 +43,35 @@ export interface TransactionsInterface {
   duration: string;
 }
 
+export interface BlockInterface {
+  index: number;
+  id: string;
+  blockchainId: string;
+  prevBlock: string;
+  nextBlock: string | null;
+  difficulty: number;
+  buyCount?: number;
+  sellCount?: number;
+  transferCount?: number;
+  transactionsBuyQueue?: number | string[];
+  transactionsSellQueue?: number | string[];
+  transactionsTransferQueue?: number | string[];
+  maxTransactions: number;
+  miners: string[]; // Direcciones de wallet planas
+  fee: number;
+  minerRewards: number; 
+  createdAt: string | Date;
+  minedAt?: string | Date;
+}
+
 export interface TransactionBucket {
   id: string;
   blockchainID: string;
   transactions: TransactionsInterface[] | [];
   count: number;
-  transactionsBuyQueue: string[] | [];
-  transactionsSellQueue: string[] | [];
-  transactionsTransferQueue: string[] | [];
+  transactionsBuyQueue: number | string[] | [];
+  transactionsSellQueue: number | string[] | [];
+  transactionsTransferQueue: number | string[] | [];
   prevBlockID?: string | null;
   nextBlockID?: string | null;
   startDate: string; 
@@ -73,9 +94,18 @@ export interface Reward {
 export interface BlockchainState {
     networks: BlockchainInterface[];
     selectedNetwork: BlockchainInterface | null;
+    activeBlock: BlockInterface | null;
+    blocksHistory: BlockInterface[];
     rewards: Reward[];
     nextBlockTime: number | null;
 
     isLoading: boolean;
     error: string | null;
+    chronoBurstFreqTypes: {
+        label: string;
+        frequencies: {
+            [key: string]: { value: number; unit: string };
+        };
+    } | null;
+    lastBlocksFetch: number | null;
 }

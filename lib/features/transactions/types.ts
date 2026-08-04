@@ -1,7 +1,6 @@
 // 1-Definir enumeraciones para tipo y estado de transacciones
 // 2-Definir interfaz para detalle de transacciones
-// 3-Definir estructura para agrupamiento de transacciones
-// 4-Definir estado global de transacciones
+// 3-Definir estado global de transacciones
 
 //# 1-Definir enumeraciones para tipo y estado de transacciones
 export enum TransactionType {
@@ -23,9 +22,8 @@ export enum TransactionStatus {
 //# 2-Definir interfaz para detalle de transacciones
 export interface TransactionsInterface {
   id: string;
-  transactionDocumentID?: string;
+  blockchainId: string;
   financialInfo: {
-    cryptoID: string;
     crypto: string;
     symbol: string;
     amount: number;
@@ -37,39 +35,20 @@ export interface TransactionsInterface {
     recipientWalletAddress: string;
     senderWalletAddress: string;
   }
-  additionalInfo: {
-    description?: string;
-  }
   transactionType: TransactionType;
   status: TransactionStatus;
-  confirmedBy?: string;
-  dateCreated: string; 
+  dateCreated: string;
   duration: string;
+  powerRequired?: number;
+  confirmedByLabId?: string;
 }
 
-//# 3-Definir estructura para agrupamiento de transacciones
-export interface TransactionBucket {
-  id: string;
-  blockchainID: string;
-  transactions: TransactionsInterface[] | [];
-  count: number;
-  transactionsBuyQueue: string[] | [];
-  transactionsSellQueue: string[] | [];
-  transactionsTransferQueue: string[] | [];
-  prevBlockID?: string | null;
-  nextBlockID?: string | null;
-  startDate: string; 
-  endDate: string | null; 
-  currentTransactionBlock: number;
-}
-
-//# 4-Definir estado global de transacciones
+//# 3-Definir estado global de transacciones
 export interface TransactionsState {
-    byStoreBoxId: {
-        [storeId: string]: TransactionBucket
-    };
+    transactions: TransactionsInterface[];
     isLoading: boolean;
     error: string | null;
+    total: number;
     lastFetch?: number;
     lastArgs?: string;
 }

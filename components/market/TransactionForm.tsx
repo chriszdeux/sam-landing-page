@@ -3,10 +3,15 @@
 
 //# 1-Definir componente de formulario de transacción
 import React from 'react';
-import { Box, MenuItem, Paper, Typography, Button, CircularProgress, SelectChangeEvent, Alert } from '@mui/material';
+import { Box, MenuItem, Paper, Typography, Button, CircularProgress, SelectChangeEvent, Alert, Chip } from '@mui/material';
+import { CustomButton } from '../ui/CustomButton';
 import { Input } from '../ui/Input';
 import { Cryptocurrency } from '../../lib/types/crypto';
 import { TaoIcon } from '../ui/TaoIcon';
+import { formatHash } from '../../lib/utils/formatHash';
+import { useAppSelector } from '../../lib/hooks';
+import { RootState } from '../../lib/store';
+import { LocalFireDepartment, SwapHoriz, TrendingUp } from '@mui/icons-material';
 
 interface TradeFormData {
   walletId: string;
@@ -40,13 +45,27 @@ export const TransactionForm = ({
     availableQuantity,
     onSetMax
 }: TransactionFormProps) => {
-    
+    const chronoBurstFreqTypes = useAppSelector((state: RootState) => state.blockchain.chronoBurstFreqTypes);
+    const networkDifficulty = 3; // Base difficulty factor for hash cost estimate
+    const estimatedHashCost = fee != null ? fee * networkDifficulty * 1000 : null;
+    const formattedHashCost = estimatedHashCost != null ? formatHash(estimatedHashCost, chronoBurstFreqTypes) : null;
+    const accentColor = transactionType === 'BUY' ? '#00e676' : transactionType === 'SELL' ? '#ff1744' : '#ffab00';
+
     //# 2-Renderizar formulario con validación y costos
     return (
         <Box>
-            <Typography variant="h6" color="primary.main" gutterBottom sx={{ mt: 4, mb: 2, borderBottom: '1px solid rgba(0,243,255,0.2)', display: 'inline-block', pb: 1 }}>
-                2. DETALLES DE LA TRANSACCIÓN
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3, mt: 4 }}>
+                <Box sx={{ width: 4, height: 24, bgcolor: accentColor, borderRadius: 1, boxShadow: `0 0 8px ${accentColor}` }} />
+                <Typography variant="h6" sx={{ color: accentColor, fontWeight: 'bold', letterSpacing: 1.5, textTransform: 'uppercase', fontSize: '0.85rem' }}>
+                    Detalles de la Transacción
+                </Typography>
+                <Chip
+                    label={transactionType === 'BUY' ? 'COMPRA' : transactionType === 'SELL' ? 'VENTA' : 'TRANSFERENCIA'}
+                    icon={transactionType === 'BUY' ? <TrendingUp style={{ fontSize: 14 }} /> : transactionType === 'SELL' ? <SwapHoriz style={{ fontSize: 14 }} /> : undefined}
+                    size="small"
+                    sx={{ bgcolor: `${accentColor}15`, color: accentColor, border: `1px solid ${accentColor}40`, fontWeight: 'bold', fontSize: '0.65rem' }}
+                />
+            </Box>
 
             {transactionType === 'TRANSFER' && (
                 <Alert severity="warning" sx={{ mb: 3, bgcolor: 'transparent', color: '#ffb700' }}>
@@ -63,7 +82,6 @@ export const TransactionForm = ({
                         value={form.cryptoId}
                         onChange={onChange}
                         fullWidth
-                        disabled
                         containerSx={{
                             '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
                             mb: 3
@@ -89,30 +107,37 @@ export const TransactionForm = ({
 
                 <Box>
                         {transactionType === 'BUY' && (
-                            <Input
-                            label="Monto a Invertir (CR)"
-                            name="amount"
-                            type="number"
-                            value={form.amount}
-                            onChange={onChange}
-                            fullWidth
-                            autoFocus
-                            inputProps={{ min: 0 }}
-                            containerSx={{
-                                '& .MuiInputLabel-root': { color: '#00f3ff' },
-                                mb: 2
-                            }}
-                            sx={{
-                                '& .MuiInputBase-input': { 
-                                    color: 'white', 
-                                    fontSize: '1.5rem',
-                                    borderColor: 'rgba(0, 243, 255, 0.3)',
-                                    '&:hover': { borderColor: '#00f3ff' },
-                                    '&:focus': { borderColor: '#00f3ff', boxShadow: '0 0 0 0.2rem rgba(0, 243, 255, 0.25)' }
-                                },
-                            }}
-                        />
-                    )}
+                            <Box>
+                                <Input
+                                    label="Monto a Invertir (CR)"
+                                    name="amount"
+                                    type="number"
+                                    value={form.amount}
+                                    onChange={onChange}
+                                    fullWidth
+                                    autoFocus
+                                    inputProps={{ min: 0 }}
+                                    containerSx={{
+                                        '& .MuiInputLabel-root': { color: '#00f3ff' },
+                                        mb: 2
+                                    }}
+                                    sx={{
+                                        '& .MuiInputBase-input': { 
+                                            color: 'white', 
+                                            fontSize: '1.5rem',
+                                            borderColor: 'rgba(0, 243, 255, 0.3)',
+                                            '&:hover': { borderColor: '#00f3ff' },
+                                            '&:focus': { borderColor: '#00f3ff', boxShadow: '0 0 0 0.2rem rgba(0, 243, 255, 0.25)' }
+                                        },
+                                    }}
+                                />
+                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mb: 2, gap: 1 }}>
+                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                        Liquidez Disponible: {selectedCrypto?.financial.supplyToTrade ? selectedCrypto.financial.supplyToTrade.toLocaleString() : '0'} {selectedCrypto?.identification.symbol}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        )}
 
                     {transactionType === 'SELL' && (
                         <Box>
@@ -173,49 +198,67 @@ export const TransactionForm = ({
                         )}
                     
 
-                    <Box sx={{ p: 2, borderRadius: 2, bgcolor: transactionType === 'BUY' ? 'rgba(0, 230, 118, 0.1)' : 'rgba(255, 23, 68, 0.1)', border: '1px dashed', borderColor: transactionType === 'BUY' ? '#00e676' : '#ff1744' }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                            <Typography variant="subtitle2" sx={{ color: transactionType === 'BUY' ? '#00e676' : '#ff1744' }}>ESTIMADO</Typography>
-                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                                {fee === null ? 'Calculando tarifa...' : `TARIFA DE RED: ${fee} CR`}
+                    <Box sx={{
+                        p: 2.5, borderRadius: 2,
+                        bgcolor: `${accentColor}08`,
+                        border: `1px solid ${accentColor}30`,
+                        position: 'relative',
+                        overflow: 'hidden',
+                    }}>
+                        {/* Glow */}
+                        <Box sx={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', bgcolor: accentColor, filter: 'blur(30px)', opacity: 0.1 }} />
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
+                            <Box>
+                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'block', letterSpacing: 1, mb: 0.5, fontSize: '0.65rem' }}>RECIBIRÁS</Typography>
+                                {transactionType === 'BUY' ? (
+                                    <Typography variant="h5" sx={{ color: 'white', fontWeight: 900, fontFamily: 'monospace' }}>
+                                        +{(form.amount / (selectedCrypto?.financial.price || 1)).toFixed(6)} <Box component="span" sx={{ color: accentColor, fontSize: '0.8em' }}>{selectedCrypto?.identification.symbol}</Box>
+                                    </Typography>
+                                ) : (
+                                    <Typography variant="h5" sx={{ color: 'white', fontWeight: 900, display: 'flex', alignItems: 'center', gap: 1, fontFamily: 'monospace' }}>
+                                        +{(form.quantity * (selectedCrypto?.financial.price || 0)).toLocaleString()} <TaoIcon size={20} />
+                                    </Typography>
+                                )}
+                            </Box>
+                            <Box sx={{ textAlign: 'right' }}>
+                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'block', letterSpacing: 1, mb: 0.5, fontSize: '0.65rem' }}>TARIFA CR</Typography>
+                                <Typography variant="body2" sx={{ color: accentColor, fontWeight: 'bold', fontFamily: 'monospace' }}>
+                                    {fee === null ? '—' : `${fee} CR`}
+                                </Typography>
+                            </Box>
+                        </Box>
+
+                        {/* Hash cost estimado */}
+                        <Box sx={{
+                            mt: 1.5, pt: 1.5,
+                            borderTop: '1px solid rgba(255,255,255,0.06)',
+                            display: 'flex', alignItems: 'center', gap: 1
+                        }}>
+                            <LocalFireDepartment sx={{ fontSize: 14, color: '#ff6d00' }} />
+                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.7rem' }}>
+                                Costo de Hash estimado por dificultad de red:
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#ff6d00', fontWeight: 'bold', fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                                {formattedHashCost ?? '...'}
                             </Typography>
                         </Box>
-                        {transactionType === 'BUY' ? (
-                            <Typography variant="h5" color="white">
-                                + {(form.amount / (selectedCrypto?.financial.price || 1)).toFixed(6)} {selectedCrypto?.identification.symbol}
-                            </Typography>
-                        ) : (
-                            <Typography variant="h5" color="white" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                + {(form.quantity * (selectedCrypto?.financial.price || 0)).toLocaleString()} <TaoIcon size={20} />
-                            </Typography>
-                        )}
                     </Box>
                 </Box>
             </Box>
 
-            <Button
-                variant="contained"
-                size="large"
+            <CustomButton
+                variant={transactionType === 'BUY' ? 'success' : transactionType === 'SELL' ? 'error' : 'warning'}
                 onClick={onSubmit}
                 disabled={!form.walletId || isProcessing || fee === null}
-                startIcon={isProcessing ? <CircularProgress size={20} color="inherit" /> : null}
-                sx={{
-                    py: 2,
-                    fontSize: '1.2rem',
-                    fontWeight: 'bold',
-                    width: '100%',
-                    mt: 4,
-                    bgcolor: transactionType === 'BUY' ? '#00e676' : '#ff1744',
-                    color: transactionType === 'BUY' ? 'black' : 'white',
-                    boxShadow: transactionType === 'BUY' ? '0 0 20px rgba(0, 230, 118, 0.4)' : '0 0 20px rgba(255, 23, 68, 0.4)',
-                    '&:hover': {
-                        bgcolor: transactionType === 'BUY' ? '#00c853' : '#d50000',
-                        transform: 'scale(1.02)'
-                    }
-                }}
+                startIcon={isProcessing ? <CircularProgress size={14} color="inherit" /> : null}
+                glow
+                fullWidth
+                sx={{ mt: 4, py: 1.25, fontSize: '0.85rem' }}
             >
-                {isProcessing ? 'Procesando...' : `CONFIRMAR ${transactionType === 'BUY' ? 'COMPRA' : transactionType === 'SELL' ? 'VENTA' : 'TRANSFERENCIA'}`}
-            </Button>
+                {isProcessing
+                    ? 'Procesando Transacción...'
+                    : `CONFIRMAR ${transactionType === 'BUY' ? 'COMPRA' : transactionType === 'SELL' ? 'VENTA' : 'TRANSFERENCIA'}`}
+            </CustomButton>
         </Box>
     );
 };

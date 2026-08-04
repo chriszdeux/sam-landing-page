@@ -1,11 +1,3 @@
-// 1-Definir componente de tabla genérica reutilizable
-// 2-Gestionar estado de paginación y filtros
-// 3-Manejar cambios en filtros y ordenamiento
-// 4-Calcular datos filtrados y ordenados
-// 5-Manejar paginación
-// 6-Renderizar estructura de la tabla y controles
-
-//# 1-Definir componente de tabla genérica reutilizable
 import React, { useState, useMemo } from 'react';
 import {
   Table,
@@ -16,7 +8,8 @@ import {
   TableRow,
   Paper,
   TablePagination,
-  Box
+  Box,
+  Typography
 } from '@mui/material';
 import { Input } from './Input';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
@@ -40,6 +33,7 @@ interface GenericTableProps<T> {
   onPageChange?: (newPage: number) => void;
   totalRows?: number;
   page?: number;
+  loading?: boolean;
 }
 
 export function GenericTable<T>({ 
@@ -50,10 +44,10 @@ export function GenericTable<T>({
   manualPagination = false,
   onPageChange,
   totalRows,
-  page: propPage
+  page: propPage,
+  loading = false
 }: GenericTableProps<T>) {
   
-  //# 2-Gestionar estado de paginación y filtros
   const [internalPage, setInternalPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pageSize);
   const [filters, setFilters] = useState<Record<string, string>>({});
@@ -61,7 +55,6 @@ export function GenericTable<T>({
 
   const page = manualPagination && propPage !== undefined ? propPage : internalPage;
 
-  //# 3-Manejar cambios en filtros y ordenamiento
   const handleFilterChange = (header: string, value: string) => {
     setFilters((prev) => ({ ...prev, [header]: value }));
     if (manualPagination && onPageChange) {
@@ -79,7 +72,6 @@ export function GenericTable<T>({
       setSortConfig({ key: header, direction });
   };
 
-  //# 4-Calcular datos filtrados y ordenados
   const filteredData = useMemo(() => {
     return (data || []).filter((row) => {
       return columns.every((col) => {
@@ -120,17 +112,11 @@ export function GenericTable<T>({
       });
   }, [filteredData, sortConfig, columns]);
 
-  //# 5-Manejar paginación
   const paginatedData = enablePagination && !manualPagination
     ? sortedData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-    : manualPagination && data.length > rowsPerPage
-        ? sortedData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-        : sortedData;
+    : sortedData;
 
-  
-  
-  //# 8-Manejo de cambios en el input page
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_: unknown, newPage: number) => {
     if (manualPagination && onPageChange) {
         onPageChange(newPage);
     } else {
@@ -138,11 +124,9 @@ export function GenericTable<T>({
     }
   };
 
-  
-  
-  //# 9-Manejo de cambios en el input rowsperpage
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
+    const newSize = parseInt(event.target.value, 10);
+    setRowsPerPage(newSize);
     if (manualPagination && onPageChange) {
         onPageChange(0);
     } else {
@@ -154,77 +138,54 @@ export function GenericTable<T>({
       if (typeof col.accessor === 'function') {
           return col.accessor(row);
       }
-      return col.accessor ? row[col.accessor] : null;
+      return col.accessor ? row[col.accessor] : '';
   };
 
-  
-  
-  //# 10-Estructuración y renderizado visual del componente UI
   return (
     <Box sx={{ width: '100%', position: 'relative' }}>
-      <TableContainer 
-        sx={{ 
-            bgcolor: 'rgba(5, 10, 20, 0.4)', 
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(0, 243, 255, 0.1)',
-            borderRadius: '8px',
-            overflow: 'hidden',
-            boxShadow: '0 4px 30px rgba(0, 0, 0, 0.5)',
-            backgroundImage: 'linear-gradient(rgba(0, 243, 255, 0.02) 1px, transparent 1px)',
-            backgroundSize: '100% 40px',
-            position: 'relative',
-            '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '2px',
-                background: 'linear-gradient(90deg, transparent, #00f3ff, transparent)',
-                zIndex: 10
-            }
-        }}
-      >
-        <Table sx={{ minWidth: 650 }}>
+      <TableContainer component={Paper} sx={{ 
+          bgcolor: 'rgba(255,255,255,0.02)', 
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(0, 243, 255, 0.1)',
+          borderRadius: '8px 8px 0 0',
+          boxShadow: 'none',
+          '&::-webkit-scrollbar': { height: 8 },
+          '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(0, 243, 255, 0.2)', borderRadius: 4 }
+      }}>
+        <Table stickyHeader sx={{ minWidth: 700 }}>
           <TableHead>
-            <TableRow sx={{ bgcolor: 'rgba(0, 243, 255, 0.05)' }}>
+            <TableRow>
               {columns.map((col) => (
                 <TableCell 
                     key={col.Header}
                     sx={{ 
+                        bgcolor: 'rgba(10, 10, 10, 0.95)', 
                         color: '#00f3ff', 
+                        fontWeight: 'bold',
                         borderBottom: '1px solid rgba(0, 243, 255, 0.2)',
-                        fontWeight: '900',
-                        fontSize: '0.75rem',
-                        letterSpacing: 1.5,
                         textTransform: 'uppercase',
-                        fontFamily: 'monospace',
-                        cursor: col.sortable ? 'pointer' : 'default',
-                        py: 2
+                        letterSpacing: 1,
+                        fontSize: '0.75rem'
                     }}
-                    onClick={() => col.sortable && handleSort(col.Header)}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {col.Header}
-                      {sortConfig?.key === col.Header && (
-                          <motion.div initial={{ rotate: 0 }} animate={{ rotate: sortConfig.direction === 'asc' ? 0 : 180 }}>
-                             <ArrowUpward sx={{ fontSize: 16 }} />
-                          </motion.div>
-                      )}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: col.sortable ? 'pointer' : 'default' }} onClick={() => col.sortable && handleSort(col.Header)}>
+                    {col.Header}
+                    {col.sortable && sortConfig?.key === col.Header && (
+                        sortConfig.direction === 'asc' ? <ArrowUpward sx={{ fontSize: 14 }} /> : <ArrowDownward sx={{ fontSize: 14 }} />
+                    )}
                   </Box>
                   {col.filterable && (
                       <Input
-                        placeholder={`_FILTRAR_`}
+                        size="small"
+                        placeholder="Filtrar..."
                         value={filters[col.Header] || ''}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFilterChange(col.Header, e.target.value)}
-                        onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                        containerSx={{ mb: 0, mt: 1 }}
+                        onChange={(e) => handleFilterChange(col.Header, e.target.value)}
                         sx={{ 
-                            input: { 
-                                color: 'rgba(255,255,255,0.7)', 
-                                fontSize: '0.65rem', 
-                                padding: '4px 6px',
-                                fontFamily: 'monospace'
+                            mt: 1, 
+                            '& .MuiInputBase-input': { 
+                                fontSize: '0.7rem', 
+                                py: 0.5,
+                                color: 'rgba(255,255,255,0.7)'
                             },
                             '& .MuiInputBase-root': {
                                 bgcolor: 'rgba(0,0,0,0.3)',
@@ -239,7 +200,18 @@ export function GenericTable<T>({
             </TableRow>
           </TableHead>
           <TableBody sx={{ position: 'relative' }}>
-            {paginatedData.length > 0 ? (
+            {loading ? (
+                <TableRow>
+                    <TableCell colSpan={columns.length} sx={{ textAlign: 'center', py: 8 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: 2 }}>
+                            <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}>
+                                <Box sx={{ width: 40, height: 40, border: '4px solid rgba(0, 243, 255, 0.1)', borderTopColor: '#00f3ff', borderRadius: '50%' }} />
+                            </motion.div>
+                            <Typography variant="caption" sx={{ color: '#00f3ff', letterSpacing: 2, fontWeight: 'bold' }}>CARGANDO PROTOCOLOS...</Typography>
+                        </Box>
+                    </TableCell>
+                </TableRow>
+            ) : paginatedData.length > 0 ? (
                 paginatedData.map((row, rowIndex) => (
                 <motion.tr 
                     key={rowIndex} 
@@ -257,9 +229,6 @@ export function GenericTable<T>({
                 >
                     {columns.map((col) => {
                     const value = getValue(row, col);
-                    
-                    
-                    //# 11-Estructuración y renderizado visual del componente UI
                     return (
                         <TableCell 
                             key={col.Header}
@@ -288,7 +257,6 @@ export function GenericTable<T>({
                     </TableCell>
                 </TableRow>
             )}
-            
           </TableBody>
         </Table>
       </TableContainer>
@@ -316,7 +284,8 @@ export function GenericTable<T>({
                     fontSize: '0.75rem',
                     fontFamily: 'monospace',
                     '& .MuiTablePagination-selectIcon': { color: '#00f3ff' },
-                    '& .MuiTablePagination-actions': { color: '#00f3ff' }
+                    '& .MuiTablePagination-actions': { color: '#00f3ff' },
+                    '& .MuiTablePagination-actions .Mui-disabled': { color: 'rgba(255,255,255,0.2) !important' }
                 }}
             />
         </Box>
@@ -324,4 +293,3 @@ export function GenericTable<T>({
     </Box>
   );
 }
-

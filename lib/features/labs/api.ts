@@ -11,10 +11,16 @@ export const updateLabStatusApi = async (labId: string, status: 'ACTIVE' | 'INAC
   return response.data;
 };
 
-export const injectPowerApi = async (labId: string, blockchainId: string, energyAmount: number) => {
-  const response = await api.post(`/labs/${labId}/inject-power`, {
+export const injectPowerApi = async (labId: string, blockchainId: string, hashAmount: number, currentLife: number) => {
+  const response = await api.put(`/labs/${labId}/inject-hash`, {
     blockchainId,
-    energyAmount
+    hashAmount,
+    currentLife
   });
+  return response.data;
+};
+
+export const createLabApi = async (payload: { slotsCapacity?: number; userId?: string } = {}) => {
+  const response = await api.post('/labs/create', payload);
   return response.data;
 };

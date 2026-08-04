@@ -17,6 +17,15 @@ interface Particle {
   color: string;
 }
 
+interface HexParticle {
+  x: number;
+  y: number;
+  vy: number;
+  text: string;
+  size: number;
+  opacity: number;
+}
+
 export const ParticleBackground = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -29,14 +38,17 @@ export const ParticleBackground = () => {
     if (!ctx) return;
 
     let particles: Particle[] = [];
+    let hexParticles: HexParticle[] = [];
     const electricPaths: { path: Particle[]; life: number }[] = [];
     let animationFrameId: number;
     let width = window.innerWidth;
     let height = window.innerHeight;
     const mouse = { x: -1000, y: -1000 };
+    let time = 0;
 
     const connectionDistance = 150;
     const colors = ['#00f3ff', '#ff0055'];
+    const hexChars = '0123456789ABCDEF';
 
     const handleMouseMove = (e: MouseEvent) => {
       mouse.x = e.clientX;
@@ -49,11 +61,12 @@ export const ParticleBackground = () => {
       canvas.width = width;
       canvas.height = height;
       initParticles();
+      initHexParticles();
     };
 
     const initParticles = () => {
       particles = [];
-      const count = Math.min(200, Math.floor((width * height) / 8000));
+      const count = Math.min(80, Math.floor((width * height) / 15000));
       for (let i = 0; i < count; i++) {
         particles.push({
           x: Math.random() * width,
@@ -66,15 +79,79 @@ export const ParticleBackground = () => {
       }
     };
 
+    const initHexParticles = () => {
+      hexParticles = [];
+      const count = Math.min(35, Math.floor(width / 45));
+      for (let i = 0; i < count; i++) {
+        const hexVal = '0x' + hexChars[Math.floor(Math.random() * 16)] + hexChars[Math.floor(Math.random() * 16)];
+        hexParticles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vy: -(Math.random() * 0.4 + 0.15),
+          text: hexVal,
+          size: Math.random() * 8 + 9, // 9px to 17px
+          opacity: Math.random() * 0.05 + 0.02
+        });
+      }
+    };
+
+    const buildGrid = (cellSize: number) => {
+      const grid: Map<string, number[]> = new Map();
+      for (let i = 0; i < particles.length; i++) {
+        const cx = Math.floor(particles[i].x / cellSize);
+        const cy = Math.floor(particles[i].y / cellSize);
+        const key = `${cx},${cy}`;
+        let cell = grid.get(key);
+        if (!cell) { cell = []; grid.set(key, cell); }
+        cell.push(i);
+      }
+      return grid;
+    };
+
     const draw = () => {
+      time++;
       ctx.clearRect(0, 0, width, height);
 
-      particles.forEach((p) => {
+      // 1. Inyección de Malla de Datos Dinámica (Grid pulsante)
+      const gridSpacing = 120;
+      const pulse = Math.sin(time * 0.015) * 0.008 + 0.015;
+      ctx.strokeStyle = `rgba(0, 243, 255, ${pulse})`;
+      ctx.lineWidth = 0.5;
+
+      for (let x = 0; x < width; x += gridSpacing) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += gridSpacing) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      // 2. Flujo de Micro-Código Atenuado (Partículas Hexadecimales)
+      for (const hp of hexParticles) {
+        hp.y += hp.vy;
+        if (hp.y < -20) {
+          hp.y = height + 20;
+          hp.x = Math.random() * width;
+          hp.text = '0x' + hexChars[Math.floor(Math.random() * 16)] + hexChars[Math.floor(Math.random() * 16)];
+        }
+        ctx.fillStyle = `rgba(0, 243, 255, ${hp.opacity})`;
+        ctx.font = `bold ${hp.size}px monospace`;
+        ctx.fillText(hp.text, hp.x, hp.y);
+      }
+
+      // Update particles positions
+      for (const p of particles) {
         const dxMouse = mouse.x - p.x;
         const dyMouse = mouse.y - p.y;
-        const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
+        const distMouseSq = dxMouse * dxMouse + dyMouse * dyMouse;
         
-        if (distMouse < 200) {
+        if (distMouseSq < 40000) {
+            const distMouse = Math.sqrt(distMouseSq);
             const force = (200 - distMouse) / 200;
             p.vx -= (dxMouse / distMouse) * force * 0.05;
             p.vy -= (dyMouse / distMouse) * force * 0.05;
@@ -82,30 +159,46 @@ export const ParticleBackground = () => {
 
         p.vx *= 0.98;
         p.vy *= 0.98;
-
         p.x += p.vx;
         p.y += p.vy;
 
         if (p.x < 0 || p.x > width) p.vx *= -1;
         if (p.y < 0 || p.y > height) p.vy *= -1;
+      }
+
+      // Build spatial grid for connections
+      const grid = buildGrid(connectionDistance);
+      const drawnPairs = new Set<string>();
+
+      // Draw particles and connections
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        
         ctx.fillStyle = p.color;
-        ctx.shadowBlur = 0;
-        
         ctx.fill();
 
-        for (let j = 0; j < particles.length; j++) {
-            const p2 = particles[j];
-            if (p === p2) continue;
+        const cx = Math.floor(p.x / connectionDistance);
+        const cy = Math.floor(p.y / connectionDistance);
+        for (let gx = cx - 1; gx <= cx + 1; gx++) {
+          for (let gy = cy - 1; gy <= cy + 1; gy++) {
+            const cell = grid.get(`${gx},${gy}`);
+            if (!cell) continue;
+            for (const j of cell) {
+              if (j <= i) continue;
+              const pairKey = i < j ? `${i}-${j}` : `${j}-${i}`;
+              if (drawnPairs.has(pairKey)) continue;
 
-            const dx = p.x - p2.x;
-            const dy = p.y - p2.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+              const p2 = particles[j];
+              const dx = p.x - p2.x;
+              const dy = p.y - p2.y;
+              const distSq = dx * dx + dy * dy;
+              const connDistSq = connectionDistance * connectionDistance;
 
-            if (distance < connectionDistance) {
+              if (distSq < connDistSq) {
+                drawnPairs.add(pairKey);
+                const distance = Math.sqrt(distSq);
                 ctx.beginPath();
                 ctx.strokeStyle = p.color;
                 ctx.globalAlpha = 1 - distance / connectionDistance;
@@ -114,9 +207,11 @@ export const ParticleBackground = () => {
                 ctx.lineTo(p2.x, p2.y);
                 ctx.stroke();
                 ctx.globalAlpha = 1;
+              }
             }
+          }
         }
-      });
+      }
 
       if (Math.random() < 0.05) {
         const startIdx = Math.floor(Math.random() * particles.length);
@@ -199,9 +294,7 @@ export const ParticleBackground = () => {
     };
   }, []);
 
-  
-  
-  //# 5-Estructuración y renderizado visual del componente UI
+  //# 3-Renderizar elemento canvas
   return (
     <>
     <Box
@@ -213,9 +306,10 @@ export const ParticleBackground = () => {
         left: 0,
         width: '100%',
         height: '100%',
-
         zIndex: -2,
-        bgcolor: '#0a0a1a', 
+        bgcolor: '#05050f',
+        willChange: 'transform',
+        transform: 'translate3d(0, 0, 0)',
       }}
     />
     <Box
@@ -225,7 +319,6 @@ export const ParticleBackground = () => {
           left: 0,
           width: '100%',
           height: '100%',
-
           zIndex: -1,
           backgroundColor: 'rgba(0, 0, 0, 0.7)',
           pointerEvents: 'none',

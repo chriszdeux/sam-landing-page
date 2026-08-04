@@ -2,6 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   SCROLLBAR GLOBAL — Identidad Visual Ciberpunk
+   Heredado por defecto en toda la aplicación.
+   Compatible con Webkit (Chrome, Edge, Safari) y Firefox.
+   ============================================================ */
+@layer base {
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #1a1a1a transparent;
+  }
+
+  /* Webkit: riel (track) */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #000000;
+    border-radius: 0;
+  }
+
+  /* Webkit: tirador (thumb) */
+  ::-webkit-scrollbar-thumb {
+    background-color: #1a1a1a;
+    border-radius: 4px;
+    border: 1px solid rgba(222, 255, 154, 0.15);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  /* Hover: transición al color de marca con brillo neón */
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #deff9a;
+    border-color: rgba(222, 255, 154, 0.5);
+    box-shadow:
+      0 0 6px rgba(222, 255, 154, 0.6),
+      0 0 12px rgba(222, 255, 154, 0.3);
+  }
+
+  /* Esquina entre scrollbars horizontal y vertical */
+  ::-webkit-scrollbar-corner {
+    background: #000000;
+  }
+}
+
 :root {
   --max-width: 1100px;
   --border-radius: 12px;
