@@ -1,124 +1,142 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { Box, Typography, Switch, Stack, Button } from '@mui/material';
+import React, { useMemo } from 'react';
+import { Box, Typography, Stack, Button, IconButton } from '@mui/material';
 import { motion } from 'framer-motion';
 import { PowerSettingsNew, History, CardGiftcard } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
-import { toggleLabStatus } from '../../lib/features/labs/actions';
-import { toggleLaboratoryPower } from '../../lib/features/labs/reducer';
+import { toggleLaboratoryPower, toggleOverclock } from '../../lib/features/labs/reducer';
 import { TechFrame } from '../ui/TechFrame';
 import { RootState } from '../../lib/store';
-import { fetchTransactions } from '../../lib/features/transactions/actions';
 import { useRouter } from 'next/navigation';
+import { formatHash } from '../../lib/utils/formatHash';
 
-interface Transaction {
-    transactionType: string;
-    dateCreated: string;
-    financialInfo: {
-        amount: number;
-    };
-}
-
-export const ControlRewardsPanel = () => {
+export const ControlRewardsPanel = React.memo(() => {
     const dispatch = useAppDispatch();
     const router = useRouter();
     const { userInfo } = useAppSelector((state) => state.auth);
-    const { currentLab, isPoweredOn } = useAppSelector((state: RootState) => state.reducerLabs);
-    const { byStoreBoxId } = useAppSelector((state) => state.transactions);
-    const { selectedNetwork, networks } = useAppSelector((state) => state.blockchain);
+    const { energy, hashAvailable, isPoweredOn, isOverheated, isOverclockActive, chronoBurstFreqTypes } = useAppSelector((state: RootState) => {
+        const lab = state.reducerLabs.currentLab;
+        const selectedNetwork = state.blockchain.selectedNetwork;
+        return {
+            energy: lab?.energy || 0,
+            hashAvailable: selectedNetwork?.hashAvailable ?? 0,
+            isPoweredOn: state.reducerLabs.isPoweredOn,
+            isOverheated: state.reducerLabs.isOverheated,
+            isOverclockActive: state.reducerLabs.isOverclockActive,
+            chronoBurstFreqTypes: state.blockchain.chronoBurstFreqTypes
+        };
+    }, (prev, next) => {
+        return (
+            prev.energy === next.energy &&
+            prev.hashAvailable === next.hashAvailable &&
+            prev.isPoweredOn === next.isPoweredOn &&
+            prev.isOverheated === next.isOverheated &&
+            prev.isOverclockActive === next.isOverclockActive &&
+            prev.chronoBurstFreqTypes === next.chronoBurstFreqTypes
+        );
+    });
+    const transactions = useAppSelector((state: RootState) => state.transactions.transactions);
     
     const isActive = isPoweredOn;
-    const energy = currentLab?.energy || 0;
-    const maxEnergy = currentLab?.maxEnergy || 100;
-    const energyPercentage = (energy / maxEnergy) * 100;
 
-    const currentNetwork = networks.find(n => n.id === selectedNetwork?.id);
-    const storeId = selectedNetwork?.storeTransactions?.transactionStoreID || currentNetwork?.storeTransactions?.transactionStoreID;
-    const walletId = userInfo?.wallets?.[0]?.walletAddress;
-
-    useEffect(() => {
-        if (storeId) {
-            dispatch(fetchTransactions({ storeId, walletId, limit: 5 }));
-        }
-    }, [dispatch, storeId, walletId]);
-
-    const transactions = (storeId ? byStoreBoxId[storeId]?.transactions : []) || [];
-    const recentTransactions = transactions.slice(0, 5) as Transaction[];
+    const recentTransactions = useMemo(() => transactions.slice(0, 5), [transactions]);
 
     const handleToggle = () => {
         dispatch(toggleLaboratoryPower());
-        if (currentLab?.id) {
-            dispatch(toggleLabStatus({ 
-                labId: currentLab.id, 
-                status: !isPoweredOn ? 'ACTIVE' : 'INACTIVE' 
-            }));
-        }
+    };
+
+    const handleOverclockToggle = () => {
+        dispatch(toggleOverclock());
     };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            {/* Power Switch & Energy Block */}
+            {/* Power Toggle & Energy Block */}
             <TechFrame color={isActive ? '#00e676' : 'rgba(255,255,255,0.1)'}>
                 <Box sx={{ p: 3 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                         <Stack direction="row" spacing={2} alignItems="center">
-                            <Box sx={{ 
-                                p: 1, 
-                                borderRadius: '50%', 
-                                bgcolor: isActive ? 'rgba(0, 230, 118, 0.1)' : 'rgba(255,255,255,0.05)',
-                                color: isActive ? '#00e676' : 'rgba(255,255,255,0.3)',
-                                border: `1px solid ${isActive ? '#00e676' : 'rgba(255,255,255,0.1)'}`,
-                                display: 'flex'
-                            }}>
-                                <PowerSettingsNew />
-                            </Box>
+                            <motion.div
+                                animate={isActive ? { 
+                                    boxShadow: ['0 0 0px #00e676', '0 0 20px #00e676', '0 0 0px #00e676'] 
+                                } : {}}
+                                transition={{ repeat: Infinity, duration: 2 }}
+                                style={{ borderRadius: '50%' }}
+                            >
+                                <IconButton 
+                                    onClick={handleToggle} disabled={isOverheated && !isActive}
+                                    sx={{ 
+                                        p: 1.5, 
+                                        bgcolor: isActive ? 'rgba(0, 230, 118, 0.1)' : 'rgba(255,255,255,0.05)',
+                                        color: isActive ? '#00e676' : 'rgba(255,255,255,0.3)',
+                                        border: `1px solid ${isActive ? '#00e676' : 'rgba(255,255,255,0.1)'}`,
+                                        transition: 'all 0.3s ease',
+                                        '&:hover': {
+                                            bgcolor: isActive ? 'rgba(0, 230, 118, 0.2)' : 'rgba(255,255,255,0.1)',
+                                            transform: 'scale(1.05)'
+                                        }
+                                    }}
+                                >
+                                    <PowerSettingsNew />
+                                </IconButton>
+                            </motion.div>
                             <Box>
                                 <Typography variant="body1" sx={{ color: '#fff', fontWeight: 'bold' }}>
                                     LABORATORIO
                                 </Typography>
-                                <Typography variant="caption" sx={{ color: isActive ? '#00e676' : 'rgba(255,255,255,0.5)', fontWeight: 'bold' }}>
-                                    {isActive ? 'ENCENDIDO' : 'APAGADO'}
+                                <Typography variant="caption" sx={{ color: isActive ? '#00e676' : isOverheated ? '#ff1744' : 'rgba(255,255,255,0.5)', fontWeight: 'bold', display: 'block' }}>
+                                    {isOverheated ? 'SISTEMA BLOQUEADO (COOLDOWN)' : isActive ? 'SISTEMA ACTIVO' : 'SISTEMA EN PAUSA'}
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'block', fontSize: '0.7rem', mt: 0.5, fontFamily: 'monospace' }}>
+                                    Acumulado: {formatHash(energy, chronoBurstFreqTypes)}
                                 </Typography>
                             </Box>
                         </Stack>
-                        <Switch 
-                            checked={isActive}
-                            onChange={handleToggle}
-                            sx={{
-                                '& .MuiSwitch-switchBase.Mui-checked': { color: '#00e676' },
-                                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#00e676' },
-                            }}
-                        />
                     </Box>
 
-                    <Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                    <Box sx={{ mb: 2 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 'bold' }}>
-                                RESERVA DE ENERGÍA
+                                HASH ACUMULADO LOCAL
                             </Typography>
-                            <Typography variant="caption" sx={{ color: '#ffd700', fontWeight: 'bold' }}>
-                                {energy} / {maxEnergy} EP
+                            <Typography variant="h6" sx={{ color: '#00f3ff', fontWeight: 'bold', fontFamily: 'monospace' }}>
+                                {formatHash(energy, chronoBurstFreqTypes)}
                             </Typography>
-                        </Box>
-                        <Box sx={{ 
-                            height: 8, 
-                            bgcolor: 'rgba(255,255,255,0.05)', 
-                            borderRadius: 4, 
-                            overflow: 'hidden',
-                            border: '1px solid rgba(255,255,255,0.1)'
-                        }}>
-                            <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${energyPercentage}%` }}
-                                style={{ 
-                                    height: '100%', 
-                                    background: 'linear-gradient(90deg, #ffd700 0%, #ffb700 100%)',
-                                    boxShadow: '0 0 10px rgba(255, 215, 0, 0.5)'
-                                }}
-                            />
                         </Box>
                     </Box>
+
+                    <Button
+                        variant="contained"
+                        fullWidth
+                        disabled={!isPoweredOn || isOverheated}
+                        onClick={handleOverclockToggle}
+                        sx={{
+                            mb: 2,
+                            py: 1,
+                            bgcolor: isOverclockActive ? 'rgba(255, 23, 68, 0.2)' : 'rgba(255, 183, 0, 0.05)',
+                            color: isOverclockActive ? '#ff1744' : '#ffb700',
+                            border: `1px solid ${isOverclockActive ? '#ff1744' : '#ffb700'}`,
+                            fontWeight: 'bold',
+                            letterSpacing: 1.5,
+                            boxShadow: isOverclockActive ? '0 0 15px rgba(255, 23, 68, 0.3)' : 'none',
+                            '&:hover': {
+                                bgcolor: isOverclockActive ? 'rgba(255, 23, 68, 0.3)' : 'rgba(255, 183, 0, 0.1)',
+                                borderColor: isOverclockActive ? '#ff1744' : '#ffb700'
+                            },
+                            '&.Mui-disabled': {
+                                border: '1px solid rgba(255,255,255,0.05)',
+                                color: 'rgba(255,255,255,0.15)',
+                                bgcolor: 'transparent'
+                            }
+                        }}
+                    >
+                        {isOverclockActive ? 'OVERCLOCK ACTIVO (3X TEMP)' : 'ACTIVAR OVERCLOCK'}
+                    </Button>
+                    
+                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', display: 'block', textAlign: 'center', fontStyle: 'italic' }}>
+                        Inyección automática de Hash activa al consolidar Round 10
+                    </Typography>
                 </Box>
             </TechFrame>
 
@@ -135,7 +153,7 @@ export const ControlRewardsPanel = () => {
                     <Stack spacing={1}>
                         {recentTransactions.length > 0 ? (
                             recentTransactions.map((tx, i) => (
-                                <Box key={i} sx={{ 
+                                <Box key={tx.id || i} sx={{ 
                                     p: 1.5, 
                                     bgcolor: 'rgba(255,255,255,0.02)', 
                                     borderRadius: 1,
@@ -195,4 +213,4 @@ export const ControlRewardsPanel = () => {
             </Button>
         </Box>
     );
-};
+});

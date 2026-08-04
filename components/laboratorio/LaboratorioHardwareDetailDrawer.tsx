@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Typography, Button, IconButton, Paper, Stack, Drawer, Divider, LinearProgress, Grid, CircularProgress } from "@mui/material";
 import { Close, Settings, DeleteForever, Speed, Thermostat, Timer } from "@mui/icons-material";
 import { SlotMachine } from "./LaboratorioMetersSection";
+import { getCBUnit, getCBDivisor } from "../../lib/constants/blockchainFrequencies";
 
 interface LaboratorioHardwareDetailDrawerProps {
   open: boolean;
@@ -15,8 +16,11 @@ interface LaboratorioHardwareDetailDrawerProps {
 export function LaboratorioHardwareDetailDrawer({ open, onClose, slot, onUninstall, onMaintenance, isMaintenanceLoading }: LaboratorioHardwareDetailDrawerProps) {
   if (!slot) return null;
 
-  const lifePercent = slot.currentLife && slot.lifeLimit ? (slot.currentLife / slot.lifeLimit) * 100 : 0;
-  const color = slot.color || "#00f3ff";
+  const lifePercent = slot.currentUsage !== undefined && slot.lifeLimit ? (1 - slot.currentUsage / slot.lifeLimit) * 100 : 100;
+  const anySlot = slot as any;
+  const color = anySlot.color || "#00f3ff";
+  const performance = anySlot.performance || (slot.hashRate ? `${(slot.hashRate / getCBDivisor(slot.hashRate)).toFixed(1)} ${getCBUnit(slot.hashRate)}` : '0.0 Mcb');
+  const efficiency = anySlot.efficiency !== undefined ? anySlot.efficiency : Math.round(lifePercent);
 
   return (
     <Drawer
@@ -46,7 +50,7 @@ export function LaboratorioHardwareDetailDrawer({ open, onClose, slot, onUninsta
       <Box sx={{ p: 3, flex: 1, overflowY: 'auto' }}>
         <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>{slot.name}</Typography>
         <Typography variant="body1" sx={{ color: color, fontWeight: 700, mb: 4 }}>
-          {slot.performance}
+          {performance}
         </Typography>
 
         <Stack spacing={4}>
@@ -77,7 +81,7 @@ export function LaboratorioHardwareDetailDrawer({ open, onClose, slot, onUninsta
                 <Typography variant="caption" display="block" sx={{ color: 'rgba(255,255,255,0.5)', mb: 1 }}>
                   <Speed sx={{ fontSize: 16, verticalAlign: 'middle', mr: 0.5 }} /> EFICIENCIA
                 </Typography>
-                <Typography variant="h6" sx={{ color: '#00e676' }}>{slot.efficiency || 0}%</Typography>
+                <Typography variant="h6" sx={{ color: '#00e676' }}>{efficiency}%</Typography>
               </Paper>
             </Grid>
             <Grid size={{ xs: 6 }}>

@@ -1,107 +1,58 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Box, Paper, CircularProgress, Typography, Button, Chip, Tooltip } from "@mui/material";
+import { Box, Paper, CircularProgress, Typography, Button, Tooltip, Chip } from "@mui/material";
 import { PowerSettingsNew, Bolt, WarningAmber } from "@mui/icons-material";
 
-const MIN_INJECT_EP = 12; // powerRequired mínimo para que flushTransactionsQueue procese
+const MIN_INJECT_EP = 12; 
 import { MiningBackground } from "./MiningBackground";
 import { useAppSelector, useAppDispatch } from "../../lib/hooks";
-import { updateNetworkPower } from "../../lib/features/blockchain/reducer";
 import { LaboratorioRegistration } from "./LaboratorioRegistration";
+import { formatHash } from "../../lib/utils/formatHash";
 import { LaboratorioInventory } from "./LaboratorioInventory";
 import { CoreModulesSimulator } from "../core_modules/CoreModulesSimulator";
+import { LaboratorySimulation } from "./LaboratorySimulation";
 import { useEffect, useState } from "react";
-import api from "../../lib/api";
-
-interface LabBasicData {
-  id: string;
-  type?: string;
-  powerMining?: number;
-  energy?: number;
-  maxEnergy?: number;
-}
+import { RootState } from "../../lib/store";
+import { fetchLaboratoryInterface } from "../../lib/features/labs/actions";
+import { getCBUnit, processingFrequencies } from "../../lib/constants/blockchainFrequencies";
 
 export function LaboratorioView() {
   const dispatch = useAppDispatch();
   const { userInfo, status } = useAppSelector((state) => state.auth);
-  const selectedNetwork = useAppSelector((state: any) => state.blockchain?.selectedNetwork);
-  const [labData, setLabData] = useState<LabBasicData | null>(null);
-  const [injecting, setInjecting] = useState(false);
+  const { currentLab, isPoweredOn, isOverheated } = useAppSelector((state: RootState) => state.reducerLabs);
+  const chronoBurstFreqTypes = useAppSelector((state: RootState) => state.blockchain.chronoBurstFreqTypes);
+  
   const [isInitializing, setIsInitializing] = useState(true);
 
-  const hasLab = userInfo?.idLabs && userInfo.idLabs.length > 0;
-  const labId = userInfo?.idLabs?.[0];
+  const hasLab = !!userInfo?.idLab;
+  const labId = userInfo?.idLab;
 
   useEffect(() => {
     if (status !== 'idle' && status !== 'loading') {
       setIsInitializing(false);
     }
-    // Fail-safe timeout in case status stays idle for some reason
-    const timer = setTimeout(() => setIsInitializing(false), 1);
+    const timer = setTimeout(() => setIsInitializing(false), 500);
     return () => clearTimeout(timer);
   }, [status]);
 
   useEffect(() => {
-    if (hasLab && labId) {
-      api.get(`/labs/${labId}`)
-        .then((res) => {
-          const data = res.data.laboratory || res.data;
-          setLabData({
-            id: data.id,
-            type: data.type || 'MINING', // Default to MINING for prototype if missing
-            powerMining: data.powerMining || 1500,
-            energy: data.energy || 0,
-            maxEnergy: data.maxEnergy || 100
-          });
-        })
-        .catch(() => {
-          // Fallback mock for UI visualization if backend is offline or unlinked
-          setLabData({ id: labId, type: 'MINING', powerMining: 5000, energy: 0, maxEnergy: 100 });
-        });
+    if (hasLab && labId && !currentLab) {
+      dispatch(fetchLaboratoryInterface(labId));
     }
-  }, [hasLab, labId]);
+  }, [hasLab, labId, currentLab]);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setLabData(prev => {
-        if (!prev) return prev;
-        const currentEnergy = prev.energy || 0;
-        const maxEnergy = prev.maxEnergy || 100;
-        if (currentEnergy >= maxEnergy) {
-          return prev;
-        }
-        return { ...prev, energy: currentEnergy + 1 };
-      });
-    }, 50);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  const currentEnergy = Math.floor(labData?.energy || 0);
-  const canInject = currentEnergy >= MIN_INJECT_EP;
-
-  const handleInjectPower = async () => {
-    if (!labData || !selectedNetwork || !canInject) return;
-    setInjecting(true);
-    try {
-      const res = await api.post(`/labs/${labData.id}/inject-power`, {
-        blockchainId: selectedNetwork.id,
-        energyAmount: currentEnergy
-      });
-      if (res.data?.labState) {
-        setLabData(prev => prev ? { ...prev, energy: res.data.labState.energy } : prev);
-      }
-      const newPower = res.data?.totalPowerMining ?? res.data?.labState?.totalPowerMining ?? res.data?.blockchainProps?.totalPowerMining ?? res.data?.networkPower ?? res.data?.data?.totalPowerMining;
-      if (newPower !== undefined && newPower !== null) {
-          dispatch(updateNetworkPower({ id: selectedNetwork.id, totalPowerMining: Number(newPower) }));
-      }
-    } catch (error) {
-      console.error('Failed to inject power', error);
-    } finally {
-      setInjecting(false);
-    }
-  };
+  const currentEnergyVal = currentLab?.energy || 0;
+  const currentEnergy = currentEnergyVal.toFixed(3);
+  const canInject = currentEnergyVal >= MIN_INJECT_EP;
+  
+  const slots = currentLab?.slots || [];
+  const labFrequency = slots.length > 0
+    ? slots.reduce((acc, s) => Math.max(acc, s.hashRate || processingFrequencies.MEGA_CB), processingFrequencies.MEGA_CB)
+    : processingFrequencies.MEGA_CB;
+  const frequencyMultiplier = labFrequency / processingFrequencies.MEGA_CB;
+  const totalPower = (currentLab?.hashRate || 0) * frequencyMultiplier;
+  const labUnit = getCBUnit(labFrequency);
 
   if (status === 'loading' || isInitializing) {
     return (
@@ -160,72 +111,61 @@ export function LaboratorioView() {
       <MiningBackground />
 
       <Box display="flex" flexDirection="column" gap={3}>
-        {/* Helios-1 Mining Power UI */}
-        {labData?.type === 'MINING' && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2, px: 3,
-                bgcolor: 'rgba(255, 215, 0, 0.05)',
-                border: '1px solid rgba(255, 215, 0, 0.3)',
-                borderRadius: 3,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                boxShadow: '0 0 20px rgba(255, 215, 0, 0.1)',
-                backdropFilter: 'blur(10px)'
-              }}
-            >
-              <Box display="flex" alignItems="center" gap={2}>
-                <Bolt sx={{ color: '#ffd700', fontSize: 30 }} />
-                <Box>
-                  <Typography variant="overline" sx={{ color: '#ffd700', fontWeight: 'bold', display: 'block', lineHeight: 1 }}>
-                    HELIOS-1 NETWORK
-                  </Typography>
-                  <Typography variant="h6" sx={{ color: 'white', fontFamily: 'monospace' }}>
-                    Poder de Minado (n): <span style={{ color: '#ffd700' }}>{labData.powerMining}</span>
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                    Energía: {currentEnergy} / {labData.maxEnergy || 100} EP
-                  </Typography>
-                  {!canInject && (
-                    <Box display="flex" alignItems="center" gap={0.5} mt={0.5}>
-                      <WarningAmber sx={{ fontSize: 14, color: '#ff9800' }} />
-                      <Typography variant="caption" sx={{ color: '#ff9800' }}>
-                        Mínimo {MIN_INJECT_EP} EP para confirmar transacciones
-                      </Typography>
-                    </Box>
-                  )}
-                </Box>
+        {/* Network Power Banner */}
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2, px: 3,
+              bgcolor: isOverheated ? 'rgba(255, 23, 68, 0.05)' : 'rgba(0, 243, 255, 0.05)',
+              border: `1px solid ${isOverheated ? 'rgba(255, 23, 68, 0.3)' : 'rgba(0, 243, 255, 0.3)'}`,
+              borderRadius: 3,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              boxShadow: isOverheated ? '0 0 20px rgba(255, 23, 68, 0.1)' : '0 0 20px rgba(0, 243, 255, 0.1)',
+              backdropFilter: 'blur(10px)'
+            }}
+          >
+            <Box display="flex" alignItems="center" gap={2}>
+              <Bolt sx={{ color: isOverheated ? '#ff1744' : '#00f3ff', fontSize: 30 }} />
+              <Box>
+                <Typography variant="overline" sx={{ color: isOverheated ? '#ff1744' : '#00f3ff', fontWeight: 'bold', display: 'block', lineHeight: 1 }}>
+                  {isOverheated ? 'SYSTEM OVERHEATED - EMERGENCY COOLDOWN' : 'LYNCORE NETWORK ACTIVE'}
+                </Typography>
+                <Typography variant="h6" sx={{ color: 'white', fontFamily: 'monospace' }}>
+                  Poder Total: <span style={{ color: isOverheated ? '#ff1744' : '#00f3ff' }}>{isPoweredOn ? totalPower.toFixed(1) : '0.0'} {labUnit}</span>
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                  Hash Acumulado: {formatHash(currentEnergyVal, chronoBurstFreqTypes)}
+                </Typography>
               </Box>
+            </Box>
 
-              <Tooltip title={!canInject ? `Necesitas al menos ${MIN_INJECT_EP} EP para procesar transacciones` : ''} arrow>
-                <span>
-                  <Button
-                    variant="outlined"
-                    disabled={injecting || !canInject}
-                    onClick={handleInjectPower}
-                    sx={{
-                      color: canInject ? '#ffd700' : 'rgba(255,215,0,0.3)',
-                      borderColor: canInject ? '#ffd700' : 'rgba(255,215,0,0.2)',
-                      fontWeight: 'bold',
-                      letterSpacing: 1,
-                      transition: 'all 0.3s ease',
-                      '&:not(:disabled):hover': {
-                        bgcolor: 'rgba(255, 215, 0, 0.1)',
-                        borderColor: '#ffd700',
-                        boxShadow: '0 0 15px rgba(255, 215, 0, 0.4)'
-                      }
+            <Box sx={{ textAlign: 'right' }}>
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'block' }}>
+                    ESTADO DE SIMULACIÓN
+                </Typography>
+                <Chip 
+                    label={isOverheated ? "BLOQUEADO" : isPoweredOn ? "EJECUTANDO" : "STANDBY"} 
+                    size="small"
+                    sx={{ 
+                        bgcolor: isOverheated ? '#ff1744' : isPoweredOn ? '#00e676' : 'rgba(255,255,255,0.1)',
+                        color: '#000',
+                        fontWeight: 'bold'
                     }}
-                  >
-                    {injecting ? 'INJECTING...' : `INJECT POWER${!canInject ? ` (${MIN_INJECT_EP - currentEnergy} EP)` : ''}`}
-                  </Button>
-                </span>
-              </Tooltip>
-            </Paper>
-          </motion.div>
-        )}
+                />
+            </Box>
+          </Paper>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <LaboratorySimulation />
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}

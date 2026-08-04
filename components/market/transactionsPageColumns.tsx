@@ -14,15 +14,16 @@ import {
     EmojiEvents, 
     Layers 
 } from '@mui/icons-material';
-import { Column } from '../ui/GenericTable';
+import { Column } from '../ui/CustomTable';
 import { TransactionsInterface, TransactionType } from '../../lib/features/transactions/types';
+import { formatHashLocal } from '../../lib/utils/formatHash';
 
 export const transactionsPageColumns: Column<TransactionsInterface>[] = [
     {
-        Header: "Fecha",
-        accessor: "dateCreated",
+        label: "Fecha",
+        key: "dateCreated",
         sortable: true,
-        Cell: ({ value }) => (
+        render: ({ value }) => (
             <Box>
                 {new Date(value as string).toLocaleDateString()}
                 <Typography variant="caption" display="block" color="text.secondary">
@@ -32,11 +33,11 @@ export const transactionsPageColumns: Column<TransactionsInterface>[] = [
         )
     },
     {
-        Header: "Tipo",
-        accessor: "transactionType",
+        label: "Tipo",
+        key: "transactionType",
         filterable: true,
         sortable: true,
-        Cell: ({ value }) => {
+        render: ({ value }) => {
            let label = value as string;
            let color = '#00f3ff';
            let bgcolor = 'rgba(0, 243, 255, 0.1)';
@@ -99,11 +100,11 @@ export const transactionsPageColumns: Column<TransactionsInterface>[] = [
         }
     },
     {
-        Header: "Activo",
-        accessor: (row) => row.financialInfo?.symbol,
+        label: "Activo",
+        key: (row) => row.financialInfo?.symbol,
         sortable: true,
         filterable: true,
-        Cell: ({ row }) => (
+        render: ({ row }) => (
             <Box>
                 {row.financialInfo?.symbol}
                 <Typography variant="caption" display="block" color="text.secondary">
@@ -113,36 +114,50 @@ export const transactionsPageColumns: Column<TransactionsInterface>[] = [
         )
     },
     {
-        Header: "Monto (Fiat)",
-        accessor: (row) => row.financialInfo?.amount,
+        label: "Monto (Fiat)",
+        key: (row) => row.financialInfo?.amount,
         sortable: true,
-        Cell: ({ value }) => (
+        render: ({ value }) => (
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <span>{(value as number)?.toLocaleString()}</span> <TaoIcon size={14} />
             </div>
         )
     },
     {
-        Header: "Cantidad",
-        accessor: (row) => row.financialInfo?.quantity,
+        label: "Cantidad",
+        key: (row) => row.financialInfo?.quantity,
         sortable: true
     },
     {
-        Header: "Origen",
-        accessor: (row) => row.addresses?.senderWalletAddress,
+        label: "Potencia CB",
+        key: (row) => row.powerRequired ?? 0,
+        sortable: true,
+        render: ({ value }) => {
+            const raw = value as number;
+            if (!raw || raw === 0) return <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)' }}>—</Typography>;
+            return (
+                <Typography variant="caption" sx={{ color: '#00f3ff', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                    {formatHashLocal(raw * 1000000)}
+                </Typography>
+            );
+        }
+    },
+    {
+        label: "Origen",
+        key: (row) => row.addresses?.senderWalletAddress,
         sortable: true,
     },
     {
-        Header: "Destino",
-        accessor: (row) => row.addresses?.recipientWalletAddress,
+        label: "Destino",
+        key: (row) => row.addresses?.recipientWalletAddress,
         sortable: true,
     },
     {
-        Header: "Estado",
-        accessor: "status",
+        label: "Estado",
+        key: "status",
         sortable: true,
         filterable: true,
-        Cell: ({ value }) => {
+        render: ({ value }) => {
             const status = String(value).toUpperCase();
             let label = value;
             let color = 'warning.main';

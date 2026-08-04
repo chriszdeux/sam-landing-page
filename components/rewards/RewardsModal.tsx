@@ -13,7 +13,8 @@
 
 //# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button, CircularProgress } from '@mui/material';
+import { Box, Typography, CircularProgress } from '@mui/material';
+import { CustomButton } from '../ui/CustomButton';
 
 //# 2-Obtención del despachador para emitir acciones al store
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
@@ -131,13 +132,13 @@ export const RewardsModal = () => {
         return (
             <Box sx={{ p: 4, textAlign: 'center' }}>
                 <Typography color="error" sx={{ mb: 2 }}>ERROR_DE_ENLACE: {error}</Typography>
-                <Button 
-                    variant="outlined" 
-                    color="error" 
+                <CustomButton 
+                    variant="error" 
                     onClick={() => dispatch(fetchRewards())}
+                    glow
                 >
                     REINTENTAR_CONEXION
-                </Button>
+                </CustomButton>
             </Box>
         );
     }
@@ -259,26 +260,16 @@ export const RewardsModal = () => {
                                     }}>
                                         +{reward.amount} CR
                                     </Typography>
-                                    <Button
+                                    <CustomButton
                                         fullWidth
-                                        variant={reward.isClaimed ? "text" : "contained"}
+                                        variant={reward.isClaimed ? "neutral" : "info"}
                                         disabled={!!reward.isClaimed || claimingId === reward.id}
                                         onClick={() => handleClaim(reward)}
-                                        sx={{ 
-                                            bgcolor: reward.isClaimed ? 'transparent' : '#00f3ff',
-                                            color: reward.isClaimed ? 'rgba(255,255,255,0.2)' : '#000',
-                                            fontWeight: 'bold',
-                                            '&:hover': {
-                                                bgcolor: reward.isClaimed ? 'transparent' : '#00d0db',
-                                            }
-                                        }}
+                                        glow={!reward.isClaimed}
+                                        startIcon={claimingId === reward.id ? <CircularProgress size={14} color="inherit" /> : null}
                                     >
-                                        {claimingId === reward.id ? (
-                                            <CircularProgress size={20} color="inherit" />
-                                        ) : (
-                                            reward.isClaimed ? 'ADQUIRIDO' : 'RECLAMAR'
-                                        )}
-                                    </Button>
+                                        {claimingId === reward.id ? 'Reclamando...' : (reward.isClaimed ? 'ADQUIRIDO' : 'RECLAMAR')}
+                                    </CustomButton>
                                 </Box>
                             </Box>
                         </TechFrame>

@@ -178,13 +178,13 @@ export default function MarketPage() {
                                 src={crypto.identification.image128} 
                                 alt={crypto.identification.name} 
                                 fill
-                                style={{ objectFit: 'contain' }} 
+                                style={{ objectFit: 'contain', borderRadius: '24%' }} 
                             />
                         ) : (
                             <Box sx={{
                                 width: 120,
                                 height: 120,
-                                borderRadius: '50%',
+                                borderRadius: '24%',
                                 bgcolor: crypto.additionalInfo?.pColor || 'primary.main',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -202,7 +202,7 @@ export default function MarketPage() {
 
                     <Box sx={{ textAlign: 'center', mb: 3, zIndex: 1, width: '100%' }}>
                         <Typography variant="h4" fontWeight="bold" sx={{ color: 'white', mb: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                            {crypto.financial.price.toLocaleString(undefined, { maximumFractionDigits: 5 })}
+                            {(crypto.financial.price || 0).toLocaleString(undefined, { maximumFractionDigits: 5 })}
                             <TaoIcon size={28} />
                         </Typography>
                         

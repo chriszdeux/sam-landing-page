@@ -17,7 +17,8 @@
 'use client';
 
 import React from 'react';
-import { Box, Container, Typography, Grid, CircularProgress, Button } from '@mui/material';
+import { Box, Container, Typography, Grid, CircularProgress } from '@mui/material';
+import { CustomButton } from '../../components/ui/CustomButton';
 import { Background } from '../../components/layout/Background';
 import { TechFrame } from '../../components/ui/TechFrame';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -264,30 +265,16 @@ export default function RewardsPage() {
                                         <TaoIcon size={12} />
                                     </Box>
 
-                                    <Button
-                                        variant={isClaimedNow ? "outlined" : "contained"}
-                                        color={isClaimedNow ? "success" : "primary"}
+                                    <CustomButton
+                                        variant={isClaimedNow ? "neutral" : "info"}
                                         fullWidth
                                         disabled={isClaimedNow || claimingRewardId === reward.id}
                                         onClick={() => handleClaim(reward)}
-                                        sx={{
-                                            bgcolor: isClaimedNow ? 'transparent' : '#ff0055',
-                                            borderColor: '#ff0055',
-                                            position: 'relative',
-                                            '&:hover': {
-                                                bgcolor: isClaimedNow ? 'transparent' : '#cc0044',
-                                                borderColor: '#cc0044'
-                                            }
-                                        }}
+                                        glow={!isClaimedNow}
+                                        startIcon={claimingRewardId === reward.id ? <CircularProgress size={14} color="inherit" /> : null}
                                     >
-                                        {claimingRewardId === reward.id ? (
-                                            <CircularProgress size={24} color="inherit" />
-                                        ) : isClaimedNow ? (
-                                            'RECLAMADO'
-                                        ) : (
-                                            'RECLAMAR'
-                                        )}
-                                    </Button>
+                                        {claimingRewardId === reward.id ? 'Reclamando...' : isClaimedNow ? 'RECLAMADO' : 'RECLAMAR'}
+                                    </CustomButton>
                                 </Box>
                             </TechFrame>
                         </motion.div>

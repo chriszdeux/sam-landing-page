@@ -7,10 +7,10 @@
 'use client';
 
 //# 1-Importar dependencias y acciones de Redux
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { checkAuth, fetchWalletDetails } from '../../lib/features/auth';
-import { fetchNetworks } from '../../lib/features/blockchain/actions';
+import { fetchNetworks, fetchProcessingFrequencies } from '../../lib/features/blockchain/actions';
 
 export const AuthLoader = ({ children }: { children: React.ReactNode }) => {
 
@@ -19,22 +19,26 @@ export const AuthLoader = ({ children }: { children: React.ReactNode }) => {
     const { userInfo } = useAppSelector((state) => state.auth);
 
     //# 3-Efecto para verificar autenticación y redes
+    const initialized = useRef(false);
+
     useEffect(function loadInitialData() {
-        dispatch(checkAuth());
-        dispatch(fetchNetworks());
+        if (!initialized.current) {
+            initialized.current = true;
+            dispatch(checkAuth());
+            dispatch(fetchNetworks());
+            dispatch(fetchProcessingFrequencies());
+        }
     }, [dispatch]);
 
     //# 4-Efecto para sincronizar detalles de la billetera
+    const firstWalletAddress = userInfo?.wallets?.[0]?.walletAddress;
+    const hasDetails = !!userInfo?.wallets?.[0]?.details;
+
     useEffect(function syncWalletDetails() {
-        if (userInfo) {
-            if (userInfo.wallets && userInfo.wallets.length > 0) {
-               const primaryWallet = userInfo.wallets[0];
-               if (!primaryWallet.details) {
-                    dispatch(fetchWalletDetails(primaryWallet.walletAddress));
-               }
-           }
+        if (firstWalletAddress && !hasDetails) {
+            dispatch(fetchWalletDetails(firstWalletAddress));
         }
-    }, [userInfo, dispatch]);
+    }, [firstWalletAddress, hasDetails, dispatch]);
 
     //# 5-Renderizar los componentes hijos contenidos
     return <>{children}</>;

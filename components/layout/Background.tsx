@@ -6,7 +6,7 @@ import React from 'react';
 
 import { ParticleBackground } from '../ui/ParticleBackground';
 
-export const Background = () => {
+export const Background = React.memo(() => {
   
   //# 2-Renderizar fondo animado
   return (
@@ -14,4 +14,4 @@ export const Background = () => {
       <ParticleBackground />
     </>
   );
-};
+});

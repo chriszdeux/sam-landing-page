@@ -22,9 +22,7 @@ export const refreshUserInfo = createAsyncThunk(
           if (auth.status === 'loading') {
               return false;
           }
-          if (auth.lastRefresh && Date.now() - auth.lastRefresh < 240000) { // 4 minutes
-              return false;
-          }
+          // The 30s UI cooldown handles rate limiting now
       }
   }
 );
@@ -33,11 +31,19 @@ export const fetchWalletDetails = createAsyncThunk(
   'auth/fetchWalletDetails',
   async (walletId: string, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/blockchain/wallets/${walletId}`);
+      const response = await api.get('/blockchain/wallets/' + walletId);
       return { walletId, data: response.data };
     } catch (err: unknown) {
       const message = (err as { message?: string })?.message || 'Failed to fetch wallet details';
       return rejectWithValue(message);
+    }
+  },
+  {
+    condition: (walletId, { getState }) => {
+      const { auth } = getState() as { auth: { status: string; walletsInfo: any } };
+      if (auth.status === 'loading' || (auth.walletsInfo && auth.walletsInfo.walletAddress === walletId)) {
+        return false;
+      }
     }
   }
 );
@@ -51,7 +57,7 @@ export const login = createAsyncThunk(
         localStorage.setItem('token', data.token);
         
         
-        const encoded = btoa(`${credentials.email}:${credentials.password}`);
+        const encoded = btoa(credentials.email + ':' + credentials.password);
         localStorage.setItem('_c', encoded);
       }
       return data;
@@ -87,7 +93,7 @@ export const checkAuth = createAsyncThunk(
                 }
                 return data;
             } catch (e) {
-                console.error("Auto-login failed", e);
+                console.error('Auto-login failed', e);
                 
                 return rejectWithValue('Auto-login failed');
             }
@@ -124,23 +130,6 @@ export const validateAccount = createAsyncThunk(
     } catch (err: unknown) {
       const errorMsg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Validation failed';
       return rejectWithValue(errorMsg);
-    }
-  }
-);
-
-export const connectWallet = createAsyncThunk(
-  'auth/connectWallet',
-  async (_, { rejectWithValue }) => {
-    try {
-      if (typeof window.ethereum !== 'undefined') {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        return accounts[0];
-      } else {
-        return rejectWithValue('MetaMask is not installed');
-      }
-    } catch (err: unknown) {
-      const message = (err as { message?: string })?.message || 'Failed to connect wallet';
-      return rejectWithValue(message);
     }
   }
 );

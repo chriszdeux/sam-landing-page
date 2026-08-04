@@ -1,234 +1,387 @@
-// 1-Efecto secundario para sincronización del ciclo de vida
-// 2-Obtención del despachador para emitir acciones al store
-// 3-Obtención del despachador para emitir acciones al store
-// 4-Selección de datos desde el estado global de Redux
-// 5-Selección de datos desde el estado global de Redux
-// 6-Gestión de estado local para page
-// 7-Manejo de cambios en el input page
-// 8-Efecto secundario para sincronización del ciclo de vida
-// 9-Estructuración y renderizado visual del componente UI
-// 10-Estructuración y renderizado visual del componente UI
-
 'use client';
 
-//# 1-Efecto secundario para sincronización del ciclo de vida
-import React, { useEffect } from 'react';
-import { Container, CircularProgress, Box, Paper, Stack, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Container, Box, Typography, Stack, Tabs, Tab, IconButton, Tooltip } from '@mui/material';
 import { Background } from '../../components/layout/Background';
 import { Input } from '../../components/ui/Input';
-import { Button } from '../../components/ui/Button';
+import { CustomButton } from '../../components/ui/CustomButton';
 import SearchIcon from '@mui/icons-material/Search';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import LaunchIcon from '@mui/icons-material/Launch';
+import { useRouter } from 'next/navigation';
 
-//# 2-Obtención del despachador para emitir acciones al store
-import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { fetchTransactions } from '../../lib/features/transactions/actions';
-import { GenericTable } from '../../components/ui/GenericTable';
+import { setTransactionsFromCache, clearTransactions } from '../../lib/features/transactions/reducer';
+import { CustomTable } from '../../components/ui/CustomTable';
 import { transactionsPageColumns } from '../../components/market/transactionsPageColumns';
-import { TransactionsInterface } from '../../lib/features/transactions/types';
-import { TechFrame } from '../../components/ui/TechFrame';
+import { RootState } from '../../lib/store';
+import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { PageHeader } from '../../components/ui/PageHeader';
-import { Sensors } from "@mui/icons-material";
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
+import { formatHash } from '../../lib/utils/formatHash';
+import { useRefreshCooldown } from '../../lib/useRefreshCooldown';
 
 export default function TransactionsPage() {
-
-    //# 3-Obtención del despachador para emitir acciones al store
     const dispatch = useAppDispatch();
+    const router = useRouter();
 
-    //# 4-Selección de datos desde el estado global de Redux
-    const { selectedNetwork, networks } = useAppSelector((state) => state.blockchain);
-    const totalPowerMining = selectedNetwork?.blockchainProps?.totalPowerMining || 0;
-
-    //# 5-Selección de datos desde el estado global de Redux
-    const { byStoreBoxId, isLoading: loading, error } = useAppSelector((state) => state.transactions);
+    const { selectedNetwork, networks, activeBlock, blocksHistory, chronoBurstFreqTypes } = useAppSelector((state: RootState) => state.blockchain);
+    const { transactions: transactionData, isLoading: loading, total, cache } = useAppSelector((state: RootState) => state.transactions);
 
     const currentNetwork = networks.find(n => n.id === selectedNetwork?.id);
-
-
     const storeId = selectedNetwork?.storeTransactions?.storeTransactionId || currentNetwork?.storeTransactionId;
-    const rawData = storeId ? byStoreBoxId[storeId] : null;
-    let transactionData: TransactionsInterface[] = [];
 
-    if (rawData?.transactions && Array.isArray(rawData.transactions)) {
-        transactionData = rawData.transactions;
-    }
-
-
-    //# 6-Gestión de estado local para page
-    const [page, setPage] = React.useState(0);
-    const [walletSearch, setWalletSearch] = React.useState('');
-    const [appliedWalletFilter, setAppliedWalletFilter] = React.useState('');
+    const [page, setPage] = useState(0);
+    const [walletSearch, setWalletSearch] = useState('');
+    const [appliedWalletFilter, setAppliedWalletFilter] = useState('');
+    const [filterType, setFilterType] = useState(''); // '' for Market, 'MINER' for Mining
     const pageSize = 10;
 
-    const handleSearch = () => {
-        setAppliedWalletFilter(walletSearch);
-        setPage(0);
-        if (storeId) {
-            dispatch(fetchTransactions({ storeId, walletId: walletSearch, page: 1, limit: pageSize }));
+    const { isCooldownActive, cooldownRemaining, triggerRefresh } = useRefreshCooldown();
+
+    const baseHash = selectedNetwork?.hashAvailable || 0;
+    const [fluctuatedHash, setFluctuatedHash] = useState(baseHash);
+    const [hashVariation, setHashVariation] = useState(0.42);
+
+    useEffect(() => {
+        setFluctuatedHash(baseHash);
+    }, [baseHash]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (baseHash > 0) {
+                const variation = 1 + (Math.random() - 0.5) * 0.006;
+                setFluctuatedHash(Math.round(baseHash * variation));
+                
+                setHashVariation(prev => {
+                    const delta = (Math.random() - 0.5) * 0.05;
+                    const nextVal = prev + delta;
+                    return Math.max(0.1, Math.min(2.5, nextVal));
+                });
+            }
+        }, 2500);
+        return () => clearInterval(interval);
+    }, [baseHash]);
+
+    const handleRefresh = () => {
+        if (triggerRefresh() && storeId) {
+            dispatch(fetchTransactions({
+                storeId,
+                page,
+                limit: pageSize,
+                walletId: appliedWalletFilter || undefined,
+                filter: filterType || undefined
+            }));
         }
     };
 
+    // Get queues from activeBlock or fallback to the latest block from blocksHistory
+    const latestBlock = activeBlock || [...blocksHistory].sort((a, b) => b.index - a.index)[0];
 
+    const buyQueue = latestBlock
+        ? (typeof latestBlock.buyCount === 'number'
+            ? latestBlock.buyCount
+            : (typeof latestBlock.transactionsBuyQueue === 'number'
+                ? latestBlock.transactionsBuyQueue
+                : Array.isArray(latestBlock.transactionsBuyQueue) ? latestBlock.transactionsBuyQueue.length : 0))
+        : 0;
 
-    //# 7-Manejo de cambios en el input page
+    const sellQueue = latestBlock
+        ? (typeof latestBlock.sellCount === 'number'
+            ? latestBlock.sellCount
+            : (typeof latestBlock.transactionsSellQueue === 'number'
+                ? latestBlock.transactionsSellQueue
+                : Array.isArray(latestBlock.transactionsSellQueue) ? latestBlock.transactionsSellQueue.length : 0))
+        : 0;
+
+    const transferQueue = latestBlock
+        ? (typeof latestBlock.transferCount === 'number'
+            ? latestBlock.transferCount
+            : (typeof latestBlock.transactionsTransferQueue === 'number'
+                ? latestBlock.transactionsTransferQueue
+                : Array.isArray(latestBlock.transactionsTransferQueue) ? latestBlock.transactionsTransferQueue.length : 0))
+        : 0;
+
+    const handleSearch = () => {
+        dispatch(clearTransactions());
+        setAppliedWalletFilter(walletSearch);
+        setPage(0);
+        if (storeId) {
+            dispatch(fetchTransactions({ storeId, walletId: walletSearch, filter: filterType, page: 1, limit: pageSize }));
+        }
+    };
+
+    const handleFilterChange = (event: React.SyntheticEvent, newValue: string) => {
+        setFilterType(newValue);
+        setPage(0);
+        dispatch(clearTransactions());
+        if (storeId) {
+            dispatch(fetchTransactions({ storeId, walletId: appliedWalletFilter, filter: newValue, page: 1, limit: pageSize }));
+        }
+    };
+
     const handlePageChange = (newPage: number) => {
         setPage(newPage);
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        if (storeId && transactionData.length < (newPage + 1) * pageSize) {
-            dispatch(fetchTransactions({ storeId, walletId: appliedWalletFilter, page: newPage + 1, limit: pageSize }));
+        const pageToFetch = newPage + 1;
+        if (cache[pageToFetch]) {
+            dispatch(setTransactionsFromCache(pageToFetch));
+        } else if (storeId) {
+            dispatch(fetchTransactions({ storeId, walletId: appliedWalletFilter, filter: filterType, page: pageToFetch, limit: pageSize }));
         }
     };
 
-    const hasMoreStats = transactionData.length >= (page + 1) * pageSize;
-    const totalRows = hasMoreStats ? transactionData.length + pageSize : transactionData.length;
-
-
-
-    //# 8-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
-        if (storeId) {
-            dispatch(fetchTransactions({ storeId, walletId: appliedWalletFilter, page: 1, limit: pageSize }));
+        if (storeId && !cache[1]) {
+            dispatch(fetchTransactions({ storeId, walletId: appliedWalletFilter, filter: filterType, page: 1, limit: pageSize }));
         }
-    }, [storeId, dispatch, appliedWalletFilter, pageSize]);
+    }, [storeId, dispatch, appliedWalletFilter, filterType, cache]);
 
-    if (!selectedNetwork) {
+    const syncedColumns = React.useMemo(() => {
+        const cols = transactionsPageColumns.map(col => {
+            if (col.label === 'Potencia CB') {
+                return {
+                    ...col,
+                    render: ({ value }: { value: any }) => {
+                        const raw = value as number;
+                        if (!raw || raw === 0) return <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)' }}>—</Typography>;
+                        return (
+                            <Typography variant="caption" sx={{ color: '#00f3ff', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                                {formatHash(raw * 1000000, chronoBurstFreqTypes)}
+                            </Typography>
+                        );
+                    }
+                };
+            }
+            return col;
+        });
 
+        const symbolMap: Record<string, string> = {
+            'SAM': 'sam-token',
+            'DTR': 'deuterium',
+            'DKM': 'dark-matter',
+            'SLR': 'solar-credits',
+            'PLC': 'plasma-core',
+            'NNO': 'nano-tech',
+            'VDS': 'void-shards',
+            'TRT': 'terra-token'
+        };
 
-        //# 9-Estructuración y renderizado visual del componente UI
-        return (
-            <main className="min-h-screen relative w-full overflow-hidden flex items-center justify-center">
-                <Background />
-                <div className="relative z-10 text-center px-4">
-                    <h2 className="text-2xl font-bold text-gray-400">Por favor seleccione una red para ver las transacciones.</h2>
-                </div>
-            </main>
-        );
-    }
+        cols.push({
+            label: "Acciones",
+            key: (row) => 'acciones',
+            render: ({ row }: { row: any }) => {
+                const symbol = row.financialInfo?.symbol;
+                const cryptoId = symbolMap[symbol] || row.blockchainId || row.financialInfo?.cryptoId || row.cryptoId;
+                if (!cryptoId) return <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)' }}>—</Typography>;
+                return (
+                    <IconButton
+                        size="small"
+                        onClick={() => router.push(`/market/${cryptoId}`)}
+                        sx={{ 
+                            color: '#00f3ff', 
+                            border: '1px solid rgba(0, 243, 255, 0.2)',
+                            bgcolor: 'rgba(0, 243, 255, 0.05)',
+                            p: 0.5,
+                            '&:hover': { 
+                                bgcolor: 'rgba(0, 243, 255, 0.15)',
+                                borderColor: '#00f3ff'
+                            } 
+                        }}
+                    >
+                        <LaunchIcon sx={{ fontSize: 14 }} />
+                    </IconButton>
+                );
+            }
+        });
 
+        return cols;
+    }, [chronoBurstFreqTypes, router]);
 
-
-    //# 10-Estructuración y renderizado visual del componente UI
     return (
-        <main className="min-h-screen relative w-full overflow-hidden">
+        <main className='min-h-screen relative pb-20'>
             <Background />
 
-            <Container maxWidth="xl" sx={{ pt: 16, pb: 10, position: 'relative', zIndex: 1 }}>
+            <Container maxWidth='xl' sx={{ pt: { xs: 12, md: 16 }, position: 'relative', zIndex: 10 }}>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <PageHeader
+                        title='Explorador de'
+                        highlight='Transacciones'
+                        subtitle='Historial técnico de operaciones en la red blockchain de LynCore.'
+                    />
 
-                <PageHeader
-                    title="Historial de Transacciones"
-                    subtitle={`Red: ${currentNetwork?.identification?.name || selectedNetwork?.identification?.name || selectedNetwork.id} | Store ID: ${storeId}`}
-                />
-
-                <Box sx={{ mb: 4, display: "flex", justifyContent: "center" }}>
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        <Paper sx={{
-                            p: 3,
-                            background: "rgba(0, 243, 255, 0.05)",
-                            border: "1px solid rgba(0, 243, 255, 0.2)",
-                            borderRadius: "16px",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 3,
-                            position: "relative",
-                            overflow: "hidden",
-                            boxShadow: "0 0 30px rgba(0, 243, 255, 0.1)",
-                        }}>
-                            <Box sx={{
-                                p: 1.5,
-                                bgcolor: "rgba(0, 243, 255, 0.1)",
-                                borderRadius: "12px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                border: "1px solid rgba(0, 243, 255, 0.3)"
-                            }}>
-                                <Sensors sx={{ color: "#00f3ff", fontSize: 32 }} className="pulse-animation" />
-                            </Box>
-                            <Box>
-                                <Typography variant="overline" sx={{ color: "#00f3ff", fontWeight: "bold", letterSpacing: 2, display: "block", lineHeight: 1, mb: 0.5 }}>
-                                    NETWORK MINING POWER
+                    {/* Blockchain Hash Metric Widget */}
+                    <Box sx={{
+                        mb: 4,
+                        p: 3,
+                        bgcolor: 'rgba(0, 243, 255, 0.03)',
+                        border: '1px solid rgba(0, 243, 255, 0.2)',
+                        borderRadius: 2,
+                        boxShadow: '0 0 15px rgba(0, 243, 255, 0.05)',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        gap: 2
+                    }}>
+                        <Box sx={{
+                            position: 'absolute',
+                            top: -50,
+                            right: -50,
+                            width: 100,
+                            height: 100,
+                            bgcolor: '#00f3ff',
+                            filter: 'blur(50px)',
+                            opacity: 0.1,
+                            zIndex: 0
+                        }} />
+                        <Box sx={{ position: 'relative', zIndex: 1, alignSelf: 'flex-start' }}>
+                            <Typography variant="subtitle2" sx={{ color: '#00f3ff', fontWeight: 'bold', letterSpacing: 1.5, textTransform: 'uppercase', mb: 0.5 }}>
+                                Hash Total Disponible en Blockchain
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+                                Auditoría macro consolidada del total de hash disponible para procesamiento en la red.
+                            </Typography>
+                        </Box>
+                        <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Typography variant="h3" sx={{ color: '#fff', fontWeight: 900, fontFamily: 'monospace', textShadow: '0 0 10px rgba(255,255,255,0.2)' }}>
+                                {formatHash(fluctuatedHash, chronoBurstFreqTypes)}
+                            </Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, px: 1, py: 0.25, bgcolor: 'rgba(0, 255, 136, 0.08)', border: '1px solid rgba(0, 255, 136, 0.3)', borderRadius: 1 }}>
+                                <Typography variant="caption" sx={{ color: '#00ff88', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 0.25, fontSize: '0.75rem' }}>
+                                    <span style={{ fontSize: '10px' }}>▲</span> +{hashVariation.toFixed(2)}%
                                 </Typography>
-                                <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
-                                    <Typography variant="h3" sx={{ color: "#fff", fontWeight: 900, letterSpacing: -1, textShadow: "0 0 20px rgba(0, 243, 255, 0.5)" }}>
-                                        {(totalPowerMining || 0).toLocaleString('en-US')}
-                                    </Typography>
-                                    <Typography variant="h5" sx={{ color: "#00f3ff", fontWeight: "bold", opacity: 0.8 }}>
-                                        GH/s
-                                    </Typography>
-                                </Box>
                             </Box>
-                            <Box sx={{ ml: "auto", display: { xs: "none", md: "block" } }}>
-                                <Stack direction="row" spacing={2}>
-                                    <Box sx={{ textAlign: "right" }}>
-                                        <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.4)", display: "block" }}>STATUS</Typography>
-                                        <Typography variant="body2" sx={{ color: "#00ff88", fontWeight: "bold", display: "flex", alignItems: "center", gap: 0.5 }}>
-                                            <Box component="span" sx={{ width: 8, height: 8, bgcolor: "#00ff88", borderRadius: "50%", display: "inline-block" }} />
-                                            ACTIVE
-                                        </Typography>
-                                    </Box>
-                                </Stack>
-                            </Box>
-                        </Paper>
-                    </motion.div>
-                </Box>
+                        </Box>
+                    </Box>
 
-                <TechFrame color="#00f3ff">
-                    <Box sx={{ p: 2, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, alignItems: 'center', borderBottom: '1px solid rgba(0, 243, 255, 0.1)' }}>
+                    {/* Pending Queues Widget */}
+                    <Box sx={{
+                        mb: 4,
+                        p: 3,
+                        bgcolor: 'rgba(255, 170, 0, 0.03)',
+                        border: '1px solid rgba(255, 170, 0, 0.2)',
+                        borderRadius: 2,
+                        boxShadow: '0 0 15px rgba(255, 170, 0, 0.05)',
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        gap: 3
+                    }}>
+                        <Box sx={{ alignSelf: 'flex-start' }}>
+                            <Typography variant="subtitle2" sx={{ color: '#ffaa00', fontWeight: 'bold', letterSpacing: 1.5, textTransform: 'uppercase', mb: 0.5 }}>
+                                Colas de Transacciones Pendientes (Red)
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+                                Transacciones en espera de inyección de energía para su confirmación en el bloque actual.
+                            </Typography>
+                        </Box>
+
+                        <Stack direction="row" spacing={3}>
+                            <Box sx={{ textAlign: 'center', minWidth: 80 }}>
+                                <Typography variant="caption" sx={{ color: '#00ff88', fontWeight: 'bold', display: 'block' }}>COMPRA</Typography>
+                                <Typography variant="h5" sx={{ color: '#fff', fontWeight: 900, fontFamily: 'monospace' }}>{buyQueue}</Typography>
+                            </Box>
+                            <Box sx={{ textAlign: 'center', minWidth: 80 }}>
+                                <Typography variant="caption" sx={{ color: '#ff0055', fontWeight: 'bold', display: 'block' }}>VENTA</Typography>
+                                <Typography variant="h5" sx={{ color: '#fff', fontWeight: 900, fontFamily: 'monospace' }}>{sellQueue}</Typography>
+                            </Box>
+                            <Box sx={{ textAlign: 'center', minWidth: 80 }}>
+                                <Typography variant="caption" sx={{ color: '#00f3ff', fontWeight: 'bold', display: 'block' }}>TRANSF.</Typography>
+                                <Typography variant="h5" sx={{ color: '#fff', fontWeight: 900, fontFamily: 'monospace' }}>{transferQueue}</Typography>
+                            </Box>
+                        </Stack>
+                    </Box>
+
+                    <Box sx={{ mb: 4, display: 'flex', gap: 2 }}>
                         <Input
-                            placeholder="Buscar por Wallet Address..."
+                            placeholder='Buscar por billetera...'
                             value={walletSearch}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWalletSearch(e.target.value)}
+                            onChange={(e) => setWalletSearch(e.target.value)}
                             fullWidth
-                            sx={{ mb: 0 }}
                         />
-                        <Button
-                            variant="contained"
+                        <CustomButton 
+                            variant='info' 
                             onClick={handleSearch}
                             startIcon={<SearchIcon />}
-                            sx={{ height: 48, minWidth: 120 }}
+                            sx={{ minWidth: 150 }}
+                            glow
                         >
                             BUSCAR
-                        </Button>
+                        </CustomButton>
+                        <Tooltip title={isCooldownActive ? `Espero ${cooldownRemaining}s` : "Actualizar Transacciones"}>
+                            <span>
+                                <IconButton
+                                    onClick={handleRefresh}
+                                    disabled={isCooldownActive}
+                                    sx={{
+                                        color: '#00f3ff',
+                                        border: '1px solid rgba(0, 243, 255, 0.2)',
+                                        bgcolor: 'rgba(0, 243, 255, 0.05)',
+                                        p: 1.5,
+                                        width: 48,
+                                        height: 48,
+                                        '&:hover': {
+                                            bgcolor: 'rgba(0, 243, 255, 0.15)',
+                                            borderColor: '#00f3ff',
+                                            boxShadow: '0 0 10px rgba(0, 243, 255, 0.3)'
+                                        },
+                                        '&.Mui-disabled': {
+                                            color: 'rgba(255, 255, 255, 0.3)',
+                                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                                            bgcolor: 'rgba(255, 255, 255, 0.02)'
+                                        }
+                                    }}
+                                >
+                                    {isCooldownActive ? (
+                                        <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: '0.75rem', color: '#ffaa00' }}>
+                                            {cooldownRemaining}s
+                                        </Typography>
+                                    ) : (
+                                        <RefreshIcon className={loading ? "animate-spin" : ""} />
+                                    )}
+                                </IconButton>
+                            </span>
+                        </Tooltip>
                     </Box>
-                    <div className="w-full overflow-x-auto p-4">
-                        {loading && transactionData.length === 0 ? (
-                            <div className="flex justify-center p-10">
-                                <CircularProgress color="primary" />
-                            </div>
-                        ) : error ? (
-                            <div className="p-10 text-center">
-                                <p className="text-red-500">{error}</p>
-                            </div>
-                        ) : (
-                            <GenericTable
-                                columns={transactionsPageColumns}
-                                data={transactionData}
-                                pageSize={pageSize}
-                                enablePagination={true}
-                                manualPagination={true}
-                                page={page}
-                                onPageChange={handlePageChange}
-                                totalRows={totalRows}
-                            />
-                        )}
-                    </div>
-                </TechFrame>
+
+                    <Box sx={{ borderBottom: 1, borderColor: 'rgba(0, 243, 255, 0.2)', mb: 3 }}>
+                        <Tabs
+                            value={filterType}
+                            onChange={handleFilterChange}
+                            textColor="inherit"
+                            sx={{
+                                '& .MuiTab-root': { color: 'rgba(255,255,255,0.6)', fontWeight: 'bold' },
+                                '& .Mui-selected': { color: '#00f3ff' },
+                                '& .MuiTabs-indicator': { backgroundColor: '#00f3ff' }
+                            }}
+                        >
+                            <Tab label="Mercado (BUY/SELL)" value="" />
+                            <Tab label="Minería (MINE)" value="MINER" />
+                        </Tabs>
+                    </Box>
+
+                    <CustomTable
+                        columns={syncedColumns}
+                        data={transactionData}
+                        loading={loading}
+                        page={page}
+                        pageSize={pageSize}
+                        onPageChange={handlePageChange}
+                        enablePagination={true}
+                        manualPagination={true}
+                        totalRows={total}
+                    />
+                </motion.div>
             </Container>
-            <style jsx global>{`
-                @keyframes pulse { 
-                    0% { opacity: 1; transform: scale(1); } 
-                    50% { opacity: 0.5; transform: scale(0.95); } 
-                    100% { opacity: 1; transform: scale(1); } 
-                }
-                .pulse-animation {
-                    animation: pulse 2s infinite ease-in-out;
-                }
-            `}</style>
         </main>
     );
 }
