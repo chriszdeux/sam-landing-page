@@ -3,7 +3,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Container, Typography, Stack } from '@mui/material';
+import { Typography } from '../components/ui/Typography';
 import { Rocket, BarChart2, ShoppingCart, Blocks } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Background } from '../components/layout/Background';
@@ -28,60 +28,34 @@ export default function Home() {
   const { userInfo } = useAppSelector((state: RootState) => state.auth);
 
   return (
-    <main style={{ minHeight: '100vh', position: 'relative', background: 'transparent' }}>
+    <main className="relative min-h-screen bg-transparent">
       <Background />
 
       {/* ——— HERO ——— */}
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
+      <div className="relative flex min-h-screen items-center overflow-hidden">
         {/* Glowing orbs */}
-        <Box sx={{ position: 'absolute', top: '20%', left: '10%', width: 400, height: 400, borderRadius: '50%', bgcolor: '#00f3ff', filter: 'blur(120px)', opacity: 0.04 }} />
-        <Box sx={{ position: 'absolute', bottom: '20%', right: '10%', width: 300, height: 300, borderRadius: '50%', bgcolor: '#ff0055', filter: 'blur(100px)', opacity: 0.04 }} />
+        <div className="absolute top-[20%] left-[10%] h-[400px] w-[400px] rounded-full bg-[#00f3ff]/[0.04] blur-[120px]" />
+        <div className="absolute bottom-[20%] right-[10%] h-[300px] w-[300px] rounded-full bg-[#ff0055]/[0.04] blur-[100px]" />
 
-        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2, pt: 12, pb: 8 }}>
-          <Box>
-            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2.5 }}>
-              <Box sx={{ width: 32, height: 2, bgcolor: '#00f3ff', boxShadow: '0 0 10px #00f3ff' }} />
-              <Typography variant="overline" sx={{ color: '#00f3ff', fontWeight: 'bold', letterSpacing: 4, fontSize: '0.65rem' }}>
+        <div className="relative z-[2] mx-auto w-full max-w-[1536px] px-4 pt-24 pb-16 sm:px-6 lg:px-8">
+          <div>
+            <div className="mb-5 flex flex-row items-center gap-2">
+              <div className="h-0.5 w-8 bg-[#00f3ff] shadow-[0_0_10px_#00f3ff]" />
+              <Typography variant="overline" className="text-[0.65rem] font-bold tracking-[4px] text-[#00f3ff]">
                 ESTADO: TRANSMISIÓN_ACTIVA
               </Typography>
-            </Stack>
+            </div>
 
-            <Typography variant="h1" sx={{
-              fontSize: { xs: '3.5rem', md: '6.5rem', lg: '8rem' },
-              fontWeight: 900,
-              lineHeight: 0.95,
-              textTransform: 'uppercase',
-              mb: 3,
-              background: 'linear-gradient(135deg, #fff 0%, #00f3ff 40%, #fff 80%)',
-              backgroundSize: '200% auto',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              animation: 'textShine 5s linear infinite',
-              '@keyframes textShine': { to: { backgroundPosition: '200% center' } },
-              filter: 'drop-shadow(0 0 20px rgba(0,243,255,0.2))',
-            }}>
+            <Typography
+              variant="h1"
+              className="mb-6 text-[3.5rem] md:text-[6.5rem] lg:text-[8rem] font-black leading-[0.95] uppercase bg-gradient-to-br from-white from-0% via-[#00f3ff] via-40% to-white to-80% bg-[length:200%_auto] bg-clip-text text-transparent [-webkit-text-fill-color:transparent] animate-[shine_5s_linear_infinite] [filter:drop-shadow(0_0_20px_rgba(0,243,255,0.2))]"
+            >
               The Lyncore
             </Typography>
 
-            <Typography variant="h4" sx={{
-              color: 'rgba(255,255,255,0.8)',
-              fontWeight: 300,
-              mb: 5,
-              maxWidth: 640,
-              lineHeight: 1.5,
-              fontSize: { xs: '1.2rem', md: '1.6rem' },
-            }}>
+            <Typography variant="h4" className="mb-10 max-w-[640px] text-[1.2rem] md:text-[1.6rem] font-light leading-[1.5] text-white/80">
               Ledger de supervivencia y simulación blockchain en un yermo digital devastado. El{' '}
-              <Box component="span" sx={{ color: '#00f3ff', fontWeight: 700 }}>HASH</Box>{' '}
+              <span className="font-bold text-[#00f3ff]">HASH</span>{' '}
               es tu único recurso vital.
             </Typography>
 
@@ -104,7 +78,7 @@ export default function Home() {
                 Ir a Operaciones
               </Button>
             ) : (
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2.5}>
+              <div className="flex flex-col gap-5 sm:flex-row">
                 <Button
                   id="hero-register-btn"
                   variant="contained"
@@ -136,11 +110,11 @@ export default function Home() {
                 >
                   Ya tengo cuenta
                 </Button>
-              </Stack>
+              </div>
             )}
-          </Box>
-        </Container>
-      </Box>
+          </div>
+        </div>
+      </div>
 
       {/* ——— BLOQUE 1: The Lyncore (Concepto) ——— */}
       <HomeSection
