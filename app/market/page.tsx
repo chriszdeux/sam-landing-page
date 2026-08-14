@@ -11,8 +11,10 @@
 'use client';
 
 //# 1-Efecto secundario para sincronización del ciclo de vida
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, Grid, Container, Button, CircularProgress } from '@mui/material';
+import GridViewIcon from '@mui/icons-material/GridView';
+import ViewListIcon from '@mui/icons-material/ViewList';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Background } from '../../components/layout/Background';
@@ -27,9 +29,11 @@ import { AppDispatch, RootState } from '../../lib/store';
 import { fetchCryptos } from '../../lib/features/market/actions';
 import { addNotification } from '../../lib/features/uiSlice';
 import { BlockchainDataDisplay } from '../../components/market/BlockchainDataDisplay';
+import { MarketTableView } from '../../components/market/MarketTableView';
 
 export default function MarketPage() {
   const router = useRouter();
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
   
   //# 3-Obtención del despachador para emitir acciones al store
   const dispatch = useDispatch<AppDispatch>();
@@ -88,7 +92,45 @@ export default function MarketPage() {
 
         <BlockchainDataDisplay network={selectedNetwork} />
 
-        <Typography variant="h4" sx={{ mb: 4, color: 'white' }}>Activos Listados</Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, mt: 4 }}>
+          <Typography variant="h4" sx={{ color: 'white', m: 0 }}>Activos Listados</Typography>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => setViewMode('cards')}
+              startIcon={<GridViewIcon />}
+              sx={{
+                borderColor: viewMode === 'cards' ? '#00f3ff' : 'rgba(255, 255, 255, 0.1)',
+                color: viewMode === 'cards' ? '#00f3ff' : 'rgba(255, 255, 255, 0.5)',
+                bgcolor: viewMode === 'cards' ? 'rgba(0, 243, 255, 0.05)' : 'transparent',
+                '&:hover': {
+                  borderColor: '#00f3ff',
+                  bgcolor: 'rgba(0, 243, 255, 0.1)',
+                }
+              }}
+            >
+              Tarjetas
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => setViewMode('table')}
+              startIcon={<ViewListIcon />}
+              sx={{
+                borderColor: viewMode === 'table' ? '#00f3ff' : 'rgba(255, 255, 255, 0.1)',
+                color: viewMode === 'table' ? '#00f3ff' : 'rgba(255, 255, 255, 0.5)',
+                bgcolor: viewMode === 'table' ? 'rgba(0, 243, 255, 0.05)' : 'transparent',
+                '&:hover': {
+                  borderColor: '#00f3ff',
+                  bgcolor: 'rgba(0, 243, 255, 0.1)',
+                }
+              }}
+            >
+              Tabla
+            </Button>
+          </Box>
+        </Box>
         
         {isLoading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', my: 10 }}>
@@ -96,6 +138,12 @@ export default function MarketPage() {
             </Box>
         ) : error ? (
             <Typography align="center" color="error">Error al cargar datos: {error}</Typography>
+        ) : viewMode === 'table' ? (
+            <MarketTableView
+              cryptos={cryptos}
+              onTrade={handleTransaction}
+              onRowClick={(id) => router.push(`/market/${id}`)}
+            />
         ) : (
             <Grid container spacing={4}>
             {cryptos.map((crypto, index) => (
@@ -178,10 +226,11 @@ export default function MarketPage() {
                                 src={crypto.identification.image128} 
                                 alt={crypto.identification.name} 
                                 fill
+                                sizes="160px"
                                 style={{ objectFit: 'contain', borderRadius: '24%' }} 
                             />
                         ) : (
-                            <Box sx={{
+                             <Box sx={{
                                 width: 120,
                                 height: 120,
                                 borderRadius: '24%',
@@ -218,7 +267,7 @@ export default function MarketPage() {
                         }}>
                              <Typography variant="body2" fontWeight="bold" sx={{ color: (crypto.financial.change24h || 0) >= 0 ? '#00ff9d' : '#ff3333' }}>
                                 {(crypto.financial.change24h || 0) > 0 ? '+' : ''}{(crypto.financial.change24h || 0).toFixed(2)}%
-                            </Typography>
+                             </Typography>
                             <Typography variant="caption" sx={{ color: 'text.secondary', ml: 0.5 }}>24h</Typography>
                         </Box>
                     </Box>

@@ -43,6 +43,11 @@ next-env.d.ts
 # IA
 .ia/
 .agent
+.agents/
 .kiro
 .gemini/
 SKILL.md
+
+# Debug DB scripts
+debug_db.js
+debug_db.ts

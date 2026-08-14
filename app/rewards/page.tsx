@@ -26,6 +26,7 @@ import { PageHeader } from '../../components/ui/PageHeader';
 //# 1-Obtención del despachador para emitir acciones al store
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { claimReward, fetchRewards } from '../../lib/features/blockchain/actions';
+import { setRewardCooldown } from '../../lib/features/blockchain/reducer';
 import { motion } from 'framer-motion';
 import { Reward } from '../../lib/features/blockchain/types';
 import { TaoIcon } from '../../components/ui/TaoIcon';
@@ -138,16 +139,34 @@ export default function RewardsPage() {
          return;
     }
 
-    
-    
-    
+    const userReward = userInfo?.rewards?.find((r) => r.id === reward.id) || userInfo?.rewards?.[0];
+    if (userReward?.claimedAt) {
+        const intervalVal = typeof reward.interval === 'number' ? reward.interval : parseInt(reward.interval || '1', 10);
+        const nextClaimTime = new Date(userReward.claimedAt).getTime() + (intervalVal * 60 * 1000);
+        const difference = nextClaimTime - Date.now();
+        if (difference > 0) {
+            const remainingMinutes = Math.ceil(difference / (1000 * 60));
+            dispatch(addNotification({ 
+                type: 'error', 
+                message: `Reward not available. You need to wait ${remainingMinutes} minutes.` 
+            }));
+            return;
+        }
+    }
 
     setClaimingRewardId(reward.id);
     try {
         await dispatch(claimReward({ id: reward.id, userId: userInfo.id, rewardType: reward?.rewardType, amount: reward?.amount })).unwrap();
         dispatch(addNotification({ type: 'success', message: '¡Recompensa reclamada con éxito!' }));
     } catch (err) {
-        dispatch(addNotification({ type: 'error', message: err as string || 'Error al reclamar recompensa.' }));
+        const errMsg = err as string || '';
+        const match = errMsg.match(/wait (\d+) minutes/);
+        if (match) {
+            const minutes = parseInt(match[1], 10);
+            const cooldownTime = Date.now() + (minutes * 60 * 1000);
+            dispatch(setRewardCooldown({ rewardId: reward.id, nextClaimTime: cooldownTime }));
+        }
+        dispatch(addNotification({ type: 'error', message: errMsg || 'Error al reclamar recompensa.' }));
     } finally {
         setClaimingRewardId(null);
     }
@@ -183,7 +202,7 @@ export default function RewardsPage() {
             }}>
                 {rewards.map((reward, index) => {
                     
-                    const userReward = userInfo?.rewards?.find((r) => r.id === reward.id);
+                    const userReward = userInfo?.rewards?.find((r) => r.id === reward.id) || userInfo?.rewards?.[0];
                     const lastClaimedAt = userReward?.claimedAt;
                     
                     const intervalVal = typeof reward.interval === 'number' ? reward.interval : parseInt(reward.interval || '1', 10);
