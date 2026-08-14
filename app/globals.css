@@ -105,6 +105,42 @@
   --info: var(--neon-blue);
 }
 
+/* ============================================================
+   Tailwind v4 design tokens — Migración MUI → Tailwind (Tier 0)
+   Fuente única de verdad: consolida lib/theme.ts (palette + overrides
+   de MuiButton/MuiCard/MuiPaper) con las variables --neon-* de arriba.
+   No introduce cambios visuales — solo expone estos valores como
+   utilidades Tailwind (bg-*, text-*, border-*, rounded-*).
+   ============================================================ */
+@theme {
+  --color-background: #0a0a0a;
+  --color-surface: var(--glass-bg);
+  --color-foreground: #ededed;
+  --color-foreground-muted: #b3b3b3;
+
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-error: var(--error);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+
+  --color-neon-cyan: var(--neon-cyan);
+  --color-neon-teal: var(--neon-teal);
+  --color-neon-green: var(--neon-green);
+  --color-neon-red: var(--neon-red);
+  --color-neon-orange: var(--neon-orange);
+  --color-neon-blue: var(--neon-blue);
+
+  --color-border: #333333;
+  --color-border-glass: var(--glass-border);
+
+  --radius-button: 4px;
+  --radius-card: 16px;
+  --radius-paper: 2px;
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
