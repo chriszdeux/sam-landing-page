@@ -177,7 +177,7 @@ export function LyncoreTeaser() {
                 fontSize: { xs: "0.85rem", sm: "1rem" },
               }}
             >
-              Su simulador de blockchain y exploración.
+              Ledger de supervivencia del yermo digital.
             </Typography>
           </motion.div>
         </Box>

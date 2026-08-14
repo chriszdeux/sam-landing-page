@@ -24,6 +24,10 @@ import { CardGiftcard, CheckCircle, MonetizationOn } from '@mui/icons-material';
 import { TechFrame } from '../ui/TechFrame';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
+import { addNotification } from '../../lib/features/uiSlice';
+import { setRewardCooldown } from '../../lib/features/blockchain/reducer';
+import { Countdown } from './Countdown';
+
 
 export const RewardsModal = () => {
     
@@ -43,6 +47,7 @@ export const RewardsModal = () => {
     
     //# 7-Control de visibilidad para interface de show success
     const [showSuccess, setShowSuccess] = useState<string | null>(null);
+    const [, forceUpdate] = React.useReducer((x: number) => x + 1, 0);
 
     
     
@@ -95,6 +100,22 @@ export const RewardsModal = () => {
     //# 9-Manejo de lógica de usuario para handleClaim
     const handleClaim = async (reward: Reward) => {
         if (!userInfo?.id) return;
+
+        const userReward = userInfo?.rewards?.find((r) => r.id === reward.id) || userInfo?.rewards?.[0];
+        if (userReward?.claimedAt) {
+            const intervalVal = Number(reward.interval) || 1;
+            const nextClaimTime = new Date(userReward.claimedAt).getTime() + (intervalVal * 60 * 1000);
+            const difference = nextClaimTime - Date.now();
+            if (difference > 0) {
+                const remainingMinutes = Math.ceil(difference / (1000 * 60));
+                dispatch(addNotification({ 
+                    type: 'error', 
+                    message: `Reward not available. You need to wait ${remainingMinutes} minutes.` 
+                }));
+                return;
+            }
+        }
+
         setClaimingId(reward.id);
         
         try {
@@ -108,6 +129,17 @@ export const RewardsModal = () => {
             }, 3000);
         } catch (err) {
             console.error(err);
+            const errMsg = err as string || '';
+            const match = errMsg.match(/wait (\d+) minutes/);
+            if (match) {
+                const minutes = parseInt(match[1], 10);
+                const cooldownTime = Date.now() + (minutes * 60 * 1000);
+                dispatch(setRewardCooldown({ rewardId: reward.id, nextClaimTime: cooldownTime }));
+            }
+            dispatch(addNotification({
+                type: 'error',
+                message: errMsg || 'Error al reclamar recompensa.'
+            }));
         } finally {
             setClaimingId(null);
         }
@@ -205,33 +237,48 @@ export const RewardsModal = () => {
                         </Typography>
                     </Box>
                 ) : (
-                    rewards.map((reward) => (
-                        <TechFrame key={reward.id} color={reward.isClaimed ? 'rgba(255,255,255,0.2)' : '#00f3ff'}>
+                    rewards.map((reward) => {
+                        const userReward = userInfo?.rewards?.find((r) => r.id === reward.id) || userInfo?.rewards?.[0];
+                        const lastClaimedAt = userReward?.claimedAt;
+                        
+                        const intervalVal = Number(reward.interval) || 1;
+                        const nextClaimTime = lastClaimedAt 
+                            ? new Date(lastClaimedAt).getTime() + (intervalVal * 60 * 1000)
+                            : null;
+                            
+                        const isClaimedPersisted = !!nextClaimTime && Date.now() < nextClaimTime;
+                        const isClaimedSession = !!(reward.nextClaimTime && Date.now() < reward.nextClaimTime);
+                        
+                        const isClaimedNow = isClaimedPersisted || isClaimedSession || !!reward.isClaimed;
+                        const targetTime = isClaimedSession ? (reward.nextClaimTime || 0) : (nextClaimTime || 0);
+
+                        return (
+                        <TechFrame key={reward.id} color={isClaimedNow ? 'rgba(255,255,255,0.2)' : '#00f3ff'}>
                             <Box sx={{ 
                                 p: 3, 
                                 display: 'flex', 
                                 flexDirection: { xs: 'column', sm: 'row' },
                                 alignItems: { xs: 'flex-start', sm: 'center' },
                                 gap: 3,
-                                bgcolor: reward.isClaimed ? 'rgba(255,255,255,0.02)' : 'rgba(0, 243, 255, 0.03)',
+                                bgcolor: isClaimedNow ? 'rgba(255,255,255,0.02)' : 'rgba(0, 243, 255, 0.03)',
                                 transition: 'all 0.3s'
                             }}>
                                 <Box sx={{ 
                                     width: 60, 
                                     height: 60, 
                                     borderRadius: 1, 
-                                    bgcolor: reward.isClaimed ? 'rgba(255,255,255,0.05)' : 'rgba(0, 243, 255, 0.1)',
+                                    bgcolor: isClaimedNow ? 'rgba(255,255,255,0.05)' : 'rgba(0, 243, 255, 0.1)',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    border: `1px solid ${reward.isClaimed ? 'rgba(255,255,255,0.1)' : 'rgba(0, 243, 255, 0.2)'}`
+                                    border: `1px solid ${isClaimedNow ? 'rgba(255,255,255,0.1)' : 'rgba(0, 243, 255, 0.2)'}`
                                 }}>
-                                    <MonetizationOn sx={{ color: reward.isClaimed ? 'rgba(255,255,255,0.3)' : '#00f3ff', fontSize: 32 }} />
+                                    <MonetizationOn sx={{ color: isClaimedNow ? 'rgba(255,255,255,0.3)' : '#00f3ff', fontSize: 32 }} />
                                 </Box>
 
                                 <Box sx={{ flex: 1 }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                                        <Typography variant="h6" sx={{ color: reward.isClaimed ? 'rgba(255,255,255,0.4)' : 'white', fontWeight: 'bold' }}>
+                                        <Typography variant="h6" sx={{ color: isClaimedNow ? 'rgba(255,255,255,0.4)' : 'white', fontWeight: 'bold' }}>
                                             {reward.name}
                                         </Typography>
                                         <Box sx={{ 
@@ -246,34 +293,49 @@ export const RewardsModal = () => {
                                             </Typography>
                                         </Box>
                                     </Box>
-                                    <Typography variant="body2" sx={{ color: reward.isClaimed ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.6)' }}>
+                                    <Typography variant="body2" sx={{ color: isClaimedNow ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.6)' }}>
                                         {reward.description}
                                     </Typography>
                                 </Box>
 
-                                <Box sx={{ textAlign: { xs: 'left', sm: 'right' }, minWidth: 140 }}>
+                                <Box sx={{ 
+                                    textAlign: { xs: 'left', sm: 'right' }, 
+                                    minWidth: 140,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: { xs: 'flex-start', sm: 'flex-end' },
+                                    gap: 1
+                                }}>
                                     <Typography variant="h5" sx={{ 
-                                        color: reward.isClaimed ? 'rgba(255,255,255,0.2)' : '#00ff88', 
+                                        color: isClaimedNow ? 'rgba(255,255,255,0.2)' : '#00ff88', 
                                         fontWeight: 'bold', 
-                                        mb: 1,
                                         fontFamily: 'monospace'
                                     }}>
                                         +{reward.amount} CR
                                     </Typography>
+
+                                    {isClaimedNow && targetTime > 0 && (
+                                        <Countdown 
+                                            targetDate={targetTime} 
+                                            onComplete={forceUpdate} 
+                                        />
+                                    )}
+
                                     <CustomButton
                                         fullWidth
-                                        variant={reward.isClaimed ? "neutral" : "info"}
-                                        disabled={!!reward.isClaimed || claimingId === reward.id}
+                                        variant={isClaimedNow ? "neutral" : "info"}
+                                        disabled={isClaimedNow || claimingId === reward.id}
                                         onClick={() => handleClaim(reward)}
-                                        glow={!reward.isClaimed}
+                                        glow={!isClaimedNow}
                                         startIcon={claimingId === reward.id ? <CircularProgress size={14} color="inherit" /> : null}
                                     >
-                                        {claimingId === reward.id ? 'Reclamando...' : (reward.isClaimed ? 'ADQUIRIDO' : 'RECLAMAR')}
+                                        {claimingId === reward.id ? 'Reclamando...' : (isClaimedNow ? 'ADQUIRIDO' : 'RECLAMAR')}
                                     </CustomButton>
                                 </Box>
                             </Box>
                         </TechFrame>
-                    ))
+                        );
+                    })
                 )}
             </Box>
         </Box>
