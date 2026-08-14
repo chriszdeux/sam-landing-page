@@ -47,3 +47,7 @@ next-env.d.ts
 .kiro
 .gemini/
 SKILL.md
+
+# Debug DB scripts
+debug_db.js
+debug_db.ts
