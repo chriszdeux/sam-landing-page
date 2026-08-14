@@ -1,10 +1,6 @@
-// 1-Definir componente de sección con scroll reveal
-// 2-Renderizar sección con animación de entrada
-
-//# 1-Definir componente de sección con scroll reveal
 import React from 'react';
-import { Box, Container } from '@mui/material';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils/cn';
 
 interface SectionProps {
   id: string;
@@ -13,22 +9,18 @@ interface SectionProps {
 }
 
 export const Section = ({ id, children, className }: SectionProps) => {
-  
-  //# 2-Renderizar sección con animación de entrada
   return (
-    <Box
-      component={motion.section}
+    <motion.section
       id={id}
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
+      viewport={{ once: true, margin: '-100px' }}
       transition={{ duration: 0.8 }}
-      sx={{ py: { xs: 8, md: 12 }, minHeight: '80vh', display: 'flex', alignItems: 'center' }}
-      className={className}
+      className={cn('flex min-h-[80vh] items-center py-8 md:py-12', className)}
     >
-      <Container maxWidth="xl">
+      <div className="mx-auto w-full max-w-[1536px] px-4 sm:px-6 lg:px-8">
         {children}
-      </Container>
-    </Box>
+      </div>
+    </motion.section>
   );
 };
