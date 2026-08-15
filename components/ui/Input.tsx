@@ -3,8 +3,6 @@
 // 3-Renderizar campo de entrada o selector
 
 import React from 'react';
-import { Select, SelectProps } from '@mui/material';
-import type { SxProps, Theme } from '@mui/material/styles';
 import { cn } from '@/lib/utils/cn';
 
 //# 1-Definir estilos base para inputs personalizados
@@ -35,9 +33,9 @@ interface CustomInputProps
    * consumers (market/economy/portfolio) - ignored by the Tailwind field. */
   fullWidth?: boolean;
   /** @deprecated see above */
-  sx?: SxProps<Theme>;
+  sx?: unknown;
   /** @deprecated see above */
-  containerSx?: SxProps<Theme>;
+  containerSx?: unknown;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, CustomInputProps>(
@@ -71,17 +69,13 @@ export const Input = React.forwardRef<HTMLInputElement, CustomInputProps>(
         )}
 
         {select ? (
-          // Modo `select` todavía respaldado por MUI Select/MenuItem: algunos
-          // consumidores (market/economy, tier posterior de la migración)
-          // siguen pasando <MenuItem> - se convierte junto con ellos para no
-          // romper esos call sites antes de tiempo.
-          <Select
+          <select
             id={id}
-            fullWidth
-            {...(props as unknown as SelectProps)}
+            className={cn(fieldClassName, error && errorFieldClassName, className)}
+            {...(props as unknown as React.SelectHTMLAttributes<HTMLSelectElement>)}
           >
             {children}
-          </Select>
+          </select>
         ) : (
           <div className="relative">
             {startAdornment && (

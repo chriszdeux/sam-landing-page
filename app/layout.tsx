@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "./StoreProvider";
-import ThemeRegistry from "../components/ThemeRegistry";
 import { Navbar } from "../components/layout/Navbar";
 import { AuthLoader } from "../components/auth/AuthLoader";
 import { Modal } from "../components/ui/Modal";
@@ -43,15 +42,13 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <StoreProvider>
-          <ThemeRegistry>
-            <AuthLoader>
-                <Navbar />
-                <LabSimulationManager />
-                <Modal />
-                <ToastStack />
-                {children}
-            </AuthLoader>
-          </ThemeRegistry>
+          <AuthLoader>
+              <Navbar />
+              <LabSimulationManager />
+              <Modal />
+              <ToastStack />
+              {children}
+          </AuthLoader>
         </StoreProvider>
       </body>
     </html>

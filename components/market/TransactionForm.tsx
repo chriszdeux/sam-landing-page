@@ -3,7 +3,6 @@
 
 //# 1-Definir componente de formulario de transacción
 import React from 'react';
-import { MenuItem, SelectChangeEvent } from '@mui/material';
 import { CustomButton } from '../ui/CustomButton';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
@@ -25,7 +24,7 @@ interface TradeFormData {
 interface TransactionFormProps {
     transactionType: 'BUY' | 'SELL' | 'TRANSFER';
     form: TradeFormData;
-    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => void;
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
     cryptos: Cryptocurrency[];
     selectedCrypto?: Cryptocurrency;
     onSubmit: () => void;
@@ -87,9 +86,9 @@ export const TransactionForm = ({
                         containerClassName="mb-6"
                     >
                         {cryptos.map((crypto) => (
-                            <MenuItem key={crypto.id} value={crypto.id}>
+                            <option key={crypto.id} value={crypto.id}>
                                 {crypto.identification.symbol} - {crypto.identification.name}
-                            </MenuItem>
+                            </option>
                         ))}
                     </Input>
 
