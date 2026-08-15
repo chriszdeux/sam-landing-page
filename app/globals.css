@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* ============================================================
    SCROLLBAR GLOBAL — Identidad Visual Ciberpunk
@@ -183,6 +181,22 @@ body {
 @keyframes shine {
   to {
     background-position: 200% center;
+  }
+}
+
+/* Usado por Navbar/NavbarDrawer: pulso dorado del item "Operaciones" cuando el lab está encendido */
+@keyframes pulseGold {
+  0% {
+    box-shadow: 0 0 0 0 rgba(212, 163, 115, 0.5);
+    border-color: rgba(212, 163, 115, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(212, 163, 115, 0);
+    border-color: rgba(230, 197, 148, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(212, 163, 115, 0);
+    border-color: rgba(212, 163, 115, 0.5);
   }
 }
 

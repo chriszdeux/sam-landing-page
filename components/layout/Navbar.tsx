@@ -10,22 +10,12 @@
 
 import React, { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  AppBar,
-  Toolbar,
-  IconButton,
-  Typography,
-  Box,
-  Drawer,
-  Tooltip,
-} from "@mui/material";
-import {
-  Menu as MenuIcon,
-  Rocket,
-  Bolt,
-} from "@mui/icons-material";
+import { Menu as MenuIcon, Rocket } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "../ui/Button";
+import { Typography } from "../ui/Typography";
+import { Drawer } from "../ui/Drawer";
+import { Tooltip } from "../ui/Tooltip";
 
 //# 1-Importar dependencias y componentes de UI
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
@@ -107,84 +97,41 @@ export const Navbar = () => {
 
   //# 6-Renderizar estructura principal de la barra
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar
-        position="fixed"
-        sx={{
-          bgcolor: "rgba(5, 5, 12, 0.8)",
-          backdropFilter: "blur(16px)",
-          borderBottom: "1px solid rgba(0, 243, 255, 0.1)",
-          boxShadow: "0 10px 30px -10px rgba(0, 0, 0, 0.8)",
-          height: '80px',
-          justifyContent: 'center',
-          backgroundImage: 'linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px)',
-          backgroundSize: '30px 30px',
-        }}
+    <div className="grow">
+      <header
+        className="fixed inset-x-0 top-0 z-50 flex h-20 items-center justify-center border-b border-[#00f3ff]/10 bg-[rgba(5,5,12,0.8)] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.8)] backdrop-blur-2xl [background-image:linear-gradient(rgba(0,243,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,243,255,0.03)_1px,transparent_1px)] [background-size:30px_30px]"
       >
         { }
-        <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent, #00f3ff, transparent)', opacity: 1, boxShadow: '0 0 15px #00f3ff' }} />
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00f3ff] to-transparent shadow-[0_0_15px_#00f3ff]" />
 
-        <Toolbar sx={{ px: { xs: 2, md: 4 } }}>
+        <div className="flex w-full items-center px-4 md:px-8">
 
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              flexGrow: 1,
-              cursor: "pointer",
-            }}
+          <div
+            className="flex grow cursor-pointer items-center"
             onClick={() => handleNavClick(navItems[0])}
           >
-            <Box sx={{
-              mr: 2,
-              p: 1,
-              border: '1px solid rgba(0, 243, 255, 0.3)',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 0 15px rgba(0, 243, 255, 0.15)',
-              bgcolor: 'rgba(0, 243, 255, 0.05)'
-            }}>
-              <Rocket sx={{ color: "primary.main", fontSize: 24, filter: 'drop-shadow(0 0 5px #00f3ff)' }} />
-            </Box>
-            <Box>
+            <div className="mr-4 flex items-center justify-center rounded-lg border border-[#00f3ff]/30 bg-[#00f3ff]/5 p-2 shadow-[0_0_15px_rgba(0,243,255,0.15)]">
+              <Rocket size={24} className="text-primary [filter:drop-shadow(0_0_5px_#00f3ff)]" />
+            </div>
+            <div>
               <Typography
                 variant="h6"
                 component="div"
-                sx={{
-                  fontWeight: "900",
-                  letterSpacing: 2,
-                  lineHeight: 1,
-                  background: 'linear-gradient(90deg, #fff, #00f3ff)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  mb: 0.5
-                }}
+                className="mb-1 bg-gradient-to-r from-white to-[#00f3ff] bg-clip-text font-black tracking-[2px] leading-none text-transparent [-webkit-text-fill-color:transparent]"
               >
                 {EnvVariables.project.toUpperCase()}
               </Typography>
-              <Typography variant="caption" sx={{ color: 'rgba(0, 243, 255, 0.7)', letterSpacing: 3, fontSize: '0.6rem', display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Box component="span" sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#00f3ff', boxShadow: '0 0 5px #00f3ff' }} />
+              <Typography variant="caption" className="flex items-center gap-2 text-[0.6rem] tracking-[3px] text-[#00f3ff]/70">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#00f3ff] shadow-[0_0_5px_#00f3ff]" />
                 SYSTEM ONLINE
               </Typography>
-            </Box>
-          </Box>
+            </div>
+          </div>
 
 
 
-          <Box
-            sx={{
-              display: { xs: "none", md: "flex" },
-              gap: 0.5,
-              alignItems: "center",
-              ml: 2,
-              p: 0.5,
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: 3,
-              bgcolor: 'rgba(0,0,0,0.3)',
-              backdropFilter: 'blur(5px)'
-            }}
+          <div
+            className="ml-4 hidden items-center gap-1 rounded-xl border border-white/[0.08] bg-black/30 p-1 backdrop-blur-sm md:flex"
           >
             {navItems.filter(item => !item.auth || userInfo).map((item) => {
               const isActive = pathname === item.path;
@@ -242,7 +189,7 @@ export const Navbar = () => {
               );
 
               return (
-                <Box key={item.id} sx={{ position: 'relative' }}>
+                <div key={item.id} className="relative">
                   {isActive && (
                     <motion.div
                       layoutId="navbar-indicator"
@@ -258,79 +205,39 @@ export const Navbar = () => {
                   )}
                   {isOperations ? (
                     <Tooltip
-                      title={tooltipText}
-                      arrow
-                      placement="bottom"
-                      componentsProps={{
-                        tooltip: {
-                          sx: {
-                            bgcolor: 'rgba(10, 10, 10, 0.95)',
-                            border: '1px solid rgba(212, 163, 115, 0.3)',
-                            color: '#E6C594',
-                            boxShadow: '0 4px 20px rgba(0,0,0,0.8)',
-                            fontWeight: 'bold',
-                            p: 1.5
-                          }
-                        },
-                        arrow: {
-                          sx: {
-                            color: 'rgba(10, 10, 10, 0.95)'
-                          }
-                        }
-                      }}
+                      content={tooltipText}
+                      side="bottom"
+                      className="border-[rgba(212,163,115,0.3)] bg-[rgba(10,10,10,0.95)] p-3 font-bold text-[#E6C594] shadow-[0_4px_20px_rgba(0,0,0,0.8)]"
                     >
                       <span>{buttonContent}</span>
                     </Tooltip>
                   ) : buttonContent}
-                </Box>
+                </div>
               );
             })}
-          </Box>
+          </div>
 
-          <Box sx={{
-            height: 30,
-            width: '1px',
-            bgcolor: 'rgba(255,255,255,0.1)',
-            mx: 2,
-            display: { xs: "none", md: "block" }
-          }} />
+          <div className="mx-4 hidden h-[30px] w-px bg-white/10 md:block" />
 
-          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 2 }}>
+          <div className="hidden items-center gap-4 md:flex">
             {userInfo && <LabNavbarIndicator />}
             <NavbarUserMenu
               userInfo={userInfo}
               onLogoutClick={() => setLogoutConfirmOpen(true)}
             />
-          </Box>
+          </div>
 
-          <IconButton
-            color="inherit"
+          <button
             aria-label="open drawer"
-            edge="start"
             onClick={handleDrawerToggle}
-            sx={{ display: { md: "none" } }}
+            className="rounded p-2 text-white md:hidden"
           >
             <MenuIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      <Box component="nav">
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true,
-          }}
-          sx={{
-            display: { xs: "block", md: "none" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: 240,
-              bgcolor: "background.default",
-            },
-          }}
-        >
+          </button>
+        </div>
+      </header>
+      <nav>
+        <Drawer open={mobileOpen} onClose={handleDrawerToggle} side="left" className="md:hidden">
           <NavbarDrawer
             handleDrawerToggle={handleDrawerToggle}
             selectedNetwork={selectedNetwork}
@@ -343,13 +250,13 @@ export const Navbar = () => {
             dispatch={dispatch}
           />
         </Drawer>
-      </Box>
+      </nav>
 
       <LogoutDialog
         open={logoutConfirmOpen}
         onClose={() => setLogoutConfirmOpen(false)}
         onConfirm={() => router.push('/auth/logging-out')}
       />
-    </Box>
+    </div>
   );
 };
