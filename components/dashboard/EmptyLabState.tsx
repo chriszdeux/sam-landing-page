@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, CircularProgress } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { createLaboratory } from '../../lib/features/labs/actions';
 import { setUserInfo } from '../../lib/features/auth/reducer';
+import { Typography } from '../ui/Typography';
+import { Button } from '../ui/Button';
 
 const animationSteps = [
     { text: '⚙️ Codificando variables de entorno...' },
@@ -23,7 +24,7 @@ export const EmptyLabState = () => {
 
         const stepDuration = 2000;
         const totalDuration = animationSteps.length * stepDuration;
-        
+
         const interval = setInterval(() => {
             setCurrentStepIndex((prev) => {
                 if (prev < animationSteps.length - 1) return prev + 1;
@@ -34,7 +35,7 @@ export const EmptyLabState = () => {
         try {
             const startTime = Date.now();
             const labResult = await dispatch(createLaboratory({})).unwrap();
-            
+
             const elapsedTime = Date.now() - startTime;
             const remainingTime = Math.max(0, totalDuration - elapsedTime);
 
@@ -57,19 +58,7 @@ export const EmptyLabState = () => {
     };
 
     return (
-        <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            minHeight: '50vh',
-            textAlign: 'center',
-            bgcolor: 'rgba(0,0,0,0.5)',
-            borderRadius: 4,
-            border: '1px solid rgba(0, 243, 255, 0.2)',
-            backdropFilter: 'blur(10px)',
-            p: 6
-        }}>
+        <div className="flex min-h-[50vh] flex-col items-center justify-center rounded-2xl border border-[#00f3ff]/20 bg-black/50 p-12 text-center backdrop-blur-md">
             <AnimatePresence mode="wait">
                 {!isAnimating ? (
                     <motion.div
@@ -79,19 +68,19 @@ export const EmptyLabState = () => {
                         exit={{ opacity: 0, scale: 0.8 }}
                         transition={{ duration: 0.4 }}
                     >
-                        <Typography variant="h4" sx={{ color: '#fff', mb: 2, fontWeight: 'bold' }}>
+                        <Typography variant="h4" className="mb-4 font-bold text-white">
                             Laboratorio Inactivo
                         </Typography>
-                        <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.7)', mb: 4, maxWidth: 400, mx: 'auto' }}>
+                        <Typography variant="body1" className="mx-auto mb-8 max-w-[400px] text-white/70">
                             Aún no cuentas con un centro de operaciones mineras. Inicia el aprovisionamiento para interactuar con la red.
                         </Typography>
-                        <Button 
-                            variant="contained" 
+                        <Button
+                            variant="contained"
                             size="large"
                             onClick={handleCreateLab}
-                            sx={{ 
-                                bgcolor: '#00f3ff', 
-                                color: '#000', 
+                            sx={{
+                                bgcolor: '#00f3ff',
+                                color: '#000',
                                 fontWeight: 'bold',
                                 py: 2,
                                 px: 4,
@@ -111,18 +100,18 @@ export const EmptyLabState = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+                        className="flex flex-col items-center"
                     >
-                        <CircularProgress size={60} sx={{ color: '#00f3ff', mb: 4 }} />
+                        <div className="mb-8 h-[60px] w-[60px] animate-spin rounded-full border-4 border-[#00f3ff]/20 border-t-[#00f3ff]" />
                         <motion.div
                             key={currentStepIndex}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5 }}
                         >
-                            <Typography 
-                                variant="h6" 
-                                sx={{ color: '#00f3ff', fontWeight: 'medium', letterSpacing: 1 }}
+                            <Typography
+                                variant="h6"
+                                className="font-medium tracking-wide text-[#00f3ff]"
                             >
                                 {animationSteps[currentStepIndex].text}
                             </Typography>
@@ -130,6 +119,6 @@ export const EmptyLabState = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </Box>
+        </div>
     );
 };

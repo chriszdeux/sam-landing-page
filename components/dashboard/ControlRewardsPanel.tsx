@@ -1,15 +1,16 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Box, Typography, Stack, Button, IconButton } from '@mui/material';
 import { motion } from 'framer-motion';
-import { PowerSettingsNew, History, CardGiftcard } from '@mui/icons-material';
+import { Power, History, Gift } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { toggleLaboratoryPower, toggleOverclock } from '../../lib/features/labs/reducer';
 import { TechFrame } from '../ui/TechFrame';
 import { RootState } from '../../lib/store';
 import { useRouter } from 'next/navigation';
 import { formatHash } from '../../lib/utils/formatHash';
+import { Typography } from '../ui/Typography';
+import { Button } from '../ui/Button';
 
 export const ControlRewardsPanel = React.memo(() => {
     const dispatch = useAppDispatch();
@@ -37,7 +38,7 @@ export const ControlRewardsPanel = React.memo(() => {
         );
     });
     const transactions = useAppSelector((state: RootState) => state.transactions.transactions);
-    
+
     const isActive = isPoweredOn;
 
     const recentTransactions = useMemo(() => transactions.slice(0, 5), [transactions]);
@@ -51,60 +52,55 @@ export const ControlRewardsPanel = React.memo(() => {
     };
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <div className="flex flex-col gap-6">
             {/* Power Toggle & Energy Block */}
             <TechFrame color={isActive ? '#00e676' : 'rgba(255,255,255,0.1)'}>
-                <Box sx={{ p: 3 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                        <Stack direction="row" spacing={2} alignItems="center">
+                <div className="p-6">
+                    <div className="mb-6 flex items-center justify-between">
+                        <div className="flex flex-row items-center gap-4">
                             <motion.div
-                                animate={isActive ? { 
-                                    boxShadow: ['0 0 0px #00e676', '0 0 20px #00e676', '0 0 0px #00e676'] 
+                                animate={isActive ? {
+                                    boxShadow: ['0 0 0px #00e676', '0 0 20px #00e676', '0 0 0px #00e676']
                                 } : {}}
                                 transition={{ repeat: Infinity, duration: 2 }}
                                 style={{ borderRadius: '50%' }}
                             >
-                                <IconButton 
+                                <button
                                     onClick={handleToggle} disabled={isOverheated && !isActive}
-                                    sx={{ 
-                                        p: 1.5, 
-                                        bgcolor: isActive ? 'rgba(0, 230, 118, 0.1)' : 'rgba(255,255,255,0.05)',
+                                    className="rounded-full p-3 transition-all duration-300 hover:scale-105"
+                                    style={{
+                                        backgroundColor: isActive ? 'rgba(0, 230, 118, 0.1)' : 'rgba(255,255,255,0.05)',
                                         color: isActive ? '#00e676' : 'rgba(255,255,255,0.3)',
                                         border: `1px solid ${isActive ? '#00e676' : 'rgba(255,255,255,0.1)'}`,
-                                        transition: 'all 0.3s ease',
-                                        '&:hover': {
-                                            bgcolor: isActive ? 'rgba(0, 230, 118, 0.2)' : 'rgba(255,255,255,0.1)',
-                                            transform: 'scale(1.05)'
-                                        }
                                     }}
                                 >
-                                    <PowerSettingsNew />
-                                </IconButton>
+                                    <Power size={20} />
+                                </button>
                             </motion.div>
-                            <Box>
-                                <Typography variant="body1" sx={{ color: '#fff', fontWeight: 'bold' }}>
+                            <div>
+                                <Typography variant="body1" className="font-bold text-white">
                                     LABORATORIO
                                 </Typography>
-                                <Typography variant="caption" sx={{ color: isActive ? '#00e676' : isOverheated ? '#ff1744' : 'rgba(255,255,255,0.5)', fontWeight: 'bold', display: 'block' }}>
+                                <Typography variant="caption" component="p" className="font-bold" style={{ color: isActive ? '#00e676' : isOverheated ? '#ff1744' : 'rgba(255,255,255,0.5)' }}>
                                     {isOverheated ? 'SISTEMA BLOQUEADO (COOLDOWN)' : isActive ? 'SISTEMA ACTIVO' : 'SISTEMA EN PAUSA'}
                                 </Typography>
-                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'block', fontSize: '0.7rem', mt: 0.5, fontFamily: 'monospace' }}>
+                                <Typography variant="caption" component="p" className="mt-1 font-mono text-[0.7rem] text-white/40">
                                     Acumulado: {formatHash(energy, chronoBurstFreqTypes)}
                                 </Typography>
-                            </Box>
-                        </Stack>
-                    </Box>
+                            </div>
+                        </div>
+                    </div>
 
-                    <Box sx={{ mb: 2 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 'bold' }}>
+                    <div className="mb-4">
+                        <div className="flex items-center justify-between">
+                            <Typography variant="caption" className="font-bold text-white/50">
                                 HASH ACUMULADO LOCAL
                             </Typography>
-                            <Typography variant="h6" sx={{ color: '#00f3ff', fontWeight: 'bold', fontFamily: 'monospace' }}>
+                            <Typography variant="h6" className="font-mono font-bold text-[#00f3ff]">
                                 {formatHash(energy, chronoBurstFreqTypes)}
                             </Typography>
-                        </Box>
-                    </Box>
+                        </div>
+                    </div>
 
                     <Button
                         variant="contained"
@@ -133,66 +129,59 @@ export const ControlRewardsPanel = React.memo(() => {
                     >
                         {isOverclockActive ? 'OVERCLOCK ACTIVO (3X TEMP)' : 'ACTIVAR OVERCLOCK'}
                     </Button>
-                    
-                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', display: 'block', textAlign: 'center', fontStyle: 'italic' }}>
+
+                    <Typography variant="caption" component="p" className="text-center italic text-white/30">
                         Inyección automática de Hash activa al consolidar Round 10
                     </Typography>
-                </Box>
+                </div>
             </TechFrame>
 
             {/* Transactions History Block */}
             <TechFrame color="rgba(255,255,255,0.1)">
-                <Box sx={{ p: 3 }}>
-                    <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
-                        <History sx={{ color: 'rgba(255,255,255,0.5)', fontSize: 20 }} />
-                        <Typography variant="h6" sx={{ color: '#fff', fontWeight: 'bold', fontSize: '1rem' }}>
+                <div className="p-6">
+                    <div className="mb-4 flex flex-row items-center gap-2">
+                        <History size={20} className="text-white/50" />
+                        <Typography variant="h6" className="text-base font-bold text-white">
                             HISTORIAL RECIENTE
                         </Typography>
-                    </Stack>
+                    </div>
 
-                    <Stack spacing={1}>
+                    <div className="flex flex-col gap-2">
                         {recentTransactions.length > 0 ? (
                             recentTransactions.map((tx, i) => (
-                                <Box key={tx.id || i} sx={{ 
-                                    p: 1.5, 
-                                    bgcolor: 'rgba(255,255,255,0.02)', 
-                                    borderRadius: 1,
-                                    border: '1px solid rgba(255,255,255,0.05)',
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center'
-                                }}>
-                                    <Box>
-                                        <Typography variant="caption" sx={{ color: '#fff', fontWeight: 'bold', display: 'block' }}>
+                                <div key={tx.id || i} className="flex items-center justify-between rounded border border-white/5 bg-white/[0.02] p-3">
+                                    <div>
+                                        <Typography variant="caption" component="p" className="font-bold text-white">
                                             {tx.transactionType || 'TRANSACCIÓN'}
                                         </Typography>
-                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)' }}>
+                                        <Typography variant="caption" component="p" className="text-white/40">
                                             {tx.dateCreated ? new Date(tx.dateCreated).toLocaleDateString() : 'Fecha desconocida'}
                                         </Typography>
-                                    </Box>
-                                    <Typography variant="body2" sx={{ 
-                                        color: tx.transactionType === 'BUY' ? '#00e676' : '#ff1744',
-                                        fontWeight: 'bold',
-                                        fontFamily: 'monospace'
-                                    }}>
+                                    </div>
+                                    <Typography
+                                        variant="body2"
+                                        component="p"
+                                        className="font-mono font-bold"
+                                        style={{ color: tx.transactionType === 'BUY' ? '#00e676' : '#ff1744' }}
+                                    >
                                         {tx.transactionType === 'BUY' ? '+' : '-'}{tx.financialInfo?.amount || 0}
                                     </Typography>
-                                </Box>
+                                </div>
                             ))
                         ) : (
-                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.2)', textAlign: 'center', py: 2 }}>
+                            <Typography variant="caption" component="p" className="py-4 text-center text-white/20">
                                 No hay transacciones recientes
                             </Typography>
                         )}
-                    </Stack>
-                </Box>
+                    </div>
+                </div>
             </TechFrame>
 
             {/* Rewards Button */}
             <Button
                 variant="contained"
                 fullWidth
-                startIcon={<CardGiftcard />}
+                startIcon={<Gift size={18} />}
                 onClick={() => router.push('/rewards')}
                 sx={{
                     py: 2,
@@ -202,8 +191,8 @@ export const ControlRewardsPanel = React.memo(() => {
                     fontWeight: 'bold',
                     letterSpacing: 2,
                     boxShadow: '0 0 20px rgba(0, 243, 255, 0.1)',
-                    '&:hover': { 
-                        bgcolor: 'rgba(0, 243, 255, 0.2)', 
+                    '&:hover': {
+                        bgcolor: 'rgba(0, 243, 255, 0.2)',
                         borderColor: '#00f3ff',
                         boxShadow: '0 0 30px rgba(0, 243, 255, 0.2)'
                     }
@@ -211,6 +200,6 @@ export const ControlRewardsPanel = React.memo(() => {
             >
                 VER RECOMPENSAS
             </Button>
-        </Box>
+        </div>
     );
 });

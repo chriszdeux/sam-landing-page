@@ -6,8 +6,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Box, Button, Typography, Stack, Alert, CircularProgress } from '@mui/material';
 import { Input } from '../ui/Input';
+import { Button } from '../ui/Button';
+import { Typography } from '../ui/Typography';
+import { cn } from '@/lib/utils/cn';
 
 //# 1-Importar dependencias y slices de economía
 import { useAppDispatch } from '../../lib/hooks';
@@ -19,29 +21,37 @@ interface BuySellFormsProps {
   currentPrice: number;
 }
 
+const alertClassName = (severity: 'warning' | 'success' | 'error') =>
+  cn(
+    'mb-2 flex items-start gap-2 rounded border-l-4 p-3 text-sm',
+    severity === 'warning' && 'border-warning bg-warning/10 text-warning',
+    severity === 'success' && 'border-success bg-success/10 text-white',
+    severity === 'error' && 'border-error bg-error/10 text-white'
+  );
+
 export const BuySellForms: React.FC<BuySellFormsProps> = ({ assetId, assetSymbol, currentPrice }) => {
-  
+
   //# 2-Definir componente y estados del formulario
   const dispatch = useAppDispatch();
-  
-  
-  
+
+
+
   const [amount, setAmount] = useState('');
-  
-  
-  
+
+
+
   const [mode, setMode] = useState<'buy' | 'sell'>('buy');
-  
-  
-  
+
+
+
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  
-  
-  
+
+
+
   const [message, setMessage] = useState('');
 
-  
-  
+
+
   //# 3-Implementar lógica de compra y venta
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,17 +84,17 @@ export const BuySellForms: React.FC<BuySellFormsProps> = ({ assetId, assetSymbol
 
   const totalCost = amount ? (Number(amount) * currentPrice).toFixed(2) : '0.00';
 
-  
-  
+
+
   //# 4-Renderizar formulario de intercambio de activos
   return (
-    <Box sx={{ p: 3, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 4, border: '1px solid rgba(255,255,255,0.1)' }}>
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
       {mode === 'sell' && (
-        <Alert severity="warning" sx={{ mb: 2, bgcolor: 'transparent', color: '#ffb700' }}>
+        <div className={alertClassName('warning')}>
           La venta de activos conlleva un impuesto de red del 3%.
-        </Alert>
+        </div>
       )}
-      <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
+      <div className="mb-6 flex flex-row gap-4">
         <Button
           fullWidth
           variant={mode === 'buy' ? 'contained' : 'outlined'}
@@ -101,41 +111,31 @@ export const BuySellForms: React.FC<BuySellFormsProps> = ({ assetId, assetSymbol
         >
           Vender
         </Button>
-      </Stack>
+      </div>
 
       <form onSubmit={handleSubmit}>
-        <Stack spacing={3}>
+        <div className="flex flex-col gap-6">
           <Input
             label={`Cantidad de ${assetSymbol}`}
             type="number"
             value={amount}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAmount(e.target.value)}
-            fullWidth
-            sx={{
-              '& .MuiInputBase-input': { color: 'white' },
-              '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' }, 
-               
-               
-            }}
-            containerSx={{
-                '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' }
-            }}
           />
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', color: 'text.secondary' }}>
-            <Typography>Precio por unidad:</Typography>
-            <Typography>${currentPrice.toFixed(2)}</Typography>
-          </Box>
+          <div className="flex justify-between text-foreground-muted">
+            <Typography component="span">Precio por unidad:</Typography>
+            <Typography component="span">${currentPrice.toFixed(2)}</Typography>
+          </div>
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', color: 'white', fontWeight: 'bold' }}>
-            <Typography>Total estimado:</Typography>
-            <Typography>${totalCost}</Typography>
-          </Box>
+          <div className="flex justify-between font-bold text-white">
+            <Typography component="span">Total estimado:</Typography>
+            <Typography component="span">${totalCost}</Typography>
+          </div>
 
           {message && (
-            <Alert severity={status === 'success' ? 'success' : 'error'} sx={{ bgcolor: 'transparent', color: 'white' }}>
+            <div className={alertClassName(status === 'success' ? 'success' : 'error')}>
               {message}
-            </Alert>
+            </div>
           )}
 
           <Button
@@ -146,10 +146,10 @@ export const BuySellForms: React.FC<BuySellFormsProps> = ({ assetId, assetSymbol
             disabled={status === 'loading'}
             fullWidth
           >
-            {status === 'loading' ? <CircularProgress size={24} /> : (mode === 'buy' ? `Comprar ${assetSymbol}` : `Vender ${assetSymbol}`)}
+            {status === 'loading' ? <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-current/30 border-t-current" /> : (mode === 'buy' ? `Comprar ${assetSymbol}` : `Vender ${assetSymbol}`)}
           </Button>
-        </Stack>
+        </div>
       </form>
-    </Box>
+    </div>
   );
 };

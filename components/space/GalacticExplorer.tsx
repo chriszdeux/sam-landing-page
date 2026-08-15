@@ -1,26 +1,113 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Box, Typography, IconButton, Paper, Autocomplete, TextField, Fade, Button, CircularProgress, useMediaQuery, useTheme } from "@mui/material";
-import { ZoomIn, ZoomOut, ArrowBack, Explore, ErrorOutline, DeleteSweep, Menu } from "@mui/icons-material";
+import { motion, AnimatePresence } from "framer-motion";
+import { ZoomIn, ZoomOut, ArrowLeft, Compass, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { fetchGalaxies, fetchSystemsByGalaxy, fetchPlanetsBySystem } from "@/lib/features/space/actions";
 import { Galaxy, SolarSystem, Planet } from "@/lib/features/space/types";
-import { keyframes } from '@mui/system';
+import { Typography } from "../ui/Typography";
+import { Button } from "../ui/Button";
+import { cn } from "@/lib/utils/cn";
 import PlanetCanvas from "./PlanetCanvas";
 
-const pulseGlow = keyframes`
-  0% { border-color: rgba(0, 240, 255, 0.3); box-shadow: 0 0 5px rgba(0, 240, 255, 0.1); }
-  50% { border-color: rgba(0, 240, 255, 0.8); box-shadow: 0 0 20px rgba(0, 240, 255, 0.3); }
-  100% { border-color: rgba(0, 240, 255, 0.3); box-shadow: 0 0 5px rgba(0, 240, 255, 0.1); }
-`;
+// Reemplaza MUI useTheme()/useMediaQuery(theme.breakpoints.down(...)) -
+// mismos puntos de corte (sm=599.98px, md=899.98px) via matchMedia.
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    setMatches(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, [query]);
+  return matches;
+}
 
-const textGlow = keyframes`
-  0% { text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
-  50% { text-shadow: 0 0 25px rgba(0, 240, 255, 0.9), 0 0 40px rgba(0, 240, 255, 0.4); }
-  100% { text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
-`;
+// Selector estilo Autocomplete (MUI) para opciones-objeto (Galaxy/System/
+// Planet) con getOptionLabel + disabled + clear-on-empty. Combobox.tsx
+// (components/ui/) sólo soporta arrays de strings/freeSolo, así que este
+// selector local cubre el caso de opciones-objeto con selección obligatoria.
+function ObjectPicker<T>({
+  options,
+  getLabel,
+  value,
+  onChange,
+  placeholder,
+  disabled,
+  className,
+}: {
+  options: T[];
+  getLabel: (opt: T) => string;
+  value: T | null;
+  onChange: (value: T | null) => void;
+  placeholder: string;
+  disabled?: boolean;
+  className?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState(value ? getLabel(value) : '');
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setQuery(value ? getLabel(value) : '');
+  }, [value]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        setQuery(value ? getLabel(value) : '');
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [value]);
+
+  const filtered = query
+    ? options.filter((o) => getLabel(o).toLowerCase().includes(query.toLowerCase()))
+    : options;
+
+  return (
+    <div ref={rootRef} className={cn('relative', className)}>
+      <input
+        type="text"
+        value={query}
+        disabled={disabled}
+        placeholder={placeholder}
+        onFocus={() => setOpen(true)}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setOpen(true);
+          if (e.target.value === '') onChange(null);
+        }}
+        className="w-full rounded-[14px] border border-white/10 bg-white/5 px-3 py-1.5 font-mono text-[0.9rem] text-white transition-all hover:border-[#00F0FF] focus:border-[#00F0FF] focus:outline-none disabled:opacity-40"
+      />
+      {open && filtered.length > 0 && (
+        <ul className="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-xl border border-white/10 bg-[#0a0a14] py-1 font-mono text-sm shadow-[0_10px_30px_rgba(0,0,0,0.6)]">
+          {filtered.map((opt, i) => (
+            <li key={i}>
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => {
+                  onChange(opt);
+                  setQuery(getLabel(opt));
+                  setOpen(false);
+                }}
+                className="block w-full truncate px-3 py-2 text-left text-white/80 hover:bg-white/5"
+              >
+                {getLabel(opt)}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 type ViewLevel = 'GALAXY' | 'SYSTEM' | 'PLANET';
 
@@ -70,9 +157,8 @@ export default function GalacticExplorer() {
   const clickStart = useRef({ x: 0, y: 0 });
   const lastPinchDistance = useRef<number | null>(null);
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery('(max-width: 599.98px)');
+  const isTablet = useMediaQuery('(max-width: 899.98px)');
 
   // Parallax Galactic Particles
   const [particles] = useState<BackgroundParticle[]>(() => 
@@ -837,7 +923,7 @@ export default function GalacticExplorer() {
   };
 
   return (
-    <Box sx={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', background: '#050514' }}>
+    <div className="relative h-full w-full overflow-hidden bg-[#050514]">
       <canvas
         ref={canvasRef}
         style={{ cursor: isDragging ? 'grabbing' : (hoveredObject ? 'pointer' : 'grab'), width: '100%', height: '100%', touchAction: 'none' }}
@@ -852,35 +938,23 @@ export default function GalacticExplorer() {
       />
 
       {/* TOP NAVIGATION BAR - Optimized for Mobile/Tablet */}
-      <Box sx={{ 
-        position: 'absolute', 
-        top: isMobile ? 10 : 25, 
-        left: 0, 
-        right: 0, 
-        display: 'flex', 
-        flexDirection: 'column',
-        alignItems: 'center', 
-        zIndex: 1000,
-        px: isMobile ? 1.5 : 4,
-        pointerEvents: 'none'
-      }}>
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          width: '100%',
-          mb: (isMobile && !showMobileMenu) ? 0 : 2,
-          pointerEvents: 'auto'
-        }}>
+      <div
+        className={cn(
+          'pointer-events-none absolute inset-x-0 z-[1000] flex flex-col items-center',
+          isMobile ? 'px-3' : 'px-8'
+        )}
+        style={{ top: isMobile ? 10 : 25 }}
+      >
+        <div className={cn('pointer-events-auto flex w-full items-center justify-between', (isMobile && !showMobileMenu) ? 'mb-0' : 'mb-4')}>
           {/* Action Buttons Group */}
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button 
-              variant="outlined" 
+          <div className="flex gap-2">
+            <Button
+              variant="outlined"
               onClick={() => router.back()}
-              sx={{ 
+              sx={{
                 minWidth: isMobile ? '44px' : 'auto',
-                borderRadius: '12px', 
-                textTransform: 'lowercase', 
+                borderRadius: '12px',
+                textTransform: 'lowercase',
                 borderColor: 'rgba(0, 240, 255, 0.4)',
                 color: '#00F0FF',
                 px: isMobile ? 1 : 3,
@@ -894,12 +968,12 @@ export default function GalacticExplorer() {
                 }
               }}
             >
-              <ArrowBack fontSize="small" sx={{ mr: isMobile ? 0 : 1 }} />
+              <ArrowLeft size={18} className={cn(!isMobile && 'mr-2')} />
               {!isMobile && 'regresar'}
             </Button>
 
             {viewLevel !== 'GALAXY' && (
-              <Button 
+              <Button
                 variant="outlined"
                 onClick={() => {
                   if (viewLevel === 'PLANET') {
@@ -925,334 +999,211 @@ export default function GalacticExplorer() {
                 subir nivel
               </Button>
             )}
-          </Box>
+          </div>
 
           {/* Right Controls */}
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <div className="flex gap-2">
             {isMobile && (
-              <IconButton 
+              <button
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
-                sx={{ 
-                  bgcolor: showMobileMenu ? 'rgba(0, 240, 255, 0.2)' : 'rgba(5, 5, 20, 0.85)',
+                className="rounded-xl p-2 backdrop-blur-[15px]"
+                style={{
+                  backgroundColor: showMobileMenu ? 'rgba(0, 240, 255, 0.2)' : 'rgba(5, 5, 20, 0.85)',
                   border: `1px solid ${showMobileMenu ? '#00F0FF' : 'rgba(255,255,255,0.1)'}`,
                   color: showMobileMenu ? '#00F0FF' : 'white',
-                  borderRadius: '12px',
-                  backdropFilter: 'blur(15px)'
                 }}
               >
-                <Explore fontSize="small" />
-              </IconButton>
+                <Compass size={18} />
+              </button>
             )}
 
             {!isMobile && (
-              <Box sx={{ 
-                display: 'flex', 
-                gap: 0.5, 
-                bgcolor: 'rgba(5, 5, 20, 0.85)', 
-                p: 0.5, 
-                borderRadius: '12px', 
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(15px)'
-              }}>
-                <IconButton size="small" onClick={() => { targetZoom.current = Math.max(targetZoom.current - 0.2, 0.2); }} sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: '#00F0FF' } }}><ZoomOut fontSize="small" /></IconButton>
-                <IconButton size="small" onClick={() => { targetZoom.current = Math.min(targetZoom.current + 0.2, 5); }} sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: '#00F0FF' } }}><ZoomIn fontSize="small" /></IconButton>
-              </Box>
+              <div className="flex gap-1 rounded-xl border border-white/10 bg-[rgba(5,5,20,0.85)] p-1 backdrop-blur-[15px]">
+                <button onClick={() => { targetZoom.current = Math.max(targetZoom.current - 0.2, 0.2); }} className="rounded p-1.5 text-white/50 hover:text-[#00F0FF]"><ZoomOut size={18} /></button>
+                <button onClick={() => { targetZoom.current = Math.min(targetZoom.current + 0.2, 5); }} className="rounded p-1.5 text-white/50 hover:text-[#00F0FF]"><ZoomIn size={18} /></button>
+              </div>
             )}
-          </Box>
-        </Box>
+          </div>
+        </div>
 
         {/* SELECTORS BOX - Toggleable on Mobile */}
-        <Fade in={!isMobile || showMobileMenu}>
-          <Box sx={{ 
-            display: (isMobile && !showMobileMenu) ? 'none' : 'flex', 
-            flexDirection: isMobile ? 'column' : 'row',
-            gap: 1.5, 
-            bgcolor: 'rgba(5, 5, 20, 0.9)', 
-            p: isMobile ? 2 : 1, 
-            borderRadius: isMobile ? '24px' : '20px', 
-            backdropFilter: 'blur(25px)',
-            border: '1px solid rgba(0, 240, 255, 0.15)',
-            width: isMobile ? '100%' : 'auto',
-            maxWidth: '95vw',
-            pointerEvents: 'auto',
-            boxShadow: '0 12px 40px rgba(0,0,0,0.6)',
-            mt: isMobile ? 1 : 0
-          }}>
-            {/* Galaxy Selector */}
-            <Autocomplete
-              options={galaxies}
-              getOptionLabel={(option: Galaxy) => option.name}
-              value={galaxies.find(g => g.id === selectedGalaxy) || null}
-              onChange={(_, newValue) => {
-                if (newValue) {
-                  setSelectedGalaxy(newValue.id);
-                  setSelectedSystem(null);
-                  setSelectedPlanet(null);
-                  setViewLevel('SYSTEM');
-                  targetZoom.current = 1.2;
-                  targetOffset.current = { x: 0, y: 0 };
-                  if (isMobile) setShowMobileMenu(false);
-                } else {
-                  setSelectedGalaxy(null);
-                  setViewLevel('GALAXY');
-                }
-              }}
-              renderInput={(params) => (
-                <TextField 
-                  {...params} 
-                  placeholder="seleccionar galaxia" 
-                  variant="standard"
-                  InputProps={{ 
-                    ...params.InputProps, 
-                    disableUnderline: true,
-                    sx: { 
-                      color: 'white', 
-                      fontSize: isMobile ? '0.9rem' : '0.9rem',
-                      fontFamily: "'Geist Mono', monospace",
-                      px: 1.5,
-                      py: isMobile ? 1 : 0.5
-                    }
-                  }}
-                />
+        <AnimatePresence>
+          {(!isMobile || showMobileMenu) && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className={cn(
+                'pointer-events-auto flex gap-3 rounded-2xl border border-[#00F0FF]/[0.15] shadow-[0_12px_40px_rgba(0,0,0,0.6)] backdrop-blur-[25px]',
+                isMobile ? 'mt-2 w-full flex-col p-4' : 'flex-row p-2'
               )}
-              sx={{
-                width: isMobile ? '100%' : (isTablet ? 180 : 220),
-                bgcolor: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '14px',
-                transition: 'all 0.3s ease',
-                '&:hover': { 
-                  borderColor: '#00F0FF',
-                  boxShadow: '0 0 15px rgba(0, 240, 255, 0.2)'
-                },
-                '& .Mui-focused': {
-                  animation: `${pulseGlow} 2s infinite ease-in-out`
-                }
-              }}
-            />
-
-            {/* System Selector */}
-            <Autocomplete
-              options={systems[selectedGalaxy || ''] || []}
-              getOptionLabel={(option: SolarSystem) => option.name}
-              value={(systems[selectedGalaxy || ''] || []).find(s => s.id === selectedSystem) || null}
-              disabled={!selectedGalaxy}
-              onChange={(_, newValue) => {
-                if (newValue) {
-                  setSelectedSystem(newValue.id);
-                  setSelectedPlanet(null);
-                  setViewLevel('PLANET');
-                  targetZoom.current = 1.5;
-                  targetOffset.current = { x: 0, y: 0 };
-                  if (isMobile) setShowMobileMenu(false);
-                } else {
-                  setSelectedSystem(null);
-                  setViewLevel('SYSTEM');
-                }
-              }}
-              renderInput={(params) => (
-                <TextField 
-                  {...params} 
-                  placeholder="seleccionar sistema" 
-                  variant="standard"
-                  InputProps={{ 
-                    ...params.InputProps, 
-                    disableUnderline: true,
-                    sx: { 
-                      color: 'white', 
-                      fontSize: isMobile ? '0.9rem' : '0.9rem',
-                      fontFamily: "'Geist Mono', monospace",
-                      px: 1.5,
-                      py: isMobile ? 1 : 0.5
-                    }
-                  }}
-                />
-              )}
-              sx={{
-                width: isMobile ? '100%' : (isTablet ? 180 : 220),
-                bgcolor: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '14px',
-                opacity: selectedGalaxy ? 1 : 0.4,
-                transition: 'all 0.3s ease',
-                '&:hover': { 
-                  borderColor: '#00F0FF',
-                  boxShadow: '0 0 15px rgba(0, 240, 255, 0.2)'
-                },
-                '& .Mui-focused': {
-                  animation: `${pulseGlow} 2s infinite ease-in-out`
-                }
-              }}
-            />
-
-            {/* Planet Selector */}
-            <Autocomplete
-              options={planets[selectedSystem || ''] || []}
-              getOptionLabel={(option: Planet) => option.name}
-              value={selectedPlanet}
-              disabled={!selectedSystem}
-              onChange={(_, newValue) => {
-                setSelectedPlanet(newValue as Planet);
-                if (isMobile && newValue) setShowMobileMenu(false);
-              }}
-              renderInput={(params) => (
-                <TextField 
-                  {...params} 
-                  placeholder="seleccionar planeta" 
-                  variant="standard"
-                  InputProps={{ 
-                    ...params.InputProps, 
-                    disableUnderline: true,
-                    sx: { 
-                      color: 'white', 
-                      fontSize: isMobile ? '0.9rem' : '0.9rem',
-                      fontFamily: "'Geist Mono', monospace",
-                      px: 1.5,
-                      py: isMobile ? 1 : 0.5
-                    }
-                  }}
-                />
-              )}
-              sx={{
-                width: isMobile ? '100%' : (isTablet ? 180 : 220),
-                bgcolor: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '14px',
-                opacity: selectedSystem ? 1 : 0.4,
-                transition: 'all 0.3s ease',
-                '&:hover': { 
-                  borderColor: '#00F0FF',
-                  boxShadow: '0 0 15px rgba(0, 240, 255, 0.2)'
-                },
-                '& .Mui-focused': {
-                  animation: `${pulseGlow} 2s infinite ease-in-out`
-                }
-              }}
-            />
-
-            {/* Reset Button */}
-            <Box sx={{ display: 'flex', gap: 1, mt: isMobile ? 1 : 0 }}>
-              <IconButton
-                onClick={() => {
-                  setSelectedGalaxy(null);
-                  setSelectedSystem(null);
-                  setSelectedPlanet(null);
-                  setViewLevel('GALAXY');
-                  targetZoom.current = 1;
-                  targetOffset.current = { x: 0, y: 0 };
-                  if (isMobile) setShowMobileMenu(false);
+              style={{ backgroundColor: 'rgba(5, 5, 20, 0.9)', maxWidth: '95vw' }}
+            >
+              {/* Galaxy Selector */}
+              <ObjectPicker
+                options={galaxies}
+                getLabel={(option: Galaxy) => option.name}
+                value={galaxies.find(g => g.id === selectedGalaxy) || null}
+                placeholder="seleccionar galaxia"
+                className={isMobile ? 'w-full' : isTablet ? 'w-[180px]' : 'w-[220px]'}
+                onChange={(newValue) => {
+                  if (newValue) {
+                    setSelectedGalaxy(newValue.id);
+                    setSelectedSystem(null);
+                    setSelectedPlanet(null);
+                    setViewLevel('SYSTEM');
+                    targetZoom.current = 1.2;
+                    targetOffset.current = { x: 0, y: 0 };
+                    if (isMobile) setShowMobileMenu(false);
+                  } else {
+                    setSelectedGalaxy(null);
+                    setViewLevel('GALAXY');
+                  }
                 }}
-                sx={{ 
-                  flex: isMobile ? 1 : 'none',
-                  color: 'rgba(255,77,77,0.8)', 
-                  bgcolor: 'rgba(255, 77, 77, 0.1)',
-                  borderRadius: '14px',
-                  p: isMobile ? 1.5 : 1,
-                  '&:hover': { 
-                    color: '#ff4d4d', 
-                    bgcolor: 'rgba(255, 77, 77, 0.2)',
-                  } 
+              />
+
+              {/* System Selector */}
+              <ObjectPicker
+                options={systems[selectedGalaxy || ''] || []}
+                getLabel={(option: SolarSystem) => option.name}
+                value={(systems[selectedGalaxy || ''] || []).find(s => s.id === selectedSystem) || null}
+                disabled={!selectedGalaxy}
+                placeholder="seleccionar sistema"
+                className={isMobile ? 'w-full' : isTablet ? 'w-[180px]' : 'w-[220px]'}
+                onChange={(newValue) => {
+                  if (newValue) {
+                    setSelectedSystem(newValue.id);
+                    setSelectedPlanet(null);
+                    setViewLevel('PLANET');
+                    targetZoom.current = 1.5;
+                    targetOffset.current = { x: 0, y: 0 };
+                    if (isMobile) setShowMobileMenu(false);
+                  } else {
+                    setSelectedSystem(null);
+                    setViewLevel('SYSTEM');
+                  }
                 }}
-              >
-                <DeleteSweep fontSize={isMobile ? "medium" : "small"} />
-              </IconButton>
-              
-              {isMobile && (
-                <Button
-                  fullWidth
-                  variant="contained"
-                  onClick={() => setShowMobileMenu(false)}
-                  sx={{
-                    flex: 2,
-                    borderRadius: '14px',
-                    bgcolor: 'rgba(0, 240, 255, 0.2)',
-                    color: '#00F0FF',
-                    textTransform: 'lowercase',
-                    fontWeight: 'bold',
-                    '&:hover': { bgcolor: 'rgba(0, 240, 255, 0.3)' }
+              />
+
+              {/* Planet Selector */}
+              <ObjectPicker
+                options={planets[selectedSystem || ''] || []}
+                getLabel={(option: Planet) => option.name}
+                value={selectedPlanet}
+                disabled={!selectedSystem}
+                placeholder="seleccionar planeta"
+                className={isMobile ? 'w-full' : isTablet ? 'w-[180px]' : 'w-[220px]'}
+                onChange={(newValue) => {
+                  setSelectedPlanet(newValue as Planet | null);
+                  if (isMobile && newValue) setShowMobileMenu(false);
+                }}
+              />
+
+              {/* Reset Button */}
+              <div className={cn('flex gap-2', isMobile && 'mt-2')}>
+                <button
+                  onClick={() => {
+                    setSelectedGalaxy(null);
+                    setSelectedSystem(null);
+                    setSelectedPlanet(null);
+                    setViewLevel('GALAXY');
+                    targetZoom.current = 1;
+                    targetOffset.current = { x: 0, y: 0 };
+                    if (isMobile) setShowMobileMenu(false);
                   }}
+                  className={cn(
+                    'rounded-xl bg-[rgba(255,77,77,0.1)] text-[rgba(255,77,77,0.8)] hover:bg-[rgba(255,77,77,0.2)] hover:text-[#ff4d4d]',
+                    isMobile ? 'flex-1 p-3' : 'flex-none p-2'
+                  )}
                 >
-                  cerrar
-                </Button>
-              )}
-            </Box>
-          </Box>
-        </Fade>
-      </Box>
+                  <Trash2 size={isMobile ? 22 : 18} className="mx-auto" />
+                </button>
+
+                {isMobile && (
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    onClick={() => setShowMobileMenu(false)}
+                    sx={{
+                      flex: 2,
+                      borderRadius: '14px',
+                      bgcolor: 'rgba(0, 240, 255, 0.2)',
+                      color: '#00F0FF',
+                      textTransform: 'lowercase',
+                      fontWeight: 'bold',
+                      '&:hover': { bgcolor: 'rgba(0, 240, 255, 0.3)' }
+                    }}
+                  >
+                    cerrar
+                  </Button>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* PLANET DETAIL PANEL */}
-      {selectedPlanet && (
-        <Fade in={true}>
-          <Paper sx={{ 
-            position: 'absolute', 
-            bottom: isMobile ? 0 : 30, 
-            right: isMobile ? 0 : 30, 
-            left: isMobile ? 0 : 'auto',
-            width: isMobile ? '100%' : (isTablet ? 340 : 420),
-            p: isMobile ? 4 : 4, 
-            bgcolor: 'rgba(5, 5, 20, 0.98)', 
-            backdropFilter: 'blur(40px)', 
-            borderRadius: isMobile ? '35px 35px 0 0' : '24px', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            border: '2px solid rgba(0, 240, 255, 0.4)',
-            animation: `${pulseGlow} 4s infinite ease-in-out`,
-            boxShadow: '0 -15px 50px rgba(0,0,0,0.7)',
-            zIndex: 2000
-          }}>
-             <Typography variant="h5" sx={{ 
-               color: '#00F0FF', 
-               mb: 0.5, 
-               fontSize: isMobile ? '2rem' : '2.4rem',
-               fontWeight: '900',
-               letterSpacing: '2px',
-               fontFamily: "'Geist Mono', monospace",
-               animation: `${textGlow} 3s infinite ease-in-out`,
-               textAlign: 'center'
-             }}>
+      <AnimatePresence>
+        {selectedPlanet && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className={cn(
+              'absolute z-[2000] flex flex-col items-center border-2 border-[#00F0FF]/40 bg-[rgba(5,5,20,0.98)] p-8 shadow-[0_-15px_50px_rgba(0,0,0,0.7)] backdrop-blur-[40px] animate-[pulseGlow_4s_infinite_ease-in-out]',
+              isMobile ? 'inset-x-0 bottom-0 w-full rounded-t-[35px]' : 'rounded-3xl'
+            )}
+            style={!isMobile ? { bottom: 30, right: 30, width: isTablet ? 340 : 420 } : undefined}
+          >
+             <Typography
+               variant="h5"
+               component="p"
+               className="mb-1 text-center font-black tracking-[2px] text-[#00F0FF] animate-[textGlow_3s_infinite_ease-in-out]"
+               style={{ fontFamily: "'Geist Mono', monospace", fontSize: isMobile ? '2rem' : '2.4rem' }}
+             >
                {selectedPlanet.name}
              </Typography>
-             
-             <Typography variant="caption" sx={{ color: '#808191', mb: 3, letterSpacing: '2px', textTransform: 'uppercase' }}>
+
+             <Typography variant="caption" component="p" className="mb-6 uppercase tracking-[2px] text-[#808191]">
                {selectedPlanet.type} // TRANSMISSION_STABLE
              </Typography>
 
-             <Box sx={{ position: 'relative', width: '100%', display: 'flex', justifyContent: 'center', mb: 3 }}>
-                <PlanetCanvas 
-                  animate 
-                  seed={selectedPlanet.seed} 
-                  size={isMobile ? 220 : 280} 
-                  terrainHue={selectedPlanet.terrainHue} 
+             <div className="relative mb-6 flex w-full justify-center">
+                <PlanetCanvas
+                  animate
+                  seed={selectedPlanet.seed}
+                  size={isMobile ? 220 : 280}
+                  terrainHue={selectedPlanet.terrainHue}
                   oceanHue={selectedPlanet.oceanHue}
                   faunaHue={selectedPlanet.faunaHue}
                   cloudHue={selectedPlanet.cloudHue}
                   radius={selectedPlanet.radius}
                   hasRings={selectedPlanet.hasRings}
-                  biome={selectedPlanet.biome || "temperate"} 
-                  type={selectedPlanet.type} 
+                  biome={selectedPlanet.biome || "temperate"}
+                  type={selectedPlanet.type}
                   atmosphere={selectedPlanet.atmosphere || 50}
                 />
-             </Box>
+             </div>
 
-             <Box sx={{ width: '100%', mb: 3, p: 2, bgcolor: 'rgba(255,255,255,0.03)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                   <Typography variant="caption" sx={{ color: '#808191' }}>POBLACIÓN</Typography>
-                   <Typography variant="caption" sx={{ color: '#00F0FF', fontWeight: 'bold' }}>{selectedPlanet.population.toLocaleString()}</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                   <Typography variant="caption" sx={{ color: '#808191' }}>ATMÓSFERA</Typography>
-                   <Typography variant="caption" sx={{ color: '#00F0FF', fontWeight: 'bold' }}>{selectedPlanet.atmosphere}%</Typography>
-                </Box>
-             </Box>
+             <div className="mb-6 w-full rounded-2xl border border-white/5 bg-white/[0.03] p-4">
+                <div className="mb-2 flex justify-between">
+                   <Typography variant="caption" component="p" className="text-[#808191]">POBLACIÓN</Typography>
+                   <Typography variant="caption" component="p" className="font-bold text-[#00F0FF]">{selectedPlanet.population.toLocaleString()}</Typography>
+                </div>
+                <div className="flex justify-between">
+                   <Typography variant="caption" component="p" className="text-[#808191]">ATMÓSFERA</Typography>
+                   <Typography variant="caption" component="p" className="font-bold text-[#00F0FF]">{selectedPlanet.atmosphere}%</Typography>
+                </div>
+             </div>
 
-             <Button 
-               fullWidth 
-               variant="outlined" 
+             <Button
+               fullWidth
+               variant="outlined"
                onClick={() => setSelectedPlanet(null)}
-               sx={{ 
-                 borderRadius: '16px', 
-                 color: 'rgba(255,255,255,0.7)', 
+               sx={{
+                 borderRadius: '16px',
+                 color: 'rgba(255,255,255,0.7)',
                  borderColor: 'rgba(255,255,255,0.1)',
                  py: 1.5,
                  textTransform: 'lowercase',
@@ -1265,9 +1216,9 @@ export default function GalacticExplorer() {
              >
                finalizar enlace
              </Button>
-          </Paper>
-        </Fade>
-      )}
-    </Box>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
