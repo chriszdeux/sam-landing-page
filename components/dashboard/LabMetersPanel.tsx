@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Typography, Divider, Grid, Button, Stack, Switch, FormControlLabel } from '@mui/material';
+import { cn } from '@/lib/utils/cn';
 import { useAppSelector, useAppDispatch } from '../../lib/hooks';
 import { TechFrame } from '../ui/TechFrame';
+import { Typography } from '../ui/Typography';
 import { RootState } from '../../lib/store';
 import { animate } from 'framer-motion';
 import { SimulationChart } from './SimulationChart';
 import { getCBUnit, getCBDivisor, processingFrequencies } from '../../lib/constants/blockchainFrequencies';
-import { updateSimulationData, setCooldownState, toggleLaboratoryPower, toggleOverclock } from '../../lib/features/labs/reducer';
 
 interface MeterProps {
     label: string;
@@ -37,55 +37,43 @@ const Meter = React.memo(({ label, value, max, unit = '', color, description, co
     }, [value]);
 
     return (
-        <Box sx={{ mb: compact ? 2 : 4 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', mb: 0.5 }}>
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 'bold', letterSpacing: 1, fontSize: compact ? '0.6rem' : '0.75rem' }}>
+        <div className={compact ? 'mb-4' : 'mb-8'}>
+            <div className="mb-1 flex items-baseline justify-between">
+                <Typography variant="caption" className={cn('font-bold tracking-[1px] text-white/50', compact ? 'text-[0.6rem]' : 'text-[0.75rem]')}>
                     {label}
                 </Typography>
-                <Typography variant={compact ? "body2" : "h6"} sx={{ color, fontWeight: 'bold', fontFamily: 'monospace' }}>
-                    {(unit === '%' || unit === '°C') ? displayValue.toFixed(2) : Math.round(displayValue)}{unit} {!compact && <Typography component="span" variant="caption" sx={{ color: 'rgba(255,255,255,0.3)' }}>/ {max}{unit}</Typography>}
+                <Typography variant={compact ? "body2" : "h6"} className="font-mono font-bold" style={{ color }}>
+                    {(unit === '%' || unit === '°C') ? displayValue.toFixed(2) : Math.round(displayValue)}{unit} {!compact && <span className="text-white/30 text-xs">/ {max}{unit}</span>}
                 </Typography>
-            </Box>
+            </div>
 
-            <Box sx={{
-                height: compact ? 6 : 12,
-                bgcolor: 'rgba(255,255,255,0.05)',
-                borderRadius: 1,
-                overflow: 'hidden',
-                border: '1px solid rgba(255,255,255,0.1)',
-                display: 'flex',
-                gap: 0.5,
-                p: '2px'
-            }}>
+            <div className={cn('flex gap-1 overflow-hidden rounded border border-white/10 bg-white/5 p-0.5', compact ? 'h-1.5' : 'h-3')}>
                 {Array.from({ length: compact ? 10 : 20 }).map((_, i) => {
                     const isActive = (i + 1) * (compact ? 10 : 5) <= percentage;
                     return (
-                        <Box
+                        <div
                             key={i}
-                            sx={{
-                                flex: 1,
-                                height: '100%',
-                                bgcolor: isActive ? color : 'transparent',
-                                borderRadius: '1px',
+                            className="h-full flex-1 rounded-[1px] transition-all duration-300"
+                            style={{
+                                backgroundColor: isActive ? color : 'transparent',
                                 boxShadow: isActive ? `0 0 10px ${color}` : 'none',
                                 opacity: isActive ? 1 : 0.1,
-                                transition: 'all 0.3s ease'
                             }}
                         />
                     );
                 })}
-            </Box>
+            </div>
             {description && (
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', mt: 0.5, display: 'block', fontSize: '0.65rem' }}>
+                <Typography variant="caption" className="mt-1 block text-[0.65rem] text-white/40">
                     {description}
                 </Typography>
             )}
-        </Box>
+        </div>
     );
 });
+Meter.displayName = 'Meter';
 
 export const LabMetersPanel = React.memo(() => {
-    const dispatch = useAppDispatch();
     const labMetersData = useAppSelector((state: RootState) => {
         const lab = state.reducerLabs.currentLab;
         return {
@@ -128,7 +116,7 @@ export const LabMetersPanel = React.memo(() => {
         return true;
     });
 
-    const { temperature, maxTemperature: maxTemp, efficiency, currentLife, hashRate, networkHash, isPoweredOn, isOverclockActive, isOverheated, slots } = labMetersData;
+    const { temperature, maxTemperature: maxTemp, efficiency, currentLife, networkHash, isPoweredOn, isOverheated, slots } = labMetersData;
 
     const [emergencyMode, setEmergencyMode] = useState<boolean>(false);
 
@@ -151,32 +139,21 @@ export const LabMetersPanel = React.memo(() => {
     const lifeColor = currentLife < 30 ? '#ff1744' : '#00e676';
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div className="flex flex-col gap-8">
             {/* Global Telemetry */}
             <TechFrame color={emergencyMode ? "#ff1744" : isPoweredOn ? "rgba(0, 243, 255, 0.3)" : "rgba(255,255,255,0.08)"}>
-                <Box sx={{ p: 3, bgcolor: '#18181b', position: 'relative' }}>
+                <div className="relative bg-[#18181b] p-6">
                     {emergencyMode && (
-                        <Box sx={{
-                            position: 'absolute',
-                            top: 0, left: 0, right: 0,
-                            height: '3px',
-                            bgcolor: '#ff1744',
-                            animation: 'pulse 1s infinite',
-                            zIndex: 10
-                        }} />
+                        <div className="absolute inset-x-0 top-0 z-10 h-[3px] animate-[pulse_1s_infinite] bg-[#ff1744]" />
                     )}
 
-                    <Typography variant="h6" sx={{ color: isPoweredOn ? '#fff' : 'rgba(255,255,255,0.3)', fontWeight: 'bold', mb: 4, textTransform: 'uppercase', letterSpacing: 2 }}>
+                    <Typography
+                        variant="h6"
+                        className="mb-8 font-bold uppercase tracking-[2px]"
+                        style={{ color: isPoweredOn ? '#fff' : 'rgba(255,255,255,0.3)' }}
+                    >
                         Telemetría Global {isOverheated ? '(COOLDOWN)' : !isPoweredOn && '(OFFLINE)'}
                     </Typography>
-
-                    <style>{`
-                        @keyframes pulse {
-                            0% { opacity: 0.5; }
-                            50% { opacity: 1; }
-                            100% { opacity: 0.5; }
-                        }
-                    `}</style>
 
                     <Meter
                         label="TEMPERATURA NÚCLEO"
@@ -215,53 +192,52 @@ export const LabMetersPanel = React.memo(() => {
                     />
 
 
-                </Box>
+                </div>
             </TechFrame>
 
             {/* Slots Telemetry (Dual Thermal Management) */}
             {slots && slots.length > 0 && (
                 <TechFrame color="rgba(0, 243, 255, 0.2)">
-                    <Box sx={{ p: 3 }}>
-                        <Typography variant="overline" sx={{ color: '#00f3ff', fontWeight: 'bold', mb: 3, display: 'block', letterSpacing: 2 }}>
+                    <div className="p-6">
+                        <Typography variant="overline" className="mb-6 block font-bold tracking-[2px] text-[#00f3ff]">
                             Componentes de Hardware (Slots)
                         </Typography>
 
-                        <Grid container spacing={3}>
+                        <div className="flex flex-col gap-6">
                             {slots.map((slot) => {
                                 const sTemp = slot.temperature || 0;
                                 const sColor = sTemp > slot.maxTemperature * 0.8 ? '#ff1744' : '#00f3ff';
                                 return (
-                                    <Grid size={{ xs: 12 }} key={slot.id}>
-                                        <Box sx={{ p: 1.5, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 1, border: '1px solid rgba(255,255,255,0.05)' }}>
-                                            <Typography variant="caption" sx={{ color: '#fff', fontWeight: 'bold', mb: 1, display: 'block' }}>
-                                                {slot.name.toUpperCase()}
+                                    <div key={slot.id} className="rounded border border-white/5 bg-white/[0.02] p-3">
+                                        <Typography variant="caption" className="mb-2 block font-bold text-white">
+                                            {slot.name.toUpperCase()}
+                                        </Typography>
+                                        <Meter
+                                            label="TEMP. COMPONENTE"
+                                            value={sTemp}
+                                            max={slot.maxTemperature}
+                                            unit="°C"
+                                            color={sColor}
+                                            compact
+                                        />
+                                        <div className="flex justify-between">
+                                            <Typography variant="caption" className="text-[0.6rem] text-white/30">
+                                                POTENCIA: ${(slot.hashRate / getCBDivisor(slot.hashRate)).toFixed(1)} ${getCBUnit(slot.hashRate)}
                                             </Typography>
-                                            <Meter
-                                                label="TEMP. COMPONENTE"
-                                                value={sTemp}
-                                                max={slot.maxTemperature}
-                                                unit="°C"
-                                                color={sColor}
-                                                compact
-                                            />
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.6rem' }}>
-                                                    POTENCIA: ${(slot.hashRate / getCBDivisor(slot.hashRate)).toFixed(1)} ${getCBUnit(slot.hashRate)}
-                                                </Typography>
-                                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.6rem' }}>
-                                                    USO: {slot.currentUsage}%
-                                                </Typography>
-                                            </Box>
-                                        </Box>
-                                    </Grid>
+                                            <Typography variant="caption" className="text-[0.6rem] text-white/30">
+                                                USO: {slot.currentUsage}%
+                                            </Typography>
+                                        </div>
+                                    </div>
                                 );
                             })}
-                        </Grid>
-                    </Box>
+                        </div>
+                    </div>
                 </TechFrame>
             )}
 
             <SimulationChart />
-        </Box>
+        </div>
     );
 });
+LabMetersPanel.displayName = 'LabMetersPanel';

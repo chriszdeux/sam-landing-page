@@ -177,6 +177,19 @@ body {
   }
 }
 
+/* Usado por LaboratorySimulation: parpadeo de alerta en modo de emergencia */
+@keyframes labAlertPulse {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+
 /* Usado por HeroSection: efecto de brillo animado sobre el título */
 @keyframes shine {
   to {
