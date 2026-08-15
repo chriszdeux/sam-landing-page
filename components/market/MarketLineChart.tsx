@@ -4,7 +4,7 @@
 
 //# 1-Definir componente de gráfico de línea de mercado
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Typography } from '../ui/Typography';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler, Legend, ScriptableContext } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
@@ -97,11 +97,14 @@ export const MarketLineChart = ({ color = '#00f3ff', height = 300, showLabel = t
 
     //# 3-Renderizar gráfico de línea
     return (
-        <Box sx={{ width: '100%', height: height, bgcolor: 'rgba(0,0,0,0.3)', borderRadius: 2, p: 2, position: 'relative', overflow: 'hidden', mb: 8, border: `1px solid ${color}20` }}>
-            {showLabel && <Typography variant="h6" sx={{ color: color, mb: 1 }}>Tendencia General del Mercado (24h)</Typography>}
-            <Box sx={{ height: 'calc(100% - 30px)', width: '100%' }}>
+        <div
+            className="relative mb-16 w-full overflow-hidden rounded-lg bg-black/30 p-4"
+            style={{ height, border: `1px solid ${color}20` }}
+        >
+            {showLabel && <Typography variant="h6" className="mb-2" style={{ color }}>Tendencia General del Mercado (24h)</Typography>}
+            <div className="h-[calc(100%-30px)] w-full">
                 <Line data={data} options={options} />
-            </Box>
-        </Box>
+            </div>
+        </div>
     );
 };

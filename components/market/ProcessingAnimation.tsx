@@ -13,7 +13,7 @@
  */
 
 import React, { useRef, useEffect, useMemo } from 'react';
-import { Box, Typography, Avatar } from '@mui/material';
+import { Typography } from '../ui/Typography';
 import { motion } from 'framer-motion';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -215,57 +215,33 @@ export const ProcessingAnimation: React.FC<ProcessingAnimationProps> = ({
       }}
     >
       {/* ── Layer 0: scrolling hex hash stream ── */}
-      <Box sx={{
-        position: 'absolute', inset: 0, overflow: 'hidden',
-        pointerEvents: 'none', zIndex: 0, opacity: 0.07,
-      }}>
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-[0.07]">
         {hexColumns.map((rows, col) => (
           <HexColumn key={col} col={col} rows={rows} />
         ))}
-      </Box>
+      </div>
 
       {/* ── Header ── */}
       <Typography
         variant="h6"
-        sx={{
-          color: '#E6C594', mb: 2, fontWeight: 900, letterSpacing: 3,
-          textShadow: '0 0 14px rgba(212,163,115,0.6)',
-          position: 'relative', zIndex: 2, mt: 1,
-          fontFamily: 'monospace',
-        }}
+        className="relative z-[2] mt-1 mb-4 font-mono font-black tracking-[3px] text-[#E6C594] [text-shadow:0_0_14px_rgba(212,163,115,0.6)]"
       >
         PROCESANDO TRANSACCIÓN
       </Typography>
 
       {/* ── Layer 1: Orbit system + Canvas ── */}
-      <Box
-        sx={{
-          position: 'relative',
-          width: 260, height: 260,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          mb: 3, zIndex: 2,
-          /* 3D stage */
-          transformStyle: 'preserve-3d',
-        }}
+      <div
+        className="relative z-[2] mb-6 flex h-[260px] w-[260px] items-center justify-center"
+        style={{ transformStyle: 'preserve-3d' }}
       >
         {/* Canvas particle emitter — sits behind everything else */}
         <ParticleCanvas step={processingStep} />
 
         {/* Radial halo glow — GPU-composited */}
-        <Box sx={{
-          position: 'absolute',
-          width: 220, height: 220,
-          borderRadius: '50%',
-          background: 'radial-gradient(ellipse at center, rgba(212,163,115,0.18) 0%, transparent 68%)',
-          filter: 'blur(18px)',
-          animation: 'haloGlow 2.4s ease-in-out infinite',
-          '@keyframes haloGlow': {
-            '0%,100%': { transform: 'scale(0.88)', opacity: 0.35 },
-            '50%':      { transform: 'scale(1.12)', opacity: 0.85 },
-          },
-          willChange: 'transform, opacity',
-          zIndex: 1,
-        }} />
+        <div
+          className="absolute z-[1] h-[220px] w-[220px] rounded-full [background:radial-gradient(ellipse_at_center,rgba(212,163,115,0.18)_0%,transparent_68%)] blur-[18px] animate-[haloGlow_2.4s_ease-in-out_infinite]"
+          style={{ willChange: 'transform, opacity' }}
+        />
 
         {/* ── SVG orbit rings — 3D perspective ── */}
         <svg
@@ -355,61 +331,51 @@ export const ProcessingAnimation: React.FC<ProcessingAnimationProps> = ({
           transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
           style={{ zIndex: 4, position: 'relative', willChange: 'transform, filter' }}
         >
-          <Avatar
-            src={selectedCrypto?.identification.image256 || selectedCrypto?.identification.image128}
-            sx={{
-              width: 72, height: 72,
-              border: '2.5px solid #D4A373',
-              bgcolor: 'rgba(5,5,12,0.98)',
-              boxShadow: currentGlow,
-              transition: 'box-shadow 0.8s ease',
-              fontWeight: 900, fontSize: '1.4rem',
-            }}
+          <div
+            className="flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-full border-[2.5px] border-[#D4A373] text-[1.4rem] font-black"
+            style={{ backgroundColor: 'rgba(5,5,12,0.98)', boxShadow: currentGlow, transition: 'box-shadow 0.8s ease' }}
           >
-            {selectedCrypto?.identification.symbol?.[0] ?? 'S'}
-          </Avatar>
+            {(selectedCrypto?.identification.image256 || selectedCrypto?.identification.image128) ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={selectedCrypto.identification.image256 || selectedCrypto.identification.image128}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              selectedCrypto?.identification.symbol?.[0] ?? 'S'
+            )}
+          </div>
         </motion.div>
-      </Box>
+      </div>
 
       {/* ── Layer 2: crypto terminal ── */}
-      <Box sx={{
-        width: '100%',
-        bgcolor: 'rgba(0,0,0,0.65)',
-        p: '14px 16px',
-        borderRadius: '10px',
-        border: '1px solid rgba(0,243,255,0.1)',
-        fontFamily: 'monospace',
-        mb: 2,
-        zIndex: 2,
-        position: 'relative',
-        backdropFilter: 'blur(6px)',
-        boxShadow: 'inset 0 0 20px rgba(0,0,0,0.4)',
-      }}>
+      <div className="relative z-[2] mb-4 w-full rounded-[10px] border border-[#00f3ff]/10 bg-black/65 py-[14px] px-4 font-mono shadow-[inset_0_0_20px_rgba(0,0,0,0.4)]" style={{ backdropFilter: 'blur(6px)' }}>
         {/* Terminal title bar */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mb: 1.2 }}>
-          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#ff5f57' }} />
-          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#febc2e' }} />
-          <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#28c840' }} />
-          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.25)', ml: 1, fontSize: '0.6rem', letterSpacing: 1 }}>
+        <div className="mb-[9.6px] flex items-center gap-[6.4px]">
+          <div className="h-2 w-2 rounded-full bg-[#ff5f57]" />
+          <div className="h-2 w-2 rounded-full bg-[#febc2e]" />
+          <div className="h-2 w-2 rounded-full bg-[#28c840]" />
+          <Typography variant="caption" className="ml-2 text-[0.6rem] tracking-[1px] text-white/25">
             CRYPTO_AUDIT_v3.1 — SECURE_CHANNEL
           </Typography>
-        </Box>
+        </div>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.6 }}>
-          <Typography variant="caption" sx={{ color: '#00ff88', fontSize: '0.63rem', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Box component="span" sx={{ color: 'rgba(255,255,255,0.3)' }}>[OK]</Box>
+        <div className="flex flex-col gap-[4.8px]">
+          <Typography variant="caption" className="flex items-center gap-1 text-[0.63rem] text-[#00ff88]">
+            <span className="text-white/30">[OK]</span>
             {' '}NODE_HANDSHAKE ·· wallet:{walletId ? `${walletId.substring(0, 14)}…` : 'N/A'}
           </Typography>
-          <Typography variant="caption" sx={{ color: '#00f3ff', fontSize: '0.63rem' }}>
-            <Box component="span" sx={{ color: 'rgba(255,255,255,0.3)' }}>[OK]</Box>
+          <Typography variant="caption" className="text-[0.63rem] text-[#00f3ff]">
+            <span className="text-white/30">[OK]</span>
             {' '}BLOCKCHAIN_NET · SYNCED · NODES:247 · DIFF:3
           </Typography>
-          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.63rem' }}>
-            <Box component="span" sx={{ color: 'rgba(255,255,255,0.3)' }}>[  ]</Box>
+          <Typography variant="caption" className="text-[0.63rem] text-white/45">
+            <span className="text-white/30">[  ]</span>
             {' '}TX_FEE:{networkFee ? ` ${networkFee} CR` : ' 0 CR'} · ASSET:{selectedCrypto?.identification.symbol ?? '—'} · PRICE:{selectedCrypto?.financial.price?.toLocaleString() ?? '—'}
           </Typography>
           {/* Blinking active line */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.4 }}>
+          <div className="mt-[3.2px] flex items-center gap-1">
             <motion.span
               animate={{ opacity: [1, 0, 1] }}
               transition={{ duration: 0.9, repeat: Infinity }}
@@ -417,7 +383,7 @@ export const ProcessingAnimation: React.FC<ProcessingAnimationProps> = ({
             >
               ▶
             </motion.span>
-            <Typography variant="caption" sx={{ color: '#E6C594', fontSize: '0.63rem', fontWeight: 'bold' }}>
+            <Typography variant="caption" className="text-[0.63rem] font-bold text-[#E6C594]">
               SIGNING_TX · {stepLabel.split(':')[0]}
             </Typography>
             <motion.span
@@ -427,31 +393,31 @@ export const ProcessingAnimation: React.FC<ProcessingAnimationProps> = ({
             >
               █
             </motion.span>
-          </Box>
-        </Box>
-      </Box>
+          </div>
+        </div>
+      </div>
 
       {/* ── Step progress bar ── */}
-      <Box sx={{ width: '100%', mb: 1, zIndex: 2, position: 'relative' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-          <Typography variant="caption" sx={{ color: '#E6C594', fontWeight: 'bold', fontSize: '0.72rem' }}>
+      <div className="relative z-[2] mb-2 w-full">
+        <div className="mb-1 flex justify-between">
+          <Typography variant="caption" className="text-[0.72rem] font-bold text-[#E6C594]">
             {stepLabel}
           </Typography>
-          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.65rem', fontFamily: 'monospace' }}>
+          <Typography variant="caption" className="font-mono text-[0.65rem] text-white/35">
             {processingStep}/4
           </Typography>
-        </Box>
+        </div>
         {/* Track */}
-        <Box sx={{ width: '100%', height: 4, bgcolor: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
+        <div className="h-1 w-full overflow-hidden rounded-lg bg-white/[0.06]">
           <motion.div
             style={{ height: '100%', borderRadius: 4, background: 'linear-gradient(90deg,#D4A373,#00f3ff)', originX: 0 }}
             animate={{ scaleX: processingStep / 4 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
           />
-        </Box>
-      </Box>
+        </div>
+      </div>
 
-      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', zIndex: 2, position: 'relative', fontFamily: 'monospace', letterSpacing: 1 }}>
+      <Typography variant="caption" className="relative z-[2] font-mono tracking-[1px] text-white/30">
         EST. &lt; 10s · 60fps · GPU_ACCEL: ON
       </Typography>
     </motion.div>

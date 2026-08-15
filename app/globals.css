@@ -184,6 +184,18 @@ body {
   }
 }
 
+/* Usado por ProcessingAnimation: halo radial pulsante detrás del avatar */
+@keyframes haloGlow {
+  0%, 100% {
+    transform: scale(0.88);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 0.85;
+  }
+}
+
 /* Usado por Navbar/NavbarDrawer: pulso dorado del item "Operaciones" cuando el lab está encendido */
 @keyframes pulseGold {
   0% {

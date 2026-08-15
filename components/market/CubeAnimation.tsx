@@ -3,9 +3,8 @@
 
 //# 1-Definir componente de animación de cubo
 import React from 'react';
-import { Box } from '@mui/material';
 import { motion } from 'framer-motion';
-import { CheckCircleOutline } from '@mui/icons-material';
+import { CheckCircle2 } from 'lucide-react';
 
 interface CubeAnimationProps {
   type: 'BUY' | 'SELL' | 'TRANSFER';
@@ -21,25 +20,25 @@ const BURST_POSITIONS = [
 export const CubeAnimation = ({ type, status = 'PROCESSING' }: CubeAnimationProps) => {
   const isBuy = type === 'BUY';
   const isSuccess = status === 'SUCCESS';
-  
+
   const burstPositions = BURST_POSITIONS;
 
   //# 2-Renderizar cubo 3D y partículas
   return (
-    <Box sx={{ position: 'relative', width: '100%', height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-      
+    <div className="relative flex h-[400px] w-full items-center justify-center overflow-hidden">
+
 
       <motion.div
 
-        animate={{ 
-          rotateX: isSuccess ? 0 : [0, 360], 
+        animate={{
+          rotateX: isSuccess ? 0 : [0, 360],
           rotateY: isSuccess ? 0 : [0, 360],
           scale: isSuccess ? [1, 1.5, 1.2] : [1, 1.1, 1],
         }}
-        transition={{ 
-          duration: isSuccess ? 0.8 : 10, 
-          repeat: isSuccess ? 0 : Infinity, 
-          ease: isSuccess ? "backOut" : "linear" 
+        transition={{
+          duration: isSuccess ? 0.8 : 10,
+          repeat: isSuccess ? 0 : Infinity,
+          ease: isSuccess ? "backOut" : "linear"
         }}
         style={{
           width: 100,
@@ -58,12 +57,12 @@ export const CubeAnimation = ({ type, status = 'PROCESSING' }: CubeAnimationProp
       >
          {!isSuccess ? (
            <>
-             <Box sx={{ position: 'absolute', width: '100%', height: '100%', border: '1px solid rgba(0,243,255,0.3)', transform: 'translateZ(50px)' }} />
-             <Box sx={{ position: 'absolute', width: '100%', height: '100%', border: '1px solid rgba(0,243,255,0.3)', transform: 'translateZ(-50px)' }} />
-             <Box sx={{ position: 'absolute', width: '100%', height: '100%', border: '1px solid rgba(0,243,255,0.3)', transform: 'rotateY(90deg) translateZ(50px)' }} />
-             <Box sx={{ position: 'absolute', width: '100%', height: '100%', border: '1px solid rgba(0,243,255,0.3)', transform: 'rotateY(90deg) translateZ(-50px)' }} />
-             <Box sx={{ position: 'absolute', width: '100%', height: '100%', border: '1px solid rgba(0,243,255,0.3)', transform: 'rotateX(90deg) translateZ(50px)' }} />
-             <Box sx={{ position: 'absolute', width: '100%', height: '100%', border: '1px solid rgba(0,243,255,0.3)', transform: 'rotateX(90deg) translateZ(-50px)' }} />
+             <div className="absolute inset-0 border border-[#00f3ff]/30" style={{ transform: 'translateZ(50px)' }} />
+             <div className="absolute inset-0 border border-[#00f3ff]/30" style={{ transform: 'translateZ(-50px)' }} />
+             <div className="absolute inset-0 border border-[#00f3ff]/30" style={{ transform: 'rotateY(90deg) translateZ(50px)' }} />
+             <div className="absolute inset-0 border border-[#00f3ff]/30" style={{ transform: 'rotateY(90deg) translateZ(-50px)' }} />
+             <div className="absolute inset-0 border border-[#00f3ff]/30" style={{ transform: 'rotateX(90deg) translateZ(50px)' }} />
+             <div className="absolute inset-0 border border-[#00f3ff]/30" style={{ transform: 'rotateX(90deg) translateZ(-50px)' }} />
            </>
          ) : (
            <motion.div
@@ -71,13 +70,13 @@ export const CubeAnimation = ({ type, status = 'PROCESSING' }: CubeAnimationProp
              animate={{ scale: 1, opacity: 1 }}
              transition={{ delay: 0.2 }}
            >
-             <CheckCircleOutline sx={{ fontSize: 60, color: '#00ff9d' }} />
+             <CheckCircle2 size={60} className="text-[#00ff9d]" />
            </motion.div>
          )}
       </motion.div>
 
       {!isSuccess && (
-      <Box sx={{ position: 'absolute', left: 0, width: '50%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', pl: 5 }}>
+      <div className="absolute left-0 flex h-full w-1/2 items-center justify-start pl-10">
           {[...Array(8)].map((_, i) => (
              <motion.div
                 key={`in-${i}`}
@@ -86,18 +85,18 @@ export const CubeAnimation = ({ type, status = 'PROCESSING' }: CubeAnimationProp
                 transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2, ease: "linear" }}
                 style={{
                     position: 'absolute',
-                    width: isBuy ? 40 : 20, 
+                    width: isBuy ? 40 : 20,
                     height: 10,
-                    backgroundColor: isBuy ? '#00ff9d' : '#00f3ff', 
+                    backgroundColor: isBuy ? '#00ff9d' : '#00f3ff',
                     borderRadius: 2,
                     boxShadow: `0 0 15px ${isBuy ? '#00ff9d' : '#00f3ff'}`
                 }}
              />
           ))}
-      </Box>
+      </div>
       )}
 
-      <Box sx={{ position: 'absolute', right: 0, width: '50%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="absolute right-0 flex h-full w-1/2 items-center justify-center">
           {!isSuccess && [...Array(8)].map((_, i) => (
              <motion.div
                 key={`out-${i}`}
@@ -115,13 +114,13 @@ export const CubeAnimation = ({ type, status = 'PROCESSING' }: CubeAnimationProp
                 }}
              />
           ))}
-          
+
           {isSuccess && burstPositions.map((pos, i) => (
              <motion.div
                 key={`burst-${i}`}
                 initial={{ x: 0, y: 0, opacity: 1, scale: 0.5 }}
-                animate={{ 
-                    x: pos.x, 
+                animate={{
+                    x: pos.x,
                     y: pos.y,
                     opacity: 0,
                     scale: 0
@@ -138,8 +137,8 @@ export const CubeAnimation = ({ type, status = 'PROCESSING' }: CubeAnimationProp
                 }}
              />
           ))}
-      </Box>
+      </div>
 
-    </Box>
+    </div>
   );
 };
