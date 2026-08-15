@@ -1,7 +1,7 @@
 import React from "react";
-import { Box, Typography, Grid, Stack } from "@mui/material";
-import { Bolt, Thermostat } from "@mui/icons-material";
+import { Thermometer } from "lucide-react";
 import { motion } from "framer-motion";
+import { Typography } from "../ui/Typography";
 
 export interface SlotMachine {
   id: string;
@@ -24,7 +24,7 @@ export interface LaboratoryInterface {
   energy: number;
   slots: SlotMachine[];
   createdAt: string | Date;
-  
+
   // Client-side simulation properties
   temperature: number; // Global lab temperature
   efficiency: number;
@@ -45,98 +45,77 @@ export function LaboratorioMetersSection({ labData, currentEnergy, isWinner }: P
   const tempPercent = (globalTemp / maxTemp) * 100;
 
   return (
-    <Box 
-      component={motion.div}
-      animate={isWinner ? { 
+    <motion.div
+      animate={isWinner ? {
         scale: [1, 1.02, 1],
         boxShadow: ["0 0 0px #ffb70000", "0 0 30px #ffb70060", "0 0 0px #ffb70000"]
       } : {}}
       transition={{ duration: 0.8, repeat: isWinner ? Infinity : 0 }}
-      sx={{ 
-        width: '100%', 
-        maxWidth: 1000,
-        p: 2,
-        borderRadius: 4,
-        position: 'relative',
-        transition: 'all 0.5s',
+      className="relative w-full max-w-[1000px] rounded-2xl p-4 transition-all duration-500"
+      style={{
         border: isWinner ? '1px solid #ffb700' : '1px solid transparent',
-        bgcolor: isWinner ? 'rgba(255,183,0,0.05)' : 'transparent'
+        backgroundColor: isWinner ? 'rgba(255,183,0,0.05)' : 'transparent'
       }}
     >
       {isWinner && (
-        <Typography 
-          variant="caption" 
-          sx={{ 
-            position: 'absolute', top: -15, left: '50%', transform: 'translateX(-50%)',
-            bgcolor: '#ffb700', color: '#000', px: 2, py: 0.5, borderRadius: 10,
-            fontWeight: 'bold', zIndex: 10, boxShadow: '0 0 10px #ffb700'
-          }}
+        <Typography
+          variant="caption"
+          className="absolute left-1/2 z-10 -translate-x-1/2 rounded-full bg-[#ffb700] px-4 py-1 font-bold text-black shadow-[0_0_10px_#ffb700]"
+          style={{ top: -15 }}
         >
           ¡COMISIÓN DE RED GANADA!
         </Typography>
       )}
-      <Grid container spacing={4}>
-      {/* System Load Meter */}
-      <Grid size={{ xs: 12, md: 6 }}>
-        <Box sx={{ mb: 1, display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600, letterSpacing: 1 }}>Carga del Sistema</Typography>
-          <Typography variant="caption" sx={{ color: '#00f3ff', fontWeight: 600, letterSpacing: 1 }}>{labData ? `${(labData.efficiency !== undefined ? labData.efficiency : 78).toFixed(2)}% Estable` : '78.00% Estable'}</Typography>
-        </Box>
-        <Box sx={{ 
-          display: 'flex', gap: 1, p: 1.5, 
-          bgcolor: 'rgba(0,0,0,0.5)', borderRadius: 2, 
-          border: '1px solid rgba(0, 243, 255, 0.2)',
-          boxShadow: '0 0 20px rgba(0,243,255,0.05)'
-        }}>
-          {Array.from({ length: 10 }).map((_, index) => {
-            const items = Math.round((labData?.efficiency || 78) / 10);
-            const isActive = index < items;
-            return (
-              <Box 
-                key={index}
-                sx={{ 
-                  flex: 1, height: 12, 
-                  bgcolor: isActive ? '#00f3ff' : 'rgba(0, 243, 255, 0.1)',
-                  borderRadius: 0.5,
-                  transition: 'all 0.3s'
-                }}
-              />
-            );
-          })}
-        </Box>
-      </Grid>
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+        {/* System Load Meter */}
+        <div>
+          <div className="mb-2 flex justify-between">
+            <Typography variant="caption" className="font-semibold tracking-wide text-white/50">Carga del Sistema</Typography>
+            <Typography variant="caption" className="font-semibold tracking-wide text-[#00f3ff]">{labData ? `${(labData.efficiency !== undefined ? labData.efficiency : 78).toFixed(2)}% Estable` : '78.00% Estable'}</Typography>
+          </div>
+          <div className="flex gap-2 rounded-lg border border-[#00f3ff]/20 bg-black/50 p-3 shadow-[0_0_20px_rgba(0,243,255,0.05)]">
+            {Array.from({ length: 10 }).map((_, index) => {
+              const items = Math.round((labData?.efficiency || 78) / 10);
+              const isActive = index < items;
+              return (
+                <div
+                  key={index}
+                  className="h-3 flex-1 rounded-sm transition-all duration-300"
+                  style={{ backgroundColor: isActive ? '#00f3ff' : 'rgba(0, 243, 255, 0.1)' }}
+                />
+              );
+            })}
+          </div>
+        </div>
 
-      {/* Global Temperature Meter */}
-      <Grid size={{ xs: 12, md: 6 }}>
-        <Box sx={{ mb: 1, display: 'flex', justifyContent: 'space-between' }}>
-          <Box display="flex" alignItems="center" gap={0.5}>
-            <Thermostat sx={{ fontSize: 14, color: tempPercent > 80 ? '#ff0055' : 'rgba(255,255,255,0.5)' }} />
-            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600, letterSpacing: 1 }}>
-              Temp. Global Laboratorio
+        {/* Global Temperature Meter */}
+        <div>
+          <div className="mb-2 flex justify-between">
+            <div className="flex items-center gap-1">
+              <Thermometer size={14} style={{ color: tempPercent > 80 ? '#ff0055' : 'rgba(255,255,255,0.5)' }} />
+              <Typography variant="caption" className="font-semibold tracking-wide text-white/50">
+                Temp. Global Laboratorio
+              </Typography>
+            </div>
+            <Typography variant="caption" className="font-semibold tracking-wide" style={{ color: tempPercent > 80 ? '#ff0055' : '#00f3ff' }}>
+              {globalTemp.toFixed(1)}°C / {maxTemp}°C
             </Typography>
-          </Box>
-          <Typography variant="caption" sx={{ color: tempPercent > 80 ? '#ff0055' : '#00f3ff', fontWeight: 600, letterSpacing: 1 }}>
-            {globalTemp.toFixed(1)}°C / {maxTemp}°C
-          </Typography>
-        </Box>
-        <Box sx={{ 
-          height: 12, width: '100%', bgcolor: 'rgba(0,0,0,0.5)', borderRadius: 10, overflow: 'hidden',
-          border: '1px solid rgba(255,255,255,0.05)'
-        }}>
-          <motion.div 
-            initial={{ width: 0 }}
-            animate={{ width: `${tempPercent}%` }}
-            style={{ 
-              height: '100%', 
-              background: tempPercent > 80 
-                ? 'linear-gradient(90deg, #ff0055, #ff5500)' 
-                : 'linear-gradient(90deg, #00f3ff, #0055ff)',
-              boxShadow: tempPercent > 80 ? '0 0 10px #ff0055' : 'none'
-            }}
-          />
-        </Box>
-      </Grid>
-      </Grid>
-    </Box>
+          </div>
+          <div className="h-3 w-full overflow-hidden rounded-full border border-white/5 bg-black/50">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${tempPercent}%` }}
+              style={{
+                height: '100%',
+                background: tempPercent > 80
+                  ? 'linear-gradient(90deg, #ff0055, #ff5500)'
+                  : 'linear-gradient(90deg, #00f3ff, #0055ff)',
+                boxShadow: tempPercent > 80 ? '0 0 10px #ff0055' : 'none'
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </motion.div>
   );
 }
