@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Box, Typography, Button, Paper, Container, Select, MenuItem, FormControl, CircularProgress } from "@mui/material";
-import { DeveloperBoard } from "@mui/icons-material";
+import { Cpu } from "lucide-react";
 import { MiningBackground } from "./MiningBackground";
 import { useAppDispatch } from "../../lib/hooks";
 import { refreshUserInfo } from "../../lib/features/auth/actions";
 import api from "../../lib/api";
 import { User } from "../../lib/features/auth/types";
+import { Typography } from "../ui/Typography";
+import { Button } from "../ui/Button";
 
 export function LaboratorioRegistration({ userInfo }: { userInfo: User }) {
   const dispatch = useAppDispatch();
@@ -15,9 +16,9 @@ export function LaboratorioRegistration({ userInfo }: { userInfo: User }) {
   const [showAnimation, setShowAnimation] = useState(false);
   const [animLines, setAnimLines] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState('');
-  
+
   const labPrice = 500;
-  
+
   const handleRegister = async () => {
     setIsRegistering(true);
     setErrorMessage('');
@@ -31,7 +32,7 @@ export function LaboratorioRegistration({ userInfo }: { userInfo: User }) {
       // Start animation
       setIsRegistering(false);
       setShowAnimation(true);
-      
+
       const payload = res.data;
       const lines = [
         `> INITIALIZING REGISTRATION SEQUENCE...`,
@@ -52,7 +53,7 @@ export function LaboratorioRegistration({ userInfo }: { userInfo: User }) {
         currentLines = [...currentLines, lines[i]];
         setAnimLines(currentLines);
       }
-      
+
       await new Promise(r => setTimeout(r, 1000));
       // Refresh user info to get the updated idLabs and transition to dashboard
       await dispatch(refreshUserInfo()).unwrap();
@@ -68,81 +69,51 @@ export function LaboratorioRegistration({ userInfo }: { userInfo: User }) {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', pt: 12, pb: 6, px: { xs: 2, sm: 3, lg: 4 }, maxWidth: 1400, mx: 'auto', position: 'relative' }}>
+    <div className="relative mx-auto min-h-screen max-w-[1400px] px-4 pb-12 pt-24 sm:px-6 lg:px-8">
       <MiningBackground />
-      <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1, pt: 8 }}>
+      <div className="relative z-[1] mx-auto w-full max-w-[900px] pt-16">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           {showAnimation ? (
-            <Box sx={{ 
-              bgcolor: 'rgba(0,0,0,0.8)', 
-              p: 4, 
-              borderRadius: 2, 
-              border: '1px solid #00f3ff',
-              boxShadow: '0 0 20px rgba(0, 243, 255, 0.2)',
-              color: '#00f3ff',
-              minHeight: 400,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'flex-start'
-            }}>
+            <div className="flex min-h-[400px] flex-col justify-start rounded-lg border border-[#00f3ff] bg-black/80 p-8 text-[#00f3ff] shadow-[0_0_20px_rgba(0,243,255,0.2)]">
               {animLines.map((line, idx) => (
-                <Typography key={idx} sx={{ fontFamily: 'monospace', mb: 1.5, fontSize: '1.1rem' }}>{line}</Typography>
+                <p key={idx} className="mb-3 font-mono text-[1.1rem]">{line}</p>
               ))}
-              <motion.div 
-                animate={{ opacity: [1, 0] }} 
+              <motion.div
+                animate={{ opacity: [1, 0] }}
                 transition={{ repeat: Infinity, duration: 0.8 }}
-                style={{ width: 12, height: 24, backgroundColor: '#00f3ff', display: 'inline-block', marginTop: 8 }}
+                className="mt-2 inline-block h-6 w-3 bg-[#00f3ff]"
               />
-            </Box>
+            </div>
           ) : (
-            <Paper sx={{ 
-              p: 6, 
-              bgcolor: 'rgba(10,12,16,0.8)', 
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(0, 243, 255, 0.2)',
-              borderRadius: 4,
-              textAlign: 'center'
-            }}>
-              <DeveloperBoard sx={{ fontSize: 80, color: '#00f3ff', mb: 3 }} />
-              <Typography variant="h3" sx={{ color: 'white', mb: 2, fontWeight: 'bold' }}>
+            <div className="rounded-2xl border border-[#00f3ff]/20 bg-[rgba(10,12,16,0.8)] p-12 text-center backdrop-blur-md">
+              <Cpu size={80} className="mx-auto mb-6 text-[#00f3ff]" />
+              <Typography variant="h3" className="mb-4 font-bold text-white">
                 REGISTRO DE LABORATORIO
               </Typography>
-              <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.6)', mb: 2 }}>
+              <Typography variant="h6" className="mb-4 text-white/60">
                 No se detectó ningún laboratorio asociado a tu cuenta. Adquiere uno ahora para comenzar a operar.
               </Typography>
-              
-              <Typography variant="body1" sx={{ color: '#00f3ff', mb: 6, fontWeight: 'bold' }}>
+
+              <Typography variant="body1" className="mb-12 font-bold text-[#00f3ff]">
                 Tu Balance: {userInfo.balance || 0} Créditos
               </Typography>
 
               {errorMessage && (
-                <Typography variant="body1" sx={{ color: '#ff3366', mb: 4, fontWeight: 'bold', p: 2, border: '1px solid #ff3366', borderRadius: 2, bgcolor: 'rgba(255, 51, 102, 0.1)' }}>
+                <Typography variant="body1" className="mb-8 rounded-lg border border-[#ff3366] bg-[#ff3366]/10 p-4 font-bold text-[#ff3366]">
                   {errorMessage}
                 </Typography>
               )}
 
-              <FormControl fullWidth sx={{ mb: 6, textAlign: 'left' }}>
-                <Typography variant="overline" sx={{ color: '#00f3ff', mb: 1, fontWeight: 'bold', fontSize: '1rem' }}>TIPO DE LABORATORIO</Typography>
-                <Select
+              <div className="mb-12 text-left">
+                <Typography variant="overline" className="mb-2 block text-base font-bold text-[#00f3ff]">TIPO DE LABORATORIO</Typography>
+                <select
                   value={labType}
                   onChange={(e) => setLabType(e.target.value)}
-                  sx={{
-                    color: 'white',
-                    bgcolor: 'rgba(0,0,0,0.5)',
-                    fontSize: '1.2rem',
-                    py: 1,
-                    '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0, 243, 255, 0.3)' },
-                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00f3ff' },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00f3ff' },
-                    '& .MuiSvgIcon-root': { color: '#00f3ff' }
-                  }}
-                  MenuProps={{ PaperProps: { sx: { bgcolor: '#12141c', border: '1px solid rgba(0, 243, 255, 0.2)' } } }}
+                  className="w-full rounded border border-[#00f3ff]/30 bg-black/50 px-3 py-2 text-lg text-white hover:border-[#00f3ff] focus:border-[#00f3ff] focus:outline-none"
                 >
-                  <MenuItem value="Mining" sx={{ color: 'white', py: 2, fontSize: '1.1rem', '&:hover': { bgcolor: 'rgba(0,243,255,0.1)' } }}>
-                    Minado / Validador de transacciones
-                  </MenuItem>
-                </Select>
-              </FormControl>
+                  <option value="Mining">Minado / Validador de transacciones</option>
+                </select>
+              </div>
 
               <Button
                 fullWidth
@@ -165,12 +136,12 @@ export function LaboratorioRegistration({ userInfo }: { userInfo: User }) {
                   }
                 }}
               >
-                {isRegistering ? <CircularProgress size={28} sx={{ color: '#00f3ff' }} /> : `COMPRAR LABORATORIO (${labPrice} CRÉDITOS)`}
+                {isRegistering ? <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-[#00f3ff]/30 border-t-[#00f3ff]" /> : `COMPRAR LABORATORIO (${labPrice} CRÉDITOS)`}
               </Button>
-            </Paper>
+            </div>
           )}
         </motion.div>
-      </Container>
-    </Box>
+      </div>
+    </div>
   );
 }

@@ -1,27 +1,10 @@
 import { useState, useEffect } from "react";
-import { 
-  Box, 
-  Typography, 
-  Button, 
-  Paper, 
-  Grid, 
-  Card, 
-  CardContent, 
-  Chip, 
-  CircularProgress,
-  IconButton,
-  Snackbar,
-  Alert
-} from "@mui/material";
-import { 
-  PrecisionManufacturing, 
-  Inventory, 
-  Delete,
-  Add
-} from "@mui/icons-material";
-import { motion } from "framer-motion";
+import { Package as PackageIcon, Hammer as HammerIcon, Trash2 as Trash2Icon } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { StationModule } from "../../lib/types/core_modules";
 import api, { hadesApi } from "../../lib/api";
+import { Typography } from "../ui/Typography";
+import { Button } from "../ui/Button";
 
 export function LaboratorioInventory() {
   const [inventory, setInventory] = useState<StationModule[]>([]);
@@ -43,22 +26,28 @@ export function LaboratorioInventory() {
 
   useEffect(() => {
     fetchInventory();
-    
-    const token = window.addEventListener('core_modules-inventory-refresh', fetchInventory);
+
+    window.addEventListener('core_modules-inventory-refresh', fetchInventory);
     return () => window.removeEventListener('core_modules-inventory-refresh', fetchInventory);
   }, []);
+
+  useEffect(() => {
+    if (!errorMsg) return;
+    const timeout = setTimeout(() => setErrorMsg(null), 6000);
+    return () => clearTimeout(timeout);
+  }, [errorMsg]);
 
   const handleForge = async () => {
     setForging(true);
     try {
       const types = ["energy", "science", "bio", "habitat"];
       const randomType = types[Math.floor(Math.random() * types.length)];
-      
+
       const res = await hadesApi.post('/modules', {
         moduleType: randomType,
         shapeType: randomType === "energy" ? "square" : randomType === "science" ? "triangle" : randomType === "bio" ? "circle" : "rectangle"
       });
-      
+
       if (res.data.module) {
         setInventory(prev => [...prev, res.data.module]);
       }
@@ -85,24 +74,24 @@ export function LaboratorioInventory() {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" p={4}>
-        <CircularProgress sx={{ color: '#00f3ff' }} />
-      </Box>
+      <div className="flex justify-center p-8">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-[#00f3ff]" />
+      </div>
     );
   }
 
   return (
-    <Box sx={{ mt: 4 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Box display="flex" alignItems="center" gap={1}>
-          <Inventory sx={{ color: '#00f3ff' }} />
-          <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold' }}>
+    <div className="relative mt-8">
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <PackageIcon size={20} className="text-[#00f3ff]" />
+          <Typography variant="h5" className="font-bold text-white">
             ALMACÉN DE ESTRUCTURAS
           </Typography>
-        </Box>
+        </div>
         <Button
           variant="contained"
-          startIcon={forging ? <CircularProgress size={20} color="inherit" /> : <PrecisionManufacturing />}
+          startIcon={forging ? <div className="h-5 w-5 animate-spin rounded-full border-2 border-current/30 border-t-current" /> : <HammerIcon size={18} />}
           onClick={handleForge}
           disabled={forging}
           sx={{
@@ -114,69 +103,66 @@ export function LaboratorioInventory() {
         >
           {forging ? 'FORJANDO...' : 'FORJAR ESTRUCTURA'}
         </Button>
-      </Box>
+      </div>
 
       {inventory.length === 0 ? (
-        <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(0,243,255,0.2)' }}>
-          <Typography sx={{ color: 'rgba(255,255,255,0.5)' }}>
+        <div className="rounded-paper border border-dashed border-[#00f3ff]/20 bg-white/[0.02] p-8 text-center">
+          <Typography component="p" className="text-white/50">
             No hay estructuras en el almacén. Utiliza la forja para crear una o adquiere módulos en el Mercado Galáctico.
           </Typography>
-        </Paper>
+        </div>
       ) : (
-        <Grid container spacing={2}>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
           {inventory.map((mod) => (
-            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={mod.moduleId}>
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                <Card sx={{ 
-                  bgcolor: 'rgba(10,12,16,0.8)', 
-                  border: '1px solid rgba(0,243,255,0.2)',
-                  position: 'relative',
-                  '&:hover': { border: '1px solid #00f3ff' }
-                }}>
-                  <CardContent>
-                    <Box display="flex" justifyContent="space-between" alignItems="flex-start">
-                      <Box>
-                        <Typography variant="overline" sx={{ color: '#00f3ff', fontWeight: 'bold' }}>
-                          {mod.moduleType.toUpperCase()}
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'white', fontFamily: 'monospace' }}>
-                          ID: {mod.moduleId.slice(0, 8)}
-                        </Typography>
-                      </Box>
-                      <IconButton 
-                        size="small" 
-                        disabled={deletingId === mod.moduleId}
-                        onClick={() => handleDelete(mod.moduleId)}
-                        sx={{ color: 'rgba(255,255,255,0.3)', '&:hover': { color: '#ff3366' } }}
-                      >
-                        {deletingId === mod.moduleId ? <CircularProgress size={16} color="inherit" /> : <Delete fontSize="small" />}
-                      </IconButton>
-                    </Box>
-                    <Box mt={2} display="flex" gap={1}>
-                      <Chip 
-                        label={`HP: ${mod.baseVitality}`} 
-                        size="small" 
-                        sx={{ bgcolor: 'rgba(0,243,255,0.1)', color: '#00f3ff', border: '1px solid rgba(0,243,255,0.2)' }} 
-                      />
-                      <Chip 
-                        label={mod.shapeType || 'Standard'} 
-                        size="small" 
-                        sx={{ bgcolor: 'rgba(255,255,255,0.05)', color: 'white' }} 
-                      />
-                    </Box>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </Grid>
+            <motion.div key={mod.moduleId} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <div className="relative rounded-lg border border-[#00f3ff]/20 bg-[rgba(10,12,16,0.8)] p-4 transition-colors hover:border-[#00f3ff]">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <Typography variant="overline" className="font-bold text-[#00f3ff]">
+                      {mod.moduleType.toUpperCase()}
+                    </Typography>
+                    <Typography variant="body2" className="font-mono text-white">
+                      ID: {mod.moduleId.slice(0, 8)}
+                    </Typography>
+                  </div>
+                  <button
+                    disabled={deletingId === mod.moduleId}
+                    onClick={() => handleDelete(mod.moduleId)}
+                    className="rounded p-1 text-white/30 hover:text-[#ff3366]"
+                  >
+                    {deletingId === mod.moduleId ? (
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-current/30 border-t-current" />
+                    ) : (
+                      <Trash2Icon size={16} />
+                    )}
+                  </button>
+                </div>
+                <div className="mt-4 flex gap-2">
+                  <span className="inline-flex items-center rounded-full border border-[#00f3ff]/20 bg-[#00f3ff]/10 px-2.5 py-0.5 text-xs text-[#00f3ff]">
+                    HP: {mod.baseVitality}
+                  </span>
+                  <span className="inline-flex items-center rounded-full bg-white/5 px-2.5 py-0.5 text-xs text-white">
+                    {mod.shapeType || 'Standard'}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
           ))}
-        </Grid>
+        </div>
       )}
 
-      <Snackbar open={!!errorMsg} autoHideDuration={6000} onClose={() => setErrorMsg(null)}>
-        <Alert onClose={() => setErrorMsg(null)} severity="error" variant="filled" sx={{ width: '100%' }}>
-          {errorMsg}
-        </Alert>
-      </Snackbar>
-    </Box>
+      <AnimatePresence>
+        {errorMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-6 right-6 z-50 rounded-lg border border-red-500/30 bg-red-950/90 px-4 py-3 text-sm text-red-200 shadow-lg"
+          >
+            {errorMsg}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
