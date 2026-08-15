@@ -14,10 +14,10 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Typography, Alert, Stack, CircularProgress, InputAdornment, Box } from '@mui/material';
+import { Typography } from '../ui/Typography';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Email, Lock, ErrorOutline } from '@mui/icons-material';
+import { Mail, Lock, AlertCircle } from 'lucide-react';
 
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { login } from '../../lib/features/auth';
@@ -60,47 +60,37 @@ export const LoginForm = () => {
     }
   };
 
-  
-  
+
+
   //# 5-Renderizar formulario de inicio de sesión
   return (
-    <form onSubmit={handleSubmit(onSubmit)} style={{ height: '100%' }}>
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} style={{ height: '100%' }}>
-        
+    <form onSubmit={handleSubmit(onSubmit)} className="h-full">
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="h-full">
 
-        <Box sx={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            
 
-            <Box sx={{ position: 'relative', zIndex: 1, flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <div className="relative flex h-full flex-col">
+
+
+            <div className="relative z-[1] flex flex-grow flex-col justify-center">
                 <TechFrame color="#00f3ff">
-                    <Box sx={{ p: 4, bgcolor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)' }}>
-                        <Box sx={{ mb: 4, textAlign: 'center' }}>
-                            <Typography variant="overline" sx={{ color: '#00f3ff', letterSpacing: 3, display: 'block', mb: 1 }}>
+                    <div className="bg-black/80 p-8 backdrop-blur-md">
+                        <div className="mb-8 text-center">
+                            <Typography variant="overline" className="mb-1 block tracking-[3px] text-[#00f3ff]">
                                 {'// SYSTEM ACCESS'}
                             </Typography>
-                            <Typography variant="h4" gutterBottom sx={{ 
-                                color: 'white', 
-                                textTransform: 'uppercase', 
-                                fontWeight: 'bold',
-                                textShadow: '0 0 20px rgba(0, 243, 255, 0.5)',
-                            }}>
+                            <Typography variant="h4" className="font-bold uppercase text-white [text-shadow:0_0_20px_rgba(0,243,255,0.5)]">
                                 INICIAR SESIÓN
                             </Typography>
-                        </Box>
+                        </div>
 
-                        <Stack spacing={3}>
+                        <div className="flex flex-col gap-6">
                             <Input
                             id="email"
                             label="Email"
                             type="email"
                             error={!!errors.email}
                             helperText={errors.email?.message}
-                            fullWidth
-                            startAdornment={
-                                <InputAdornment position="start">
-                                    <Email sx={{ color: '#00f3ff' }} />
-                                </InputAdornment>
-                            }
+                            startAdornment={<Mail size={18} className="text-[#00f3ff]" />}
                             {...register('email')}
                             />
 
@@ -111,12 +101,7 @@ export const LoginForm = () => {
                             placeholder="******"
                             error={!!errors.password}
                             helperText={errors.password?.message}
-                            fullWidth
-                            startAdornment={
-                                <InputAdornment position="start">
-                                    <Lock sx={{ color: '#00f3ff' }} />
-                                </InputAdornment>
-                            }
+                            startAdornment={<Lock size={18} className="text-[#00f3ff]" />}
                             {...register('password')}
                             />
 
@@ -127,17 +112,10 @@ export const LoginForm = () => {
                                         animate={{ opacity: 1, height: 'auto' }}
                                         exit={{ opacity: 0, height: 0 }}
                                     >
-                                        <Alert 
-                                            severity="error" 
-                                            icon={<ErrorOutline sx={{ color: '#ff0055' }} />}
-                                            sx={{ 
-                                                bgcolor: 'rgba(255, 0, 85, 0.1)', 
-                                                border: '1px solid #ff0055',
-                                                color: '#ffcdd2'
-                                            }}
-                                        >
+                                        <div className="flex items-start gap-2 rounded border border-[#ff0055] bg-[#ff0055]/10 p-3 text-sm text-[#ffcdd2]">
+                                            <AlertCircle size={18} className="mt-0.5 shrink-0 text-[#ff0055]" />
                                             {error}
-                                        </Alert>
+                                        </div>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -153,13 +131,15 @@ export const LoginForm = () => {
                                     boxShadow: '0 0 20px rgba(0, 243, 255, 0.6)'
                                 }
                             }}>
-                            {status === 'loading' ? <CircularProgress size={24} color="inherit" /> : 'ACCEDER'}
+                            {status === 'loading' ? (
+                                <div className="h-6 w-6 animate-spin rounded-full border-2 border-black/20 border-t-black" />
+                            ) : 'ACCEDER'}
                             </Button>
-                        </Stack>
-                    </Box>
+                        </div>
+                    </div>
                 </TechFrame>
-            </Box>
-        </Box>
+            </div>
+        </div>
       </motion.div>
     </form>
   );

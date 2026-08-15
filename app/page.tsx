@@ -8,7 +8,6 @@ import { Rocket, BarChart2, ShoppingCart, Blocks } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Background } from '../components/layout/Background';
 import { Footer } from '../components/layout/Footer';
-import { Modal } from '../components/ui/Modal';
 import { Button } from '../components/ui/Button';
 import { openModal } from '../lib/features/uiSlice';
 import { useAppDispatch, useAppSelector } from '../lib/hooks';
@@ -182,7 +181,6 @@ export default function Home() {
       </HomeSection>
 
       <Footer />
-      <Modal />
     </main>
   );
 }
