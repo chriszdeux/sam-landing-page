@@ -6,7 +6,6 @@
 
 //# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useEffect, useState } from 'react';
-import { Box } from '@mui/material';
 import { motion } from 'framer-motion';
 
 export const MarketAnimation = ({ color }: { color: string }) => {
@@ -38,17 +37,7 @@ export const MarketAnimation = ({ color }: { color: string }) => {
     
     //# 5-Estructuración y renderizado visual del componente UI
     return (
-        <Box sx={{ 
-            width: '100%', 
-            height: '100%', 
-            display: 'flex', 
-            alignItems: 'flex-end', 
-            justifyContent: 'space-between',
-            gap: 1,
-            p: 2,
-            bgcolor: 'rgba(0,0,0,0.5)',
-            overflow: 'hidden'
-        }}>
+        <div className="flex h-full w-full items-end justify-between gap-2 overflow-hidden bg-black/50 p-4">
             {candles.map((height, i) => (
                 <motion.div
                     key={i}
@@ -63,6 +52,6 @@ export const MarketAnimation = ({ color }: { color: string }) => {
                     }}
                 />
             ))}
-        </Box>
+        </div>
     );
 };

@@ -1,23 +1,18 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  Box, 
-  Typography, 
-  IconButton, 
-  Container,
-} from "@mui/material";
-import { 
-  AnimatePresence, 
-  motion 
+import {
+  AnimatePresence,
+  motion
 } from "framer-motion";
-import { 
-  Close as CloseIcon, 
-  ArrowBackIos as PrevIcon, 
-  ArrowForwardIos as NextIcon 
-} from "@mui/icons-material";
+import {
+  X as CloseIcon,
+  ChevronLeft as PrevIcon,
+  ChevronRight as NextIcon
+} from "lucide-react";
 import { HistoryEvent } from "../../lib/data/history";
 import Image from "next/image";
+import { Typography } from "./Typography";
 
 interface Slide {
   type: "intro" | "detail";
@@ -36,10 +31,10 @@ interface CinematicStorytellerProps {
   onClose: () => void;
 }
 
-export const CinematicStoryteller: React.FC<CinematicStorytellerProps> = ({ 
-  data, 
-  isOpen, 
-  onClose 
+export const CinematicStoryteller: React.FC<CinematicStorytellerProps> = ({
+  data,
+  isOpen,
+  onClose
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -90,134 +85,112 @@ export const CinematicStoryteller: React.FC<CinematicStorytellerProps> = ({
   const currentSlide = slides[currentIndex];
 
   return (
-    <Box
-      component={motion.div}
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      sx={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
-        bgcolor: 'rgba(5, 5, 12, 0.98)',
-        zIndex: 9999,
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        backdropFilter: 'blur(20px)',
-      }}
+      className="fixed inset-0 z-[9999] flex h-screen w-screen flex-col overflow-hidden bg-[rgba(5,5,12,0.98)] backdrop-blur-2xl"
     >
       {/* Background Image with Ken Burns effect */}
       <AnimatePresence mode="wait">
-        <Box
+        <motion.div
           key={`bg-${currentIndex}`}
-          component={motion.div}
           initial={{ opacity: 0, scale: 1.1 }}
           animate={{ opacity: 0.4, scale: 1.05 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 1.5, ease: "linear" }}
-          sx={{ position: 'absolute', inset: 0, zIndex: 0 }}
+          className="absolute inset-0 z-0"
         >
           {currentSlide.image ? (
-            <Image 
-              src={currentSlide.image} 
-              alt={currentSlide.caption || "Story Image"} 
-              fill 
+            <Image
+              src={currentSlide.image}
+              alt={currentSlide.caption || "Story Image"}
+              fill
               style={{ objectFit: 'cover' }}
             />
           ) : (
-            <Box sx={{ width: '100%', height: '100%', background: 'radial-gradient(circle at center, rgba(0, 243, 255, 0.1), transparent 70%)' }} />
+            <div className="h-full w-full" style={{ background: 'radial-gradient(circle at center, rgba(0, 243, 255, 0.1), transparent 70%)' }} />
           )}
-        </Box>
+        </motion.div>
       </AnimatePresence>
 
       {/* Header */}
-      <Box sx={{ position: 'absolute', top: 0, width: '100%', p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 10 }}>
-        <Typography variant="overline" sx={{ color: '#00f3ff', letterSpacing: 4, fontWeight: 'bold' }}>
+      <div className="absolute top-0 z-10 flex w-full items-center justify-between p-6">
+        <Typography variant="overline" component="p" className="font-bold tracking-[4px] text-[#00f3ff]">
           LYNCORE ARCHIVE // {currentSlide.year}
         </Typography>
-        <IconButton onClick={onClose} sx={{ color: 'white', '&:hover': { color: '#ff0055' } }}>
-          <CloseIcon fontSize="large" />
-        </IconButton>
-      </Box>
+        <button onClick={onClose} className="text-white transition-colors hover:text-[#ff0055]">
+          <CloseIcon size={32} />
+        </button>
+      </div>
 
       {/* Content Area */}
-      <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5, p: 4 }}>
+      <div className="z-[5] flex flex-1 items-center justify-center p-8">
         <AnimatePresence mode="wait">
-          <Box
+          <motion.div
             key={currentIndex}
-            component={motion.div}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.6 }}
-            sx={{ maxWidth: 800, width: '100%', textAlign: 'center' }}
+            className="w-full max-w-[800px] text-center"
           >
             {currentSlide.type === "intro" ? (
               <>
-                <Typography variant="h1" sx={{ color: 'white', fontWeight: 900, textTransform: 'uppercase', mb: 2, fontSize: { xs: '3rem', md: '5rem' }, textShadow: '0 0 20px rgba(255, 255, 255, 0.5)' }}>
+                <Typography variant="h1" component="p" className="mb-4 text-[3rem] font-black uppercase text-white [text-shadow:0_0_20px_rgba(255,255,255,0.5)] md:text-[5rem]">
                   {currentSlide.year}
                 </Typography>
-                <Typography variant="h3" sx={{ color: '#00f3ff', mb: 4, fontWeight: 'bold' }}>
+                <Typography variant="h3" component="p" className="mb-8 font-bold text-[#00f3ff]">
                   {currentSlide.title}
                 </Typography>
-                <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '1.2rem', lineHeight: 1.8 }}>
+                <Typography variant="body1" component="p" className="text-[1.2rem] leading-[1.8] text-white/70">
                   {currentSlide.description}
                 </Typography>
               </>
             ) : (
-              <Box sx={{ 
-                bgcolor: 'rgba(255,255,255,0.05)', 
-                p: 6, 
-                borderRadius: 4, 
-                border: '1px solid rgba(0, 243, 255, 0.3)',
-                backdropFilter: 'blur(10px)',
-                textAlign: 'left'
-              }}>
-                <Typography variant="overline" sx={{ color: '#ffb700', mb: 1, display: 'block' }}>
+              <div className="rounded-2xl border border-[#00f3ff]/30 bg-white/5 p-12 text-left backdrop-blur-md">
+                <Typography variant="overline" component="p" className="mb-1 block text-[#ffb700]">
                   ESTRELLA DE DATOS
                 </Typography>
-                <Typography variant="h4" sx={{ color: 'white', mb: 3, fontWeight: 'bold' }}>
+                <Typography variant="h4" component="p" className="mb-6 font-bold text-white">
                   {currentSlide.heading}
                 </Typography>
                 {currentSlide.paragraphs?.map((p, i) => (
-                  <Typography key={i} variant="body1" sx={{ color: 'rgba(255,255,255,0.8)', mb: 2, lineHeight: 1.8 }}>
+                  <Typography key={i} variant="body1" component="p" className="mb-4 leading-[1.8] text-white/80">
                     {p}
                   </Typography>
                 ))}
-              </Box>
+              </div>
             )}
-          </Box>
+          </motion.div>
         </AnimatePresence>
-      </Box>
+      </div>
 
       {/* Navigation Controls */}
-      <Box sx={{ position: 'absolute', bottom: 40, width: '100%', display: 'flex', justifyContent: 'center', gap: 4, alignItems: 'center', zIndex: 10 }}>
-        <IconButton 
-          onClick={handlePrev} 
+      <div className="absolute bottom-10 z-10 flex w-full items-center justify-center gap-8">
+        <button
+          onClick={handlePrev}
           disabled={currentIndex === 0}
-          sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.05)', '&:hover': { bgcolor: 'rgba(0, 243, 255, 0.2)' }, '&.Mui-disabled': { color: 'rgba(255,255,255,0.1)' } }}
+          className="rounded-full bg-white/5 p-2 text-white transition-colors hover:bg-[#00f3ff]/20 disabled:text-white/10"
         >
-          <PrevIcon />
-        </IconButton>
-        
+          <PrevIcon size={24} />
+        </button>
+
         {/* Progress Bar */}
-        <Box sx={{ width: 200, height: 4, bgcolor: 'rgba(255,255,255,0.1)', borderRadius: 2, overflow: 'hidden' }}>
-          <motion.div 
-            style={{ height: '100%', background: '#00f3ff' }} 
+        <div className="h-1 w-[200px] overflow-hidden rounded-lg bg-white/10">
+          <motion.div
+            style={{ height: '100%', background: '#00f3ff' }}
             animate={{ width: `${((currentIndex + 1) / slides.length) * 100}%` }}
           />
-        </Box>
+        </div>
 
-        <IconButton 
-          onClick={handleNext} 
-          sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.05)', '&:hover': { bgcolor: 'rgba(0, 243, 255, 0.2)' } }}
+        <button
+          onClick={handleNext}
+          className="rounded-full bg-white/5 p-2 text-white transition-colors hover:bg-[#00f3ff]/20"
         >
-          <NextIcon />
-        </IconButton>
-      </Box>
-    </Box>
+          <NextIcon size={24} />
+        </button>
+      </div>
+    </motion.div>
   );
 };

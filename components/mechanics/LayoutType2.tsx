@@ -3,17 +3,16 @@
 // 3-Estructuración y renderizado visual del componente UI
 
 import React, { useState } from 'react';
-import { Box, Typography, Container, Grid, Stack } from '@mui/material';
 import { motion } from 'framer-motion';
-import { AutoGraph, CheckCircle, Info } from '@mui/icons-material';
+import { TrendingUp, CheckCircle, Info } from 'lucide-react';
 import { Mechanic } from '../../lib/data/mechanics';
 import { FeatureModal } from './FeatureModal';
+import { Typography } from '../ui/Typography';
 
 import { AnimationRegistry } from './AnimationRegistry';
 
 export const LayoutType2 = ({ mechanic }: { mechanic: Mechanic }) => {
-    
-    
+
     //# 1-Rastreo de elemento seleccionado para selected feature
     const [selectedFeature, setSelectedFeature] = useState<{title: string, description: string, modalContent?: string, modalImage?: string} | null>(null);
 
@@ -21,105 +20,92 @@ export const LayoutType2 = ({ mechanic }: { mechanic: Mechanic }) => {
         if (!animationType) return null;
         const AnimationComponent = AnimationRegistry[animationType];
         if (!AnimationComponent) return null;
-        
+
         //# 2-Estructuración y renderizado visual del componente UI
         return <AnimationComponent color={mechanic.color} />;
     };
 
-    
-    
     //# 3-Estructuración y renderizado visual del componente UI
     return (
-    <Box>
-        <FeatureModal 
-            open={!!selectedFeature} 
-            onClose={() => setSelectedFeature(null)} 
-            title={selectedFeature?.title || ''} 
-            description={selectedFeature?.description || ''} 
+    <div>
+        <FeatureModal
+            open={!!selectedFeature}
+            onClose={() => setSelectedFeature(null)}
+            title={selectedFeature?.title || ''}
+            description={selectedFeature?.description || ''}
             content={selectedFeature?.modalContent}
             image={selectedFeature?.modalImage}
             color={mechanic.color}
         />
-        <Box sx={{ 
-            height: '60vh', 
-            position: 'relative', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            bgcolor: 'black',
-            overflow: 'hidden'
-        }}>
+        <div className="relative flex h-[60vh] items-center justify-center overflow-hidden bg-black">
             {renderAnimation(mechanic.backgroundAnimation)}
-            
-            <Box sx={{
-                position: 'absolute',
-                top: '50%', left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: '120%', height: '120%',
-                background: `radial-gradient(circle, ${mechanic.color}20 0%, transparent 70%)`,
-                zIndex: 1
-            }} />
-             <Container maxWidth="md" sx={{ textAlign: 'center', position: 'relative', zIndex: 10 }}>
+
+            <div
+                className="absolute z-[1] h-[120%] w-[120%]"
+                style={{
+                    top: '50%', left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    background: `radial-gradient(circle, ${mechanic.color}20 0%, transparent 70%)`,
+                }}
+            />
+             <div className="relative z-10 mx-auto w-full max-w-[900px] px-4 text-center sm:px-6">
                 <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
                     <mechanic.icon size={64} color={mechanic.color} style={{ marginBottom: 20 }} />
-                    <Typography variant="h1" sx={{ fontWeight: 900, textTransform: 'uppercase', letterSpacing: -2 }}>
+                    <Typography variant="h1" className="font-black uppercase tracking-[-2px]">
                         {mechanic.title}
                     </Typography>
-                    <Typography variant="h5" color="text.secondary" sx={{ mt: 2, fontFamily: 'monospace' }}>
+                    <Typography variant="h5" component="p" className="mt-4 font-mono text-foreground-muted">
                          {mechanic.content.statLabel}: <span style={{ color: mechanic.color }}>{mechanic.content.statValue}</span>
                     </Typography>
                 </motion.div>
-            </Container>
-        </Box>
+            </div>
+        </div>
 
-        <Container maxWidth="lg" sx={{ mt: -10, position: 'relative', zIndex: 20, mb: 10 }}>
-            <Box sx={{ bgcolor: '#0a0a0a', p: { xs: 4, md: 8 }, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)' }}>
-                <Grid container spacing={6}>
-                    <Grid size={{ xs: 12, md: 8 }}>
-                         <Typography variant="h4" gutterBottom sx={{ color: mechanic.color }}>{mechanic.content.heading}</Typography>
+        <div className="relative z-20 mx-auto -mt-20 mb-20 w-full max-w-[1200px] px-4 sm:px-6">
+            <div className="rounded-[32px] border border-white/10 bg-[#0a0a0a] p-8 md:p-16">
+                <div className="grid grid-cols-1 gap-12 md:grid-cols-12">
+                    <div className="md:col-span-8">
+                         <Typography variant="h4" component="p" className="mb-2" style={{ color: mechanic.color }}>{mechanic.content.heading}</Typography>
                          {mechanic.content.paragraphs.map((p: string, i: number) => (
-                             <Typography key={i} paragraph sx={{ color: 'text.secondary', fontSize: '1.1rem', mb: 3 }}>
+                             <Typography key={i} component="p" className="mb-6 text-[1.1rem] text-foreground-muted">
                                  {p}
                              </Typography>
                          ))}
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 4 }}>
-                        <Box sx={{ p: 4, bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 4 }}>
-                            <Typography variant="h6" gutterBottom><AutoGraph sx={{ verticalAlign: 'middle', mr: 1 }} /> Highlights</Typography>
-                            <Stack spacing={2} sx={{ mt: 3 }}>
+                    </div>
+                    <div className="md:col-span-4">
+                        <div className="rounded-2xl bg-white/[0.03] p-8">
+                            <Typography variant="h6" component="p" className="mb-2 flex items-center gap-2"><TrendingUp size={20} className="align-middle" /> Highlights</Typography>
+                            <div className="mt-6 flex flex-col gap-4">
                                 {mechanic.content.features.map((f, i) => (
-                                    <Box 
-                                        key={i} 
-                                        onClick={() => mechanic.id === 'combat' ? setSelectedFeature(f) : null}
-                                        sx={{ 
-                                            display: 'flex', 
-                                            flexDirection: 'column', 
-                                            gap: 1, 
+                                    <div
+                                        key={i}
+                                        onClick={() => mechanic.id === 'combat' ? setSelectedFeature(f) : undefined}
+                                        className={`flex flex-col gap-2 ${mechanic.id === 'combat' ? 'hover:opacity-80' : ''}`}
+                                        style={{
                                             cursor: mechanic.id === 'combat' ? 'pointer' : 'default',
-                                            '&:hover': mechanic.id === 'combat' ? { opacity: 0.8 } : {}
                                         }}
                                     >
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                            <CheckCircle sx={{ color: mechanic.color, fontSize: 20 }} />
-                                            <Typography variant="body1" fontWeight="bold">
+                                        <div className="flex items-center gap-4">
+                                            <CheckCircle size={20} style={{ color: mechanic.color }} />
+                                            <Typography variant="body1" component="p" className="font-bold">
                                                 {f.title}
-                                                {mechanic.id === 'combat' && <Info sx={{ fontSize: 16, ml: 1, color: 'text.secondary' }} />}
+                                                {mechanic.id === 'combat' && <Info size={16} className="ml-2 inline text-foreground-muted" />}
                                             </Typography>
-                                        </Box>
+                                        </div>
                                         {}
                                         {mechanic.id !== 'combat' && (
-                                            <Typography variant="body2" color="gray" sx={{ ml: 4 }}>
+                                            <Typography variant="body2" component="p" className="ml-8 text-gray-400">
                                                 {f.description}
                                             </Typography>
                                         )}
-                                    </Box>
+                                    </div>
                                 ))}
-                            </Stack>
-                        </Box>
-                    </Grid>
-                </Grid>
-            </Box>
-        </Container>
-    </Box>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     );
 };
