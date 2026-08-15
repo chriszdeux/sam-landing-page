@@ -10,15 +10,11 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import {
-  Box, Typography, Stack, CircularProgress, InputAdornment, Alert,
-  Grid, LinearProgress, Chip
-} from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Email, Lock, Person, CalendarToday, Badge,
-  ErrorOutline, CheckCircleOutline, ArrowForward
-} from '@mui/icons-material';
+  Mail, Lock, User, Calendar, IdCard,
+  AlertCircle, CheckCircle2, ArrowRight
+} from 'lucide-react';
 
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { login } from '../../lib/features/auth';
@@ -26,6 +22,7 @@ import { setRegistrationData } from '../../lib/features/auth/reducer';
 import { closeModal } from '../../lib/features/uiSlice';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
+import { Typography } from '../ui/Typography';
 
 //# 2-Definir esquemas y tipos de formularios
 const loginSchema = z.object({
@@ -106,43 +103,22 @@ export const AuthModal = ({ initialMode = 'login' }: AuthModalProps) => {
   const isLogin = mode === 'login';
 
   return (
-    <Box sx={{
-      display: 'flex',
-      minHeight: { xs: 'auto', md: '600px' },
-      borderRadius: 4,
-      overflow: 'hidden',
-      position: 'relative',
-    }}>
+    <div className="relative flex min-h-0 overflow-hidden rounded-2xl md:min-h-[600px]">
       {/* Left decorative panel */}
-      <Box sx={{
-        display: { xs: 'none', md: 'flex' },
-        width: '42%',
-        flexShrink: 0,
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        p: 5,
-        background: isLogin
-          ? 'linear-gradient(145deg, rgba(0,243,255,0.08) 0%, rgba(0,20,40,0.95) 100%)'
-          : 'linear-gradient(145deg, rgba(255,0,85,0.08) 0%, rgba(30,0,20,0.95) 100%)',
-        borderRight: `1px solid ${isLogin ? 'rgba(0,243,255,0.15)' : 'rgba(255,0,85,0.15)'}`,
-        transition: 'all 0.5s ease',
-        position: 'relative',
-        overflow: 'hidden',
-      }}>
+      <div
+        className="relative hidden w-[42%] flex-shrink-0 flex-col items-center justify-center overflow-hidden border-r p-10 transition-all duration-500 md:flex"
+        style={{
+          background: isLogin
+            ? 'linear-gradient(145deg, rgba(0,243,255,0.08) 0%, rgba(0,20,40,0.95) 100%)'
+            : 'linear-gradient(145deg, rgba(255,0,85,0.08) 0%, rgba(30,0,20,0.95) 100%)',
+          borderColor: isLogin ? 'rgba(0,243,255,0.15)' : 'rgba(255,0,85,0.15)',
+        }}
+      >
         {/* Glow orb */}
-        <Box sx={{
-          position: 'absolute',
-          width: 250,
-          height: 250,
-          borderRadius: '50%',
-          bgcolor: isLogin ? '#00f3ff' : '#ff0055',
-          filter: 'blur(80px)',
-          opacity: 0.08,
-          top: '20%',
-          left: '50%',
-          transform: 'translateX(-50%)',
-        }} />
+        <div
+          className="absolute left-1/2 top-[20%] h-[250px] w-[250px] -translate-x-1/2 rounded-full opacity-[0.08] blur-[80px]"
+          style={{ backgroundColor: isLogin ? '#00f3ff' : '#ff0055' }}
+        />
 
         <AnimatePresence mode="wait">
           <motion.div
@@ -153,27 +129,21 @@ export const AuthModal = ({ initialMode = 'login' }: AuthModalProps) => {
             transition={{ duration: 0.4 }}
             style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}
           >
-            <Typography variant="overline" sx={{
-              color: isLogin ? '#00f3ff' : '#ff0055',
-              letterSpacing: 4,
-              fontWeight: 'bold',
-              display: 'block',
-              mb: 2,
-              fontSize: '0.65rem',
-            }}>
+            <Typography
+              variant="overline"
+              className="mb-4 block text-[0.65rem] font-bold tracking-[4px]"
+              style={{ color: isLogin ? '#00f3ff' : '#ff0055' }}
+            >
               {isLogin ? '// SYSTEM ACCESS' : '// NEW OPERATOR'}
             </Typography>
-            <Typography variant="h3" sx={{
-              color: 'white',
-              fontWeight: 900,
-              textTransform: 'uppercase',
-              lineHeight: 1.1,
-              mb: 2,
-              textShadow: `0 0 30px ${isLogin ? 'rgba(0,243,255,0.4)' : 'rgba(255,0,85,0.4)'}`,
-            }}>
+            <Typography
+              variant="h3"
+              className="mb-4 font-black uppercase leading-[1.1] text-white"
+              style={{ textShadow: `0 0 30px ${isLogin ? 'rgba(0,243,255,0.4)' : 'rgba(255,0,85,0.4)'}` }}
+            >
               {isLogin ? 'Bienvenido\nde vuelta' : 'Únete al\nsistema'}
             </Typography>
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, mb: 4, maxWidth: 240, mx: 'auto' }}>
+            <Typography variant="body2" className="mx-auto mb-8 max-w-[240px] leading-[1.7] text-white/50">
               {isLogin
                 ? 'Accede a tu panel de operaciones, gestiona tu hash y audita tus activos en la red.'
                 : 'Crea tu perfil de operador, inicializa tu laboratorio y comienza a minar en la simulación blockchain.'}
@@ -182,7 +152,7 @@ export const AuthModal = ({ initialMode = 'login' }: AuthModalProps) => {
             <Button
               variant="outlined"
               size="small"
-              endIcon={<ArrowForward />}
+              endIcon={<ArrowRight size={18} />}
               onClick={() => setMode(isLogin ? 'register' : 'login')}
               sx={{
                 borderColor: isLogin ? 'rgba(0,243,255,0.4)' : 'rgba(255,0,85,0.4)',
@@ -197,46 +167,35 @@ export const AuthModal = ({ initialMode = 'login' }: AuthModalProps) => {
             </Button>
           </motion.div>
         </AnimatePresence>
-      </Box>
+      </div>
 
       {/* Right form panel */}
-      <Box sx={{
-        flex: 1,
-        p: { xs: 3, md: 5 },
-        bgcolor: 'rgba(8,10,20,0.97)',
-        backdropFilter: 'blur(20px)',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        overflowY: 'auto',
-      }}>
+      <div className="flex flex-1 flex-col justify-center overflow-y-auto bg-[rgba(8,10,20,0.97)] p-6 backdrop-blur-xl md:p-10">
         {/* Mobile mode switcher */}
-        <Box sx={{ display: { xs: 'flex', md: 'none' }, gap: 1, mb: 3, justifyContent: 'center' }}>
-          <Chip
-            label="Iniciar Sesión"
+        <div className="mb-6 flex justify-center gap-2 md:hidden">
+          <button
             onClick={() => setMode('login')}
-            variant={isLogin ? 'filled' : 'outlined'}
-            sx={{
-              bgcolor: isLogin ? '#00f3ff' : 'transparent',
+            className="rounded-full border px-3 py-1 text-[0.7rem] font-bold transition-colors"
+            style={{
+              backgroundColor: isLogin ? '#00f3ff' : 'transparent',
               color: isLogin ? '#000' : '#00f3ff',
               borderColor: '#00f3ff',
-              fontWeight: 'bold',
-              fontSize: '0.7rem',
             }}
-          />
-          <Chip
-            label="Registro"
+          >
+            Iniciar Sesión
+          </button>
+          <button
             onClick={() => setMode('register')}
-            variant={!isLogin ? 'filled' : 'outlined'}
-            sx={{
-              bgcolor: !isLogin ? '#ff0055' : 'transparent',
+            className="rounded-full border px-3 py-1 text-[0.7rem] font-bold transition-colors"
+            style={{
+              backgroundColor: !isLogin ? '#ff0055' : 'transparent',
               color: !isLogin ? '#fff' : '#ff0055',
               borderColor: '#ff0055',
-              fontWeight: 'bold',
-              fontSize: '0.7rem',
             }}
-          />
-        </Box>
+          >
+            Registro
+          </button>
+        </div>
 
         <AnimatePresence mode="wait" custom={isLogin ? -1 : 1}>
           {isLogin ? (
@@ -250,23 +209,19 @@ export const AuthModal = ({ initialMode = 'login' }: AuthModalProps) => {
               transition={{ duration: 0.35, ease: 'easeInOut' }}
             >
               <form onSubmit={loginForm.handleSubmit(onLogin)}>
-                <Typography variant="h5" sx={{
-                  color: 'white', fontWeight: 900, textTransform: 'uppercase',
-                  mb: 0.5, letterSpacing: 1,
-                }}>
+                <Typography variant="h5" className="mb-1 font-black uppercase tracking-[1px] text-white">
                   Iniciar Sesión
                 </Typography>
-                <Box sx={{ width: 40, height: 2, bgcolor: '#00f3ff', mb: 4, boxShadow: '0 0 8px #00f3ff' }} />
+                <div className="mb-8 h-0.5 w-10 bg-[#00f3ff] shadow-[0_0_8px_#00f3ff]" />
 
-                <Stack spacing={2.5}>
+                <div className="flex flex-col gap-5">
                   <Input
                     id="login-email"
                     label="Email"
                     type="email"
                     error={!!loginForm.formState.errors.email}
                     helperText={loginForm.formState.errors.email?.message}
-                    fullWidth
-                    startAdornment={<InputAdornment position="start"><Email sx={{ color: '#00f3ff', fontSize: 18 }} /></InputAdornment>}
+                    startAdornment={<Mail size={18} className="text-[#00f3ff]" />}
                     {...loginForm.register('email')}
                   />
                   <Input
@@ -275,21 +230,17 @@ export const AuthModal = ({ initialMode = 'login' }: AuthModalProps) => {
                     type="password"
                     error={!!loginForm.formState.errors.password}
                     helperText={loginForm.formState.errors.password?.message}
-                    fullWidth
-                    startAdornment={<InputAdornment position="start"><Lock sx={{ color: '#00f3ff', fontSize: 18 }} /></InputAdornment>}
+                    startAdornment={<Lock size={18} className="text-[#00f3ff]" />}
                     {...loginForm.register('password')}
                   />
 
                   <AnimatePresence>
                     {error && (
                       <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
-                        <Alert
-                          severity="error"
-                          icon={<ErrorOutline sx={{ color: '#ff0055' }} />}
-                          sx={{ bgcolor: 'rgba(255,0,85,0.08)', border: '1px solid rgba(255,0,85,0.3)', color: '#ffcdd2', fontSize: '0.8rem' }}
-                        >
+                        <div className="flex items-start gap-2 rounded border border-[#ff0055]/30 bg-[#ff0055]/[0.08] p-3 text-[0.8rem] text-[#ffcdd2]">
+                          <AlertCircle size={18} className="mt-0.5 shrink-0 text-[#ff0055]" />
                           {error}
-                        </Alert>
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -308,9 +259,11 @@ export const AuthModal = ({ initialMode = 'login' }: AuthModalProps) => {
                       transition: 'all 0.2s ease',
                     }}
                   >
-                    {status === 'loading' ? <CircularProgress size={22} color="inherit" /> : 'ACCEDER AL SISTEMA'}
+                    {status === 'loading' ? (
+                      <div className="h-[22px] w-[22px] animate-spin rounded-full border-2 border-black/20 border-t-black" />
+                    ) : 'ACCEDER AL SISTEMA'}
                   </Button>
-                </Stack>
+                </div>
               </form>
             </motion.div>
           ) : (
@@ -324,122 +277,107 @@ export const AuthModal = ({ initialMode = 'login' }: AuthModalProps) => {
               transition={{ duration: 0.35, ease: 'easeInOut' }}
             >
               <form onSubmit={registerForm.handleSubmit(onRegister)}>
-                <Typography variant="h5" sx={{
-                  color: 'white', fontWeight: 900, textTransform: 'uppercase',
-                  mb: 0.5, letterSpacing: 1,
-                }}>
+                <Typography variant="h5" className="mb-1 font-black uppercase tracking-[1px] text-white">
                   Crear Cuenta
                 </Typography>
-                <Box sx={{ width: 40, height: 2, bgcolor: '#ff0055', mb: 4, boxShadow: '0 0 8px #ff0055' }} />
+                <div className="mb-8 h-0.5 w-10 bg-[#ff0055] shadow-[0_0_8px_#ff0055]" />
 
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <Input
-                      id="reg-name"
-                      label="Nombre"
-                      error={!!registerForm.formState.errors.name}
-                      helperText={registerForm.formState.errors.name?.message}
-                      fullWidth
-                      startAdornment={<InputAdornment position="start"><Person sx={{ color: '#ff0055', fontSize: 18 }} /></InputAdornment>}
-                      {...registerForm.register('name')}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <Input
-                      id="reg-lastname"
-                      label="Apellido"
-                      error={!!registerForm.formState.errors.lastName}
-                      helperText={registerForm.formState.errors.lastName?.message}
-                      fullWidth
-                      startAdornment={<InputAdornment position="start"><Person sx={{ color: '#ff0055', fontSize: 18 }} /></InputAdornment>}
-                      {...registerForm.register('lastName')}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12 }}>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Input
+                    id="reg-name"
+                    label="Nombre"
+                    error={!!registerForm.formState.errors.name}
+                    helperText={registerForm.formState.errors.name?.message}
+                    startAdornment={<User size={18} className="text-[#ff0055]" />}
+                    {...registerForm.register('name')}
+                  />
+                  <Input
+                    id="reg-lastname"
+                    label="Apellido"
+                    error={!!registerForm.formState.errors.lastName}
+                    helperText={registerForm.formState.errors.lastName?.message}
+                    startAdornment={<User size={18} className="text-[#ff0055]" />}
+                    {...registerForm.register('lastName')}
+                  />
+                  <div className="sm:col-span-2">
                     <Input
                       id="reg-username"
                       label="Nombre de Usuario"
                       error={!!registerForm.formState.errors.username}
                       helperText={registerForm.formState.errors.username?.message}
-                      fullWidth
-                      startAdornment={<InputAdornment position="start"><Badge sx={{ color: '#ff0055', fontSize: 18 }} /></InputAdornment>}
+                      startAdornment={<IdCard size={18} className="text-[#ff0055]" />}
                       {...registerForm.register('username')}
                     />
-                  </Grid>
-                  <Grid size={{ xs: 12 }}>
+                  </div>
+                  <div className="sm:col-span-2">
                     <Input
                       id="reg-email"
                       label="Email"
                       type="email"
                       error={!!registerForm.formState.errors.email}
                       helperText={registerForm.formState.errors.email?.message}
-                      fullWidth
-                      startAdornment={<InputAdornment position="start"><Email sx={{ color: '#ff0055', fontSize: 18 }} /></InputAdornment>}
+                      startAdornment={<Mail size={18} className="text-[#ff0055]" />}
                       {...registerForm.register('email')}
                     />
-                  </Grid>
-                  <Grid size={{ xs: 12 }}>
+                  </div>
+                  <div className="sm:col-span-2">
                     <Input
                       id="reg-password"
                       label="Contraseña"
                       type="password"
                       error={!!registerForm.formState.errors.password}
                       helperText={registerForm.formState.errors.password?.message}
-                      fullWidth
-                      startAdornment={<InputAdornment position="start"><Lock sx={{ color: '#ff0055', fontSize: 18 }} /></InputAdornment>}
+                      startAdornment={<Lock size={18} className="text-[#ff0055]" />}
                       {...registerForm.register('password', {
                         onChange: (e) => setPassword(e.target.value),
                       })}
                     />
                     {password && (
-                      <Box sx={{ mt: 1 }}>
-                        <LinearProgress
-                          variant="determinate"
-                          value={(strength.score / 4) * 100}
-                          sx={{
-                            height: 3, borderRadius: 2,
-                            bgcolor: 'rgba(255,255,255,0.08)',
-                            '& .MuiLinearProgress-bar': { bgcolor: strength.color, transition: 'all 0.3s ease' },
-                          }}
-                        />
-                        <Typography variant="caption" sx={{ color: strength.color, mt: 0.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          {strength.score >= 3 && <CheckCircleOutline sx={{ fontSize: 12 }} />}
+                      <div className="mt-1">
+                        <div className="h-[3px] w-full overflow-hidden rounded bg-white/[0.08]">
+                          <div
+                            className="h-full rounded transition-all duration-300"
+                            style={{ width: `${(strength.score / 4) * 100}%`, backgroundColor: strength.color }}
+                          />
+                        </div>
+                        <Typography
+                          variant="caption"
+                          className="mt-1 flex items-center gap-1"
+                          style={{ color: strength.color }}
+                        >
+                          {strength.score >= 3 && <CheckCircle2 size={12} />}
                           {strength.label}
                         </Typography>
-                      </Box>
+                      </div>
                     )}
-                  </Grid>
-                  <Grid size={{ xs: 12 }}>
+                  </div>
+                  <div className="sm:col-span-2">
                     <Input
                       id="reg-birthday"
                       label="Fecha de Nacimiento"
                       type="date"
                       error={!!registerForm.formState.errors.birthday}
                       helperText={registerForm.formState.errors.birthday?.message}
-                      fullWidth
-                      startAdornment={<InputAdornment position="start"><CalendarToday sx={{ color: '#ff0055', fontSize: 18 }} /></InputAdornment>}
+                      startAdornment={<Calendar size={18} className="text-[#ff0055]" />}
                       {...registerForm.register('birthday')}
                     />
-                  </Grid>
-                  <Grid size={{ xs: 12 }}>
+                  </div>
+                  <div className="sm:col-span-2">
                     <Input
                       id="reg-referral"
                       label="Código de Referencia (Opcional)"
                       error={!!registerForm.formState.errors.referralCode}
                       helperText={registerForm.formState.errors.referralCode?.message}
-                      fullWidth
                       {...registerForm.register('referralCode')}
                     />
-                  </Grid>
-                </Grid>
+                  </div>
+                </div>
 
                 {error && (
-                  <Alert
-                    severity="error"
-                    sx={{ mt: 2, bgcolor: 'rgba(255,0,85,0.08)', border: '1px solid rgba(255,0,85,0.3)', color: '#ffcdd2', fontSize: '0.8rem' }}
-                  >
+                  <div className="mt-4 flex items-start gap-2 rounded border border-[#ff0055]/30 bg-[#ff0055]/[0.08] p-3 text-[0.8rem] text-[#ffcdd2]">
+                    <AlertCircle size={18} className="mt-0.5 shrink-0 text-[#ff0055]" />
                     {error}
-                  </Alert>
+                  </div>
                 )}
 
                 <Button
@@ -456,13 +394,15 @@ export const AuthModal = ({ initialMode = 'login' }: AuthModalProps) => {
                     transition: 'all 0.2s ease',
                   }}
                 >
-                  {status === 'loading' ? <CircularProgress size={22} color="inherit" /> : 'CREAR CUENTA'}
+                  {status === 'loading' ? (
+                    <div className="h-[22px] w-[22px] animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                  ) : 'CREAR CUENTA'}
                 </Button>
               </form>
             </motion.div>
           )}
         </AnimatePresence>
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };

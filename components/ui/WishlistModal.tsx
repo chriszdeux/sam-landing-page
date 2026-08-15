@@ -1,16 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Typography,
-  Box,
-  CircularProgress,
-} from "@mui/material";
-import { Close as CloseIcon, CheckCircle as CheckCircleIcon } from "@mui/icons-material";
+import { X, CheckCircle } from "lucide-react";
+import { Dialog } from "./Dialog";
+import { Typography } from "./Typography";
 import { Input } from "./Input";
 import { Button } from "./Button";
 
@@ -64,41 +57,30 @@ export const WishlistModal: React.FC<WishlistModalProps> = ({ open, onClose }) =
   };
 
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          bgcolor: 'rgba(10, 15, 30, 0.95)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(0, 243, 255, 0.3)',
-          boxShadow: '0 0 30px rgba(0, 243, 255, 0.2)',
-          borderRadius: 4,
-          color: 'white',
-          maxWidth: 400,
-          width: '100%',
-        }
-      }}
+      className="w-full max-w-[400px] rounded-2xl border border-[#00f3ff]/30 bg-[rgba(10,15,30,0.95)] text-white shadow-[0_0_30px_rgba(0,243,255,0.2)] backdrop-blur-2xl"
     >
-      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h6" fontWeight="bold">Join Lyncore Wishlist</Typography>
-        <IconButton onClick={onClose} sx={{ color: 'rgba(255,255,255,0.7)' }}>
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
-      <DialogContent>
+      <div className="flex items-center justify-between p-6 pb-0">
+        <Typography variant="h6" className="font-bold">Join Lyncore Wishlist</Typography>
+        <button onClick={onClose} className="rounded-full p-1 text-white/70 hover:text-white">
+          <X size={20} />
+        </button>
+      </div>
+      <div className="p-6">
         {status === "success" ? (
-          <Box textAlign="center" py={4}>
-            <CheckCircleIcon sx={{ fontSize: 60, color: '#00f3ff', mb: 2 }} />
+          <div className="py-8 text-center">
+            <CheckCircle size={60} className="mx-auto mb-4 text-[#00f3ff]" />
             <Typography variant="h6">¡Gracias por unirte!</Typography>
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', mt: 1 }}>
+            <Typography variant="body2" className="mt-2 text-white/70">
               Te notificaremos cuando el MVP esté listo.
             </Typography>
-          </Box>
+          </div>
         ) : (
           <form onSubmit={handleSubmit}>
-            <Box sx={{ mt: 1 }}>
-              <Typography variant="body2" sx={{ mb: 3, color: 'rgba(255,255,255,0.7)' }}>
+            <div className="mt-2">
+              <Typography variant="body2" className="mb-6 text-white/70">
                 Sé de los primeros en experimentar el poder de la economía Lyncore. ¡Regístrate ahora!
               </Typography>
               <Input
@@ -117,7 +99,7 @@ export const WishlistModal: React.FC<WishlistModalProps> = ({ open, onClose }) =
                 required
               />
               {status === "error" && (
-                <Typography color="error" variant="caption" sx={{ display: 'block', mt: 1 }}>
+                <Typography variant="caption" className="mt-2 block text-error">
                   {errorMsg}
                 </Typography>
               )}
@@ -129,12 +111,14 @@ export const WishlistModal: React.FC<WishlistModalProps> = ({ open, onClose }) =
                 disabled={status === "loading"}
                 sx={{ mt: 3, py: 1.5, background: 'linear-gradient(45deg, #00f3ff, #0088ff)' }}
               >
-                {status === "loading" ? <CircularProgress size={24} sx={{ color: 'white' }} /> : "Unirse a la Wishlist"}
+                {status === "loading" ? (
+                  <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                ) : "Unirse a la Wishlist"}
               </Button>
-            </Box>
+            </div>
           </form>
         )}
-      </DialogContent>
+      </div>
     </Dialog>
   );
 };
