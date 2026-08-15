@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Box, Typography } from '@mui/material';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { useAppSelector } from '../../lib/hooks';
 import { RootState } from '../../lib/store';
 import { formatHash } from '../../lib/utils/formatHash';
+import { Typography } from '../ui/Typography';
 
 export const SimulationChart = React.memo(() => {
     const chartData = useAppSelector((state: RootState) => {
@@ -28,7 +28,7 @@ export const SimulationChart = React.memo(() => {
     const chronoBurstFreqTypes = useAppSelector((state: RootState) => state.blockchain.chronoBurstFreqTypes);
 
     const { simulationHistory, isPoweredOn, isOverheated, maxTemperature } = chartData;
-    
+
     // Memoize the data transformation to avoid calling toLocaleTimeString on every render
     const data = useMemo(() => simulationHistory.map(point => ({
         ...point,
@@ -36,32 +36,23 @@ export const SimulationChart = React.memo(() => {
     })), [simulationHistory]);
 
     return (
-        <Box sx={{ 
-            width: '100%', 
-            height: 300, 
-            bgcolor: 'rgba(0,0,0,0.3)', 
-            borderRadius: 2, 
-            p: 2,
-            border: '1px solid rgba(255,255,255,0.05)',
-            position: 'relative',
-            overflow: 'hidden'
-        }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 'bold', letterSpacing: 1 }}>
+        <div className="relative h-[300px] w-full overflow-hidden rounded-lg border border-white/5 bg-black/30 p-4">
+            <div className="mb-4 flex justify-between">
+                <Typography variant="caption" className="font-bold tracking-wide text-white/50">
                     MONITOR DE RENDIMIENTO EN TIEMPO REAL
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <Box sx={{ width: 8, height: 8, bgcolor: '#00f3ff', borderRadius: '50%' }} />
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.6rem' }}>HASH RATE</Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <Box sx={{ width: 8, height: 8, bgcolor: '#ff1744', borderRadius: '50%' }} />
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.6rem' }}>TEMP</Typography>
-                    </Box>
-                </Box>
-            </Box>
- 
+                <div className="flex gap-4">
+                    <div className="flex items-center gap-1">
+                        <div className="h-2 w-2 rounded-full bg-[#00f3ff]" />
+                        <Typography variant="caption" className="text-[0.6rem] text-white/40">HASH RATE</Typography>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <div className="h-2 w-2 rounded-full bg-[#ff1744]" />
+                        <Typography variant="caption" className="text-[0.6rem] text-white/40">TEMP</Typography>
+                    </div>
+                </div>
+            </div>
+
             <ResponsiveContainer width="100%" height="85%">
                 <LineChart data={data}>
                     <defs>
@@ -81,21 +72,21 @@ export const SimulationChart = React.memo(() => {
                         </filter>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                    <XAxis 
-                        dataKey="time" 
-                        hide 
+                    <XAxis
+                        dataKey="time"
+                        hide
                     />
-                    <YAxis 
+                    <YAxis
                         yAxisId="power"
-                        hide 
-                        domain={[0, 'auto']} 
+                        hide
+                        domain={[0, 'auto']}
                     />
-                    <YAxis 
+                    <YAxis
                         yAxisId="temp"
-                        hide 
-                        domain={[0, maxTemperature]} 
+                        hide
+                        domain={[0, maxTemperature]}
                     />
-                    <Tooltip 
+                    <Tooltip
                         formatter={(value: any, name: any) => {
                             const valNum = Number(value) || 0;
                             if (name === "Procesamiento (Hash Rate)") {
@@ -103,21 +94,21 @@ export const SimulationChart = React.memo(() => {
                             }
                             return [`${valNum.toFixed(1)}°C`, name];
                         }}
-                        contentStyle={{ 
-                            backgroundColor: 'rgba(10, 10, 10, 0.9)', 
+                        contentStyle={{
+                            backgroundColor: 'rgba(10, 10, 10, 0.9)',
                             border: '1px solid rgba(255,255,255,0.1)',
                             borderRadius: '4px',
                             fontSize: '0.7rem'
                         }}
                         itemStyle={{ padding: '0px' }}
                     />
-                    <Line 
+                    <Line
                         yAxisId="power"
-                        type="monotone" 
-                        dataKey="power" 
+                        type="monotone"
+                        dataKey="power"
                         name="Procesamiento (Hash Rate)"
-                        stroke="#00f3ff" 
-                        strokeWidth={2} 
+                        stroke="#00f3ff"
+                        strokeWidth={2}
                         filter="url(#glow-power)"
                         dot={({ cx, cy, index }) => {
                             if (index === data.length - 1) {
@@ -136,13 +127,13 @@ export const SimulationChart = React.memo(() => {
                         isAnimationActive={false}
                         animationDuration={300}
                     />
-                    <Line 
+                    <Line
                         yAxisId="temp"
-                        type="monotone" 
-                        dataKey="temperature" 
+                        type="monotone"
+                        dataKey="temperature"
                         name="Temperatura"
-                        stroke="#ff1744" 
-                        strokeWidth={2} 
+                        stroke="#ff1744"
+                        strokeWidth={2}
                         filter="url(#glow-temp)"
                         dot={({ cx, cy, index }) => {
                             if (index === data.length - 1) {
@@ -165,37 +156,21 @@ export const SimulationChart = React.memo(() => {
             </ResponsiveContainer>
 
             {/* Efecto de cuadrícula de fondo estilo Administrador de Tareas */}
-            <Box sx={{ 
-                position: 'absolute', 
-                top: 0, 
-                left: 0, 
-                right: 0, 
-                bottom: 0, 
-                pointerEvents: 'none',
-                opacity: 0.03,
-                backgroundSize: '20px 20px',
-                backgroundImage: 'linear-gradient(to right, grey 1px, transparent 1px), linear-gradient(to bottom, grey 1px, transparent 1px)'
-            }} />
-            
+            <div
+                className="pointer-events-none absolute inset-0 opacity-[0.03]"
+                style={{
+                    backgroundSize: '20px 20px',
+                    backgroundImage: 'linear-gradient(to right, grey 1px, transparent 1px), linear-gradient(to bottom, grey 1px, transparent 1px)'
+                }}
+            />
+
             {(!isPoweredOn && !isOverheated) && (
-                <Box sx={{ 
-                    position: 'absolute', 
-                    top: 0, 
-                    left: 0, 
-                    right: 0, 
-                    bottom: 0, 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    bgcolor: 'rgba(0,0,0,0.4)',
-                    backdropFilter: 'blur(2px)',
-                    zIndex: 2
-                }}>
-                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontWeight: 'bold', letterSpacing: 2 }}>
+                <div className="absolute inset-0 z-[2] flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
+                    <Typography variant="caption" className="font-bold tracking-[2px] text-white/30">
                         SISTEMA EN ESPERA
                     </Typography>
-                </Box>
+                </div>
             )}
-        </Box>
+        </div>
     );
 });
