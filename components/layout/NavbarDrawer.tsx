@@ -4,19 +4,13 @@
 
 //# 1-Definir componente de menú lateral (Drawer)
 import React from "react";
-import {
-  Box,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  Tooltip,
-} from "@mui/material";
+import { Gift } from "lucide-react";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { EnvVariables } from "../../lib/constants/variables";
-import { CardGiftcard, Star } from "@mui/icons-material";
 import { CustomButton } from "../ui/CustomButton";
 import { CountUp } from "../ui/CountUp";
+import { Typography } from "../ui/Typography";
+import { Tooltip } from "../ui/Tooltip";
 import { openModal } from "../../lib/features/uiSlice";
 import { navItems } from "./navItems";
 import { TaoIcon } from "../ui/TaoIcon";
@@ -51,159 +45,88 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({
   const currentLab = useAppSelector((state) => state.reducerLabs.currentLab);
   const chronoBurstFreqTypes = useAppSelector((state) => state.blockchain.chronoBurstFreqTypes);
   const localHash = currentLab?.energy ?? 0;
-  
+
   //# 2-Renderizar lista de redes y navegación
   return (
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
-      <Typography variant="h6" sx={{ my: 2, color: "primary.main" }}>
+    <div onClick={handleDrawerToggle} className="text-center">
+      <Typography variant="h6" className="my-4 text-primary">
         {EnvVariables.project.toUpperCase()}
       </Typography>
-      <List>
+      <ul>
         {selectedNetwork && (
-          <ListItem disablePadding onClick={handleNetworkClick}>
-            <ListItemText
-              primary={selectedNetwork.identification.name}
-              sx={{
-                textAlign: "center",
-                color: selectedNetwork.additionalInfo.color,
-                cursor: "pointer",
-              }}
-            />
-          </ListItem>
+          <li onClick={handleNetworkClick}>
+            <p
+              className="cursor-pointer text-center"
+              style={{ color: selectedNetwork.additionalInfo.color }}
+            >
+              {selectedNetwork.identification.name}
+            </p>
+          </li>
         )}
-        <ListItem disablePadding>
-          <Box
-            sx={{
-              width: "100%",
-              borderBottom: "1px solid rgba(255,255,255,0.1)",
-              mb: 1,
-            }}
-          />
-        </ListItem>
+        <li>
+          <div className="mb-2 w-full border-b border-white/10" />
+        </li>
         {navItems.filter(item => !item.auth || userInfo).map((item) => {
           const isActive = pathname === item.path;
           const isOperations = item.id === 'dashboard';
           const formattedHash = formatHash(localHash, chronoBurstFreqTypes);
           const tooltipText = `Hash Acumulado Local: ${formattedHash}`;
-          
-          const itemTextSx = {
-            textAlign: "center",
-            color: isActive ? "primary.main" : "inherit",
-            p: 1.5,
-            borderRadius: 1,
-            transition: 'all 0.3s ease',
-            ...(isOperations && isPoweredOn ? {
-              '@keyframes pulseGold': {
-                '0%': {
-                  boxShadow: '0 0 0 0 rgba(212, 163, 115, 0.4)',
-                  borderColor: 'rgba(212, 163, 115, 0.4)',
-                },
-                '70%': {
-                  boxShadow: '0 0 0 6px rgba(212, 163, 115, 0)',
-                  borderColor: 'rgba(230, 197, 148, 0.7)',
-                },
-                '100%': {
-                  boxShadow: '0 0 0 0 rgba(212, 163, 115, 0)',
-                  borderColor: 'rgba(212, 163, 115, 0.4)',
-                }
-              },
-              animation: 'pulseGold 2s infinite ease-in-out',
-              border: '1px solid #D4A373',
-              background: 'linear-gradient(45deg, rgba(212, 163, 115, 0.05), rgba(230, 197, 148, 0.1))',
-              color: '#E6C594',
-            } : {})
-          };
+
+          const itemClassName = [
+            'block rounded p-3 text-center transition-all duration-300',
+            isActive ? 'text-primary' : 'text-inherit',
+            isOperations && isPoweredOn
+              ? 'border border-[#D4A373] bg-gradient-to-br from-[rgba(212,163,115,0.05)] to-[rgba(230,197,148,0.1)] text-[#E6C594] animate-[pulseGold_2s_infinite_ease-in-out]'
+              : '',
+          ].join(' ');
 
           const itemContent = (
-            <ListItemText
-              primary={item.name}
-              sx={itemTextSx}
-            />
+            <p className={itemClassName}>{item.name}</p>
           );
 
           return (
-            <ListItem
+            <li
               key={item.id}
-              disablePadding
               onClick={() => handleNavClick(item)}
-              sx={{ mb: 0.5, px: 2 }}
+              className="mb-1 px-4"
             >
               {isOperations ? (
-                <Tooltip 
-                  title={tooltipText} 
-                  arrow 
-                  placement="right"
-                  componentsProps={{
-                    tooltip: {
-                      sx: {
-                        bgcolor: 'rgba(10, 10, 10, 0.95)',
-                        border: '1px solid rgba(212, 163, 115, 0.3)',
-                        color: '#E6C594',
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.8)',
-                        fontWeight: 'bold',
-                        p: 1
-                      }
-                    },
-                    arrow: {
-                      sx: {
-                        color: 'rgba(10, 10, 10, 0.95)'
-                      }
-                    }
-                  }}
+                <Tooltip
+                  content={tooltipText}
+                  side="right"
+                  className="border-[rgba(212,163,115,0.3)] bg-[rgba(10,10,10,0.95)] font-bold text-[#E6C594] shadow-[0_4px_20px_rgba(0,0,0,0.8)]"
                 >
                   <div style={{ width: '100%' }}>{itemContent}</div>
                 </Tooltip>
               ) : itemContent}
-            </ListItem>
+            </li>
           );
         })}
-        <ListItem disablePadding>
+        <li>
           {/* //# 3-Renderizar opciones de usuario o acceso */}
-          <Box
-            sx={{
-              p: 2,
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              gap: 1,
-            }}
-          >
+          <div className="flex w-full flex-col gap-2 p-4">
             {userInfo ? (
               <>
-                  <Typography variant="body2" sx={{ color: "primary.main", mb: 1, fontWeight: 'bold' }}>
+                  <Typography variant="body2" className="mb-2 font-bold text-primary">
                   {'// USUARIO:'} {userInfo.username}
                 </Typography>
-                <Box
-                  sx={{
-                    display: 'none', // Ocultar por orden del PM
-                    color: "text.secondary",
-                    mb: 2,
-                    alignItems: "center",
-                    gap: 1,
-                    justifyContent: "center",
-                    bgcolor: 'rgba(0, 243, 255, 0.05)',
-                    p: 1,
-                    borderRadius: 1,
-                    border: '1px solid rgba(0, 243, 255, 0.1)'
-                  }}
+                <div
+                  className="mb-4 hidden items-center justify-center gap-2 rounded border border-[#00f3ff]/10 bg-[#00f3ff]/5 p-2 text-foreground-muted"
                 >
                   <TaoIcon size={20} />
-                  <Typography variant="body2" sx={{ color: '#00f3ff', fontWeight: 'bold' }}>
+                  <Typography variant="body2" className="font-bold text-[#00f3ff]">
                      TAO: <CountUp to={userInfo.balance} />
                   </Typography>
-                </Box>
+                </div>
                 <CustomButton
                   variant="info"
                   fullWidth
-                  startIcon={<CardGiftcard />}
+                  startIcon={<Gift />}
                   onClick={() => {
                       dispatch(openModal('rewards'));
                       handleDrawerToggle();
                   }}
-                  sx={{ 
-                      display: 'none', // Ocultar por orden del PM
-                      mb: 1, 
-                  }}
+                  className="mb-2 hidden"
                 >
                   Recompensas
                 </CustomButton>
@@ -224,7 +147,7 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({
                     dispatch(openModal("login"));
                     handleDrawerToggle();
                   }}
-                  sx={{ mb: 1 }}
+                  className="mb-2"
                 >
                   Entrar
                 </CustomButton>
@@ -241,9 +164,9 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({
                 </CustomButton>
               </>
             )}
-          </Box>
-        </ListItem>
-      </List>
-    </Box>
+          </div>
+        </li>
+      </ul>
+    </div>
   );
 };
