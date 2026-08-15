@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Stack, IconButton, Divider, Container } from '@mui/material';
-import { ArrowBack } from '@mui/icons-material';
+import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { BlocksModule } from '../../../components/modules/blocks/BlocksModule';
 import { Background } from '../../../components/layout/Background';
@@ -13,28 +12,23 @@ export default function BlocksPage() {
     return (
         <main className="min-h-screen relative pb-20">
             <Background />
-            
-            <Container maxWidth="xl" sx={{ pt: { xs: 12, md: 16 }, position: 'relative', zIndex: 10 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-                    <Stack direction="row" spacing={3} alignItems="center">
-                        <IconButton 
-                            onClick={() => router.back()} 
-                            sx={{ 
-                                color: '#00f3ff', 
-                                border: '1px solid rgba(0, 243, 255, 0.3)',
-                                bgcolor: 'rgba(0, 243, 255, 0.05)',
-                                '&:hover': { bgcolor: 'rgba(0, 243, 255, 0.1)' }
-                            }}
-                        >
-                            <ArrowBack />
-                        </IconButton>
-                    </Stack>
-                </Box>
 
-                <Divider sx={{ mb: 4, borderColor: 'rgba(255,255,255,0.05)' }} />
+            <div className="relative z-10 mx-auto w-full max-w-[1536px] px-4 pt-24 sm:px-6 md:pt-32 lg:px-8">
+                <div className="mb-8 flex items-center justify-between">
+                    <div className="flex flex-row items-center gap-6">
+                        <button
+                            onClick={() => router.back()}
+                            className="rounded-full border border-[#00f3ff]/30 bg-[#00f3ff]/5 p-2 text-[#00f3ff] transition-colors hover:bg-[#00f3ff]/10"
+                        >
+                            <ArrowLeft />
+                        </button>
+                    </div>
+                </div>
+
+                <hr className="mb-8 border-white/5" />
 
                 <BlocksModule />
-            </Container>
+            </div>
         </main>
     );
 }

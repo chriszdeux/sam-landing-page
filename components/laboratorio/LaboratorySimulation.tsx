@@ -1,12 +1,22 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button, Paper, LinearProgress, Stack, Chip, Grid, Divider } from '@mui/material';
-import { Warning, PowerSettingsNew, Speed, Thermostat, Favorite, Memory } from '@mui/icons-material';
+import { AlertTriangle, Power, Gauge, Thermometer, Heart, Cpu } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '../ui/Button';
+import { Typography } from '../ui/Typography';
 import { useAppSelector, useAppDispatch } from '../../lib/hooks';
 import { RootState } from '../../lib/store';
 import { updateSimulationData, setCooldownState, toggleLaboratoryPower } from '../../lib/features/labs/reducer';
+
+const ProgressBar = ({ value, barColor }: { value: number; barColor: string }) => (
+    <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+        <div
+            className="h-full rounded-full transition-[background-color,width] duration-300 ease-out"
+            style={{ width: `${Math.max(0, Math.min(100, value))}%`, backgroundColor: barColor }}
+        />
+    </div>
+);
 
 export const LaboratorySimulation = () => {
     const dispatch = useAppDispatch();
@@ -66,18 +76,12 @@ export const LaboratorySimulation = () => {
     };
 
     return (
-        <Paper
-            elevation={0}
-            sx={{
-                p: 4,
-                bgcolor: 'rgba(10, 12, 16, 0.8)',
+        <div
+            className="relative overflow-hidden rounded-2xl p-8 backdrop-blur-md transition-all duration-300"
+            style={{
+                backgroundColor: 'rgba(10, 12, 16, 0.8)',
                 border: `1px solid ${emergencyMode ? 'rgba(255, 23, 68, 0.5)' : 'rgba(0, 243, 255, 0.2)'}`,
-                borderRadius: 4,
-                position: 'relative',
-                overflow: 'hidden',
-                backdropFilter: 'blur(10px)',
                 boxShadow: emergencyMode ? '0 0 30px rgba(255, 23, 68, 0.2)' : '0 0 30px rgba(0, 243, 255, 0.05)',
-                transition: 'all 0.3s ease'
             }}
         >
             <AnimatePresence>
@@ -86,142 +90,86 @@ export const LaboratorySimulation = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        style={{
-                            position: 'absolute',
-                            top: 0, left: 0, right: 0, bottom: 0,
-                            pointerEvents: 'none',
-                            backgroundColor: 'rgba(255, 23, 68, 0.05)',
-                            zIndex: 0
-                        }}
+                        className="pointer-events-none absolute inset-0 z-0 bg-[rgba(255,23,68,0.05)]"
                     >
-                        <Box sx={{
-                            position: 'absolute',
-                            top: 0, left: 0, right: 0,
-                            height: '4px',
-                            bgcolor: '#ff1744',
-                            animation: 'pulse 1s infinite'
-                        }} />
+                        <div className="absolute inset-x-0 top-0 h-1 animate-[labAlertPulse_1s_infinite] bg-[#ff1744]" />
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            <style>{`
-                @keyframes pulse {
-                    0% { opacity: 0.5; }
-                    50% { opacity: 1; }
-                    100% { opacity: 0.5; }
-                }
-            `}</style>
-
-            <Box sx={{ position: 'relative', zIndex: 1 }}>
-                <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-                    <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Memory sx={{ color: '#00f3ff' }} />
+            <div className="relative z-[1]">
+                <div className="mb-8 flex items-center justify-between">
+                    <Typography variant="h5" className="flex items-center gap-2 font-bold text-white">
+                        <Cpu className="text-[#00f3ff]" />
                         SIMULADOR DE LABORATORIO
                     </Typography>
-                    
-                    <Box display="flex" alignItems="center" gap={2}>
+
+                    <div className="flex items-center gap-4">
                         {emergencyMode && (
-                            <Chip 
-                                icon={<Warning />} 
-                                label="MODO DE CAÍDA ACTIVO" 
-                                color="error" 
-                                variant="outlined" 
-                                sx={{ animation: 'pulse 1s infinite', fontWeight: 'bold' }}
-                            />
+                            <span className="flex animate-[labAlertPulse_1s_infinite] items-center gap-1.5 rounded-full border border-error px-3 py-1 text-sm font-bold text-error">
+                                <AlertTriangle size={16} />
+                                MODO DE CAÍDA ACTIVO
+                            </span>
                         )}
-                        <Chip 
-                            label={isOverheated ? "ENFRIANDO..." : isPoweredOn ? "OPERATIVO" : "APAGADO"} 
-                            sx={{ 
-                                bgcolor: isOverheated ? '#00f3ff20' : isPoweredOn ? '#00e67620' : '#424242',
+                        <span
+                            className="rounded-full px-3 py-1 text-sm font-bold"
+                            style={{
+                                backgroundColor: isOverheated ? '#00f3ff20' : isPoweredOn ? '#00e67620' : '#424242',
                                 color: isOverheated ? '#00f3ff' : isPoweredOn ? '#00e676' : '#9e9e9e',
-                                fontWeight: 'bold',
-                                border: `1px solid ${isOverheated ? '#00f3ff' : isPoweredOn ? '#00e676' : '#9e9e9e'}`
-                            }} 
-                        />
-                    </Box>
-                </Box>
+                                border: `1px solid ${isOverheated ? '#00f3ff' : isPoweredOn ? '#00e676' : '#9e9e9e'}`,
+                            }}
+                        >
+                            {isOverheated ? "ENFRIANDO..." : isPoweredOn ? "OPERATIVO" : "APAGADO"}
+                        </span>
+                    </div>
+                </div>
 
-                <Grid container spacing={4} mb={4}>
-                    <Grid size={{ xs: 12, md: 6 }}>
-                        <Box sx={{ p: 3, bgcolor: 'rgba(0,0,0,0.4)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.05)', height: '100%' }}>
-                            <Typography variant="overline" color="text.secondary" display="flex" alignItems="center" gap={1}>
-                                <Speed /> OUTPUT DE CÓMPUTO
-                            </Typography>
-                            <Typography variant="h2" sx={{ color: '#00f3ff', fontFamily: 'monospace', fontWeight: 'bold', mt: 1 }}>
-                                {hashrate.toFixed(2)} <span style={{ fontSize: '1.5rem', color: 'rgba(255,255,255,0.5)' }}>H/s</span>
-                            </Typography>
-                        </Box>
-                    </Grid>
+                <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-2">
+                    <div className="h-full rounded-lg border border-white/5 bg-black/40 p-6">
+                        <Typography variant="overline" className="flex items-center gap-1 text-foreground-muted">
+                            <Gauge size={16} /> OUTPUT DE CÓMPUTO
+                        </Typography>
+                        <Typography variant="h2" className="mt-1 font-mono font-bold text-[#00f3ff]">
+                            {hashrate.toFixed(2)} <span style={{ fontSize: '1.5rem', color: 'rgba(255,255,255,0.5)' }}>H/s</span>
+                        </Typography>
+                    </div>
 
-                    <Grid size={{ xs: 12, md: 6 }}>
-                        <Stack spacing={3}>
-                            <Box>
-                                <Box display="flex" justifyContent="space-between" mb={1}>
-                                    <Typography variant="caption" sx={{ color: getTempColor(), fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                        <Thermostat fontSize="small" /> TEMPERATURA ({temperature.toFixed(1)}°C)
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary">Máx 80°C</Typography>
-                                </Box>
-                                <LinearProgress 
-                                    variant="determinate" 
-                                    value={(temperature / 80) * 100} 
-                                    sx={{ 
-                                        height: 8, 
-                                        borderRadius: 4,
-                                        bgcolor: 'rgba(255,255,255,0.1)',
-                                        '& .MuiLinearProgress-bar': { 
-                                            bgcolor: getTempColor(),
-                                            transition: 'background-color 0.3s ease'
-                                        }
-                                    }} 
-                                />
-                            </Box>
+                    <div className="flex flex-col gap-6">
+                        <div>
+                            <div className="mb-1 flex justify-between">
+                                <Typography variant="caption" className="flex items-center gap-1 font-bold" style={{ color: getTempColor() }}>
+                                    <Thermometer size={14} /> TEMPERATURA ({temperature.toFixed(1)}°C)
+                                </Typography>
+                                <Typography variant="caption" className="text-foreground-muted">Máx 80°C</Typography>
+                            </div>
+                            <ProgressBar value={(temperature / 80) * 100} barColor={getTempColor()} />
+                        </div>
 
-                            <Box>
-                                <Box display="flex" justifyContent="space-between" mb={1}>
-                                    <Typography variant="caption" sx={{ color: '#b000ff', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                        <Speed fontSize="small" /> RENDIMIENTO ({performance.toFixed(2)}%)
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary">Tope 80%</Typography>
-                                </Box>
-                                <LinearProgress 
-                                    variant="determinate" 
-                                    value={performance} 
-                                    sx={{ 
-                                        height: 8, 
-                                        borderRadius: 4,
-                                        bgcolor: 'rgba(255,255,255,0.1)',
-                                        '& .MuiLinearProgress-bar': { bgcolor: '#b000ff', transition: 'transform 0.3s ease' }
-                                    }} 
-                                />
-                            </Box>
+                        <div>
+                            <div className="mb-1 flex justify-between">
+                                <Typography variant="caption" className="flex items-center gap-1 font-bold text-[#b000ff]">
+                                    <Gauge size={14} /> RENDIMIENTO ({performance.toFixed(2)}%)
+                                </Typography>
+                                <Typography variant="caption" className="text-foreground-muted">Tope 80%</Typography>
+                            </div>
+                            <ProgressBar value={performance} barColor="#b000ff" />
+                        </div>
 
-                            <Box>
-                                <Box display="flex" justifyContent="space-between" mb={1}>
-                                    <Typography variant="caption" sx={{ color: life > 30 ? '#00e676' : '#ff1744', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                        <Favorite fontSize="small" /> VIDA ÚTIL ({life.toFixed(2)}%)
-                                    </Typography>
-                                </Box>
-                                <LinearProgress 
-                                    variant="determinate" 
-                                    value={life} 
-                                    sx={{ 
-                                        height: 8, 
-                                        borderRadius: 4,
-                                        bgcolor: 'rgba(255,255,255,0.1)',
-                                        '& .MuiLinearProgress-bar': { bgcolor: life > 30 ? '#00e676' : '#ff1744', transition: 'transform 0.3s ease' }
-                                    }} 
-                                />
-                            </Box>
-                        </Stack>
-                    </Grid>
-                </Grid>
+                        <div>
+                            <div className="mb-1 flex justify-between">
+                                <Typography variant="caption" className="flex items-center gap-1 font-bold" style={{ color: life > 30 ? '#00e676' : '#ff1744' }}>
+                                    <Heart size={14} /> VIDA ÚTIL ({life.toFixed(2)}%)
+                                </Typography>
+                            </div>
+                            <ProgressBar value={life} barColor={life > 30 ? '#00e676' : '#ff1744'} />
+                        </div>
+                    </div>
+                </div>
 
-                <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', mb: 3 }} />
+                <hr className="mb-6 border-white/10" />
 
-                <Box display="flex" flexWrap="wrap" gap={2} justifyContent="space-between" alignItems="center">
-                    <Stack direction="row" spacing={2}>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex flex-row gap-4">
                         <Button
                             variant="contained"
                             disabled={!isPoweredOn || isOverheated || emergencyMode}
@@ -248,12 +196,12 @@ export const LaboratorySimulation = () => {
                         >
                             ESCALÓN 20%
                         </Button>
-                    </Stack>
+                    </div>
 
                     <Button
                         variant="contained"
                         color={isPoweredOn ? "error" : "success"}
-                        startIcon={<PowerSettingsNew />}
+                        startIcon={<Power size={18} />}
                         onClick={handlePowerOff}
                         disabled={isOverheated}
                         sx={{
@@ -265,8 +213,8 @@ export const LaboratorySimulation = () => {
                     >
                         {isPoweredOn ? "APAGADO DE EMERGENCIA" : "INICIAR SISTEMA"}
                     </Button>
-                </Box>
-            </Box>
-        </Paper>
+                </div>
+            </div>
+        </div>
     );
 };
