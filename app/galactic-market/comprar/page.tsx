@@ -1,32 +1,23 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { 
-  Box, 
-  Container, 
-  Typography, 
-  Grid, 
-  Card, 
-  CardContent, 
-  Button, 
-  CircularProgress,
-  IconButton,
-  Tooltip
-} from "@mui/material";
-import { 
-  ArrowBack, 
-  ShoppingCart, 
-  ElectricBolt, 
-  Nature, 
-  Groups, 
-  Science,
-  InfoOutlined
-} from "@mui/icons-material";
-import { Snackbar, Alert } from "@mui/material";
+import {
+  ArrowLeft,
+  ShoppingCart,
+  Zap,
+  Leaf,
+  Users,
+  FlaskConical,
+  Info
+} from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils/cn";
 import api, { hadesApi } from "../../../lib/api";
 import { TechFrame } from "../../../components/ui/TechFrame";
+import { Typography } from "../../../components/ui/Typography";
+import { Button } from "../../../components/ui/Button";
+import { Tooltip } from "../../../components/ui/Tooltip";
 import { StationToast } from "../../../components/core_modules/StationToast";
 
 interface MarketListing {
@@ -73,23 +64,29 @@ export default function ComprarModulosPage() {
     fetchListings();
   }, []);
 
+  useEffect(() => {
+    if (!errorMsg) return;
+    const timeout = setTimeout(() => setErrorMsg(null), 6000);
+    return () => clearTimeout(timeout);
+  }, [errorMsg]);
+
   const handleBuy = async (listingId: string) => {
     setBuyingId(listingId);
     try {
       // Phase 1: Purchase logic (Backend handles inventory creation)
       await hadesApi.post('/confirmBuyTransaction', { listingId });
       setErrorMsg(null);
-      setToast({ 
-        message: "Estructura Forjada con Éxito - Lista en Almacén", 
-        type: 'success' 
+      setToast({
+        message: "Estructura Forjada con Éxito - Lista en Almacén",
+        type: 'success'
       });
       setListings(prev => prev.filter(l => l.listingId !== listingId));
     } catch (error: any) {
       console.error("Error buying module:", error);
       setErrorMsg("No se pudo completar la compra. Revisa tu conexión o saldo.");
-      setToast({ 
-        message: "Fallo en la forja de estructura. Verifique recursos.", 
-        type: 'error' 
+      setToast({
+        message: "Fallo en la forja de estructura. Verifique recursos.",
+        type: 'error'
       });
     } finally {
       setBuyingId(null);
@@ -98,11 +95,11 @@ export default function ComprarModulosPage() {
 
   const getIcon = (type: string) => {
     switch (type) {
-      case 'energy': return <ElectricBolt sx={{ fontSize: 30, color: '#FF2200' }} />;
-      case 'bio': return <Nature sx={{ fontSize: 30, color: '#22FF44' }} />;
-      case 'habitat': return <Groups sx={{ fontSize: 30, color: '#C0C0C0' }} />;
-      case 'science': return <Science sx={{ fontSize: 30, color: '#0055FF' }} />;
-      default: return <ShoppingCart sx={{ fontSize: 30, color: '#00f3ff' }} />;
+      case 'energy': return <Zap size={30} color="#FF2200" />;
+      case 'bio': return <Leaf size={30} color="#22FF44" />;
+      case 'habitat': return <Users size={30} color="#C0C0C0" />;
+      case 'science': return <FlaskConical size={30} color="#0055FF" />;
+      default: return <ShoppingCart size={30} color="#00f3ff" />;
     }
   };
 
@@ -118,129 +115,119 @@ export default function ComprarModulosPage() {
 
   if (loading) {
     return (
-      <Box sx={{ minHeight: '100vh', pt: 15, display: 'flex', justifyContent: 'center', bgcolor: '#05050c' }}>
-        <CircularProgress sx={{ color: '#00f3ff' }} />
-      </Box>
+      <div className="flex min-h-screen justify-center bg-[#05050c] pt-[120px]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#00f3ff]/20 border-t-[#00f3ff]" />
+      </div>
     );
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', pt: 15, pb: 10, bgcolor: '#05050c' }}>
-      <Container maxWidth="lg">
-        <Box display="flex" alignItems="center" gap={2} mb={6}>
+    <div className="min-h-screen bg-[#05050c] pb-20 pt-[120px]">
+      <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8">
+        <div className="mb-12 flex items-center gap-4">
           <Link href="/galactic-market">
-            <IconButton sx={{ color: 'white' }}>
-              <ArrowBack />
-            </IconButton>
+            <button className="rounded p-2 text-white hover:bg-white/10">
+              <ArrowLeft />
+            </button>
           </Link>
-          <Typography variant="h3" sx={{ color: 'white', fontWeight: 'bold' }}>
+          <Typography variant="h3" className="font-bold text-white">
             GALACTIC <span style={{ color: '#00f3ff' }}>SHOP</span>
           </Typography>
-        </Box>
+        </div>
 
         {listings.length === 0 ? (
-          <Box textAlign="center" py={10}>
-            <Typography variant="h5" sx={{ color: 'rgba(255,255,255,0.4)' }}>
+          <div className="py-20 text-center">
+            <Typography variant="h5" className="text-white/40">
               No hay módulos disponibles en el mercado actualmente.
             </Typography>
-          </Box>
+          </div>
         ) : (
-          <Grid container spacing={3}>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
             {listings.map((listing, index) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={listing.listingId}>
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }} 
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <TechFrame color={getColor(listing.moduleData?.type || '')}>
-                    <Box p={3}>
-                      <Box display="flex" justifyContent="space-between" mb={2}>
-                        {getIcon(listing.moduleData?.type || '')}
-                        <Chip 
-                          label={`${listing.price || 0} THAO`} 
-                          sx={{ 
-                            bgcolor: 'rgba(0,243,255,0.1)', 
-                            color: '#00f3ff', 
-                            fontWeight: 'bold',
-                            border: '1px solid rgba(0,243,255,0.3)'
-                          }} 
-                        />
-                      </Box>
-                      
-                      <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
-                        {(listing.moduleData?.type || 'unknown').toUpperCase()}
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', mb: 3, height: 60, overflow: 'hidden' }}>
-                        {listing.description || `Módulo de tipo ${listing.moduleData?.type || 'estándar'} optimizado para sistemas CORE_MODULES-8.`}
-                      </Typography>
+              <motion.div
+                key={listing.listingId}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <TechFrame color={getColor(listing.moduleData?.type || '')}>
+                  <div className="p-6">
+                    <div className="mb-4 flex justify-between">
+                      {getIcon(listing.moduleData?.type || '')}
+                      <Chip label={`${listing.price || 0} THAO`} />
+                    </div>
 
-                      <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Tooltip title="Integridad Base">
-                          <Box display="flex" alignItems="center" gap={0.5}>
-                             <InfoOutlined sx={{ fontSize: 14, color: 'rgba(255,255,255,0.4)' }} />
-                             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)' }}>
-                               HP: {listing.moduleData?.stats?.baseVitality || 100}%
-                             </Typography>
-                          </Box>
-                        </Tooltip>
-                        
-                        <Button
-                          variant="contained"
-                          size="small"
-                          disabled={buyingId === listing.listingId}
-                          onClick={() => handleBuy(listing.listingId)}
-                          sx={{ 
-                            bgcolor: getColor(listing.moduleData?.type || ''),
-                            '&:hover': { bgcolor: getColor(listing.moduleData?.type || ''), filter: 'brightness(1.2)' }
-                          }}
-                        >
-                          {buyingId === listing.listingId ? <CircularProgress size={20} color="inherit" /> : 'COMPRAR'}
-                        </Button>
-                      </Box>
-                    </Box>
-                  </TechFrame>
-                </motion.div>
-              </Grid>
+                    <Typography variant="h6" className="mb-2 font-bold text-white">
+                      {(listing.moduleData?.type || 'unknown').toUpperCase()}
+                    </Typography>
+                    <Typography variant="body2" className="mb-6 h-[60px] overflow-hidden text-white/60">
+                      {listing.description || `Módulo de tipo ${listing.moduleData?.type || 'estándar'} optimizado para sistemas CORE_MODULES-8.`}
+                    </Typography>
+
+                    <div className="flex items-center justify-between">
+                      <Tooltip content="Integridad Base">
+                        <div className="flex items-center gap-1">
+                           <Info size={14} className="text-white/40" />
+                           <Typography variant="caption" className="text-white/40">
+                             HP: {listing.moduleData?.stats?.baseVitality || 100}%
+                           </Typography>
+                        </div>
+                      </Tooltip>
+
+                      <Button
+                        variant="contained"
+                        size="small"
+                        disabled={buyingId === listing.listingId}
+                        onClick={() => handleBuy(listing.listingId)}
+                        sx={{
+                          bgcolor: getColor(listing.moduleData?.type || ''),
+                          '&:hover': { bgcolor: getColor(listing.moduleData?.type || ''), filter: 'brightness(1.2)' }
+                        }}
+                      >
+                        {buyingId === listing.listingId ? (
+                          <div className="h-5 w-5 animate-spin rounded-full border-2 border-current/30 border-t-current" />
+                        ) : 'COMPRAR'}
+                      </Button>
+                    </div>
+                  </div>
+                </TechFrame>
+              </motion.div>
             ))}
-          </Grid>
+          </div>
         )}
 
-        <Snackbar 
-          open={!!errorMsg} 
-          autoHideDuration={6000} 
-          onClose={() => setErrorMsg(null)}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        >
-          <Alert onClose={() => setErrorMsg(null)} severity="error" variant="filled" sx={{ width: '100%' }}>
-            {errorMsg}
-          </Alert>
-        </Snackbar>
+        <AnimatePresence>
+          {errorMsg && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="fixed bottom-6 right-6 z-50 max-w-sm rounded-lg border border-red-500/30 bg-red-950/95 px-4 py-3 text-sm font-bold text-red-100 shadow-lg"
+            >
+              {errorMsg}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <AnimatePresence>
           {toast && (
-            <StationToast 
-              message={toast.message} 
-              type={toast.type} 
-              onClose={() => setToast(null)} 
+            <StationToast
+              message={toast.message}
+              type={toast.type}
+              onClose={() => setToast(null)}
             />
           )}
         </AnimatePresence>
-      </Container>
-    </Box>
+      </div>
+    </div>
   );
 }
 
 // Internal Chip mock since MUI primary Chip might look too generic here
-function Chip({ label, sx }: { label: string, sx: any }) {
+function Chip({ label }: { label: string }) {
   return (
-    <Box sx={{ 
-      px: 1.5, py: 0.5, 
-      borderRadius: 1, 
-      fontSize: '0.75rem', 
-      ...sx 
-    }}>
+    <div className={cn('rounded px-3 py-1 text-xs font-bold', 'border border-[#00f3ff]/30 bg-[#00f3ff]/10 text-[#00f3ff]')}>
       {label}
-    </Box>
+    </div>
   );
 }

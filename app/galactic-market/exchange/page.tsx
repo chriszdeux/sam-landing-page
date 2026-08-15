@@ -1,41 +1,35 @@
 "use client";
 
-import { Box, Container, Typography, IconButton } from "@mui/material";
-import { ArrowBack, SwapHoriz } from "@mui/icons-material";
+import { ArrowLeft, ArrowLeftRight } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Typography } from "../../../components/ui/Typography";
 
 export default function ExchangePage() {
   return (
-    <Box sx={{ minHeight: '100vh', pt: 15, pb: 10, bgcolor: '#05050c' }}>
-      <Container maxWidth="lg">
-        <Box display="flex" alignItems="center" gap={2} mb={6}>
+    <div className="min-h-screen bg-[#05050c] pt-[120px] pb-20">
+      <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8">
+        <div className="mb-12 flex items-center gap-4">
           <Link href="/galactic-market">
-            <IconButton sx={{ color: 'white' }}>
-              <ArrowBack />
-            </IconButton>
+            <button className="rounded p-2 text-white">
+              <ArrowLeft />
+            </button>
           </Link>
-          <Typography variant="h3" sx={{ color: 'white', fontWeight: 'bold' }}>
+          <Typography variant="h3" className="font-bold text-white">
             RESOURCE <span style={{ color: '#ffd700' }}>EXCHANGE</span>
           </Typography>
-        </Box>
+        </div>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <Box sx={{ 
-            p: 10, 
-            textAlign: 'center', 
-            bgcolor: 'rgba(255,215,0,0.05)', 
-            border: '1px dashed rgba(255,215,0,0.3)',
-            borderRadius: 4
-          }}>
-            <SwapHoriz sx={{ fontSize: 100, color: '#ffd700', mb: 4, opacity: 0.5 }} />
-            <Typography variant="h4" sx={{ color: 'white', mb: 2 }}>Módulo de Intercambio P2P</Typography>
-            <Typography sx={{ color: 'rgba(255,255,255,0.6)' }}>
+          <div className="rounded-2xl border border-dashed border-[rgba(255,215,0,0.3)] bg-[rgba(255,215,0,0.05)] p-20 text-center">
+            <ArrowLeftRight size={100} className="mb-8 text-[#ffd700] opacity-50" />
+            <Typography variant="h4" className="mb-4 text-white">Módulo de Intercambio P2P</Typography>
+            <Typography className="text-white/60">
               Esta sección estará disponible en la Fase 3 del despliegue del Mercado Galáctico.
             </Typography>
-          </Box>
+          </div>
         </motion.div>
-      </Container>
-    </Box>
+      </div>
+    </div>
   );
 }

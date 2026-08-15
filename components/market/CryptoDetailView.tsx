@@ -8,9 +8,10 @@
 'use client';
 
 import React from 'react';
-import { Box, Typography, Stack, Container, Grid, Button, Chip, Avatar, Divider, CircularProgress } from '@mui/material';
+import { Typography } from '../ui/Typography';
+import { Button } from '../ui/Button';
 import { ParticleBackground } from '../ui/ParticleBackground';
-import { ArrowBack, TrendingUp, TrendingDown, AccessTime, Code, ShoppingCart, AttachMoney } from '@mui/icons-material';
+import { ArrowLeft, TrendingUp, TrendingDown, Clock, Code, ShoppingCart, DollarSign } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { CryptoChart } from './CryptoChart';
 import { CryptoStats } from './CryptoStats';
@@ -28,14 +29,14 @@ interface CryptoDetailViewProps {
 
 export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
     const router = useRouter();
-    
+
     //# 2-Obtener estado global, autenticación y configuración
     const dispatch = useAppDispatch();
     const { cryptos, isLoading } = useAppSelector((state) => state.market);
     const { token } = useAppSelector((state) => state.auth);
-    
+
     const [selectedRange, setSelectedRange] = React.useState('1d');
-    
+
     const crypto = cryptos.find((c) => c.id === id);
 
     //# 3-Manejar navegación a transacción
@@ -53,18 +54,18 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
     //# 4-Renderizar vista de carga o error
     if (isLoading && !crypto) {
         return (
-            <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#000' }}>
-               <CircularProgress color="primary" />
-            </Box>
+            <div className="flex min-h-screen items-center justify-center bg-black">
+               <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-primary" />
+            </div>
         );
     }
 
     if (!crypto) {
         return (
-            <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#000', flexDirection: 'column', gap: 2 }}>
-                <Typography variant="h5" color="error">Criptomoneda no encontrada</Typography>
+            <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-black">
+                <Typography variant="h5" className="text-error">Criptomoneda no encontrada</Typography>
                 <Button onClick={() => router.push('/market')} variant="outlined">Volver al Mercado</Button>
-            </Box>
+            </div>
         );
     }
 
@@ -76,118 +77,120 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
 
     //# 5-Renderizar detalles completos de la criptomoneda
     return (
-        <Box sx={{ minHeight: '100vh', position: 'relative', overflow: 'hidden', pt: 10, pb: 10 }}>
+        <div className="relative min-h-screen overflow-hidden pt-20 pb-20">
             <ParticleBackground />
-            
-            <Container maxWidth="xl">
-                <Stack spacing={4}>
-                    <Button 
-                        startIcon={<ArrowBack />} 
+
+            <div className="mx-auto w-full max-w-[1536px] px-4 sm:px-6 lg:px-8">
+                <div className="flex flex-col gap-8">
+                    <Button
+                        startIcon={<ArrowLeft />}
                         onClick={() => router.back()}
                         sx={{ color: 'text.secondary', width: 'fit-content', '&:hover': { color: 'primary.main' } }}
                     >
                         Volver al Mercado
                     </Button>
 
-                    <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'flex-start', md: 'center' }} justifyContent="space-between" spacing={2}>
-                        <Stack direction="row" alignItems="center" spacing={2}>
-                            <Avatar 
-                                src={crypto.identification.image256 || crypto.identification.image128}
-                                alt={crypto.identification.name}
-                                sx={{ width: 64, height: 64, bgcolor: crypto.additionalInfo?.pColor || 'primary.main', borderRadius: '24%' }}
+                    <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+                        <div className="flex flex-row items-center gap-4">
+                            <div
+                                className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-[24%] text-lg font-bold text-white"
+                                style={{ backgroundColor: crypto.additionalInfo?.pColor || '#00f3ff' }}
                             >
-                                {crypto.identification.symbol[0]}
-                            </Avatar>
-                            <Box>
-                                <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#fff' }}>
-                                    {crypto.identification.name} <Typography component="span" variant="h5" sx={{ color: 'text.secondary', ml: 1 }}>{crypto.identification.symbol}</Typography>
+                                {crypto.identification.image256 || crypto.identification.image128 ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img
+                                        src={crypto.identification.image256 || crypto.identification.image128}
+                                        alt={crypto.identification.name}
+                                        className="h-full w-full object-cover"
+                                    />
+                                ) : (
+                                    crypto.identification.symbol[0]
+                                )}
+                            </div>
+                            <div>
+                                <Typography variant="h3" className="font-bold text-white">
+                                    {crypto.identification.name} <Typography component="span" variant="h5" className="ml-2 text-foreground-muted">{crypto.identification.symbol}</Typography>
                                 </Typography>
-                                <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                                    <Chip label="Rank #N/A" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: '#fff' }} />
-                                    <Chip label="Coin" size="small" sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: '#fff' }} />
-                                    <Chip label={crypto.network.name} size="small" sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: '#fff' }} />
+                                <div className="mt-2 flex flex-row gap-2">
+                                    <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs text-white">Rank #N/A</span>
+                                    <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs text-white">Coin</span>
+                                    <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs text-white">{crypto.network.name}</span>
                                     {crypto.isActive !== undefined && (
-                                        <Chip 
-                                            label={crypto.isActive ? 'Activo' : 'Inactivo'} 
-                                            size="small" 
-                                            sx={{ 
-                                                bgcolor: crypto.isActive ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 0, 85, 0.1)', 
+                                        <span
+                                            className="inline-flex items-center rounded-full border px-3 py-1 text-xs"
+                                            style={{
+                                                backgroundColor: crypto.isActive ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 0, 85, 0.1)',
                                                 color: crypto.isActive ? '#00ff88' : '#ff0055',
-                                                border: '1px solid',
-                                                borderColor: crypto.isActive ? '#00ff88' : '#ff0055'
-                                            }} 
-                                        />
+                                                borderColor: crypto.isActive ? '#00ff88' : '#ff0055',
+                                            }}
+                                        >
+                                            {crypto.isActive ? 'Activo' : 'Inactivo'}
+                                        </span>
                                     )}
-                                </Stack>
-                            </Box>
-                        </Stack>
+                                </div>
+                            </div>
+                        </div>
 
-                        <Box sx={{ textAlign: { xs: 'left', md: 'right' } }}>
-                            <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 1 }}>
+                        <div className="text-left md:text-right">
+                            <Typography variant="h3" className="flex items-center justify-start gap-2 font-bold text-white md:justify-end">
                                 {crypto.financial.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
                                 <TaoIcon size={32} />
                             </Typography>
-                            <Stack direction="row" alignItems="center" spacing={1} justifyContent={{ xs: 'flex-start', md: 'flex-end' }}>
-                                <Chip 
-                                    icon={isPositive ? <TrendingUp /> : <TrendingDown />} 
-                                    label={`${isPositive ? '+' : ''}${crypto.financial.change24h?.toFixed(2)}% (24h)`}
-                                    sx={{ 
-                                        bgcolor: isPositive ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 0, 85, 0.1)', 
-                                        color: color,
-                                        fontWeight: 'bold'
-                                    }} 
-                                />
-                            </Stack>
-                        </Box>
-                    </Stack>
+                            <div className="flex flex-row items-center justify-start gap-2 md:justify-end">
+                                <span
+                                    className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-bold"
+                                    style={{
+                                        backgroundColor: isPositive ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 0, 85, 0.1)',
+                                        color,
+                                    }}
+                                >
+                                    {isPositive ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+                                    {`${isPositive ? '+' : ''}${crypto.financial.change24h?.toFixed(2)}% (24h)`}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
 
-                    <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
+                    <hr className="border-t border-white/10" />
 
-                    <Grid container spacing={4}>
-                        <Grid size={{ xs: 12, lg: 8 }}>
-                            <Stack spacing={4}>
-                                <Box>
-                                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-                                        <Typography variant="h5" sx={{ color: '#fff', fontWeight: 'bold' }}>Rendimiento</Typography>
-                                        <Stack direction="row" spacing={1}>
+                    <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+                        <div className="lg:col-span-8">
+                            <div className="flex flex-col gap-8">
+                                <div>
+                                    <div className="mb-4 flex flex-row items-center justify-between">
+                                        <Typography variant="h5" className="font-bold text-white">Rendimiento</Typography>
+                                        <div className="flex flex-row gap-2">
                                             {['1h', '6h', '1d', '7d', '1m', '3m', '12m', 'all'].map((tf) => (
-                                                <Button 
-                                                    key={tf} 
-                                                    variant="text" 
-                                                    size="small"
+                                                <button
+                                                    key={tf}
                                                     onClick={() => setSelectedRange(tf)}
-                                                    sx={{ 
-                                                        color: tf === selectedRange ? 'primary.main' : 'text.secondary',
-                                                        minWidth: 'auto',
-                                                        bgcolor: tf === selectedRange ? 'rgba(0, 243, 255, 0.1)' : 'transparent',
-                                                        textTransform: 'uppercase'
-                                                    }}
+                                                    className={`min-w-fit rounded px-2 py-1 text-sm uppercase transition-colors ${tf === selectedRange ? 'bg-[#00f3ff]/10 text-primary' : 'bg-transparent text-foreground-muted'}`}
                                                 >
                                                     {tf}
-                                                </Button>
+                                                </button>
                                             ))}
-                                        </Stack>
-                                    </Stack>
+                                        </div>
+                                    </div>
                                     <CryptoChart color={color} cryptoId={id} range={selectedRange} />
-                                </Box>
+                                </div>
 
-                                <Box>
+                                <div>
                                      <MarketSentiment cryptoId={id} />
                                      <TransactionHistory walletId={crypto.financial.contractAddress} />
-                                </Box>
-                            </Stack>
-                        </Grid>
+                                </div>
+                            </div>
+                        </div>
 
-                        <Grid size={{ xs: 12, lg: 4 }}>
-                            <Stack spacing={4}>
-                                <Stack direction="row" spacing={2}>
+                        <div className="lg:col-span-4">
+                            <div className="flex flex-col gap-8">
+                                <div className="flex flex-row gap-4">
                                     <Button
                                         fullWidth
                                         variant="contained"
                                         startIcon={<ShoppingCart />}
                                         onClick={() => handleTransaction('BUY')}
-                                        sx={{ 
-                                            bgcolor: '#00ff88', 
+                                        sx={{
+                                            bgcolor: '#00ff88',
                                             color: '#000',
                                             fontWeight: 'bold',
                                             '&:hover': { bgcolor: '#00cc6a' }
@@ -198,97 +201,100 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                                     <Button
                                         fullWidth
                                         variant="outlined"
-                                        startIcon={<AttachMoney />}
+                                        startIcon={<DollarSign />}
                                         onClick={() => handleTransaction('SELL')}
-                                        sx={{ 
-                                            color: '#ff0055', 
+                                        sx={{
+                                            color: '#ff0055',
                                             borderColor: '#ff0055',
                                             fontWeight: 'bold',
-                                            '&:hover': { 
+                                            '&:hover': {
                                                 bgcolor: 'rgba(255, 0, 85, 0.1)',
-                                                borderColor: '#ff0055' 
+                                                borderColor: '#ff0055'
                                             }
                                         }}
                                     >
                                         Vender
                                     </Button>
-                                </Stack>
-                                <Box>
-                                    <Typography variant="h6" sx={{ color: '#fff', mb: 2, borderBottom: '2px solid', borderColor: 'primary.main', display: 'inline-block', pb: 0.5 }}>
+                                </div>
+                                <div>
+                                    <Typography variant="h6" className="mb-4 inline-block border-b-2 border-primary pb-1 text-white">
                                         Estadísticas de Mercado
                                     </Typography>
                                     <CryptoStats financial={crypto.financial} color={color} />
-                                </Box>
+                                </div>
 
                                 <Card glowColor={crypto.additionalInfo?.pColor || color} sx={{ p: 3, border: `1px solid ${crypto.additionalInfo?.pColor || 'rgba(255,255,255,0.1)'}40` }}>
-                                    <Typography variant="h6" sx={{ color: '#fff', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Typography variant="h6" className="mb-4 flex items-center gap-2 text-white">
                                         Sobre {crypto.identification.name}
                                         {crypto.additionalInfo?.pColor && (
-                                            <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: crypto.additionalInfo.pColor, boxShadow: `0 0 10px ${crypto.additionalInfo.pColor}` }} />
+                                            <span
+                                                className="h-3 w-3 rounded-full"
+                                                style={{ backgroundColor: crypto.additionalInfo.pColor, boxShadow: `0 0 10px ${crypto.additionalInfo.pColor}` }}
+                                            />
                                         )}
                                     </Typography>
-                                    
-                                    <Box sx={{ mb: 3 }}>
+
+                                    <div className="mb-6">
                                         {description.map((desc, i) => (
-                                            <Typography key={i} variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.8, mb: 1.5 }}>
+                                            <Typography key={i} variant="body2" className="mb-3 leading-[1.8] text-foreground-muted">
                                                 {desc}
                                             </Typography>
                                         ))}
-                                    </Box>
-                                    
-                                    <Divider sx={{ my: 2, borderColor: `${crypto.additionalInfo?.sColor || 'rgba(255,255,255,0.1)'}40` }} />
+                                    </div>
 
-                                    <Stack spacing={2}>
-                                        <Stack direction="row" alignItems="center" spacing={1}>
-                                            <AccessTime fontSize="small" sx={{ color: crypto.additionalInfo?.pColor || 'primary.main' }} />
-                                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                                <Box component="span" sx={{ color: 'text.primary', fontWeight: 'bold' }}>Creado:</Box> {crypto.additionalInfo?.dateCreated ? new Date(crypto.additionalInfo.dateCreated).toLocaleDateString() : 'Desconocido'}
+                                    <hr className="my-4" style={{ borderColor: `${crypto.additionalInfo?.sColor || 'rgba(255,255,255,0.1)'}40` }} />
+
+                                    <div className="flex flex-col gap-4">
+                                        <div className="flex flex-row items-center gap-2">
+                                            <Clock size={16} style={{ color: crypto.additionalInfo?.pColor || '#00f3ff' }} />
+                                            <Typography variant="body2" className="text-foreground-muted">
+                                                <span className="font-bold text-foreground">Creado:</span> {crypto.additionalInfo?.dateCreated ? new Date(crypto.additionalInfo.dateCreated).toLocaleDateString() : 'Desconocido'}
                                             </Typography>
-                                        </Stack>
-                                        
+                                        </div>
+
                                         {crypto.updatedAt && (
-                                            <Stack direction="row" alignItems="center" spacing={1}>
-                                                <AccessTime fontSize="small" sx={{ color: crypto.additionalInfo?.sColor || 'text.secondary' }} />
-                                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                                    <Box component="span" sx={{ color: 'text.primary', fontWeight: 'bold' }}>Actualizado:</Box> {new Date(crypto.updatedAt).toLocaleString('en-US')}
+                                            <div className="flex flex-row items-center gap-2">
+                                                <Clock size={16} style={{ color: crypto.additionalInfo?.sColor || undefined }} className={!crypto.additionalInfo?.sColor ? 'text-foreground-muted' : undefined} />
+                                                <Typography variant="body2" className="text-foreground-muted">
+                                                    <span className="font-bold text-foreground">Actualizado:</span> {new Date(crypto.updatedAt).toLocaleString('en-US')}
                                                 </Typography>
-                                            </Stack>
+                                            </div>
                                         )}
-                                        
-                                        <Box>
-                                            <Stack direction="row" alignItems="center" spacing={1} mb={1}>
-                                                <Code fontSize="small" sx={{ color: crypto.additionalInfo?.pColor || 'primary.main' }} />
-                                                <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
+
+                                        <div>
+                                            <div className="mb-1 flex flex-row items-center gap-2">
+                                                <Code size={16} style={{ color: crypto.additionalInfo?.pColor || '#00f3ff' }} />
+                                                <Typography variant="body2" className="font-bold text-foreground">
                                                     Developers:
                                                 </Typography>
-                                            </Stack>
-                                            <Stack direction="row" flexWrap="wrap" gap={1}>
+                                            </div>
+                                            <div className="flex flex-row flex-wrap gap-2">
                                                 {crypto.additionalInfo?.developers && crypto.additionalInfo.developers.length > 0 ? (
                                                     crypto.additionalInfo.developers.map((dev, index) => (
-                                                        <Chip 
-                                                            key={index} 
-                                                            label={dev} 
-                                                            size="small" 
-                                                            variant="outlined"
-                                                            sx={{ 
-                                                                color: crypto.additionalInfo?.sColor || 'text.secondary',
+                                                        <span
+                                                            key={index}
+                                                            className="inline-flex items-center rounded-full border px-3 py-1 text-xs"
+                                                            style={{
+                                                                color: crypto.additionalInfo?.sColor || undefined,
                                                                 borderColor: `${crypto.additionalInfo?.pColor || 'rgba(255,255,255,0.2)'}60`,
-                                                                bgcolor: `${crypto.additionalInfo?.pColor || '#ffffff'}10`
-                                                            }} 
-                                                        />
+                                                                backgroundColor: `${crypto.additionalInfo?.pColor || '#ffffff'}10`,
+                                                            }}
+                                                        >
+                                                            {dev}
+                                                        </span>
                                                     ))
                                                 ) : (
-                                                    <Typography variant="caption" color="text.secondary">N/A</Typography>
+                                                    <Typography variant="caption" className="text-foreground-muted">N/A</Typography>
                                                 )}
-                                            </Stack>
-                                        </Box>
-                                    </Stack>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </Card>
-                            </Stack>
-                        </Grid>
-                    </Grid>
-                </Stack>
-            </Container>
-        </Box>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 };
