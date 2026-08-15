@@ -8,7 +8,7 @@ import { Background } from '../../components/layout/Background';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { TechFrame } from '../../components/ui/TechFrame';
 import { Typography } from '../../components/ui/Typography';
-import { Button } from '../../components/ui/Button';
+import { TechButton } from '../../components/ui/TechButton';
 
 export default function QueEsLyncorePage() {
   const router = useRouter();
@@ -51,17 +51,15 @@ export default function QueEsLyncorePage() {
       <Background />
 
       <div className="relative z-[1] mx-auto w-full max-w-[1200px] px-4 pt-32 pb-20 sm:px-6 lg:px-8">
-        <Button
-          startIcon={<ArrowLeft />}
+        <TechButton
+          color="#b3b3b3"
+          size="small"
+          startIcon={<ArrowLeft size={16} />}
           onClick={() => router.push('/')}
-          sx={{
-            color: 'text.secondary',
-            mb: 4,
-            '&:hover': { color: '#00f3ff', bgcolor: 'rgba(0, 243, 255, 0.05)' }
-          }}
+          className="mb-8"
         >
           Volver al Inicio
-        </Button>
+        </TechButton>
 
         <PageHeader
           title="¿Qué es"
@@ -116,28 +114,9 @@ export default function QueEsLyncorePage() {
         </div>
 
         <div className="mt-16 text-center">
-          <Button
-            variant="contained"
-            onClick={() => router.push('/')}
-            sx={{
-              bgcolor: '#00f3ff',
-              color: '#000',
-              fontWeight: 'bold',
-              px: 6,
-              py: 1.8,
-              fontSize: '1rem',
-              letterSpacing: 1.5,
-              boxShadow: '0 0 30px rgba(0,243,255,0.3)',
-              '&:hover': {
-                bgcolor: '#00dbe6',
-                boxShadow: '0 0 50px rgba(0,243,255,0.5)',
-                transform: 'translateY(-2px)'
-              },
-              transition: 'all 0.25s ease'
-            }}
-          >
+          <TechButton color="#00f3ff" size="large" onClick={() => router.push('/')}>
             Comenzar Misión
-          </Button>
+          </TechButton>
         </div>
       </div>
     </div>
