@@ -5,14 +5,15 @@
 'use client';
 
 import React from 'react';
-import { Box, Container, Typography, Button, Avatar, Grid, Chip } from '@mui/material';
 import { Background } from '../../components/layout/Background';
 
 //# 1-Selección de datos desde el estado global de Redux
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { TechFrame } from '../../components/ui/TechFrame';
 import { PageHeader } from '../../components/ui/PageHeader';
-import { ContentCopy, Verified, GppBad } from '@mui/icons-material';
+import { Typography } from '../../components/ui/Typography';
+import { Button } from '../../components/ui/Button';
+import { Copy, BadgeCheck, ShieldOff } from 'lucide-react';
 import { addNotification } from '../../lib/features/uiSlice';
 
 export default function SettingsPage() {
@@ -28,149 +29,115 @@ export default function SettingsPage() {
     }));
   };
 
-  
-  
+
+
   //# 3-Estructuración y renderizado visual del componente UI
   return (
-    <Box sx={{ minHeight: '100vh', position: 'relative' }}>
+    <div className="relative min-h-screen">
       <Background />
-      <Container maxWidth="lg" sx={{ pt: 16, pb: 10, position: 'relative', zIndex: 1 }}>
-        <PageHeader 
-            title="CONFIGURACIÓN DE CUENTA" 
+      <div className="relative z-[1] mx-auto w-full max-w-[1200px] px-4 pb-20 pt-32 sm:px-6 lg:px-8">
+        <PageHeader
+            title="CONFIGURACIÓN DE CUENTA"
             subtitle="Administra tu perfil personal, preferencias y seguridad del sistema."
             color="#00f3ff"
         />
 
-        <Grid container spacing={4}>
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
             {}
-            <Grid size={{ xs: 12, md: 4 }}>
+            <div className="md:col-span-4">
                 <TechFrame>
-                    <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                         <Box sx={{ 
-                             position: 'relative', 
-                             width: 120, 
-                             height: 120, 
-                             mb: 3 
-                         }}>
-                             <Avatar sx={{ 
-                                 width: '100%', 
-                                 height: '100%', 
-                                 bgcolor: 'primary.main', 
-                                 fontSize: '3rem',
-                                 border: '2px solid #00f3ff',
-                                 boxShadow: '0 0 20px rgba(0, 243, 255, 0.4)'
-                             }}>
+                    <div className="flex flex-col items-center p-8 text-center">
+                         <div className="relative mb-6 h-[120px] w-[120px]">
+                             <div className="flex h-full w-full items-center justify-center rounded-full border-2 border-[#00f3ff] bg-primary text-5xl shadow-[0_0_20px_rgba(0,243,255,0.4)]">
                                 {userInfo?.username?.[0]?.toUpperCase() || 'U'}
-                            </Avatar>
-                            <Box sx={{
-                                position: 'absolute',
-                                bottom: 0,
-                                right: 0,
-                                width: 24,
-                                height: 24,
-                                borderRadius: '50%',
-                                bgcolor: userInfo?.confirmedAccount ? '#00e676' : '#ff1744',
-                                border: '2px solid black',
-                                boxShadow: '0 0 10px currentColor',
-                                color: userInfo?.confirmedAccount ? '#00e676' : '#ff1744'
-                            }} />
-                         </Box>
+                            </div>
+                            <div
+                                className="absolute bottom-0 right-0 h-6 w-6 rounded-full border-2 border-black shadow-[0_0_10px_currentColor]"
+                                style={{
+                                    backgroundColor: userInfo?.confirmedAccount ? '#00e676' : '#ff1744',
+                                    color: userInfo?.confirmedAccount ? '#00e676' : '#ff1744',
+                                }}
+                            />
+                         </div>
 
-                         <Typography variant="h5" color="white" fontWeight="bold" gutterBottom>
+                         <Typography variant="h5" component="p" className="mb-1 font-bold text-white">
                              {userInfo?.name} {userInfo?.lastName}
                          </Typography>
-                         <Typography variant="body1" color="primary.main" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                         <Typography variant="body1" component="p" className="mb-1 flex items-center gap-2 text-primary">
                              @{userInfo?.username}
-                             {userInfo?.confirmedAccount && <Verified fontSize="small" />}
+                             {userInfo?.confirmedAccount && <BadgeCheck size={18} />}
                          </Typography>
-                         
-                         <Box sx={{ mt: 2, width: '100%' }}>
-                            <Chip 
-                                label={userInfo?.isBanned ? "ACCESO DENEGADO" : "ACCESO AUTORIZADO"} 
-                                color={userInfo?.isBanned ? "error" : "success"} 
-                                variant="outlined"
-                                sx={{ width: '100%' }}
-                            />
-                         </Box>
-                    </Box>
+
+                         <div className="mt-4 w-full">
+                            <span
+                                className={
+                                  'inline-flex w-full items-center justify-center rounded-full border px-3 py-1.5 text-sm font-bold ' +
+                                  (userInfo?.isBanned
+                                    ? 'border-error text-error'
+                                    : 'border-success text-success')
+                                }
+                            >
+                                {userInfo?.isBanned ? "ACCESO DENEGADO" : "ACCESO AUTORIZADO"}
+                            </span>
+                         </div>
+                    </div>
                 </TechFrame>
-            </Grid>
+            </div>
 
             {}
-            <Grid size={{ xs: 12, md: 8 }}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    
+            <div className="md:col-span-8">
+                <div className="flex flex-col gap-8">
+
                     {}
                     <TechFrame color="#ff0055">
-                        <Box sx={{ p: 4 }}>
-                            <Typography variant="h6" sx={{ color: '#ff0055', mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <div className="p-8">
+                            <Typography variant="h6" component="p" className="mb-6 flex items-center gap-2 text-[#ff0055]">
                                 {'// DATOS DE USUARIO'}
                             </Typography>
-                            
-                            <Grid container spacing={3}>
-                                <Grid size={{ xs: 12, sm: 6 }}>
-                                    <Typography variant="caption" color="text.secondary">ID DE USUARIO</Typography>
-                                    <Box 
+
+                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                                <div>
+                                    <Typography variant="caption" component="p" className="text-foreground-muted">ID DE USUARIO</Typography>
+                                    <div
                                         onClick={() => copyToClipboard(userInfo?.id || '', 'ID de Usuario')}
-                                        sx={{ 
-                                            display: 'flex', 
-                                            alignItems: 'center', 
-                                            gap: 1, 
-                                            color: 'white', 
-                                            cursor: 'pointer',
-                                            '&:hover': { color: 'primary.main' }
-                                        }}
+                                        className="flex cursor-pointer items-center gap-2 text-white hover:text-primary"
                                     >
-                                        <Typography variant="body1" sx={{ fontFamily: 'monospace' }}>
+                                        <Typography variant="body1" component="p" className="font-mono">
                                             {userInfo?.id ? `${userInfo.id.substring(0, 12)}...` : 'N/A'}
                                         </Typography>
-                                        <ContentCopy fontSize="small" sx={{ opacity: 0.5 }} />
-                                    </Box>
-                                </Grid>
-                                <Grid size={{ xs: 12, sm: 6 }}>
-                                    <Typography variant="caption" color="text.secondary">CORREO ELECTRÓNICO</Typography>
-                                    <Box 
+                                        <Copy size={16} className="opacity-50" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <Typography variant="caption" component="p" className="text-foreground-muted">CORREO ELECTRÓNICO</Typography>
+                                    <div
                                         onClick={() => copyToClipboard(userInfo?.email || '', 'Correo electrónico')}
-                                        sx={{ 
-                                            display: 'flex', 
-                                            alignItems: 'center', 
-                                            gap: 1, 
-                                            color: 'white', 
-                                            cursor: 'pointer',
-                                            '&:hover': { color: 'primary.main' }
-                                        }}
+                                        className="flex cursor-pointer items-center gap-2 text-white hover:text-primary"
                                     >
-                                        <Typography variant="body1">
+                                        <Typography variant="body1" component="p">
                                             {userInfo?.email || 'N/A'}
                                         </Typography>
-                                        <ContentCopy fontSize="small" sx={{ opacity: 0.5 }} />
-                                    </Box>
-                                </Grid>
-                                <Grid size={{ xs: 12, sm: 6 }}>
-                                    <Typography variant="caption" color="text.secondary">FECHA DE NACIMIENTO</Typography>
-                                    <Typography variant="body1" color="white">{userInfo?.birthday || 'No definida'}</Typography>
-                                </Grid>
-                                <Grid size={{ xs: 12, sm: 6 }}>
-                                    <Typography variant="caption" color="text.secondary">CÓDIGO DE REFERENCIA</Typography>
-                                    <Box 
+                                        <Copy size={16} className="opacity-50" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <Typography variant="caption" component="p" className="text-foreground-muted">FECHA DE NACIMIENTO</Typography>
+                                    <Typography variant="body1" component="p" className="text-white">{userInfo?.birthday || 'No definida'}</Typography>
+                                </div>
+                                <div>
+                                    <Typography variant="caption" component="p" className="text-foreground-muted">CÓDIGO DE REFERENCIA</Typography>
+                                    <div
                                         onClick={() => copyToClipboard(userInfo?.referralCode || '', 'Código de Referencia')}
-                                        sx={{ 
-                                            display: 'flex', 
-                                            alignItems: 'center', 
-                                            gap: 1, 
-                                            color: '#ffb700', 
-                                            cursor: 'pointer',
-                                            fontWeight: 'bold'
-                                        }}
+                                        className="flex cursor-pointer items-center gap-2 font-bold text-[#ffb700]"
                                     >
-                                        <Typography variant="body1" sx={{ fontFamily: 'monospace' }}>
+                                        <Typography variant="body1" component="p" className="font-mono">
                                             {userInfo?.referralCode || 'N/A'}
                                         </Typography>
-                                        <ContentCopy fontSize="small" sx={{ opacity: 0.5 }} />
-                                    </Box>
-                                </Grid>
-                            </Grid>
-                        </Box>
+                                        <Copy size={16} className="opacity-50" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </TechFrame>
 
                     {}
@@ -178,20 +145,20 @@ export default function SettingsPage() {
 
                      {}
                      <TechFrame color="#ffb700">
-                        <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                            <Typography variant="h6" sx={{ color: '#ffb700', mb: 1 }}>
+                        <div className="flex flex-col gap-4 p-8">
+                            <Typography variant="h6" component="p" className="mb-2 text-[#ffb700]">
                                 {'// ZONA DE SEGURIDAD'}
                             </Typography>
-                            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                                <Button variant="outlined" color="error" startIcon={<GppBad />}>Cerrar Sesión en otros dispositivos</Button>
-                            </Box>
-                        </Box>
+                            <div className="flex flex-wrap gap-4">
+                                <Button variant="outlined" color="error" startIcon={<ShieldOff size={18} />}>Cerrar Sesión en otros dispositivos</Button>
+                            </div>
+                        </div>
                      </TechFrame>
 
-                </Box>
-            </Grid>
-        </Grid>
-      </Container>
-    </Box>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
   );
 }

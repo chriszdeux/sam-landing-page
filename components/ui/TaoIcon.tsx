@@ -3,10 +3,8 @@
 
 //# 1-Definir componente de icono Tao animado
 import React from 'react';
-import { Typography } from '@mui/material';
 import { motion } from 'framer-motion';
 import { EnvVariables } from '@/lib/constants/variables';
-import { cyan } from '@mui/material/colors';
 
 interface TaoIconProps {
     size?: number;
@@ -14,15 +12,14 @@ interface TaoIconProps {
     style?: React.CSSProperties;
 }
 
-export const TaoIcon: React.FC<TaoIconProps> = ({ size = 12, color: customColor, style}) => { 
+export const TaoIcon: React.FC<TaoIconProps> = ({ size = 12, color: customColor, style}) => {
     const color = customColor || 'var(--neon-cyan, #00f3ff)';
-    
+
     //# 2-Renderizar icono con animación Framer Motion
     return (
-        <Typography 
-            component={motion.span}
+        <motion.span
             initial={{ opacity: 0.8 }}
-            animate={{ 
+            animate={{
                 opacity: [0.8, 1, 0.8],
                 textShadow: [
                     `0 0 0px ${color === 'var(--neon-cyan, #00f3ff)' ? '#00f3ff00' : color + '00'}`,
@@ -31,26 +28,19 @@ export const TaoIcon: React.FC<TaoIconProps> = ({ size = 12, color: customColor,
                 ]
             }}
 
-            transition={{ 
-                duration: 2, 
+            transition={{
+                duration: 2,
                 repeat: Infinity,
                 ease: "easeInOut"
             }}
-            sx={{ 
-                color: color,
-                fontWeight: 900, 
+            className="ml-1 inline-flex items-baseline align-middle font-mono font-black leading-none tracking-wide"
+            style={{
+                color,
                 fontSize: size,
-                fontFamily: 'monospace',
-                lineHeight: 1,
-                display: 'inline-flex',
-                alignItems: 'baseline',
-                letterSpacing: 1,
-                ml: 0.5,
-                verticalAlign: 'middle',
-                ...style 
+                ...style
             }}
         >
             {EnvVariables.coin1}
-        </Typography>
+        </motion.span>
     );
 };

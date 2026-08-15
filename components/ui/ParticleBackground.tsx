@@ -6,7 +6,6 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { Box } from '@mui/material';
 
 interface Particle {
   x: number;
@@ -297,33 +296,11 @@ export const ParticleBackground = () => {
   //# 3-Renderizar elemento canvas
   return (
     <>
-    <Box
-      component="canvas"
+    <canvas
       ref={canvasRef}
-      sx={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        zIndex: -2,
-        bgcolor: '#05050f',
-        willChange: 'transform',
-        transform: 'translate3d(0, 0, 0)',
-      }}
+      className="fixed inset-0 -z-20 h-full w-full bg-[#05050f] [transform:translate3d(0,0,0)] [will-change:transform]"
     />
-    <Box
-        sx={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          zIndex: -1,
-          backgroundColor: 'rgba(0, 0, 0, 0.7)',
-          pointerEvents: 'none',
-        }}
-    />
+    <div className="pointer-events-none fixed inset-0 -z-10 h-full w-full bg-black/70" />
     </>
   );
 };

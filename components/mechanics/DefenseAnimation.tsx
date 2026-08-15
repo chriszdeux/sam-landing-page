@@ -12,18 +12,13 @@
 
 //# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useState, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AttackDetection = () => {
-    
-    
-    
+
     //# 2-Gestión de estado local para threats
     const [threats, setThreats] = useState<{id: number, angle: number, distance: number, delay: number}[]>([]);
 
-    
-    
     //# 3-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         setThreats(Array.from({ length: 5 }).map((_, i) => ({
@@ -34,11 +29,9 @@ const AttackDetection = () => {
         })));
     }, []);
 
-    
-    
     //# 4-Estructuración y renderizado visual del componente UI
     return (
-        <Box sx={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="relative flex h-full w-full items-center justify-center">
             {}
             <motion.div
                 style={{
@@ -58,7 +51,7 @@ const AttackDetection = () => {
                     position: 'absolute'
                 }}
             />
-            
+
             {}
             <motion.div
                 style={{
@@ -75,7 +68,7 @@ const AttackDetection = () => {
             />
 
             {}
-            <Box sx={{ width: 20, height: 20, bgcolor: '#ff3333', borderRadius: '50%', zIndex: 10, boxShadow: '0 0 20px #ff3333' }} />
+            <div style={{ width: 20, height: 20, backgroundColor: '#ff3333', borderRadius: '50%', zIndex: 10, boxShadow: '0 0 20px #ff3333' }} />
 
             {}
             {threats.map((threat) => (
@@ -93,23 +86,22 @@ const AttackDetection = () => {
                     animate={{ opacity: [0, 1, 0], scale: [0, 1.5, 0] }}
                     transition={{ duration: 1.5, repeat: Infinity, delay: threat.delay, repeatDelay: 1 }}
                 >
-                     <Box sx={{ position: 'absolute', inset: -5, border: '1px solid red', borderRadius: '50%' }} />
+                     <div style={{ position: 'absolute', inset: -5, border: '1px solid red', borderRadius: '50%' }} />
                 </motion.div>
             ))}
 
-             <Typography sx={{ position: 'absolute', bottom: 40, color: '#ff3333', fontWeight: 'bold', letterSpacing: 3 }}>
+             <p style={{ position: 'absolute', bottom: 40, color: '#ff3333', fontWeight: 'bold', letterSpacing: 3 }}>
                 DETECTANDO AMENAZAS
-            </Typography>
-        </Box>
+            </p>
+        </div>
     );
 };
 
 const InformationInterception = () => {
-    
-    
+
     //# 5-Estructuración y renderizado visual del componente UI
     return (
-        <Box sx={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+        <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
             {}
             {Array.from({ length: 8 }).map((_, i) => (
                 <motion.div
@@ -123,14 +115,14 @@ const InformationInterception = () => {
                         background: '#00f3ff',
                         borderRadius: 2
                     }}
-                    animate={{ 
+                    animate={{
                         x: [0, 800],
                         opacity: [0, 1, 0],
-                        background: ['#00f3ff', '#00f3ff', '#ff3333'] 
+                        background: ['#00f3ff', '#00f3ff', '#ff3333']
                     }}
-                    transition={{ 
-                        duration: 2, 
-                        repeat: Infinity, 
+                    transition={{
+                        duration: 2,
+                        repeat: Infinity,
                         delay: i * 0.3,
                         ease: "linear"
                     }}
@@ -150,7 +142,7 @@ const InformationInterception = () => {
                 animate={{ height: [200, 300, 200], opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 2, repeat: Infinity }}
             />
-            
+
             {}
             <motion.div
                  style={{
@@ -164,36 +156,33 @@ const InformationInterception = () => {
                  animate={{ scale: [1, 1.1, 1] }}
                  transition={{ repeat: Infinity, duration: 1 }}
             >
-                <Typography variant="caption" fontWeight="bold">LOCKED</Typography>
+                <span className="text-xs font-bold">LOCKED</span>
             </motion.div>
 
-            <Typography sx={{ position: 'absolute', bottom: 40, color: '#ff3333', fontWeight: 'bold', letterSpacing: 3 }}>
+            <p style={{ position: 'absolute', bottom: 40, color: '#ff3333', fontWeight: 'bold', letterSpacing: 3 }}>
                 INTERCEPTANDO PAQUETES
-            </Typography>
-        </Box>
+            </p>
+        </div>
     );
 };
 
 const NetworkInterruption = () => {
-    
+
     const nodes = [
         { x: -100, y: -50 }, { x: 100, y: -50 },
         { x: -100, y: 50 }, { x: 100, y: 50 },
-        { x: 0, y: 0 } 
+        { x: 0, y: 0 }
     ];
 
-    
-    
     //# 6-Estructuración y renderizado visual del componente UI
     return (
-        <Box sx={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="relative flex h-full w-full items-center justify-center">
             {}
             <svg style={{ position: 'absolute', width: '100%', height: '100%', overflow: 'visible' }}>
                 {nodes.map((node, i) => (
                     nodes.map((target, j) => {
-                        if (i >= j) return null; 
-                        
-                        
+                        if (i >= j) return null;
+
                         //# 7-Estructuración y renderizado visual del componente UI
                         return (
                             <motion.line
@@ -205,13 +194,13 @@ const NetworkInterruption = () => {
                                 stroke="#ff3333"
                                 strokeWidth="2"
                                 initial={{ opacity: 1 }}
-                                animate={{ 
+                                animate={{
                                     opacity: [1, 0, 1, 0, 0, 1],
                                     strokeDasharray: ["0 0", "10 10", "0 0"]
                                 }}
-                                transition={{ 
-                                    duration: 2, 
-                                    repeat: Infinity, 
+                                transition={{
+                                    duration: 2,
+                                    repeat: Infinity,
                                     delay: i * 0.1,
                                     times: [0, 0.1, 0.2, 0.3, 0.8, 1]
                                 }}
@@ -235,7 +224,7 @@ const NetworkInterruption = () => {
                         borderRadius: '50%',
                         backgroundColor: '#ff3333'
                     }}
-                    animate={{ 
+                    animate={{
                         scale: [1, 1.2, 0.8, 1],
                         filter: ["brightness(1)", "brightness(2)", "brightness(0.5)"]
                     }}
@@ -248,29 +237,25 @@ const NetworkInterruption = () => {
                 animate={{ x: [-2, 2, -2], opacity: [0.8, 1, 0.8] }}
                 transition={{ duration: 0.1, repeat: Infinity }}
              >
-                <Typography sx={{ position: 'absolute', bottom: 40, left: 0, right: 0, textAlign: 'center', color: '#ff3333', fontWeight: 'bold', letterSpacing: 3 }}>
+                <p style={{ position: 'absolute', bottom: 40, left: 0, right: 0, textAlign: 'center', color: '#ff3333', fontWeight: 'bold', letterSpacing: 3 }}>
                     RED INTERRUMPIDA
-                </Typography>
+                </p>
              </motion.div>
-        </Box>
+        </div>
     );
 };
 
 export const DefenseAnimation = () => {
-    
-    
+
     //# 8-Verificación de existencia para active phase
     const [activePhase, setActivePhase] = useState(0);
 
-    
-    
     //# 9-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         const interval = setInterval(() => {
             setActivePhase((prev) => (prev + 1) % 3);
         }, 5000);
-        
-        
+
         //# 10-Estructuración y renderizado visual del componente UI
         return () => clearInterval(interval);
     }, []);
@@ -281,27 +266,20 @@ export const DefenseAnimation = () => {
         <NetworkInterruption key="interruption" />
     ];
 
-    
-    
     //# 11-Estructuración y renderizado visual del componente UI
     return (
-        <Box sx={{ 
-            width: '100%', 
-            height: 600, 
-            bgcolor: 'rgba(20, 0, 0, 0.6)', 
-            borderRadius: 8, 
-            border: '1px solid #ff333330',
-            overflow: 'hidden',
-            position: 'relative'
-        }}>
+        <div
+            className="relative h-[600px] w-full overflow-hidden rounded-lg border border-[#ff333330]"
+            style={{ backgroundColor: 'rgba(20, 0, 0, 0.6)' }}
+        >
             {}
-            <Box sx={{ 
-                position: 'absolute', 
-                inset: 0, 
-                opacity: 0.1,
-                backgroundImage: 'linear-gradient(#f33 1px, transparent 1px), linear-gradient(90deg, #f33 1px, transparent 1px)',
-                backgroundSize: '40px 40px'
-            }} />
+            <div
+                className="absolute inset-0 opacity-10"
+                style={{
+                    backgroundImage: 'linear-gradient(#f33 1px, transparent 1px), linear-gradient(90deg, #f33 1px, transparent 1px)',
+                    backgroundSize: '40px 40px'
+                }}
+            />
 
             <AnimatePresence mode="wait">
                 <motion.div
@@ -317,20 +295,15 @@ export const DefenseAnimation = () => {
             </AnimatePresence>
 
             {}
-            <Box sx={{ position: 'absolute', bottom: 20, left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 2 }}>
+            <div className="absolute bottom-5 left-0 right-0 flex justify-center gap-4">
                 {[0, 1, 2].map((i) => (
-                    <Box 
-                        key={i} 
-                        sx={{ 
-                            width: 8, 
-                            height: 8, 
-                            borderRadius: '50%', 
-                            bgcolor: i === activePhase ? '#ff3333' : 'rgba(255, 51, 51, 0.2)',
-                            transition: 'background-color 0.3s'
-                        }} 
+                    <div
+                        key={i}
+                        className="h-2 w-2 rounded-full transition-colors duration-300"
+                        style={{ backgroundColor: i === activePhase ? '#ff3333' : 'rgba(255, 51, 51, 0.2)' }}
                     />
                 ))}
-            </Box>
-        </Box>
+            </div>
+        </div>
     );
 };

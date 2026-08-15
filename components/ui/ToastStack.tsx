@@ -11,15 +11,15 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Box, Typography, IconButton } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Close, CheckCircle, Error, Info, Warning } from '@mui/icons-material';
+import { X, CheckCircle, XCircle, Info, AlertTriangle } from 'lucide-react';
 
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { removeNotification, Notification } from '../../lib/features/uiSlice';
+import { Typography } from './Typography';
 
 const ToastItem = ({ notification }: { notification: Notification }) => {
-    
+
     //# 2-Obtener despachador y configurar temporizador
     const dispatch = useAppDispatch();
 
@@ -29,7 +29,7 @@ const ToastItem = ({ notification }: { notification: Notification }) => {
             const timer = setTimeout(() => {
                 dispatch(removeNotification(notification.id));
             }, notification.duration);
-            
+
             return () => clearTimeout(timer);
         }
     }, [notification, dispatch]);
@@ -37,10 +37,10 @@ const ToastItem = ({ notification }: { notification: Notification }) => {
     //# 4-Determinar icono y colores según tipo
     const getIcon = () => {
         switch (notification.type) {
-            case 'success': return <CheckCircle fontSize="small" sx={{ color: '#00fa9a' }} />;
-            case 'error': return <Error fontSize="small" sx={{ color: '#ff4d4d' }} />;
-            case 'warning': return <Warning fontSize="small" sx={{ color: '#ffcc00' }} />;
-            default: return <Info fontSize="small" sx={{ color: '#00f3ff' }} />;
+            case 'success': return <CheckCircle size={18} className="text-[#00fa9a]" />;
+            case 'error': return <XCircle size={18} className="text-[#ff4d4d]" />;
+            case 'warning': return <AlertTriangle size={18} className="text-[#ffcc00]" />;
+            default: return <Info size={18} className="text-[#00f3ff]" />;
         }
     };
 
@@ -52,7 +52,7 @@ const ToastItem = ({ notification }: { notification: Notification }) => {
             default: return { border: '#00f3ff', bg: 'rgba(0, 243, 255, 0.1)' };
         }
     };
-    
+
     const colors = getColors();
 
     //# 5-Renderizar notificación con animación de salida
@@ -64,65 +64,43 @@ const ToastItem = ({ notification }: { notification: Notification }) => {
             exit={{ opacity: 0, x: 100, transition: { duration: 0.2 } }}
             style={{ marginBottom: 8 }}
         >
-            <Box sx={{
-                width: 300,
-                p: 2,
-                borderRadius: 2,
-                bgcolor: 'rgba(10, 10, 10, 0.95)',
-                border: `1px solid ${colors.border}`,
-                borderLeft: `4px solid ${colors.border}`,
-                boxShadow: `0 4px 20px rgba(0,0,0,0.5)`,
-                backdropFilter: 'blur(10px)',
-                display: 'flex',
-                alignItems: 'start',
-                gap: 2,
-                position: 'relative',
-                overflow: 'hidden'
-            }}>
-                <Box sx={{ mt: 0.5 }}>{getIcon()}</Box>
-                <Box sx={{ flexGrow: 1 }}>
-                     <Typography variant="body2" sx={{ color: 'white', fontWeight: 500 }}>
+            <div
+                className="relative flex w-[300px] items-start gap-4 overflow-hidden rounded-lg bg-[rgba(10,10,10,0.95)] p-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)] backdrop-blur-md"
+                style={{ border: `1px solid ${colors.border}`, borderLeft: `4px solid ${colors.border}` }}
+            >
+                <div className="mt-0.5">{getIcon()}</div>
+                <div className="flex-grow">
+                     <Typography variant="body2" component="p" className="font-medium text-white">
                          {notification.message}
                      </Typography>
-                </Box>
-                <IconButton 
-                    size="small" 
+                </div>
+                <button
                     onClick={() => dispatch(removeNotification(notification.id))}
-                    sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: 'white' }, p: 0.5, mt: 0 }}
+                    className="mt-0 p-0.5 text-white/50 transition-colors hover:text-white"
                 >
-                    <Close fontSize="small" />
-                </IconButton>
-                
+                    <X size={18} />
+                </button>
 
-            </Box>
+
+            </div>
         </motion.div>
     );
 };
 
 //# 6-Definir contenedor de pila de notificaciones
 export const ToastStack = () => {
-    
+
     //# 7-Seleccionar notificaciones del estado global
     const notifications = useAppSelector(state => state.ui.notifications);
 
     //# 8-Renderizar lista de notificaciones
     return (
-        <Box sx={{
-            position: 'fixed',
-            bottom: 24,
-            right: 24,
-            zIndex: 9999,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-            pointerEvents: 'none',
-            '& > div': { pointerEvents: 'auto' }
-        }}>
+        <div className="pointer-events-none fixed bottom-6 right-6 z-[9999] flex flex-col items-end [&>div]:pointer-events-auto">
             <AnimatePresence>
                 {notifications.map(notification => (
                     <ToastItem key={notification.id} notification={notification} />
                 ))}
             </AnimatePresence>
-        </Box>
+        </div>
     );
 };
