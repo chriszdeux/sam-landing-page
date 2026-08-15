@@ -2,14 +2,12 @@
 // 2-Estructuración y renderizado visual del componente UI
 
 import React from 'react';
-import { Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { Doughnut, Radar, PolarArea, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, RadialLinearScale, BarElement, CategoryScale, LinearScale, PointElement, LineElement, Filler } from 'chart.js';
-import DonutLargeIcon from '@mui/icons-material/DonutLarge';
-import DataUsageIcon from '@mui/icons-material/DataUsage';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import TrackChangesIcon from '@mui/icons-material/TrackChanges';
+import { PieChart, Gauge, BarChart3, Target } from 'lucide-react';
 import { motion, LegacyAnimationControls } from 'framer-motion';
+import { cn } from '@/lib/utils/cn';
+import { Typography } from '../ui/Typography';
 import { Asset } from '../../lib/types/portfolio';
 
 ChartJS.register(ArcElement, Tooltip, Legend, RadialLinearScale, BarElement, CategoryScale, LinearScale, PointElement, LineElement, Filler);
@@ -94,52 +92,49 @@ export const PortfolioChart: React.FC<PortfolioChartProps> = ({ assets, controls
     
     
     //# 2-Estructuración y renderizado visual del componente UI
+    const toggleOptions: { value: string; icon: React.ReactNode }[] = [
+        { value: 'doughnut', icon: <PieChart size={18} /> },
+        { value: 'radar', icon: <Target size={18} /> },
+        { value: 'polar', icon: <Gauge size={18} /> },
+        { value: 'bar', icon: <BarChart3 size={18} /> },
+    ];
+
     return (
         <motion.div animate={controls}>
-            <Box sx={{ position: 'relative', height: 400, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <ToggleButtonGroup
-                    value={chartType}
-                    exclusive
-                    onChange={(e, newType) => { if(newType) setChartType(newType) }}
+            <div className="relative flex h-[400px] w-full flex-col items-center">
+                <div
+                    role="group"
                     aria-label="chart type"
-                    sx={{ mb: 2, bgcolor: 'rgba(255,255,255,0.05)', borderRadius: 2 }}
-                    size="small"
+                    className="mb-4 flex gap-1 rounded-lg bg-white/5 p-1"
                 >
-                    <ToggleButton value="doughnut" sx={{ color: 'rgba(255,255,255,0.5)', '&.Mui-selected': { color: '#00f3ff', bgcolor: 'rgba(0, 243, 255, 0.1)' } }}>
-                        <DonutLargeIcon />
-                    </ToggleButton>
-                    <ToggleButton value="radar" sx={{ color: 'rgba(255,255,255,0.5)', '&.Mui-selected': { color: '#00f3ff', bgcolor: 'rgba(0, 243, 255, 0.1)' } }}>
-                        <TrackChangesIcon />
-                    </ToggleButton>
-                    <ToggleButton value="polar" sx={{ color: 'rgba(255,255,255,0.5)', '&.Mui-selected': { color: '#00f3ff', bgcolor: 'rgba(0, 243, 255, 0.1)' } }}>
-                        <DataUsageIcon />
-                    </ToggleButton>
-                    <ToggleButton value="bar" sx={{ color: 'rgba(255,255,255,0.5)', '&.Mui-selected': { color: '#00f3ff', bgcolor: 'rgba(0, 243, 255, 0.1)' } }}>
-                        <BarChartIcon />
-                    </ToggleButton>
-                </ToggleButtonGroup>
+                    {toggleOptions.map((opt) => (
+                        <button
+                            key={opt.value}
+                            onClick={() => setChartType(opt.value)}
+                            className={cn(
+                                'rounded px-2 py-1.5 text-white/50 transition-colors',
+                                chartType === opt.value && 'bg-[#00f3ff]/10 text-[#00f3ff]'
+                            )}
+                        >
+                            {opt.icon}
+                        </button>
+                    ))}
+                </div>
 
-                <Box sx={{ position: 'relative', height: 350, width: '100%' }}>
+                <div className="relative h-[350px] w-full">
                     {chartType === 'doughnut' && <Doughnut data={chartData} options={chartOptions} />}
                     {chartType === 'radar' && <Radar data={chartData} options={radarChartOptions} />}
                     {chartType === 'polar' && <PolarArea data={chartData} options={{ ...chartOptions, scales: { r: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { display: false } } } }} />}
                     {chartType === 'bar' && <Bar data={chartData} options={barChartOptions} />}
-                    
+
                     {chartType === 'doughnut' && (
-                        <Box sx={{ 
-                            position: 'absolute', 
-                            top: '50%', 
-                            left: '50%', 
-                            transform: 'translate(-50%, -50%)', 
-                            textAlign: 'center',
-                            pointerEvents: 'none'
-                        }}>
-                            <Typography variant="h6" color="primary.main">PORTAFOLIO</Typography>
-                            <Typography variant="caption" color="text.secondary">DIVERSIFICACIÓN</Typography>
-                        </Box>
+                        <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+                            <Typography variant="h6" className="text-primary">PORTAFOLIO</Typography>
+                            <Typography variant="caption" className="text-foreground-muted">DIVERSIFICACIÓN</Typography>
+                        </div>
                     )}
-                </Box>
-            </Box>
+                </div>
+            </div>
         </motion.div>
     );
 };

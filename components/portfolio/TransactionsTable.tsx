@@ -1,20 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import {
-    Box,
-    Typography,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    CircularProgress,
-    Chip,
-    Alert,
-    ChipProps
-} from '@mui/material';
+import { Typography } from '../ui/Typography';
 import { fetchTransactions } from '../../lib/features/transactions/actions';
 import { TransactionStatus } from '../../lib/features/transactions/types';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
@@ -25,10 +12,19 @@ interface TransactionsTableProps {
     walletId?: string;
 }
 
+const statusColorClass: Record<string, string> = {
+    [TransactionStatus.CONFIRMED]: 'border-[#00e676] text-[#00e676]',
+    [TransactionStatus.PENDING]: 'border-[#ff9100] text-[#ff9100]',
+    [TransactionStatus.FAILED]: 'border-[#ff1744] text-[#ff1744]',
+};
+
+const getStatusColorClass = (status: TransactionStatus): string =>
+    statusColorClass[status] || 'border-white/40 text-white/40';
+
 export const TransactionsTable: React.FC<TransactionsTableProps> = ({ storeId, walletId = '' }) => {
     const dispatch = useAppDispatch();
     const { transactions, isLoading, error } = useAppSelector((state) => state.transactions);
-    
+
     // Get transactions for this specific store from Redux state
     const transactionsData = transactions || [];
 
@@ -38,182 +34,127 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({ storeId, w
         }
     }, [storeId, walletId]);
 
-    const getStatusColor = (status: TransactionStatus): ChipProps['color'] => {
-        switch (status) {
-            case TransactionStatus.CONFIRMED: return 'success';
-            case TransactionStatus.PENDING: return 'warning';
-            case TransactionStatus.FAILED: return 'error';
-            default: return 'default';
-        }
-    };
-
     if (transactionsData.length === 0 && isLoading) {
         return (
             <TechFrame>
-                <Box sx={{ display: 'flex', justifyContent: 'center', p: 4, bgcolor: 'rgba(0,0,0,0.2)' }}>
-                    <CircularProgress sx={{ color: '#00f3ff' }} />
-                </Box>
+                <div className="flex justify-center bg-black/20 p-8">
+                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20" style={{ borderTopColor: '#00f3ff' }} />
+                </div>
             </TechFrame>
         );
     }
-    
+
     if (error) {
         return (
-             <Alert severity="error" sx={{ bgcolor: 'rgba(255,0,0,0.1)', color: '#ff4444' }}>
+             <div className="rounded border-l-4 border-red-500 bg-red-500/10 p-3 text-[#ff4444]">
                 {error}
-            </Alert>
+            </div>
         );
     }
-    
+
     if (transactionsData.length === 0 && !isLoading) {
         return (
             <TechFrame>
-                <Box sx={{ p: 4, textAlign: 'center', color: 'text.secondary', bgcolor: 'rgba(0,0,0,0.2)' }}>
+                <div className="bg-black/20 p-8 text-center text-foreground-muted">
                     <Typography>No hay transacciones recientes.</Typography>
-                </Box>
+                </div>
             </TechFrame>
         );
     }
     return (
         <React.Fragment>
-             <Typography variant="overline" sx={{ color: '#00f3ff', fontWeight: 'bold', mb: 2, display: 'block', letterSpacing: 4 }}>
+             <Typography variant="overline" className="mb-2 block font-bold tracking-[4px] text-[#00f3ff]">
                 {'// ULTIMAS_TRANSACCIONES'}
             </Typography>
             <TechFrame>
-                <TableContainer component={Box} sx={{ bgcolor: 'rgba(0,0,0,0.2)', p: 0 }}>
+                <div className="bg-black/20">
                     {/* Desktop View */}
-                    <Table size="small" sx={{ display: { xs: 'none', md: 'table' } }}>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell sx={{ color: 'rgba(0, 243, 255, 0.7)', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace' }}>FECHA</TableCell>
-                                <TableCell sx={{ color: 'rgba(0, 243, 255, 0.7)', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace' }}>TIPO</TableCell>
-                                <TableCell sx={{ color: 'rgba(0, 243, 255, 0.7)', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace' }}>ACTIVO</TableCell>
-                                <TableCell align="right" sx={{ color: 'rgba(0, 243, 255, 0.7)', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace' }}>CANTIDAD</TableCell>
-                                <TableCell align="center" sx={{ color: 'rgba(0, 243, 255, 0.7)', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace' }}>VALIDADO</TableCell>
-                                <TableCell align="center" sx={{ color: 'rgba(0, 243, 255, 0.7)', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace' }}>ESTADO</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
+                    <table className="hidden w-full border-collapse text-sm md:table">
+                        <thead>
+                            <tr>
+                                <th className="border-b border-[#00f3ff]/10 p-2 text-left font-mono font-normal text-[#00f3ff]/70">FECHA</th>
+                                <th className="border-b border-[#00f3ff]/10 p-2 text-left font-mono font-normal text-[#00f3ff]/70">TIPO</th>
+                                <th className="border-b border-[#00f3ff]/10 p-2 text-left font-mono font-normal text-[#00f3ff]/70">ACTIVO</th>
+                                <th className="border-b border-[#00f3ff]/10 p-2 text-right font-mono font-normal text-[#00f3ff]/70">CANTIDAD</th>
+                                <th className="border-b border-[#00f3ff]/10 p-2 text-center font-mono font-normal text-[#00f3ff]/70">VALIDADO</th>
+                                <th className="border-b border-[#00f3ff]/10 p-2 text-center font-mono font-normal text-[#00f3ff]/70">ESTADO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             {transactionsData.slice(0, 10).map((tx) => (
-                                <TableRow key={tx.id} hover sx={{ '&:hover': { bgcolor: 'rgba(0, 243, 255, 0.05)' } }}>
-                                    <TableCell sx={{ color: 'rgba(255,255,255,0.8)', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                                <tr key={tx.id} className="hover:bg-[#00f3ff]/5">
+                                    <td className="border-b border-[#00f3ff]/10 p-2 font-mono text-[0.85rem] text-white/80">
                                         {new Date(tx.dateCreated).toLocaleDateString()} {new Date(tx.dateCreated).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                                    </TableCell>
-                                    <TableCell sx={{ color: 'white', borderColor: 'rgba(0, 243, 255, 0.1)' }}>
-                                        <Chip 
-                                            label={tx.transactionType} 
-                                            size="small" 
-                                            sx={{ 
-                                                bgcolor: 'rgba(0, 243, 255, 0.05)', 
-                                                color: '#00f3ff',
-                                                border: '1px solid rgba(0, 243, 255, 0.2)',
-                                                fontWeight: 'bold',
-                                                fontSize: '0.65rem',
-                                                height: 20
-                                            }} 
-                                        />
-                                    </TableCell>
-                                    <TableCell sx={{ color: 'rgba(255,255,255,0.8)', borderColor: 'rgba(0, 243, 255, 0.1)', fontWeight: 'bold' }}>
+                                    </td>
+                                    <td className="border-b border-[#00f3ff]/10 p-2 text-white">
+                                        <span className="inline-flex h-5 items-center rounded border border-[#00f3ff]/20 bg-[#00f3ff]/5 px-2 text-[0.65rem] font-bold text-[#00f3ff]">
+                                            {tx.transactionType}
+                                        </span>
+                                    </td>
+                                    <td className="border-b border-[#00f3ff]/10 p-2 font-bold text-white/80">
                                         {tx.financialInfo.symbol}
-                                    </TableCell>
-                                    <TableCell align="right" sx={{ color: 'white', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace' }}>
+                                    </td>
+                                    <td className="border-b border-[#00f3ff]/10 p-2 text-right font-mono text-white">
                                         {tx.financialInfo.quantity}
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ color: 'rgba(255,255,255,0.8)', borderColor: 'rgba(0, 243, 255, 0.1)', fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                                    </td>
+                                    <td className="border-b border-[#00f3ff]/10 p-2 text-center font-mono text-[0.85rem] text-white/80">
                                         {tx.confirmedByLabId || '-'}
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ color: 'white', borderColor: 'rgba(0, 243, 255, 0.1)' }}>
-                                         <Chip 
-                                            label={tx.status} 
-                                            size="small" 
-                                            color={getStatusColor(tx.status)}
-                                            variant="outlined"
-                                            sx={{ fontSize: '0.65rem', height: 20 }}
-                                        />
-                                    </TableCell>
-                                </TableRow>
+                                    </td>
+                                    <td className="border-b border-[#00f3ff]/10 p-2 text-center text-white">
+                                         <span className={`inline-flex h-5 items-center rounded border bg-transparent px-2 text-[0.65rem] ${getStatusColorClass(tx.status)}`}>
+                                            {tx.status}
+                                        </span>
+                                    </td>
+                                </tr>
                             ))}
-                        </TableBody>
-                    </Table>
+                        </tbody>
+                    </table>
 
                     {/* Mobile View */}
-                    <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 2, p: 2 }}>
+                    <div className="flex flex-col gap-4 p-4 md:hidden">
                         {Array.isArray(transactionsData) && transactionsData.slice(0, 10).map((tx) => (
-                            <Box 
-                                key={tx.id} 
-                                sx={{ 
-                                    p: 2.5, 
-                                    border: '1px solid rgba(0, 243, 255, 0.1)', 
-                                    borderRadius: '8px',
-                                    bgcolor: 'rgba(255,255,255,0.03)',
-                                    position: 'relative',
-                                    overflow: 'hidden',
-                                    '&::before': {
-                                        content: '""',
-                                        position: 'absolute',
-                                        top: 0,
-                                        left: 0,
-                                        width: '4px',
-                                        height: '100%',
-                                        bgcolor: tx.status === 'CONFIRMED' ? '#00e676' : tx.status === 'PENDING' ? '#ff9100' : '#ff1744',
-                                        opacity: 0.7
-                                    }
-                                }}
+                            <div
+                                key={tx.id}
+                                className="relative overflow-hidden rounded-lg border border-[#00f3ff]/10 bg-white/[0.03] p-5"
                             >
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                                    <Box>
-                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'monospace', display: 'block', mb: 0.5 }}>
+                                <span
+                                    className="pointer-events-none absolute left-0 top-0 h-full w-1 opacity-70"
+                                    style={{ backgroundColor: tx.status === 'CONFIRMED' ? '#00e676' : tx.status === 'PENDING' ? '#ff9100' : '#ff1744' }}
+                                />
+                                <div className="mb-4 flex items-start justify-between">
+                                    <div>
+                                        <Typography variant="caption" className="mb-1 block font-mono text-white/40">
                                             {new Date(tx.dateCreated).toLocaleDateString()} {new Date(tx.dateCreated).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                         </Typography>
-                                        <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold', fontSize: '1rem' }}>
+                                        <Typography variant="h6" className="text-[1rem] font-bold text-white">
                                             {tx.financialInfo.symbol}
                                         </Typography>
-                                    </Box>
-                                    <Chip 
-                                        label={tx.status} 
-                                        size="small" 
-                                        color={getStatusColor(tx.status)}
-                                        variant="outlined"
-                                        sx={{ 
-                                            fontSize: '0.6rem', 
-                                            height: 18,
-                                            borderColor: 'currentColor',
-                                            textTransform: 'uppercase',
-                                            fontWeight: 'bold'
-                                        }}
-                                    />
-                                </Box>
-                                
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                        <Chip 
-                                            label={tx.transactionType} 
-                                            size="small" 
-                                            sx={{ 
-                                                bgcolor: 'rgba(0, 243, 255, 0.1)', 
-                                                color: '#00f3ff',
-                                                border: '1px solid rgba(0, 243, 255, 0.3)',
-                                                fontWeight: 'bold',
-                                                fontSize: '0.65rem',
-                                                height: 22,
-                                                width: 'fit-content'
-                                            }} 
-                                        />
-                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', fontSize: '0.7rem' }}>
+                                    </div>
+                                    <span className={`inline-flex h-[18px] items-center rounded border bg-transparent px-2 text-[0.6rem] font-bold uppercase ${getStatusColorClass(tx.status)}`}>
+                                        {tx.status}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-end justify-between">
+                                    <div className="flex flex-col gap-1">
+                                        <span className="inline-flex h-[22px] w-fit items-center rounded border border-[#00f3ff]/30 bg-[#00f3ff]/10 px-2 text-[0.65rem] font-bold text-[#00f3ff]">
+                                            {tx.transactionType}
+                                        </span>
+                                        <Typography variant="caption" className="font-mono text-[0.7rem] text-white/30">
                                             VAL: {tx.confirmedByLabId || '---'}
                                         </Typography>
-                                    </Box>
-                                    <Box sx={{ textAlign: 'right' }}>
-                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'block', mb: -0.5 }}>CANTIDAD</Typography>
-                                        <Typography sx={{ color: '#00f3ff', fontFamily: 'monospace', fontWeight: 'bold', fontSize: '1.2rem' }}>
+                                    </div>
+                                    <div className="text-right">
+                                        <Typography variant="caption" className="-mb-0.5 block text-white/40">CANTIDAD</Typography>
+                                        <Typography className="font-mono text-[1.2rem] font-bold text-[#00f3ff]">
                                             {tx.financialInfo.quantity}
                                         </Typography>
-                                    </Box>
-                                </Box>
-                            </Box>
+                                    </div>
+                                </div>
+                            </div>
                         ))}
-                    </Box>
-                </TableContainer>
+                    </div>
+                </div>
             </TechFrame>
         </React.Fragment>
     );
