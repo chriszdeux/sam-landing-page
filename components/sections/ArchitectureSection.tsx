@@ -3,11 +3,12 @@
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Typography, Grid, Box, Button } from '@mui/material';
+import { Typography } from '../ui/Typography';
+import { Button } from '../ui/Button';
 import { Section } from '../ui/Section';
 import { TechFrame } from '../ui/TechFrame';
 import { SectionTitle } from '../ui/SectionTitle';
-import { ArrowForward } from '@mui/icons-material';
+import { ArrowRight } from 'lucide-react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -16,7 +17,7 @@ import { architectureData } from '../../lib/data/architecture';
 gsap.registerPlugin(ScrollTrigger);
 
 export const ArchitectureSection = () => {
-  const container = useRef<HTMLElement | null>(null);
+  const container = useRef<HTMLDivElement | null>(null);
   const previewBuildings = architectureData.slice(0, 4);
 
   useGSAP(() => {
@@ -62,87 +63,62 @@ export const ArchitectureSection = () => {
   //# 1-Estructuración y renderizado visual del componente UI
   return (
     <Section id="architecture">
-      <Box ref={container}>
-        <Box className="arch-title">
+      <div ref={container}>
+        <div className="arch-title">
             <SectionTitle subtitle="// STRUCTURES" align="center">
                 Arquitectura
             </SectionTitle>
-        </Box>
+        </div>
 
-        <Grid container spacing={4} justifyContent="center" alignItems="stretch" className="arch-grid">
+        <div className="arch-grid grid grid-cols-1 items-stretch justify-center gap-8 sm:grid-cols-12">
             {previewBuildings.map((building, index) => (
-            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index} sx={{ display: 'flex' }} className="arch-card">
+            <div key={index} className="arch-card flex sm:col-span-6 md:col-span-3">
                 <TechFrame color={building.color} className="h-full w-full">
-                    <Box sx={{
-                        height: '100%',
-                        width: '100%',
-                        p: 4,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        textAlign: 'center',
-                        position: 'relative',
-                        justifyContent: 'space-between'
-                    }}>
-                        <Box className="glitch-effect" sx={{
-                            width: '100%',
-                            height: 180,
-                            position: 'relative',
-                            borderRadius: '16px',
-                            bgcolor: 'rgba(255,255,255,0.03)',
-                            mb: 3,
-                            border: `1px solid rgba(255,255,255,0.1)`,
-                            overflow: 'hidden',
-                        }}>
-                            <Image 
-                                src={building.image} 
+                    <div className="relative flex h-full w-full flex-col items-center justify-between p-8 text-center">
+                        <div className="glitch-effect relative mb-6 h-[180px] w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
+                            <Image
+                                src={building.image}
                                 alt={building.name}
                                 fill
                                 className="holo-image"
-                                style={{ 
+                                style={{
                                     objectFit: 'cover',
                                     opacity: 0.8,
                                     animationDelay: `${(index * 1.2) % 5}s`
-                                }} 
+                                }}
                             />
-                            <Box sx={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, ${building.color}40, transparent)` }} />
-                        </Box>
-                        
-                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexGrow: 1 }}>
-                            <Typography variant="h6" gutterBottom fontWeight="bold" sx={{ color: 'white', mb: 1, zIndex: 2 }}>
+                            <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${building.color}40, transparent)` }} />
+                        </div>
+
+                        <div className="flex grow flex-col items-center">
+                            <Typography variant="h6" className="z-[2] mb-2 font-bold text-white">
                                 {building.name}
                             </Typography>
 
-                            <Typography variant="caption" sx={{ 
-                                color: building.color, 
-                                border: `1px solid ${building.color}40`, 
-                                px: 1, 
-                                py: 0.5, 
-                                borderRadius: 1,
-                                mb: 2,
-                                textTransform: 'uppercase',
-                                fontSize: '0.65rem',
-                                zIndex: 2
-                            }}>
+                            <Typography
+                                variant="caption"
+                                className="z-[2] mb-4 rounded px-2 py-1 text-[0.65rem] uppercase"
+                                style={{ color: building.color, border: `1px solid ${building.color}40` }}
+                            >
                                 NIVEL {building.level} | {building.type}
                             </Typography>
-                            
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.6, zIndex: 2 }}>
+
+                            <Typography variant="body2" className="z-[2] mb-4 leading-[1.6] text-foreground-muted">
                                 {building.description}
                             </Typography>
-                        </Box>
-                    </Box>
+                        </div>
+                    </div>
                 </TechFrame>
-            </Grid>
+            </div>
             ))}
-        </Grid>
-        
-        <Box sx={{ mt: 8, display: 'flex', justifyContent: 'center' }} className="arch-btn">
-            <Link href="/architecture" style={{ textDecoration: 'none' }}>
-                <Button 
-                    variant="outlined" 
-                    endIcon={<ArrowForward />}
-                    sx={{ 
+        </div>
+
+        <div className="arch-btn mt-16 flex justify-center">
+            <Link href="/architecture" className="no-underline">
+                <Button
+                    variant="outlined"
+                    endIcon={<ArrowRight />}
+                    sx={{
                         color: 'white',
                         borderColor: 'rgba(255,255,255,0.2)',
                         px: 4,
@@ -156,8 +132,8 @@ export const ArchitectureSection = () => {
                     Ver más estructuras
                 </Button>
             </Link>
-        </Box>
-      </Box>
+        </div>
+      </div>
     </Section>
   );
 };

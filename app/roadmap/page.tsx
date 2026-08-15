@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Box, Container, Typography } from '@mui/material';
+import { Typography } from '@/components/ui/Typography';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { ParticleBackground } from '@/components/ui/ParticleBackground';
 import { roadmapData } from '@/lib/data/roadmap';
@@ -9,32 +9,24 @@ import { RoadmapNode } from '@/components/ui/RoadmapNode';
 
 export default function RoadmapPage() {
   return (
-    <Box sx={{ position: 'relative', minHeight: '100vh', pt: 12, pb: 20 }}>
+    <div className="relative min-h-screen pt-24 pb-40">
       <ParticleBackground />
-      
-      <Container maxWidth="md" sx={{ position: 'relative', zIndex: 10 }}>
-        <PageHeader 
-          title="Lyncore Roadmap" 
-          subtitle="Conoce el camino hacia la descentralización y la economía del futuro." 
+
+      <div className="relative z-10 mx-auto w-full max-w-[900px] px-4 sm:px-6 lg:px-8">
+        <PageHeader
+          title="Lyncore Roadmap"
+          subtitle="Conoce el camino hacia la descentralización y la economía del futuro."
         />
-        
-        <Box sx={{ mt: 12, position: 'relative' }}>
+
+        <div className="relative mt-24">
           {/* Vertical Riel (Timeline Line) */}
-          <Box 
-            sx={{ 
-              position: 'absolute', 
-              left: { xs: 0, md: 0 }, // Aligning with the dots in RoadmapNode
-              top: 0, 
-              bottom: 0, 
-              width: '2px', 
-              background: 'linear-gradient(to bottom, #00f3ff, rgba(255,255,255,0.1))',
-              opacity: 0.3,
-              zIndex: 0
-            }} 
+          <div
+            className="absolute top-0 bottom-0 left-0 z-0 w-[2px] opacity-30"
+            style={{ background: 'linear-gradient(to bottom, #00f3ff, rgba(255,255,255,0.1))' }}
           />
 
           {/* Roadmap Phases */}
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <div className="flex flex-col">
             {roadmapData.map((item, index) => (
               <RoadmapNode
                 key={index}
@@ -43,15 +35,15 @@ export default function RoadmapPage() {
                 isLast={index === roadmapData.length - 1}
               />
             ))}
-          </Box>
-        </Box>
+          </div>
+        </div>
 
-        <Box sx={{ mt: 10, textAlign: 'center' }}>
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.4)', fontStyle: 'italic' }}>
+        <div className="mt-20 text-center">
+            <Typography variant="body2" className="italic text-white/40">
                 * El Roadmap está sujeto a cambios basados en el consenso de la red y avances tecnológicos.
             </Typography>
-        </Box>
-      </Container>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }

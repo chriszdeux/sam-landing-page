@@ -1,13 +1,14 @@
 'use client';
 
 import React from 'react';
-import { Box, Container, Typography, Grid, Button, Stack } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Compass, Cpu, Wallet, Users, Orbit, ArrowLeft } from 'lucide-react';
 import { Background } from '../../components/layout/Background';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { TechFrame } from '../../components/ui/TechFrame';
+import { Typography } from '../../components/ui/Typography';
+import { Button } from '../../components/ui/Button';
 
 export default function QueEsLyncorePage() {
   const router = useRouter();
@@ -46,10 +47,10 @@ export default function QueEsLyncorePage() {
   ];
 
   return (
-    <Box sx={{ minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
+    <div className="relative min-h-screen overflow-hidden">
       <Background />
 
-      <Container maxWidth="lg" sx={{ pt: 16, pb: 10, position: 'relative', zIndex: 1 }}>
+      <div className="relative z-[1] mx-auto w-full max-w-[1200px] px-4 pt-32 pb-20 sm:px-6 lg:px-8">
         <Button
           startIcon={<ArrowLeft />}
           onClick={() => router.push('/')}
@@ -69,11 +70,14 @@ export default function QueEsLyncorePage() {
           color="#00f3ff"
         />
 
-        <Grid container spacing={4} sx={{ mt: 2 }}>
+        <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-12">
           {features.map((feat, index) => {
             const Icon = feat.icon;
             return (
-              <Grid size={{ xs: 12, md: feat.title === 'Cooperación Galáctica' ? 12 : 6 }} key={index}>
+              <div
+                className={feat.title === 'Cooperación Galáctica' ? 'md:col-span-12' : 'md:col-span-6'}
+                key={index}
+              >
                 <motion.div
                   initial={{ opacity: 0, y: 25 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -84,36 +88,34 @@ export default function QueEsLyncorePage() {
                     color={feat.color}
                     sx={{ height: '100%', cursor: 'default' }}
                   >
-                    <Box sx={{ p: 4, height: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      <Stack direction="row" spacing={2} alignItems="center">
-                        <Box sx={{
-                          p: 1.5,
-                          borderRadius: '12px',
-                          bgcolor: `${feat.color}15`,
-                          border: `1px solid ${feat.color}40`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          boxShadow: `0 0 15px ${feat.color}20`
-                        }}>
+                    <div className="flex h-full flex-col gap-4 p-8">
+                      <div className="flex flex-row items-center gap-4">
+                        <div
+                          className="flex items-center justify-center rounded-xl p-3"
+                          style={{
+                            backgroundColor: `${feat.color}15`,
+                            border: `1px solid ${feat.color}40`,
+                            boxShadow: `0 0 15px ${feat.color}20`,
+                          }}
+                        >
                           <Icon size={28} color={feat.color} />
-                        </Box>
-                        <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', letterSpacing: 1 }}>
+                        </div>
+                        <Typography variant="h5" className="text-white font-bold tracking-[1px]">
                           {feat.title}
                         </Typography>
-                      </Stack>
-                      <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.8 }}>
+                      </div>
+                      <Typography variant="body1" className="text-white/70 leading-[1.8]">
                         {feat.description}
                       </Typography>
-                    </Box>
+                    </div>
                   </TechFrame>
                 </motion.div>
-              </Grid>
+              </div>
             );
           })}
-        </Grid>
+        </div>
 
-        <Box sx={{ mt: 8, textAlign: 'center' }}>
+        <div className="mt-16 text-center">
           <Button
             variant="contained"
             onClick={() => router.push('/')}
@@ -136,8 +138,8 @@ export default function QueEsLyncorePage() {
           >
             Comenzar Misión
           </Button>
-        </Box>
-      </Container>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -4,11 +4,12 @@
 'use client';
 
 import React, { use } from 'react';
-import { Box, Typography, Container, Button } from '@mui/material';
+import { Typography } from '../../../components/ui/Typography';
+import { Button } from '../../../components/ui/Button';
 import { Background } from '../../../components/layout/Background';
 import { Card } from '../../../components/ui/Card';
 import { newsData } from '../../../lib/data/news';
-import { ArrowBack } from '@mui/icons-material';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 export default function NewsArticlePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -16,67 +17,52 @@ export default function NewsArticlePage({ params }: { params: Promise<{ slug: st
     const article = newsData.find(n => n.slug === slug);
 
     if (!article) {
-        
+
         //# 1-Estructuración y renderizado visual del componente UI
-        return <Box sx={{ color: 'white', pt: 20, textAlign: 'center' }}>Articulo no encontrado</Box>;
+        return <div className="pt-40 text-center text-white">Articulo no encontrado</div>;
     }
 
-  
-  
+
   //# 2-Estructuración y renderizado visual del componente UI
   return (
-    <Box sx={{ minHeight: '100vh', position: 'relative' }}>
+    <div className="relative min-h-screen">
         <Background />
-        
-        <Container maxWidth="lg" sx={{ pt: 16, pb: 10, position: 'relative', zIndex: 1 }}>
+
+        <div className="relative z-[1] mx-auto w-full max-w-[1200px] px-4 pt-32 pb-20 sm:px-6 lg:px-8">
             <Link href="/news">
-                <Button startIcon={<ArrowBack />} sx={{ color: 'white', mb: 4 }}>
+                <Button startIcon={<ArrowLeft size={18} />} sx={{ color: 'white', mb: 4 }}>
                     Volver a Noticias
                 </Button>
             </Link>
 
             <Card sx={{ p: { xs: 3, md: 6 } }} hoverEffect={false}>
-                <Box sx={{ mb: 4, height: 400, width: '100%', overflow: 'hidden', borderRadius: 4, border: '1px solid rgba(255,255,255,0.1)' }}>
+                <div className="mb-8 h-[400px] w-full overflow-hidden rounded border border-white/10">
                     <img src={article.image} alt={article.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                </Box>
+                </div>
 
-                <Box sx={{ display: 'flex', gap: 2, mb: 3, alignItems: 'center' }}>
-                    <Typography sx={{ 
-                        color: 'primary.main', 
-                        border: '1px solid rgba(0, 243, 255, 0.3)',
-                        bgcolor: 'rgba(0, 243, 255, 0.1)',
-                        px: 1.5,
-                        py: 0.5, 
-                        borderRadius: 1, 
-                        fontWeight: 'bold',
-                        fontSize: '0.875rem'
-                    }}>
+                <div className="mb-6 flex items-center gap-4">
+                    <Typography className="rounded-[1px] border border-[#00f3ff]/30 bg-[#00f3ff]/10 px-3 py-1 text-[0.875rem] font-bold text-primary">
                         {article.category}
                     </Typography>
-                    <Typography sx={{ color: 'text.secondary' }}>
+                    <Typography className="text-foreground-muted">
                         {article.date}
                     </Typography>
-                </Box>
+                </div>
 
-                <Typography variant="h2" sx={{ color: 'white', fontWeight: 'bold', mb: 2 }}>
+                <Typography variant="h2" className="mb-4 font-bold text-white">
                     {article.title}
                 </Typography>
 
-                <Typography variant="subtitle1" sx={{ color: 'primary.light', mb: 4, fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="subtitle1" className="mb-8 flex items-center gap-2 italic text-primary">
                      By {article.author}
                 </Typography>
 
-                <Box 
-                    sx={{ 
-                        color: 'text.secondary', 
-                        typography: 'body1', 
-                        '& p': { mb: 2, lineHeight: 1.8, fontSize: '1.1rem' },
-                        '& strong': { color: 'white' }
-                    }}
-                    dangerouslySetInnerHTML={{ __html: article.content }} 
+                <div
+                    className="text-foreground-muted [&_p]:mb-4 [&_p]:leading-[1.8] [&_p]:text-[1.1rem] [&_strong]:text-white"
+                    dangerouslySetInnerHTML={{ __html: article.content }}
                 />
             </Card>
-        </Container>
-    </Box>
+        </div>
+    </div>
   );
 }

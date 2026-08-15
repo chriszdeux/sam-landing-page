@@ -1,9 +1,6 @@
-// 1-Definir componente de título de sección
-// 2-Renderizar título con subtítulo y divisor
-
-//# 1-Definir componente de título de sección
 import React from 'react';
-import { Typography, Divider, Box } from '@mui/material';
+import { cn } from '@/lib/utils/cn';
+import { Typography } from './Typography';
 
 interface SectionTitleProps {
   children: React.ReactNode;
@@ -12,32 +9,31 @@ interface SectionTitleProps {
   color?: string;
 }
 
+const alignClasses = {
+  left: 'text-left',
+  center: 'text-center',
+  right: 'text-right',
+} as const;
+
 export const SectionTitle = ({ children, subtitle, align = 'center', color = '#00f3ff' }: SectionTitleProps) => {
-  
-  //# 2-Renderizar título con subtítulo y divisor
   return (
-    <Box sx={{ mb: 8, textAlign: align }}>
+    <div className={cn('mb-16', alignClasses[align])}>
       {subtitle && (
-        <Typography variant="overline" sx={{ color: color, letterSpacing: 3, display: 'block', mb: 1 }}>
+        <Typography variant="overline" className="mb-1 block tracking-[3px]" style={{ color }}>
           {subtitle}
         </Typography>
       )}
-      <Typography variant="h2" gutterBottom sx={{ 
-          color: 'white', 
-          textTransform: 'uppercase', 
-          fontWeight: 900,
-          textShadow: `0 0 20px ${color}80`,
-          fontSize: { xs: '2rem', md: '3rem' }
-      }}>
+      <Typography
+        variant="h2"
+        className="mb-1 text-[2rem] md:text-[3rem] font-black uppercase text-white"
+        style={{ textShadow: `0 0 20px ${color}80` }}
+      >
         {children}
       </Typography>
-      <Divider sx={{ 
-        my: 2, 
-        borderColor: color, 
-        opacity: 0.3, 
-        maxWidth: align === 'center' ? '200px' : '100px', 
-        mx: align === 'center' ? 'auto' : 0 
-      }} />
-    </Box>
+      <hr
+        className={cn('my-4 border-t opacity-30', align === 'center' ? 'mx-auto max-w-[200px]' : 'max-w-[100px]')}
+        style={{ borderColor: color }}
+      />
+    </div>
   );
 };
