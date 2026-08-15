@@ -28,8 +28,6 @@
 //# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { MenuItem } from '@mui/material';
-import type { SelectChangeEvent } from '@mui/material';
 import { CustomButton } from '../../../components/ui/CustomButton';
 import { motion } from 'framer-motion';
 import { Background } from '../../../components/layout/Background';
@@ -183,7 +181,7 @@ const TradeContent = () => {
 
 
   //# 17-Manejo de cambios en el input genérico
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setForm(prev => ({
         ...prev,
@@ -514,9 +512,9 @@ const TradeContent = () => {
                                 onChange={handleChange}
                             >
                                 {displayCryptos.map((crypto) => (
-                                    <MenuItem key={crypto.id} value={crypto.id}>
+                                    <option key={crypto.id} value={crypto.id}>
                                         {crypto.identification.symbol} - {crypto.identification.name}
-                                    </MenuItem>
+                                    </option>
                                 ))}
                             </Input>
                         </div>
