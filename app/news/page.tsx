@@ -4,46 +4,47 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Box, Typography, Grid, Container, Chip, Button } from '@mui/material';
+import { Typography } from '../../components/ui/Typography';
+import { Button } from '../../components/ui/Button';
 import Image from 'next/image';
 import { Background } from '../../components/layout/Background';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { newsData } from '../../lib/data/news';
 import { TechFrame } from '../../components/ui/TechFrame';
 import { motion } from 'framer-motion';
-import { AccessTime, Person, ArrowForward } from '@mui/icons-material';
+import { Clock, User, ArrowRight } from 'lucide-react';
 
 export default function NewsPage() {
-  
-  
+
+
   //# 1-Estructuración y renderizado visual del componente UI
   return (
-    <Box sx={{ minHeight: '100vh', position: 'relative' }}>
+    <div className="relative min-h-screen">
       <Background />
-      
-      <Container maxWidth="xl" sx={{ pt: 16, pb: 10, position: 'relative', zIndex: 1 }}>
-        <PageHeader 
+
+      <div className="relative z-[1] mx-auto w-full max-w-[1536px] px-4 pt-32 pb-20 sm:px-6 lg:px-8">
+        <PageHeader
             title="Noticias Galácticas"
             subtitle="Mantente informado sobre los últimos acontecimientos en el sistema solar."
             color="#00f3ff"
         />
 
-        <Grid container spacing={4}>
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
           {newsData.map((news, index) => (
-            <Grid size={{ xs: 12, md: index === 0 ? 12 : 4 }} key={news.id}>
+            <div className={index === 0 ? 'md:col-span-12' : 'md:col-span-4'} key={news.id}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 style={{ height: '100%' }}
               >
-                  <Link href={`/news/${news.slug}`} style={{ textDecoration: 'none' }}>
+                  <Link href={`/news/${news.slug}`} className="no-underline">
                     <TechFrame
                         sx={{
                             height: '100%',
                             display: 'flex',
                             flexDirection: index === 0 ? { xs: 'column', md: 'row' } : 'column',
-                            p: 0, 
+                            p: 0,
                             '&:hover': {
                                 '& .news-image-container': {
                                     transform: 'scale(1.05)'
@@ -51,92 +52,51 @@ export default function NewsPage() {
                             }
                         }}
                     >
-                        <Box sx={{ 
-                            position: 'relative', 
-                            width: index === 0 ? { xs: '100%', md: '60%' } : '100%',
-                            height: index === 0 ? { xs: 300, md: 'auto' } : 250,
-                            overflow: 'hidden',
-                            flexShrink: 0
-                        }}>
-                             <Box 
-                                className="news-image-container"
-                                sx={{
-                                    width: '100%',
-                                    height: '100%',
-                                    position: 'relative',
-                                    transition: 'transform 0.5s ease'
-                                }}
+                        <div className={index === 0 ? 'relative h-[300px] w-full flex-shrink-0 overflow-hidden md:h-auto md:w-[60%]' : 'relative h-[250px] w-full flex-shrink-0 overflow-hidden'}>
+                             <div
+                                className="news-image-container relative h-full w-full transition-transform duration-500"
                              >
-                                <Image 
-                                    src={news.image} 
-                                    alt={news.title} 
+                                <Image
+                                    src={news.image}
+                                    alt={news.title}
                                     fill
-                                    style={{ 
+                                    style={{
                                         objectFit: 'cover',
-                                    }} 
+                                    }}
                                 />
-                             </Box>
-                            <Box sx={{ 
-                                position: 'absolute', 
-                                top: 16, 
-                                left: 16,
-                                zIndex: 2 
-                            }}>
-                                <Chip 
-                                    label={news.category} 
-                                    size="small"
-                                    sx={{ 
-                                        bgcolor: 'rgba(0,0,0,0.7)', 
-                                        backdropFilter: 'blur(4px)',
-                                        color: 'primary.main',
-                                        border: '1px solid rgba(0,243,255,0.3)',
-                                        fontWeight: 'bold'
-                                    }} 
-                                />
-                            </Box>
-                        </Box>
-                        
-                        <Box sx={{ 
-                            p: 4, 
-                            flex: 1, 
-                            display: 'flex', 
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                        }}>
-                            <Box sx={{ display: 'flex', gap: 2, mb: 2, color: 'text.secondary', fontSize: '0.8rem' }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                    <AccessTime sx={{ fontSize: 16 }} /> {news.date}
-                                </Box>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                    <Person sx={{ fontSize: 16 }} /> {news.author}
-                                </Box>
-                            </Box>
+                             </div>
+                            <div className="absolute top-4 left-4 z-[2]">
+                                <span className="rounded-full border border-[#00f3ff]/30 bg-black/70 px-2 py-0.5 text-xs font-bold text-primary backdrop-blur-sm">
+                                    {news.category}
+                                </span>
+                            </div>
+                        </div>
 
-                            <Typography 
-                                variant={index === 0 ? 'h3' : 'h5'} 
-                                gutterBottom 
-                                sx={{ 
-                                    color: 'white', 
-                                    fontWeight: 'bold',
-                                    mb: 2,
-                                    background: 'linear-gradient(45deg, #fff, #aaa)',
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                    wordBreak: 'break-word',
-                                    hyphens: 'auto',
-                                }}
+                        <div className="flex flex-1 flex-col justify-center p-8">
+                            <div className="mb-4 flex gap-4 text-[0.8rem] text-foreground-muted">
+                                <div className="flex items-center gap-1">
+                                    <Clock size={16} /> {news.date}
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <User size={16} /> {news.author}
+                                </div>
+                            </div>
+
+                            <Typography
+                                variant={index === 0 ? 'h3' : 'h5'}
+                                className="mb-4 break-words font-bold text-white bg-gradient-to-br from-white to-[#aaaaaa] bg-clip-text text-transparent [-webkit-text-fill-color:transparent] [hyphens:auto]"
                             >
                                 {news.title}
                             </Typography>
-                            
-                            <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3, flexGrow: 1 }}>
+
+                            <Typography variant="body1" className="mb-6 grow text-foreground-muted">
                                 {news.excerpt}
                             </Typography>
-                            
-                            <Box>
-                                <Button 
-                                    endIcon={<ArrowForward />} 
-                                    sx={{ 
+
+                            <div>
+                                <Button
+                                    endIcon={<ArrowRight size={18} />}
+                                    sx={{
                                         color: 'primary.main',
                                         pl: 0,
                                         '&:hover': { bg: 'transparent', textDecoration: 'underline' }
@@ -144,15 +104,15 @@ export default function NewsPage() {
                                 >
                                     Leer Artículo
                                 </Button>
-                            </Box>
-                        </Box>
+                            </div>
+                        </div>
                     </TechFrame>
                   </Link>
               </motion.div>
-            </Grid>
+            </div>
           ))}
-        </Grid>
-      </Container>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -5,8 +5,8 @@
 
 import React, { use } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Typography } from '@mui/material';
-import { ArrowBack } from '@mui/icons-material';
+import { ArrowLeft } from 'lucide-react';
+import { Typography } from '../../../components/ui/Typography';
 import { mechanicsData } from '../../../lib/data/mechanics';
 import { Button } from '../../../components/ui/Button';
 import { LayoutType1, LayoutType2, LayoutType3, LayoutType4, LayoutTypeDefense } from '../../../components/mechanics/MechanicLayouts';
@@ -22,10 +22,10 @@ export default function MechanicPage({ params }: { params: Promise<{ slug: strin
     
     //# 1-Estructuración y renderizado visual del componente UI
     return (
-      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="flex min-h-screen items-center justify-center">
         <Typography>Mecánica no encontrada</Typography>
         <Button onClick={() => router.back()}>Volver</Button>
-      </Box>
+      </div>
     );
   }
 
@@ -43,19 +43,19 @@ export default function MechanicPage({ params }: { params: Promise<{ slug: strin
   
   //# 2-Estructuración y renderizado visual del componente UI
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', position: 'relative' }}>
-      <Box sx={{ position: 'fixed', top: 100, left: { xs: 20, md: 40 }, zIndex: 100 }}>
-        <Button 
-            variant="outlined" 
-            startIcon={<ArrowBack />} 
+    <div className="relative min-h-screen bg-background">
+      <div className="fixed top-[100px] left-[20px] z-[100] md:left-[40px]">
+        <Button
+            variant="outlined"
+            startIcon={<ArrowLeft />}
             onClick={() => router.back()}
             sx={{ backdropFilter: 'blur(5px)' }}
         >
             Atrás
         </Button>
-      </Box>
-      
+      </div>
+
       {renderLayout()}
-    </Box>
+    </div>
   );
 }
