@@ -17,7 +17,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Container, Typography, Grid, CircularProgress } from '@mui/material';
+import { Typography } from '../../components/ui/Typography';
 import { CustomButton } from '../../components/ui/CustomButton';
 import { Background } from '../../components/layout/Background';
 import { TechFrame } from '../../components/ui/TechFrame';
@@ -70,22 +70,11 @@ const Countdown = ({ targetDate, onComplete }: { targetDate: number; onComplete?
     
     //# 5-Estructuración y renderizado visual del componente UI
     return (
-        <Box sx={{ 
-            position: 'absolute', 
-            top: 16, 
-            left: '50%', 
-            transform: 'translateX(-50%)', 
-            zIndex: 10,
-            bgcolor: 'rgba(0,0,0,0.6)',
-            px: 2,
-            py: 0.5,
-            borderRadius: 4,
-            border: '1px solid rgba(255,255,255,0.1)'
-        }}>
-            <Typography variant="caption" sx={{ color: '#00e676', fontWeight: 'bold' }}>
+        <div className="absolute top-4 left-1/2 z-10 -translate-x-1/2 rounded-2xl border border-white/10 bg-black/60 px-4 py-1">
+            <Typography variant="caption" className="font-bold text-[#00e676]">
                 {timeLeft}
             </Typography>
-        </Box>
+        </div>
     );
 };
 
@@ -176,30 +165,26 @@ export default function RewardsPage() {
   
   //# 14-Estructuración y renderizado visual del componente UI
   return (
-    <Box sx={{ minHeight: '100vh', position: 'relative' }}>
+    <div className="relative min-h-screen">
       <Background />
-      
-      <Container maxWidth="xl" sx={{ pt: 20, pb: 10, position: 'relative', zIndex: 1 }}>
+
+      <div className="relative z-10 mx-auto w-full max-w-[1536px] px-4 pt-40 pb-20 sm:px-6 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <PageHeader 
-                title="Centro de Recompensas" 
+            <PageHeader
+                title="Centro de Recompensas"
                 subtitle="Reclama suministros diarios y bonificaciones por tus logros en la expansión de la red."
                 color="#ff0055"
             />
         </motion.div>
 
         {isLoading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', my: 10 }}>
-                <CircularProgress color="primary" />
-            </Box>
+            <div className="my-20 flex justify-center">
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-white" />
+            </div>
         ) : error ? (
-            <Typography align="center" color="error">Error al cargar recompensas: {error}</Typography>
+            <Typography variant="body1" className="text-center text-error">Error al cargar recompensas: {error}</Typography>
         ) : (
-            <Grid container spacing={4} sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}>
+            <div className="grid grid-cols-1 items-center justify-center gap-8 sm:grid-cols-2 md:grid-cols-3">
                 {rewards.map((reward, index) => {
                     
                     const userReward = userInfo?.rewards?.find((r) => r.id === reward.id) || userInfo?.rewards?.[0];
@@ -223,66 +208,53 @@ export default function RewardsPage() {
                     
                     //# 15-Estructuración y renderizado visual del componente UI
                     return (
-                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={reward.id}>
-                        <motion.div 
+                    <div key={reward.id}>
+                        <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: index * 0.1 }}
                             style={{ height: '100%' }}
                         >
-                            <TechFrame 
-                                color={isClaimedNow ? '#00ff9d' : '#ff0055'} 
+                            <TechFrame
+                                color={isClaimedNow ? '#00ff9d' : '#ff0055'}
                                 className="h-full w-full"
                             >
-                                <Box sx={{
-                                    p: 4,
-                                    height: '100%',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    textAlign: 'center',
-                                    position: 'relative'
-                                }}>
+                                <div className="relative flex h-full flex-col items-center p-8 text-center">
                                     {isClaimedNow && targetTime > 0 && (
-                                        <Countdown 
-                                            targetDate={targetTime} 
-                                            onComplete={forceUpdate} 
+                                        <Countdown
+                                            targetDate={targetTime}
+                                            onComplete={forceUpdate}
                                         />
                                     )}
-                                    <Box sx={{
-                                        position: 'relative',
-                                        width: 80,
-                                        height: 80,
-                                        borderRadius: '50%',
-                                        bgcolor: reward.isClaimed ? 'rgba(0, 255, 157, 0.1)' : 'rgba(255, 0, 85, 0.1)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        mb: 3,
-                                        border: `1px solid ${isClaimedNow ? '#00ff9d' : '#ff0055'}`,
-                                        boxShadow: `0 0 20px ${isClaimedNow ? '#00ff9d' : '#ff0055'}40`
-                                    }}>
+                                    <div
+                                        className="relative mb-6 flex h-20 w-20 items-center justify-center rounded-full"
+                                        style={{
+                                            backgroundColor: reward.isClaimed ? 'rgba(0, 255, 157, 0.1)' : 'rgba(255, 0, 85, 0.1)',
+                                            border: `1px solid ${isClaimedNow ? '#00ff9d' : '#ff0055'}`,
+                                            boxShadow: `0 0 20px ${isClaimedNow ? '#00ff9d' : '#ff0055'}40`,
+                                        }}
+                                    >
                                         {isClaimedNow ? (
                                             <Check size={40} color="#00ff9d" />
                                         ) : (
                                             <TaoIcon size={40} />
                                         )}
-                                    </Box>
+                                    </div>
 
-                                    <Typography variant="h5" gutterBottom sx={{ color: 'white', fontWeight: 'bold' }}>
+                                    <Typography variant="h5" className="mb-2 font-bold text-white">
                                         {reward.name}
                                     </Typography>
-                                    
-                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 4, flexGrow: 1 }}>
+
+                                    <Typography variant="body2" className="mb-8 flex-grow text-foreground-muted">
                                         {reward.description}
                                     </Typography>
 
-                                    <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Typography variant="h6" sx={{ color: isClaimedNow ? '#00ff9d' : '#ffb700', fontWeight: 'bold' }}>
+                                    <div className="mb-6 flex items-center gap-2">
+                                        <Typography variant="h6" className="font-bold" style={{ color: isClaimedNow ? '#00ff9d' : '#ffb700' }}>
                                             {reward.amount.toLocaleString()}
                                         </Typography>
                                         <TaoIcon size={12} />
-                                    </Box>
+                                    </div>
 
                                     <CustomButton
                                         variant={isClaimedNow ? "neutral" : "info"}
@@ -290,19 +262,19 @@ export default function RewardsPage() {
                                         disabled={isClaimedNow || claimingRewardId === reward.id}
                                         onClick={() => handleClaim(reward)}
                                         glow={!isClaimedNow}
-                                        startIcon={claimingRewardId === reward.id ? <CircularProgress size={14} color="inherit" /> : null}
+                                        startIcon={claimingRewardId === reward.id ? <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current/20 border-t-current" /> : null}
                                     >
                                         {claimingRewardId === reward.id ? 'Reclamando...' : isClaimedNow ? 'RECLAMADO' : 'RECLAMAR'}
                                     </CustomButton>
-                                </Box>
+                                </div>
                             </TechFrame>
                         </motion.div>
-                    </Grid>
+                    </div>
                     );
                 })}
-            </Grid>
+            </div>
         )}
-      </Container>
-    </Box>
+      </div>
+    </div>
   );
 }
