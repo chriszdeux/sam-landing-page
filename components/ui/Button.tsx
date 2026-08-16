@@ -25,9 +25,9 @@ interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>
 }
 
 const sizeClasses: Record<Size, string> = {
-  small: 'px-3 py-1 text-sm',
-  medium: 'px-4 py-2 text-base',
-  large: 'px-6 py-3 text-lg',
+  small: 'px-3 py-1.5 text-xs',
+  medium: 'px-5 py-2.5 text-sm',
+  large: 'px-7 py-3.5 text-base',
 };
 
 const colorHex: Record<Color, string> = {
@@ -41,12 +41,16 @@ const colorHex: Record<Color, string> = {
 };
 
 //# 2-Renderizar botón con estilos condicionales
+// Misma identidad visual "tech frame" que components/ui/TechFrame.tsx /
+// TechButton.tsx: borde con corte diagonal + glow de color + fondo con
+// blur. Se aplica a TODOS los botones de la app vía este componente
+// compartido. Color por defecto: "info" (azulado, #90caf9).
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       glow,
       variant = 'text',
-      color = 'primary',
+      color = 'info',
       size = 'medium',
       fullWidth,
       startIcon,
@@ -54,6 +58,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       className,
       children,
       sx: _sx,
+      disabled,
       style,
       ...props
     },
@@ -62,44 +67,62 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const uid = useId().replace(/[:]/g, '');
     const cls = `btn-${uid}`;
     const hex = colorHex[color];
-
-    const variantClass =
-      variant === 'contained'
-        ? 'text-black'
-        : variant === 'outlined'
-          ? 'border bg-transparent'
-          : 'bg-transparent';
+    const isContained = variant === 'contained';
 
     return (
       <button
         ref={ref}
+        disabled={disabled}
         className={cn(
           cls,
-          'inline-flex items-center justify-center gap-2 rounded font-semibold normal-case transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40',
-          sizeClasses[size],
-          variantClass,
+          'relative inline-block p-1 text-left transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-40',
           fullWidth && 'w-full',
           className
         )}
-        style={{
-          ...(variant === 'contained' ? { backgroundColor: hex } : {}),
-          ...(variant === 'outlined' ? { borderColor: hex, color: hex } : {}),
-          ...(variant === 'text' ? { color: hex } : {}),
-          ...(glow ? { boxShadow: `0 0 10px ${hex}` } : {}),
-          ...style,
-        }}
+        style={style}
         {...props}
       >
         <style>{`
+          .${cls} {
+            background: linear-gradient(45deg, transparent 5%, ${hex} 5%, ${hex} 10%, transparent 10%, transparent 90%, ${hex} 90%, ${hex} 95%, transparent 95%);
+            filter: drop-shadow(0 0 5px ${hex}80);
+          }
           .${cls}:hover:not(:disabled) {
-            ${variant === 'contained' ? `filter: brightness(0.9); box-shadow: 0 0 10px ${hex};` : ''}
-            ${variant === 'outlined' ? `background-color: ${hex}1a;` : ''}
-            ${variant === 'text' ? `background-color: ${hex}1a;` : ''}
+            filter: drop-shadow(0 0 10px ${hex});
+            transform: translateY(-2px);
+          }
+          .${cls}::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 1px solid ${hex}40;
+            pointer-events: none;
+            transition: all 0.3s ease;
+          }
+          .${cls}:hover:not(:disabled)::before {
+            border-color: ${hex}80;
+            border-width: 2px;
           }
         `}</style>
-        {startIcon}
-        {children}
-        {endIcon}
+        <div
+          className={cn(
+            'relative flex items-center justify-center gap-2 overflow-hidden font-bold uppercase tracking-wide backdrop-blur-md',
+            sizeClasses[size]
+          )}
+          style={{
+            backgroundColor: isContained ? hex : 'rgba(10,10,10,0.8)',
+            color: isContained ? '#000' : hex,
+            boxShadow: glow ? `0 0 10px ${hex}` : undefined,
+          }}
+        >
+          {startIcon}
+          {children}
+          {endIcon}
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-full opacity-50 [background-size:100%_4px]"
+            style={{ background: `linear-gradient(to bottom, transparent 50%, ${hex}${isContained ? '00' : '10'} 50%)` }}
+          />
+        </div>
       </button>
     );
   }
