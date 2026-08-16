@@ -8,14 +8,15 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu as MenuIcon, Rocket } from "lucide-react";
+import { Menu as MenuIcon, Rocket, ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "../ui/Button";
 import { Typography } from "../ui/Typography";
 import { Drawer } from "../ui/Drawer";
 import { Tooltip } from "../ui/Tooltip";
+import { Dropdown } from "../ui/Dropdown";
 
 //# 1-Importar dependencias y componentes de UI
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
@@ -28,6 +29,9 @@ import { NavbarUserMenu } from "./NavbarUserMenu";
 import { LabNavbarIndicator } from "./LabNavbarIndicator";
 import { formatHash } from "../../lib/utils/formatHash";
 import { EnvVariables } from "@/lib/constants/variables";
+import { cn } from "@/lib/utils/cn";
+
+const NAV_GAP = 4; // px, coincide con gap-1 en la fila de navegación
 
 export const Navbar = () => {
 
@@ -49,9 +53,49 @@ export const Navbar = () => {
 
   const selectedNetwork = networks.find(n => n.id === selectedNetworkState?.id) || networks[0];
 
+  const visibleNavItems = navItems.filter(item => !item.auth || userInfo);
 
+  //# 4-Medir el ancho disponible y decidir cuántos items caben antes de desbordar a "Más"
+  const navRowRef = useRef<HTMLDivElement>(null);
+  const measureRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const moreMeasureRef = useRef<HTMLButtonElement>(null);
+  const [visibleCount, setVisibleCount] = useState(visibleNavItems.length);
 
-  //# 4-Efecto para sincronizar detalles de la billetera y polling de poder
+  useEffect(() => {
+    const recalc = () => {
+      const row = navRowRef.current;
+      if (!row) return;
+      const available = row.clientWidth;
+      const widths = measureRefs.current.map((el) => el?.offsetWidth ?? 0);
+      const moreWidth = (moreMeasureRef.current?.offsetWidth ?? 0) + NAV_GAP;
+
+      let total = 0;
+      let count = widths.length;
+      for (let i = 0; i < widths.length; i++) {
+        total += widths[i] + (i > 0 ? NAV_GAP : 0);
+        const hasRemaining = i < widths.length - 1;
+        const budget = available - (hasRemaining ? moreWidth : 0);
+        if (total > budget) {
+          count = i;
+          break;
+        }
+      }
+      setVisibleCount(count);
+    };
+
+    recalc();
+    const ro = new ResizeObserver(recalc);
+    if (navRowRef.current) ro.observe(navRowRef.current);
+    window.addEventListener("resize", recalc);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", recalc);
+    };
+  }, [visibleNavItems.length]);
+
+  const shownItems = visibleNavItems.slice(0, visibleCount);
+  const overflowItems = visibleNavItems.slice(visibleCount);
+  const activeInOverflow = overflowItems.some((item) => pathname === item.path);
 
 
 
@@ -93,133 +137,146 @@ export const Navbar = () => {
     }
   };
 
+  const renderNavButton = (item: (typeof navItems)[0]) => {
+    const isActive = pathname === item.path;
+    const isOperations = item.id === 'dashboard';
+    const formattedHash = formatHash(localHash, chronoBurstFreqTypes);
+    const tooltipText = `Hash Acumulado Local: ${formattedHash}`;
+    const color = isOperations && isPoweredOn ? 'warning' : isActive ? 'primary' : 'info';
 
+    const buttonContent = (
+      <Button
+        variant="text"
+        size="small"
+        color={color}
+        onClick={() => handleNavClick(item)}
+      >
+        {item.name}
+      </Button>
+    );
+
+    return (
+      <div key={item.id} className="relative">
+        {isActive && (
+          <motion.div
+            layoutId="navbar-indicator"
+            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'rgba(0, 243, 255, 0.1)',
+              borderRadius: '8px',
+              border: '1px solid rgba(0, 243, 255, 0.3)',
+            }}
+          />
+        )}
+        {isOperations ? (
+          <Tooltip
+            content={tooltipText}
+            side="bottom"
+            className="border-[rgba(212,163,115,0.3)] bg-[rgba(10,10,10,0.95)] p-3 font-bold text-[#E6C594] shadow-[0_4px_20px_rgba(0,0,0,0.8)]"
+          >
+            <span>{buttonContent}</span>
+          </Tooltip>
+        ) : buttonContent}
+      </div>
+    );
+  };
 
   //# 6-Renderizar estructura principal de la barra
   return (
     <div className="grow">
       <header
-        className="fixed inset-x-0 top-0 z-50 flex h-20 items-center justify-center border-b border-[#00f3ff]/10 bg-[rgba(5,5,12,0.8)] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.8)] backdrop-blur-2xl [background-image:linear-gradient(rgba(0,243,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,243,255,0.03)_1px,transparent_1px)] [background-size:30px_30px]"
+        className="fixed inset-x-0 top-0 z-50 flex h-16 items-center justify-center border-b border-[#00f3ff]/10 bg-[rgba(5,5,12,0.8)] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.8)] backdrop-blur-2xl [background-image:linear-gradient(rgba(0,243,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,243,255,0.03)_1px,transparent_1px)] [background-size:30px_30px]"
       >
         { }
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00f3ff] to-transparent shadow-[0_0_15px_#00f3ff]" />
 
-        <div className="flex w-full items-center px-4 md:px-8">
+        <div className="flex w-full items-center gap-3 px-4 md:px-6">
 
           <div
-            className="flex grow cursor-pointer items-center"
+            className="flex shrink-0 cursor-pointer items-center"
             onClick={() => handleNavClick(navItems[0])}
           >
-            <div className="mr-4 flex items-center justify-center rounded-lg border border-[#00f3ff]/30 bg-[#00f3ff]/5 p-2 shadow-[0_0_15px_rgba(0,243,255,0.15)]">
-              <Rocket size={24} className="text-primary [filter:drop-shadow(0_0_5px_#00f3ff)]" />
+            <div className="mr-3 flex items-center justify-center rounded-lg border border-[#00f3ff]/30 bg-[#00f3ff]/5 p-1.5 shadow-[0_0_15px_rgba(0,243,255,0.15)]">
+              <Rocket size={20} className="text-primary [filter:drop-shadow(0_0_5px_#00f3ff)]" />
             </div>
-            <div>
+            <div className="hidden sm:block">
               <Typography
                 variant="h6"
                 component="div"
-                className="mb-1 bg-gradient-to-r from-white to-[#00f3ff] bg-clip-text font-black tracking-[2px] leading-none text-transparent [-webkit-text-fill-color:transparent]"
+                className="mb-0.5 bg-gradient-to-r from-white to-[#00f3ff] bg-clip-text text-base font-black tracking-[2px] leading-none text-transparent [-webkit-text-fill-color:transparent]"
               >
                 {EnvVariables.project.toUpperCase()}
               </Typography>
-              <Typography variant="caption" className="flex items-center gap-2 text-[0.6rem] tracking-[3px] text-[#00f3ff]/70">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#00f3ff] shadow-[0_0_5px_#00f3ff]" />
+              <Typography variant="caption" className="flex items-center gap-1.5 text-[0.55rem] tracking-[3px] text-[#00f3ff]/70">
+                <span className="h-1 w-1 rounded-full bg-[#00f3ff] shadow-[0_0_5px_#00f3ff]" />
                 SYSTEM ONLINE
               </Typography>
             </div>
           </div>
 
-
-
+          {/* Fila de navegación: mide su ancho disponible y desborda a "Más" */}
           <div
-            className="ml-4 hidden items-center gap-1 rounded-xl border border-white/[0.08] bg-black/30 p-1 backdrop-blur-sm md:flex"
+            ref={navRowRef}
+            className="hidden min-w-0 flex-1 items-center gap-1 rounded-xl border border-white/[0.08] bg-black/30 p-1 backdrop-blur-sm md:flex"
           >
-            {navItems.filter(item => !item.auth || userInfo).map((item) => {
-              const isActive = pathname === item.path;
-              const isOperations = item.id === 'dashboard';
-              const formattedHash = formatHash(localHash, chronoBurstFreqTypes);
-              const tooltipText = `Hash Acumulado Local: ${formattedHash}`;
+            {shownItems.map(renderNavButton)}
 
-              const buttonSx = {
-                color: isActive ? "primary.main" : "rgba(255,255,255,0.6)",
-                fontWeight: isActive ? 'bold' : 'normal',
-                "&:hover": { color: "primary.main" },
-                position: 'relative',
-                zIndex: 1,
-                borderBottom: 'none',
-                borderRadius: 2,
-                minWidth: 'auto',
-                px: 3,
-                py: 1,
-                letterSpacing: 1,
-                ...(isOperations && isPoweredOn ? {
-                  '@keyframes pulseGold': {
-                    '0%': {
-                      boxShadow: '0 0 0 0 rgba(212, 163, 115, 0.5)',
-                      borderColor: 'rgba(212, 163, 115, 0.5)',
-                    },
-                    '70%': {
-                      boxShadow: '0 0 0 8px rgba(212, 163, 115, 0)',
-                      borderColor: 'rgba(230, 197, 148, 0.8)',
-                    },
-                    '100%': {
-                      boxShadow: '0 0 0 0 rgba(212, 163, 115, 0)',
-                      borderColor: 'rgba(212, 163, 115, 0.5)',
-                    }
-                  },
-                  animation: 'pulseGold 2s infinite ease-in-out',
-                  border: '1px solid #D4A373',
-                  background: 'linear-gradient(45deg, rgba(212, 163, 115, 0.1), rgba(230, 197, 148, 0.15))',
-                  color: '#E6C594',
-                  '&:hover': {
-                    color: '#fff',
-                    borderColor: '#E6C594',
-                    background: 'linear-gradient(45deg, rgba(212, 163, 115, 0.2), rgba(230, 197, 148, 0.25))',
-                  }
-                } : {})
-              };
+            {overflowItems.length > 0 && (
+              <Dropdown
+                align="left"
+                trigger={({ open }) => (
+                  <Button
+                    variant="text"
+                    size="small"
+                    color={activeInOverflow ? 'primary' : 'info'}
+                    endIcon={<ChevronDown size={14} className={cn('transition-transform', open && 'rotate-180')} />}
+                  >
+                    Más
+                  </Button>
+                )}
+              >
+                {overflowItems.map((item) => {
+                  const isActive = pathname === item.path;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleNavClick(item)}
+                      className={cn(
+                        'block w-full px-4 py-2.5 text-left text-sm font-semibold uppercase tracking-wide transition-colors hover:bg-white/5',
+                        isActive ? 'text-[#00f3ff]' : 'text-white/70'
+                      )}
+                    >
+                      {item.name}
+                    </button>
+                  );
+                })}
+              </Dropdown>
+            )}
 
-              const buttonContent = (
+            {/* Copia oculta usada solo para medir el ancho real de cada item (misma tipografía/padding) */}
+            <div className="pointer-events-none absolute left-0 top-0 flex -translate-y-full gap-1 opacity-0" aria-hidden="true">
+              {visibleNavItems.map((item, index) => (
                 <Button
+                  key={item.id}
+                  ref={(el) => { measureRefs.current[index] = el; }}
                   variant="text"
-                  onClick={() => handleNavClick(item)}
-                  sx={buttonSx}
+                  size="small"
+                  tabIndex={-1}
                 >
                   {item.name}
                 </Button>
-              );
-
-              return (
-                <div key={item.id} className="relative">
-                  {isActive && (
-                    <motion.div
-                      layoutId="navbar-indicator"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        background: 'rgba(0, 243, 255, 0.1)',
-                        borderRadius: '8px',
-                        border: '1px solid rgba(0, 243, 255, 0.3)',
-                      }}
-                    />
-                  )}
-                  {isOperations ? (
-                    <Tooltip
-                      content={tooltipText}
-                      side="bottom"
-                      className="border-[rgba(212,163,115,0.3)] bg-[rgba(10,10,10,0.95)] p-3 font-bold text-[#E6C594] shadow-[0_4px_20px_rgba(0,0,0,0.8)]"
-                    >
-                      <span>{buttonContent}</span>
-                    </Tooltip>
-                  ) : buttonContent}
-                </div>
-              );
-            })}
+              ))}
+              <Button ref={moreMeasureRef} variant="text" size="small" endIcon={<ChevronDown size={14} />} tabIndex={-1}>
+                Más
+              </Button>
+            </div>
           </div>
 
-          <div className="mx-4 hidden h-[30px] w-px bg-white/10 md:block" />
+          <div className="mx-1 hidden h-[30px] w-px shrink-0 bg-white/10 md:block" />
 
-          <div className="hidden items-center gap-4 md:flex">
+          <div className="hidden shrink-0 items-center gap-3 md:flex">
             {userInfo && <LabNavbarIndicator />}
             <NavbarUserMenu
               userInfo={userInfo}
