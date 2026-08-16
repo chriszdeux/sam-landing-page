@@ -177,6 +177,28 @@ body {
   }
 }
 
+/* Usado por OperationsCanvasBg: viñeta roja persistente durante sobrecalentamiento */
+@keyframes criticalVignette {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Usado por SimulationChart: borde de alerta cuando el sistema está sobrecalentado */
+@keyframes chartAlertBorder {
+  0%, 100% {
+    border-color: rgba(255, 23, 68, 0.3);
+    box-shadow: 0 0 15px rgba(255, 23, 68, 0.1);
+  }
+  50% {
+    border-color: rgba(255, 23, 68, 0.7);
+    box-shadow: 0 0 25px rgba(255, 23, 68, 0.3);
+  }
+}
+
 /* Usado por LaboratorySimulation: parpadeo de alerta en modo de emergencia */
 @keyframes labAlertPulse {
   0% {
