@@ -3,7 +3,6 @@
 
 //# 1-Definir componente de formulario de transacción
 import React from 'react';
-import { CustomButton } from '../ui/CustomButton';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Typography } from '../ui/Typography';
@@ -13,6 +12,15 @@ import { formatHash } from '../../lib/utils/formatHash';
 import { useAppSelector } from '../../lib/hooks';
 import { RootState } from '../../lib/store';
 import { Flame, ArrowLeftRight, TrendingUp } from 'lucide-react';
+
+// Semáforo único para compra / venta / transferencia: el mismo token alimenta
+// el acento del encabezado, el borde del input y el color del CTA, para que el
+// formulario no mezcle un neón vivo con un botón de otra paleta.
+const SEMANTIC = {
+    BUY: { color: 'success', hex: '#a5d6a7' },
+    SELL: { color: 'error', hex: '#ef9a9a' },
+    TRANSFER: { color: 'warning', hex: '#ffcc80' },
+} as const;
 
 interface TradeFormData {
   walletId: string;
@@ -50,7 +58,8 @@ export const TransactionForm = ({
     const networkDifficulty = 3; // Base difficulty factor for hash cost estimate
     const estimatedHashCost = fee != null ? fee * networkDifficulty * 1000 : null;
     const formattedHashCost = estimatedHashCost != null ? formatHash(estimatedHashCost, chronoBurstFreqTypes) : null;
-    const accentColor = transactionType === 'BUY' ? '#00e676' : transactionType === 'SELL' ? '#ff1744' : '#ffab00';
+    const accentColor = SEMANTIC[transactionType].hex;
+    const submitColor = SEMANTIC[transactionType].color;
 
     //# 2-Renderizar formulario con validación y costos
     return (
@@ -115,7 +124,7 @@ export const TransactionForm = ({
                                     autoFocus
                                     inputProps={{ min: 0 }}
                                     containerClassName="mb-4"
-                                    className="text-[1.5rem] text-white border-[#00f3ff]/30 hover:border-[#00f3ff] focus:border-[#00f3ff] focus:shadow-[0_0_0_0.2rem_rgba(0,243,255,0.25)]"
+                                    className="border-[#a5d6a7]/30 text-[1.5rem] text-white hover:border-[#a5d6a7] focus:border-[#a5d6a7] focus:shadow-[0_0_0_3px_rgba(165,214,167,0.18)]"
                                 />
                                 <div className="mb-4 flex items-center justify-end gap-2">
                                     <Typography variant="caption" className="text-foreground-muted">
@@ -136,7 +145,7 @@ export const TransactionForm = ({
                                 autoFocus
                                 inputProps={{ min: 0, max: availableQuantity }}
                                 containerClassName="mb-2"
-                                className="text-[1.5rem] text-white border-[#ff1744]/30 hover:border-[#ff1744] focus:border-[#ff1744] focus:shadow-[0_0_0_0.2rem_rgba(255,23,68,0.25)]"
+                                className="border-[#ef9a9a]/30 text-[1.5rem] text-white hover:border-[#ef9a9a] focus:border-[#ef9a9a] focus:shadow-[0_0_0_3px_rgba(239,154,154,0.18)]"
                             />
                             <div className="mb-4 flex items-center justify-end gap-2">
                                 <Typography variant="caption" className="text-foreground-muted">
@@ -148,11 +157,6 @@ export const TransactionForm = ({
                                         variant="outlined"
                                         color="error"
                                         onClick={onSetMax}
-                                        sx={{
-                                            minWidth: 'auto',
-                                            padding: '2px 8px',
-                                            fontSize: '0.7rem'
-                                        }}
                                     >
                                         MAX
                                     </Button>
@@ -212,19 +216,22 @@ export const TransactionForm = ({
                 </div>
             </div>
 
-            <CustomButton
-                variant={transactionType === 'BUY' ? 'success' : transactionType === 'SELL' ? 'error' : 'warning'}
+            {/* Compra = success, venta = error: el color del CTA es el mismo
+                semáforo que ya usan el acento y el badge de la cabecera. */}
+            <Button
+                variant="contained"
+                size="large"
+                color={submitColor}
                 onClick={onSubmit}
                 disabled={!form.walletId || isProcessing || fee === null}
                 startIcon={isProcessing ? <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" /> : null}
-                glow
                 fullWidth
-                sx={{ mt: 4, py: 1.25, fontSize: '0.85rem' }}
+                className="mt-8"
             >
                 {isProcessing
                     ? 'Procesando Transacción...'
                     : `CONFIRMAR ${transactionType === 'BUY' ? 'COMPRA' : transactionType === 'SELL' ? 'VENTA' : 'TRANSFERENCIA'}`}
-            </CustomButton>
+            </Button>
         </div>
     );
 };

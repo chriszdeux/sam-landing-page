@@ -1,22 +1,29 @@
 'use client';
 
 /**
- * ProcessingAnimation — Premium Web3 Crypto Audit Experience
+ * ProcessingAnimation — auditoría de transacción
  *
- * Layers:
- *  1. Canvas particle emitter (60fps, GPU-accelerated via translate3d)
- *  2. Scrolling hex-hash stream background (CSS keyframes)
- *  3. 3D SVG orbit rings (framer-motion, multi-axis rotation)
- *  4. Central token avatar with step-synchronized glow
- *  5. Live crypto-terminal with blinking cursor line
- *  6. Step progress label
+ * Todo el gráfico vive en UN canvas con UN loop de rAF. La versión anterior
+ * repartía la animación entre 5 elipses SVG animadas por framer-motion, 3 nodos
+ * con arrays de 37 keyframes, 168 nodos de texto DOM en columnas hex y hasta
+ * 200 partículas dibujadas con `shadowBlur` (el ajuste más caro del contexto 2D).
+ *
+ * Optimizaciones:
+ *  - un solo canvas, un solo rAF, sin animaciones DOM en el gráfico
+ *  - glow por sprite pre-renderizado (drawImage) en vez de shadowBlur por partícula
+ *  - pool fijo de partículas: cero asignaciones dentro del loop
+ *  - animación por delta de tiempo, no por conteo de frames
+ *  - se detiene con la pestaña oculta y respeta prefers-reduced-motion
+ *
+ * El gráfico también dice algo: el anillo de progreso alrededor del token es el
+ * avance real de los 4 pasos, y las partículas convergen hacia el centro
+ * (la transacción se asienta) en vez de estallar hacia afuera.
  */
 
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Typography } from '../ui/Typography';
 import { motion } from 'framer-motion';
 
-// ─── Types ───────────────────────────────────────────────────────────────────
 interface ProcessingAnimationProps {
   processingStep: number;
   walletId: string;
@@ -28,35 +35,38 @@ interface ProcessingAnimationProps {
   getStepText: (step: number) => string;
 }
 
-// ─── Particle type ────────────────────────────────────────────────────────────
-interface Particle {
-  x: number; y: number;
-  vx: number; vy: number;
-  life: number; maxLife: number;
-  size: number;
-  color: string;
+const SIZE = 280;          // lado del canvas en px CSS
+const PARTICLES = 90;      // pool fijo
+const TOTAL_STEPS = 4;
+
+const GOLD = '#D4A373';
+const CYAN = '#00f3ff';
+const MINT = '#a5d6a7';    // mismo verde "success" que el CTA del formulario
+
+// Sprite de glow: un gradiente radial pre-renderizado una sola vez por color.
+// Sustituye a shadowBlur, que recalcula un blur gaussiano por cada figura.
+function makeGlowSprite(color: string, r = 32): HTMLCanvasElement {
+  const c = document.createElement('canvas');
+  c.width = c.height = r * 2;
+  const g = c.getContext('2d')!;
+  const grad = g.createRadialGradient(r, r, 0, r, r, r);
+  grad.addColorStop(0, color);
+  grad.addColorStop(0.35, color + '80');
+  grad.addColorStop(1, color + '00');
+  g.fillStyle = grad;
+  g.beginPath();
+  g.arc(r, r, r, 0, Math.PI * 2);
+  g.fill();
+  return c;
 }
 
-// ─── Static hex rows (generated once per mount, not on every render) ──────────
-function makeHexRows(count: number): string[] {
-  return Array.from({ length: count }, () =>
-    (Math.random() * 0xFFFFFFFF >>> 0).toString(16).padStart(8, '0')
-  );
-}
+interface P { a: number; rad: number; sp: number; life: number; max: number; size: number; tint: 0 | 1 | 2 }
 
-// ─── Step → glow intensity map ───────────────────────────────────────────────
-const STEP_GLOW: Record<number, string> = {
-  1: '0 0 20px rgba(212,163,115,0.5), 0 0 50px rgba(0,243,255,0.15)',
-  2: '0 0 30px rgba(212,163,115,0.7), 0 0 70px rgba(0,243,255,0.25)',
-  3: '0 0 40px rgba(212,163,115,0.9), 0 0 90px rgba(0,243,255,0.35)',
-  4: '0 0 50px rgba(0,255,136,0.8),   0 0 100px rgba(0,243,255,0.4)',
-};
-
-// ─── Canvas Particle Emitter ──────────────────────────────────────────────────
-const ParticleCanvas = React.memo(({ step }: { step: number }) => {
+const AuditCanvas = React.memo(({ step }: { step: number }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const particlesRef = useRef<Particle[]>([]);
-  const rafRef = useRef<number>(0);
+  // El paso vive en un ref para que cambiarlo no reinicie la animación.
+  const stepRef = useRef(step);
+  stepRef.current = step;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -64,122 +74,182 @@ const ParticleCanvas = React.memo(({ step }: { step: number }) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const W = canvas.width = canvas.offsetWidth;
-    const H = canvas.height = canvas.offsetHeight;
-    const cx = W / 2;
-    const cy = H / 2;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = SIZE * dpr;
+    canvas.height = SIZE * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const GOLD = ['#E6C594', '#D4A373', '#FFD580'];
-    const CYAN = ['#00f3ff', '#00e5ff', '#40c4ff'];
-    const emitRate = 2 + step; // more particles as step advances
+    const cx = SIZE / 2;
+    const cy = SIZE / 2;
+    const sprites = [makeGlowSprite(GOLD), makeGlowSprite(CYAN), makeGlowSprite(MINT)];
+    const tints = [GOLD, CYAN, MINT];
 
-    let frameCount = 0;
+    // Pool fijo: se reciclan en sitio, nunca se crean partículas en el loop.
+    const pool: P[] = Array.from({ length: PARTICLES }, () => ({
+      a: Math.random() * Math.PI * 2,
+      rad: 46 + Math.random() * 84,
+      sp: 0.12 + Math.random() * 0.3,
+      life: Math.random(),
+      max: 2.4 + Math.random() * 2.6,
+      size: 0.8 + Math.random() * 1.8,
+      tint: (Math.random() < 0.55 ? 0 : 1) as 0 | 1 | 2,
+    }));
 
-    const emit = () => {
-      for (let i = 0; i < emitRate; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 0.4 + Math.random() * 1.2;
-        const isGold = Math.random() > 0.45;
-        const palette = isGold ? GOLD : CYAN;
-        particlesRef.current.push({
-          x: cx + Math.cos(angle) * (20 + Math.random() * 15),
-          y: cy + Math.sin(angle) * (20 + Math.random() * 15),
-          vx: Math.cos(angle) * speed + (Math.random() - 0.5) * 0.5,
-          vy: Math.sin(angle) * speed + (Math.random() - 0.5) * 0.5,
-          life: 0,
-          maxLife: 60 + Math.random() * 80,
-          size: 1.2 + Math.random() * 2.5,
-          color: palette[Math.floor(Math.random() * palette.length)],
-        });
-      }
-      // cap at 200 particles
-      if (particlesRef.current.length > 200) {
-        particlesRef.current.splice(0, particlesRef.current.length - 200);
-      }
+    const respawn = (p: P) => {
+      p.a = Math.random() * Math.PI * 2;
+      p.rad = 96 + Math.random() * 42;
+      p.sp = 0.12 + Math.random() * 0.3;
+      p.life = 0;
+      p.max = 2.4 + Math.random() * 2.6;
+      p.size = 0.8 + Math.random() * 1.8;
+      p.tint = stepRef.current >= TOTAL_STEPS ? 2 : ((Math.random() < 0.55 ? 0 : 1) as 0 | 1);
     };
 
-    const draw = () => {
-      ctx.clearRect(0, 0, W, H);
-      frameCount++;
-      if (frameCount % 2 === 0) emit(); // emit every 2nd frame → ~30 emits/s
+    // Órbitas: inclinación fija, sólo cambia la fase con el tiempo.
+    const orbits = [
+      { rx: 104, ry: 33, rot: 0, sp: 0.32, color: GOLD, dash: [5, 6], w: 1 },
+      { rx: 118, ry: 46, rot: -0.42, sp: -0.24, color: CYAN, dash: [], w: 0.9 },
+      { rx: 78, ry: 22, rot: 0.55, sp: 0.5, color: '#E6C594', dash: [2, 7], w: 1 },
+    ];
 
-      particlesRef.current = particlesRef.current.filter(p => p.life < p.maxLife);
-      for (const p of particlesRef.current) {
-        p.life++;
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vx *= 0.98; // air resistance
-        p.vy *= 0.98;
-        const progress = p.life / p.maxLife;
-        const alpha = progress < 0.2
-          ? progress / 0.2               // fade in
-          : 1 - (progress - 0.2) / 0.8; // fade out
-        ctx.globalAlpha = alpha * 0.85;
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = p.color;
-        ctx.fillStyle = p.color;
+    let raf = 0;
+    let last = performance.now();
+    let t = 0;
+    let shownProgress = 0;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const frame = (now: number) => {
+      const dt = Math.min((now - last) / 1000, 0.05); // clamp: evita saltos al volver de una pestaña oculta
+      last = now;
+      t += dt;
+
+      const accent = stepRef.current >= TOTAL_STEPS ? MINT : GOLD;
+      const target = Math.min(stepRef.current / TOTAL_STEPS, 1);
+      shownProgress += (target - shownProgress) * Math.min(dt * 3, 1);
+
+      ctx.clearRect(0, 0, SIZE, SIZE);
+
+      // ── Halo suave ──
+      const halo = ctx.createRadialGradient(cx, cy, 8, cx, cy, 118);
+      halo.addColorStop(0, accent + '22');
+      halo.addColorStop(1, accent + '00');
+      ctx.fillStyle = halo;
+      ctx.fillRect(0, 0, SIZE, SIZE);
+
+      // ── Órbitas ──
+      for (const o of orbits) {
+        const phase = o.rot + t * o.sp;
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(phase);
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * (1 - progress * 0.3), 0, Math.PI * 2);
-        ctx.fill();
+        ctx.ellipse(0, 0, o.rx, o.ry, 0, 0, Math.PI * 2);
+        ctx.setLineDash(o.dash);
+        ctx.lineWidth = o.w;
+        ctx.strokeStyle = o.color + '59';
+        ctx.stroke();
+        ctx.restore();
+
+        // Nodo que cabalga la órbita: se ubica con la misma fase, sin keyframes.
+        const na = t * o.sp * 2.4;
+        const nx = cx + Math.cos(na) * o.rx * Math.cos(phase) - Math.sin(na) * o.ry * Math.sin(phase);
+        const ny = cy + Math.cos(na) * o.rx * Math.sin(phase) + Math.sin(na) * o.ry * Math.cos(phase);
+        const sp = o.color === CYAN ? sprites[1] : sprites[0];
+        ctx.globalAlpha = 0.75;
+        ctx.drawImage(sp, nx - 7, ny - 7, 14, 14);
+        ctx.globalAlpha = 1;
       }
+
+      // ── Partículas convergentes (blit de sprite, sin shadowBlur) ──
+      ctx.globalCompositeOperation = 'lighter';
+      const density = reduced ? 0.35 : 1;
+      const count = Math.floor(PARTICLES * density);
+      for (let i = 0; i < count; i++) {
+        const p = pool[i];
+        p.life += dt;
+        if (p.life >= p.max) respawn(p);
+        p.a += p.sp * dt;
+        p.rad -= (12 + stepRef.current * 4) * dt; // converge hacia el centro
+        if (p.rad < 30) respawn(p);
+
+        const prog = p.life / p.max;
+        const alpha = prog < 0.18 ? prog / 0.18 : 1 - (prog - 0.18) / 0.82;
+        const x = cx + Math.cos(p.a) * p.rad;
+        const y = cy + Math.sin(p.a) * p.rad * 0.42;
+        const s = p.size * 3;
+        ctx.globalAlpha = Math.max(alpha, 0) * 0.3;
+        ctx.drawImage(sprites[p.tint], x - s, y - s, s * 2, s * 2);
+      }
+      ctx.globalCompositeOperation = 'source-over';
       ctx.globalAlpha = 1;
-      ctx.shadowBlur = 0;
-      rafRef.current = requestAnimationFrame(draw);
+
+      // ── Anillo de progreso: dato real, no adorno ──
+      const R = 46;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+      ctx.setLineDash([]);
+      ctx.stroke();
+
+      if (shownProgress > 0.001) {
+        const from = -Math.PI / 2;
+        const to = from + shownProgress * Math.PI * 2;
+        const grad = ctx.createLinearGradient(cx - R, cy - R, cx + R, cy + R);
+        grad.addColorStop(0, accent);
+        grad.addColorStop(1, stepRef.current >= TOTAL_STEPS ? MINT : CYAN);
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, from, to);
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = grad;
+        ctx.stroke();
+
+        // Cabeza del arco
+        const hx = cx + Math.cos(to) * R;
+        const hy = cy + Math.sin(to) * R;
+        ctx.drawImage(sprites[stepRef.current >= TOTAL_STEPS ? 2 : 0], hx - 8, hy - 8, 16, 16);
+      }
+
+      raf = requestAnimationFrame(frame);
     };
 
-    rafRef.current = requestAnimationFrame(draw);
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-      particlesRef.current = [];
+    // Un frame estático es suficiente si el usuario pidió menos movimiento.
+    if (reduced) {
+      frame(performance.now());
+      cancelAnimationFrame(raf);
+      raf = 0;
+    } else {
+      raf = requestAnimationFrame(frame);
+    }
+
+    // No quemar CPU con la pestaña en segundo plano.
+    const onVisibility = () => {
+      if (document.hidden) {
+        if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      } else if (!raf && !reduced) {
+        last = performance.now();
+        raf = requestAnimationFrame(frame);
+      }
     };
-  }, [step]);
+    document.addEventListener('visibilitychange', onVisibility);
+
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      style={{
-        position: 'absolute',
-        inset: 0,
-        width: '100%',
-        height: '100%',
-        pointerEvents: 'none',
-        zIndex: 0,
-      }}
+      aria-hidden="true"
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
     />
   );
 });
-ParticleCanvas.displayName = 'ParticleCanvas';
+AuditCanvas.displayName = 'AuditCanvas';
 
-// ─── Hex Stream Column ────────────────────────────────────────────────────────
-const HexColumn = React.memo(({ col, rows }: { col: number; rows: string[] }) => (
-  <motion.div
-    style={{
-      position: 'absolute',
-      left: `${col * 16.5}%`,
-      top: 0,
-      fontSize: '0.45rem',
-      fontFamily: 'monospace',
-      color: col % 2 === 0 ? '#00f3ff' : '#D4A373',
-      lineHeight: 1.7,
-      userSelect: 'none',
-      pointerEvents: 'none',
-    }}
-    initial={{ y: '-100%', opacity: 0 }}
-    animate={{ y: '220%', opacity: [0, 1, 1, 0] }}
-    transition={{
-      duration: 7 + col * 1.4,
-      repeat: Infinity,
-      ease: 'linear',
-      delay: col * 0.9,
-      opacity: { times: [0, 0.1, 0.85, 1], duration: 7 + col * 1.4 },
-    }}
-  >
-    {rows.map((h, r) => <div key={r}>{h}</div>)}
-  </motion.div>
-));
-HexColumn.displayName = 'HexColumn';
-
-// ─── Main Component ───────────────────────────────────────────────────────────
 export const ProcessingAnimation: React.FC<ProcessingAnimationProps> = ({
   processingStep,
   walletId,
@@ -187,239 +257,100 @@ export const ProcessingAnimation: React.FC<ProcessingAnimationProps> = ({
   selectedCrypto,
   getStepText,
 }) => {
-  // Stable hex rows — only generated once per mount
-  const hexColumns = useMemo(
-    () => Array.from({ length: 6 }, () => makeHexRows(28)),
-    []
-  );
-
-  const currentGlow = STEP_GLOW[processingStep] ?? STEP_GLOW[1];
   const stepLabel = getStepText(processingStep);
+  const done = processingStep >= TOTAL_STEPS;
+  const accent = done ? MINT : '#E6C594';
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.97 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        width: '100%',
-        position: 'relative',
-        minHeight: 520,
-        overflow: 'hidden',
-        /* CSS 3D context for child perspective transforms */
-        perspective: '800px',
-        perspectiveOrigin: '50% 40%',
-      }}
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+      className="relative flex w-full flex-col items-center"
+      role="status"
+      aria-live="polite"
     >
-      {/* ── Layer 0: scrolling hex hash stream ── */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-[0.07]">
-        {hexColumns.map((rows, col) => (
-          <HexColumn key={col} col={col} rows={rows} />
-        ))}
-      </div>
-
-      {/* ── Header ── */}
       <Typography
-        variant="h6"
-        className="relative z-[2] mt-1 mb-4 font-mono font-black tracking-[3px] text-[#E6C594] [text-shadow:0_0_14px_rgba(212,163,115,0.6)]"
+        variant="caption"
+        className="mb-5 font-mono text-[0.6875rem] font-semibold uppercase leading-none tracking-[0.24em] transition-colors duration-500"
+        style={{ color: accent }}
       >
-        PROCESANDO TRANSACCIÓN
+        Procesando transacción
       </Typography>
 
-      {/* ── Layer 1: Orbit system + Canvas ── */}
-      <div
-        className="relative z-[2] mb-6 flex h-[260px] w-[260px] items-center justify-center"
-        style={{ transformStyle: 'preserve-3d' }}
-      >
-        {/* Canvas particle emitter — sits behind everything else */}
-        <ParticleCanvas step={processingStep} />
+      {/* Gráfico: un canvas para todo */}
+      <div className="relative mb-6 flex items-center justify-center" style={{ width: SIZE, height: SIZE }}>
+        <AuditCanvas step={processingStep} />
 
-        {/* Radial halo glow — GPU-composited */}
         <div
-          className="absolute z-[1] h-[220px] w-[220px] rounded-full [background:radial-gradient(ellipse_at_center,rgba(212,163,115,0.18)_0%,transparent_68%)] blur-[18px] animate-[haloGlow_2.4s_ease-in-out_infinite]"
-          style={{ willChange: 'transform, opacity' }}
-        />
-
-        {/* ── SVG orbit rings — 3D perspective ── */}
-        <svg
+          className="relative z-[1] flex h-[68px] w-[68px] items-center justify-center overflow-hidden rounded-full text-[1.3rem] font-black transition-colors duration-700"
           style={{
-            position: 'absolute',
-            width: '100%', height: '100%',
-            overflow: 'visible',
-            zIndex: 2,
-            transform: 'rotateX(20deg)',
-            transformStyle: 'preserve-3d',
+            backgroundColor: 'rgba(6,6,12,0.96)',
+            border: `1px solid ${accent}59`,
+            color: accent,
           }}
         >
-          {/* Ring A: wide gold dashed — slow CW */}
-          <motion.ellipse cx="130" cy="130" rx="100" ry="32"
-            fill="none" stroke="#D4A373" strokeWidth="1.6" strokeDasharray="6 5"
-            style={{ transformOrigin: '130px 130px' }}
-            animate={{ rotate: 360 }}
-            transition={{ duration: 7, repeat: Infinity, ease: 'linear' }}
-          />
-          {/* Ring B: medium cyan solid — fast CCW */}
-          <motion.ellipse cx="130" cy="130" rx="115" ry="42"
-            fill="none" stroke="#00f3ff" strokeWidth="1" strokeOpacity={0.8}
-            style={{ transformOrigin: '130px 130px', rotateX: '55deg' }}
-            animate={{ rotate: -360 }}
-            transition={{ duration: 5.5, repeat: Infinity, ease: 'linear' }}
-          />
-          {/* Ring C: inner tight gold — fast CW */}
-          <motion.ellipse cx="130" cy="130" rx="75" ry="24"
-            fill="none" stroke="#E6C594" strokeWidth="1.3" strokeDasharray="3 7"
-            style={{ transformOrigin: '130px 130px' }}
-            animate={{ rotate: 360 }}
-            transition={{ duration: 3.5, repeat: Infinity, ease: 'linear', delay: 0.8 }}
-          />
-          {/* Ring D: outer white ghost — ultra-slow CW */}
-          <motion.ellipse cx="130" cy="130" rx="128" ry="52"
-            fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="0.8" strokeDasharray="4 10"
-            style={{ transformOrigin: '130px 130px', rotate: -25 }}
-            animate={{ rotate: 335 }}
-            transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
-          />
-          {/* Ring E: diagonal red-orange accent — medium CCW */}
-          <motion.ellipse cx="130" cy="130" rx="88" ry="16"
-            fill="none" stroke="rgba(255,120,80,0.4)" strokeWidth="0.9" strokeDasharray="2 8"
-            style={{ transformOrigin: '130px 130px', rotateY: '70deg' }}
-            animate={{ rotate: -360 }}
-            transition={{ duration: 11, repeat: Infinity, ease: 'linear', delay: 2 }}
-          />
-        </svg>
-
-        {/* ── Orbital nodes — glowing dots that ride the rings ── */}
-        {[0, 1, 2].map(i => {
-          const colors = ['#D4A373', '#00f3ff', '#E6C594'];
-          const radii = [100, 115, 75];
-          const durations = [7, 5.5, 3.5];
-          const r = radii[i];
-          return (
-            <motion.div
-              key={`node-${i}`}
-              style={{
-                position: 'absolute',
-                width: 7, height: 7,
-                borderRadius: '50%',
-                backgroundColor: colors[i],
-                boxShadow: `0 0 12px 3px ${colors[i]}`,
-                willChange: 'transform',
-                zIndex: 3,
-              }}
-              animate={{
-                x: Array.from({ length: 37 }, (_, k) => Math.cos((k / 36) * Math.PI * 2) * r),
-                y: Array.from({ length: 37 }, (_, k) => Math.sin((k / 36) * Math.PI * 2) * (r * 0.3)),
-              }}
-              transition={{ duration: durations[i], repeat: Infinity, ease: 'linear' }}
+          {(selectedCrypto?.identification.image256 || selectedCrypto?.identification.image128) ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={selectedCrypto.identification.image256 || selectedCrypto.identification.image128}
+              alt=""
+              className="h-full w-full object-cover"
             />
-          );
-        })}
+          ) : (
+            selectedCrypto?.identification.symbol?.[0] ?? 'S'
+          )}
+        </div>
+      </div>
 
-        {/* ── Central token — step-synced glow ── */}
-        <motion.div
-          animate={{
-            scale: [1, 1.07, 1],
-            filter: [
-              `drop-shadow(0 0 8px rgba(212,163,115,0.5))`,
-              `drop-shadow(0 0 22px rgba(212,163,115,0.95)) drop-shadow(0 0 40px rgba(0,243,255,0.4))`,
-              `drop-shadow(0 0 8px rgba(212,163,115,0.5))`,
-            ],
-          }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-          style={{ zIndex: 4, position: 'relative', willChange: 'transform, filter' }}
-        >
-          <div
-            className="flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-full border-[2.5px] border-[#D4A373] text-[1.4rem] font-black"
-            style={{ backgroundColor: 'rgba(5,5,12,0.98)', boxShadow: currentGlow, transition: 'box-shadow 0.8s ease' }}
+      {/* Terminal de auditoría */}
+      <div className="relative w-full overflow-hidden rounded-[3px] border border-white/[0.07] bg-[rgba(6,6,12,0.7)] px-4 py-3 font-mono backdrop-blur-md">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00f3ff]/35 to-transparent"
+        />
+        <div className="flex flex-col gap-1.5">
+          <Typography variant="caption" className="text-[0.65rem] leading-relaxed text-[#a5d6a7]">
+            <span className="text-white/25">[ok]</span> node_handshake · wallet:{walletId ? `${walletId.substring(0, 14)}…` : 'n/a'}
+          </Typography>
+          <Typography variant="caption" className="text-[0.65rem] leading-relaxed text-[#00f3ff]/85">
+            <span className="text-white/25">[ok]</span> blockchain_net · synced · nodes:247 · diff:3
+          </Typography>
+          <Typography variant="caption" className="text-[0.65rem] leading-relaxed text-white/40">
+            <span className="text-white/25">[··]</span> tx_fee:{networkFee ? ` ${networkFee} CR` : ' 0 CR'} · asset:{selectedCrypto?.identification.symbol ?? '—'} · price:{selectedCrypto?.financial.price?.toLocaleString() ?? '—'}
+          </Typography>
+        </div>
+      </div>
+
+      {/* Progreso por pasos */}
+      <div className="mt-4 w-full">
+        <div className="mb-2 flex items-baseline justify-between">
+          <Typography
+            variant="caption"
+            className="text-[0.6875rem] font-semibold uppercase tracking-[0.12em] transition-colors duration-500"
+            style={{ color: accent }}
           >
-            {(selectedCrypto?.identification.image256 || selectedCrypto?.identification.image128) ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={selectedCrypto.identification.image256 || selectedCrypto.identification.image128}
-                alt=""
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              selectedCrypto?.identification.symbol?.[0] ?? 'S'
-            )}
-          </div>
-        </motion.div>
-      </div>
-
-      {/* ── Layer 2: crypto terminal ── */}
-      <div className="relative z-[2] mb-4 w-full rounded-[10px] border border-[#00f3ff]/10 bg-black/65 py-[14px] px-4 font-mono shadow-[inset_0_0_20px_rgba(0,0,0,0.4)]" style={{ backdropFilter: 'blur(6px)' }}>
-        {/* Terminal title bar */}
-        <div className="mb-[9.6px] flex items-center gap-[6.4px]">
-          <div className="h-2 w-2 rounded-full bg-[#ff5f57]" />
-          <div className="h-2 w-2 rounded-full bg-[#febc2e]" />
-          <div className="h-2 w-2 rounded-full bg-[#28c840]" />
-          <Typography variant="caption" className="ml-2 text-[0.6rem] tracking-[1px] text-white/25">
-            CRYPTO_AUDIT_v3.1 — SECURE_CHANNEL
-          </Typography>
-        </div>
-
-        <div className="flex flex-col gap-[4.8px]">
-          <Typography variant="caption" className="flex items-center gap-1 text-[0.63rem] text-[#00ff88]">
-            <span className="text-white/30">[OK]</span>
-            {' '}NODE_HANDSHAKE ·· wallet:{walletId ? `${walletId.substring(0, 14)}…` : 'N/A'}
-          </Typography>
-          <Typography variant="caption" className="text-[0.63rem] text-[#00f3ff]">
-            <span className="text-white/30">[OK]</span>
-            {' '}BLOCKCHAIN_NET · SYNCED · NODES:247 · DIFF:3
-          </Typography>
-          <Typography variant="caption" className="text-[0.63rem] text-white/45">
-            <span className="text-white/30">[  ]</span>
-            {' '}TX_FEE:{networkFee ? ` ${networkFee} CR` : ' 0 CR'} · ASSET:{selectedCrypto?.identification.symbol ?? '—'} · PRICE:{selectedCrypto?.financial.price?.toLocaleString() ?? '—'}
-          </Typography>
-          {/* Blinking active line */}
-          <div className="mt-[3.2px] flex items-center gap-1">
-            <motion.span
-              animate={{ opacity: [1, 0, 1] }}
-              transition={{ duration: 0.9, repeat: Infinity }}
-              style={{ color: '#E6C594', fontSize: '0.7rem' }}
-            >
-              ▶
-            </motion.span>
-            <Typography variant="caption" className="text-[0.63rem] font-bold text-[#E6C594]">
-              SIGNING_TX · {stepLabel.split(':')[0]}
-            </Typography>
-            <motion.span
-              animate={{ opacity: [1, 0, 1] }}
-              transition={{ duration: 0.7, repeat: Infinity, delay: 0.35 }}
-              style={{ color: '#E6C594', fontSize: '0.75rem', marginLeft: 2 }}
-            >
-              █
-            </motion.span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Step progress bar ── */}
-      <div className="relative z-[2] mb-2 w-full">
-        <div className="mb-1 flex justify-between">
-          <Typography variant="caption" className="text-[0.72rem] font-bold text-[#E6C594]">
             {stepLabel}
           </Typography>
-          <Typography variant="caption" className="font-mono text-[0.65rem] text-white/35">
-            {processingStep}/4
+          <Typography variant="caption" className="font-mono text-[0.65rem] tabular-nums text-white/30">
+            {processingStep}/{TOTAL_STEPS}
           </Typography>
         </div>
-        {/* Track */}
-        <div className="h-1 w-full overflow-hidden rounded-lg bg-white/[0.06]">
-          <motion.div
-            style={{ height: '100%', borderRadius: 4, background: 'linear-gradient(90deg,#D4A373,#00f3ff)', originX: 0 }}
-            animate={{ scaleX: processingStep / 4 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
-          />
+        {/* Un segmento por paso: comunica cuántos faltan, no sólo el porcentaje */}
+        <div className="flex gap-1">
+          {Array.from({ length: TOTAL_STEPS }, (_, i) => (
+            <div key={i} className="h-px flex-1 overflow-hidden bg-white/[0.08]">
+              <motion.div
+                className="h-full origin-left"
+                style={{ backgroundColor: i < processingStep ? accent : 'transparent' }}
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: i < processingStep ? 1 : 0 }}
+                transition={{ duration: 0.45, ease: 'easeOut', delay: i === processingStep - 1 ? 0.05 : 0 }}
+              />
+            </div>
+          ))}
         </div>
       </div>
-
-      <Typography variant="caption" className="relative z-[2] font-mono tracking-[1px] text-white/30">
-        EST. &lt; 10s · 60fps · GPU_ACCEL: ON
-      </Typography>
     </motion.div>
   );
 };
