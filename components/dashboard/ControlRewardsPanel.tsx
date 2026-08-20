@@ -102,30 +102,15 @@ export const ControlRewardsPanel = React.memo(() => {
                         </div>
                     </div>
 
+                    {/* Verde para activar; en marcha pasa a error porque el
+                        overclock triplica la temperatura. */}
                     <Button
                         variant="contained"
                         fullWidth
+                        color={isOverclockActive ? 'error' : 'success'}
                         disabled={!isPoweredOn || isOverheated}
                         onClick={handleOverclockToggle}
-                        sx={{
-                            mb: 2,
-                            py: 1,
-                            bgcolor: isOverclockActive ? 'rgba(255, 23, 68, 0.2)' : 'rgba(255, 183, 0, 0.05)',
-                            color: isOverclockActive ? '#ff1744' : '#ffb700',
-                            border: `1px solid ${isOverclockActive ? '#ff1744' : '#ffb700'}`,
-                            fontWeight: 'bold',
-                            letterSpacing: 1.5,
-                            boxShadow: isOverclockActive ? '0 0 15px rgba(255, 23, 68, 0.3)' : 'none',
-                            '&:hover': {
-                                bgcolor: isOverclockActive ? 'rgba(255, 23, 68, 0.3)' : 'rgba(255, 183, 0, 0.1)',
-                                borderColor: isOverclockActive ? '#ff1744' : '#ffb700'
-                            },
-                            '&.Mui-disabled': {
-                                border: '1px solid rgba(255,255,255,0.05)',
-                                color: 'rgba(255,255,255,0.15)',
-                                bgcolor: 'transparent'
-                            }
-                        }}
+                        className="mb-4"
                     >
                         {isOverclockActive ? 'OVERCLOCK ACTIVO (3X TEMP)' : 'ACTIVAR OVERCLOCK'}
                     </Button>
