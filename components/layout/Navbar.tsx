@@ -12,11 +12,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu as MenuIcon, Rocket, ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
-import { Button } from "../ui/Button";
 import { Typography } from "../ui/Typography";
 import { Drawer } from "../ui/Drawer";
 import { Tooltip } from "../ui/Tooltip";
 import { Dropdown } from "../ui/Dropdown";
+import { NavLabel } from "./NavLabel";
 
 //# 1-Importar dependencias y componentes de UI
 import { useAppDispatch, useAppSelector } from "../../lib/hooks";
@@ -31,7 +31,8 @@ import { formatHash } from "../../lib/utils/formatHash";
 import { EnvVariables } from "@/lib/constants/variables";
 import { cn } from "@/lib/utils/cn";
 
-const NAV_GAP = 4; // px, coincide con gap-1 en la fila de navegación
+// Los items ya separan con su propio padding horizontal, la fila no usa gap.
+const NAV_GAP = 0;
 
 export const Navbar = () => {
 
@@ -142,43 +143,34 @@ export const Navbar = () => {
     const isOperations = item.id === 'dashboard';
     const formattedHash = formatHash(localHash, chronoBurstFreqTypes);
     const tooltipText = `Hash Acumulado Local: ${formattedHash}`;
-    const color = isOperations && isPoweredOn ? 'warning' : isActive ? 'primary' : 'info';
+    const state = isOperations && isPoweredOn ? 'alert' : isActive ? 'active' : 'rest';
 
     const buttonContent = (
-      <Button
-        variant="text"
-        size="small"
-        color={color}
-        onClick={() => handleNavClick(item)}
-      >
+      <NavLabel state={state} onClick={() => handleNavClick(item)}>
         {item.name}
-      </Button>
+      </NavLabel>
     );
 
     return (
       <div key={item.id} className="relative">
-        {isActive && (
-          <motion.div
-            layoutId="navbar-indicator"
-            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'rgba(0, 243, 255, 0.1)',
-              borderRadius: '8px',
-              border: '1px solid rgba(0, 243, 255, 0.3)',
-            }}
-          />
-        )}
         {isOperations ? (
           <Tooltip
             content={tooltipText}
             side="bottom"
-            className="border-[rgba(212,163,115,0.3)] bg-[rgba(10,10,10,0.95)] p-3 font-bold text-[#E6C594] shadow-[0_4px_20px_rgba(0,0,0,0.8)]"
+            className="border-[rgba(212,163,115,0.25)] bg-[rgba(8,8,14,0.96)] px-3 py-2 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-[#E6C594] shadow-[0_18px_50px_-12px_rgba(0,0,0,0.9)]"
           >
             <span>{buttonContent}</span>
           </Tooltip>
         ) : buttonContent}
+        {/* Indicador activo: hairline de 1px que se desliza entre ítems */}
+        {isActive && (
+          <motion.div
+            layoutId="navbar-indicator"
+            transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
+            className="pointer-events-none absolute inset-x-2 bottom-0 h-px bg-[#00f3ff]"
+            style={{ boxShadow: '0 0 8px rgba(0,243,255,0.8)' }}
+          />
+        )}
       </div>
     );
   };
@@ -187,10 +179,10 @@ export const Navbar = () => {
   return (
     <div className="grow">
       <header
-        className="fixed inset-x-0 top-0 z-50 flex h-16 items-center justify-center border-b border-[#00f3ff]/10 bg-[rgba(5,5,12,0.8)] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.8)] backdrop-blur-2xl [background-image:linear-gradient(rgba(0,243,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,243,255,0.03)_1px,transparent_1px)] [background-size:30px_30px]"
+        className="fixed inset-x-0 top-0 z-50 flex h-16 items-center justify-center border-b border-white/[0.06] bg-[rgba(5,5,12,0.85)] shadow-[0_10px_30px_-14px_rgba(0,0,0,0.9)] backdrop-blur-2xl"
       >
-        { }
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00f3ff] to-transparent shadow-[0_0_15px_#00f3ff]" />
+        {/* Hairline superior de identidad, atenuada para no competir con los items */}
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00f3ff]/50 to-transparent" />
 
         <div className="flex w-full items-center gap-3 px-4 md:px-6">
 
@@ -198,19 +190,19 @@ export const Navbar = () => {
             className="flex shrink-0 cursor-pointer items-center"
             onClick={() => handleNavClick(navItems[0])}
           >
-            <div className="mr-3 flex items-center justify-center rounded-lg border border-[#00f3ff]/30 bg-[#00f3ff]/5 p-1.5 shadow-[0_0_15px_rgba(0,243,255,0.15)]">
-              <Rocket size={20} className="text-primary [filter:drop-shadow(0_0_5px_#00f3ff)]" />
+            <div className="mr-3 flex items-center justify-center rounded-[3px] border border-[#00f3ff]/20 bg-[#00f3ff]/[0.04] p-1.5">
+              <Rocket size={18} className="text-[#00f3ff]" />
             </div>
             <div className="hidden sm:block">
               <Typography
                 variant="h6"
                 component="div"
-                className="mb-0.5 bg-gradient-to-r from-white to-[#00f3ff] bg-clip-text text-base font-black tracking-[2px] leading-none text-transparent [-webkit-text-fill-color:transparent]"
+                className="mb-1 bg-gradient-to-r from-white to-[#00f3ff] bg-clip-text text-[0.9375rem] font-black tracking-[0.16em] leading-none text-transparent [-webkit-text-fill-color:transparent]"
               >
                 {EnvVariables.project.toUpperCase()}
               </Typography>
-              <Typography variant="caption" className="flex items-center gap-1.5 text-[0.55rem] tracking-[3px] text-[#00f3ff]/70">
-                <span className="h-1 w-1 rounded-full bg-[#00f3ff] shadow-[0_0_5px_#00f3ff]" />
+              <Typography variant="caption" className="flex items-center gap-1.5 text-[0.5rem] font-semibold leading-none tracking-[0.24em] text-[#00f3ff]/60">
+                <span className="h-[3px] w-[3px] rounded-full bg-[#00f3ff]" />
                 SYSTEM ONLINE
               </Typography>
             </div>
@@ -219,7 +211,7 @@ export const Navbar = () => {
           {/* Fila de navegación: mide su ancho disponible y desborda a "Más" */}
           <div
             ref={navRowRef}
-            className="hidden min-w-0 flex-1 items-center gap-1 rounded-xl border border-white/[0.08] bg-black/30 p-1 backdrop-blur-sm md:flex"
+            className="hidden min-w-0 flex-1 items-center self-stretch md:flex"
           >
             {shownItems.map(renderNavButton)}
 
@@ -227,14 +219,14 @@ export const Navbar = () => {
               <Dropdown
                 align="left"
                 trigger={({ open }) => (
-                  <Button
-                    variant="text"
-                    size="small"
-                    color={activeInOverflow ? 'primary' : 'info'}
-                    endIcon={<ChevronDown size={14} className={cn('transition-transform', open && 'rotate-180')} />}
-                  >
+                  <NavLabel state={activeInOverflow || open ? 'active' : 'rest'}>
                     Más
-                  </Button>
+                    <ChevronDown
+                      size={12}
+                      strokeWidth={2.5}
+                      className={cn('transition-transform duration-200', open && 'rotate-180')}
+                    />
+                  </NavLabel>
                 )}
               >
                 {overflowItems.map((item) => {
@@ -244,10 +236,21 @@ export const Navbar = () => {
                       key={item.id}
                       onClick={() => handleNavClick(item)}
                       className={cn(
-                        'block w-full px-4 py-2.5 text-left text-sm font-semibold uppercase tracking-wide transition-colors hover:bg-white/5',
-                        isActive ? 'text-[#00f3ff]' : 'text-white/70'
+                        'group relative block w-full px-4 py-2.5 text-left text-[0.6875rem] font-semibold uppercase leading-none',
+                        'tracking-[0.14em] transition-colors duration-200 focus-visible:outline-none',
+                        isActive ? 'text-[#00f3ff]' : 'text-white/55 hover:text-white focus-visible:text-white'
                       )}
                     >
+                      {/* Acento de borde: hairline vertical en vez de fondo relleno */}
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          'pointer-events-none absolute inset-y-1 left-0 w-px transition-colors duration-200',
+                          isActive
+                            ? 'bg-[#00f3ff]'
+                            : 'bg-transparent group-hover:bg-white/30 group-focus-visible:bg-white/30'
+                        )}
+                      />
                       {item.name}
                     </button>
                   );
@@ -256,25 +259,24 @@ export const Navbar = () => {
             )}
 
             {/* Copia oculta usada solo para medir el ancho real de cada item (misma tipografía/padding) */}
-            <div className="pointer-events-none absolute left-0 top-0 flex -translate-y-full gap-1 opacity-0" aria-hidden="true">
+            <div className="pointer-events-none absolute left-0 top-0 flex -translate-y-full opacity-0" aria-hidden="true">
               {visibleNavItems.map((item, index) => (
-                <Button
+                <NavLabel
                   key={item.id}
                   ref={(el) => { measureRefs.current[index] = el; }}
-                  variant="text"
-                  size="small"
                   tabIndex={-1}
                 >
                   {item.name}
-                </Button>
+                </NavLabel>
               ))}
-              <Button ref={moreMeasureRef} variant="text" size="small" endIcon={<ChevronDown size={14} />} tabIndex={-1}>
+              <NavLabel ref={moreMeasureRef} tabIndex={-1}>
                 Más
-              </Button>
+                <ChevronDown size={12} strokeWidth={2.5} />
+              </NavLabel>
             </div>
           </div>
 
-          <div className="mx-1 hidden h-[30px] w-px shrink-0 bg-white/10 md:block" />
+          <div className="mx-2 hidden h-5 w-px shrink-0 bg-white/[0.08] md:block" />
 
           <div className="hidden shrink-0 items-center gap-3 md:flex">
             {userInfo && <LabNavbarIndicator />}
@@ -287,9 +289,9 @@ export const Navbar = () => {
           <button
             aria-label="open drawer"
             onClick={handleDrawerToggle}
-            className="rounded p-2 text-white md:hidden"
+            className="ml-auto rounded-[3px] border border-white/[0.08] p-1.5 text-white/70 transition-colors hover:border-white/20 hover:text-white md:hidden"
           >
-            <MenuIcon />
+            <MenuIcon size={18} />
           </button>
         </div>
       </header>

@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { User as UserIcon, Settings, LogOut } from "lucide-react";
 import { TaoIcon } from "../ui/TaoIcon";
 import { Button } from "../ui/Button";
+import { NavLabel } from "./NavLabel";
 import { CountUp } from "../ui/CountUp";
 import { Typography } from "../ui/Typography";
 
@@ -92,14 +93,12 @@ export const NavbarUserMenu = ({
 
   //# 4-Renderizar botones de acceso para invitados
   return (
-    <div className="flex flex-row items-center gap-2">
-      <Button
-        variant="text"
-        size="small"
-        onClick={() => dispatch(openModal("login"))}
-      >
+    // El CTA enmarcado se reserva para "Registrarse"; "Entrar" queda como
+    // etiqueta fina para no tener dos botones compitiendo en el navbar.
+    <div className="flex flex-row items-center gap-1">
+      <NavLabel onClick={() => dispatch(openModal("login"))}>
         Entrar
-      </Button>
+      </NavLabel>
       <Button
         variant="contained"
         size="small"

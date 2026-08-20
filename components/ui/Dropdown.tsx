@@ -43,11 +43,18 @@ export const Dropdown = ({ trigger, children, align = 'right', className, panelC
         <div
           onClick={() => setOpen(false)}
           className={cn(
-            'absolute top-full z-30 mt-2 min-w-[200px] overflow-hidden rounded-lg border border-white/10 bg-[#0a0a0f] py-1 shadow-[0_10px_30px_rgba(0,0,0,0.6)]',
+            'absolute top-full z-30 mt-2 min-w-[210px] overflow-hidden rounded-[3px] py-1.5',
+            'border border-white/[0.07] bg-[rgba(8,8,14,0.96)] backdrop-blur-xl',
+            'shadow-[0_18px_50px_-12px_rgba(0,0,0,0.9)]',
             align === 'right' ? 'right-0' : 'left-0',
             panelClassName
           )}
         >
+          {/* Hairline superior: mismo recurso de identidad que la línea del header */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00f3ff]/40 to-transparent"
+          />
           {children}
         </div>
       )}
