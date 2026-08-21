@@ -66,45 +66,59 @@ function makeGalaxy(color: string, r = 56): HTMLCanvasElement {
   const c = document.createElement('canvas');
   c.width = c.height = r * 2;
   const g = c.getContext('2d')!;
+
+  // Los brazos se trazan aparte para poder difuminarlos enteros. Pocas vueltas
+  // con poca dispersión daban aspas de shuriken en vez de una espiral: acá van
+  // casi dos vueltas completas, con la nube ensanchándose hacia afuera.
+  const tmp = document.createElement('canvas');
+  tmp.width = tmp.height = r * 2;
+  const tg = tmp.getContext('2d')!;
+  tg.translate(r, r);
+  tg.globalCompositeOperation = 'lighter';
+  tg.fillStyle = color;
+  const ARMS = 2;
+  for (let arm = 0; arm < ARMS; arm++) {
+    const base = (arm / ARMS) * Math.PI * 2;
+    for (let i = 0; i < 300; i++) {
+      const f = i / 300;
+      const a = base + f * 5.6;               // ~1.8 vueltas: envuelve como disco
+      const rad = f * r * 0.94;
+      const spread = 2.4 + f * 5.5;           // nube ancha, no una línea
+      const px = Math.cos(a) * rad + (Math.random() - 0.5) * spread;
+      const py = Math.sin(a) * rad * 0.62 + (Math.random() - 0.5) * spread;
+      tg.globalAlpha = (1 - f) * 0.3;
+      tg.beginPath();
+      tg.arc(px, py, 0.85 - f * 0.35, 0, Math.PI * 2);
+      tg.fill();
+    }
+  }
+
   g.translate(r, r);
 
   // Halo del disco
   const halo = g.createRadialGradient(0, 0, 0, 0, 0, r);
-  halo.addColorStop(0, color + '8c');
-  halo.addColorStop(0.45, color + '33');
+  halo.addColorStop(0, color + '73');
+  halo.addColorStop(0.45, color + '2b');
   halo.addColorStop(1, color + '00');
   g.fillStyle = halo;
   g.fillRect(-r, -r, r * 2, r * 2);
 
-  // Dos brazos espirales trazados con puntos que se atenúan hacia afuera
+  // Un blur sobre los brazos ya trazados: se paga una vez al crear el sprite,
+  // no por frame, y es lo que los vuelve difusos en lugar de recortados.
   g.globalCompositeOperation = 'lighter';
-  const ARMS = 3;
-  for (let arm = 0; arm < ARMS; arm++) {
-    const base = (arm / ARMS) * Math.PI * 2;
-    for (let i = 0; i < 170; i++) {
-      const f = i / 170;
-      const a = base + f * 2.5;              // enrollado mas cerrado = brazos definidos
-      const rad = f * r * 0.92;
-      const spread = 0.7 + f * 1.3;          // menos dispersion: los brazos no se empastan
-      const px = Math.cos(a) * rad + (Math.random() - 0.5) * spread;
-      const py = Math.sin(a) * rad * 0.62 + (Math.random() - 0.5) * spread;
-      g.globalAlpha = (1 - f) * 0.9;
-      g.fillStyle = color;
-      g.beginPath();
-      g.arc(px, py, 1.15 - f * 0.45, 0, Math.PI * 2);
-      g.fill();
-    }
-  }
+  g.filter = `blur(${(r * 0.055).toFixed(2)}px)`;
+  g.drawImage(tmp, -r, -r);
+  g.filter = 'none';
 
-  // Núcleo
+  // Núcleo, también difuso en el borde
   g.globalAlpha = 1;
-  const core = g.createRadialGradient(0, 0, 0, 0, 0, r * 0.22);
+  const core = g.createRadialGradient(0, 0, 0, 0, 0, r * 0.26);
   core.addColorStop(0, '#ffffff');
-  core.addColorStop(0.4, color);
+  core.addColorStop(0.28, color);
   core.addColorStop(1, color + '00');
   g.fillStyle = core;
   g.beginPath();
-  g.arc(0, 0, r * 0.22, 0, Math.PI * 2);
+  g.arc(0, 0, r * 0.26, 0, Math.PI * 2);
   g.fill();
   return c;
 }
@@ -413,7 +427,7 @@ export const ParticleBackground = () => {
           ctx.translate(p.x, p.y);
           ctx.rotate(p.rot);
           ctx.scale(1, p.tilt);            // inclinación: se leen como discos, no como círculos
-          ctx.globalAlpha = 0.8 * tw;
+          ctx.globalAlpha = 0.5 * tw;
           ctx.drawImage(galaxies[p.ci], -r, -r, r * 2, r * 2);
           ctx.restore();
         } else {
