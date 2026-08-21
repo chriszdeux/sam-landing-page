@@ -3,8 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { Background } from '../../components/layout/Background';
 import { Input } from '../../components/ui/Input';
-import { CustomButton } from '../../components/ui/CustomButton';
+import { Button } from '../../components/ui/Button';
 import { Typography } from '../../components/ui/Typography';
+import { cn } from '@/lib/utils/cn';
 import { Tooltip } from '../../components/ui/Tooltip';
 import { Search as SearchIcon, RefreshCw as RefreshIcon, ExternalLink as LaunchIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -175,12 +176,15 @@ export default function TransactionsPage() {
                 const cryptoId = symbolMap[symbol] || row.blockchainId || row.financialInfo?.cryptoId || row.cryptoId;
                 if (!cryptoId) return <Typography variant="caption" className="text-white/30">—</Typography>;
                 return (
-                    <button
+                    <Button
+                        size="small"
+                        color="info"
+                        aria-label="Ver activo en el mercado"
                         onClick={() => router.push(`/market/${cryptoId}`)}
-                        className="rounded border border-[#00f3ff]/20 bg-[#00f3ff]/5 p-1 text-[#00f3ff] transition-colors hover:border-[#00f3ff] hover:bg-[#00f3ff]/15"
+                        className="[&>div]:px-2 [&>div]:py-1.5"
                     >
                         <LaunchIcon size={14} />
-                    </button>
+                    </Button>
                 );
             }
         });
@@ -254,39 +258,49 @@ export default function TransactionsPage() {
                         </div>
                     </div>
 
-                    <div className="mb-8 flex gap-4">
+                    {/* items-center + mb-0: el margen propio del Input estiraba la
+                        fila y dejaba los botones desalineados respecto al campo. */}
+                    <div className="mb-8 flex items-center gap-3">
                         <Input
                             placeholder='Buscar por billetera...'
                             value={walletSearch}
                             onChange={(e) => setWalletSearch(e.target.value)}
+                            containerClassName="mb-0 flex-1"
                         />
-                        <CustomButton
-                            variant='info'
+                        <Button
+                            color="info"
+                            size="large"
                             onClick={handleSearch}
-                            startIcon={<SearchIcon />}
-                            sx={{ minWidth: 150 }}
-                            glow
+                            startIcon={<SearchIcon size={15} />}
+                            className="min-w-[150px]"
                         >
                             BUSCAR
-                        </CustomButton>
+                        </Button>
                         <Tooltip content={isCooldownActive ? `Espero ${cooldownRemaining}s` : "Actualizar Transacciones"}>
-                            <button
-                                onClick={handleRefresh}
-                                disabled={isCooldownActive}
-                                className="h-12 w-12 rounded border border-[#00f3ff]/20 bg-[#00f3ff]/5 p-3 text-[#00f3ff] transition-colors hover:border-[#00f3ff] hover:bg-[#00f3ff]/15 hover:shadow-[0_0_10px_rgba(0,243,255,0.3)] disabled:border-white/10 disabled:bg-white/[0.02] disabled:text-white/30"
-                            >
-                                {isCooldownActive ? (
-                                    <Typography variant="caption" className="text-xs font-bold text-[#ffaa00]">
-                                        {cooldownRemaining}s
-                                    </Typography>
-                                ) : (
-                                    <RefreshIcon className={loading ? "animate-spin" : ""} />
-                                )}
-                            </button>
+                            {/* El span mantiene el tooltip activo aunque el botón
+                                esté deshabilitado durante el cooldown. */}
+                            <span>
+                                <Button
+                                    color={isCooldownActive ? 'warning' : 'info'}
+                                    size="large"
+                                    onClick={handleRefresh}
+                                    disabled={isCooldownActive}
+                                    aria-label="Actualizar transacciones"
+                                    className="[&>div]:px-3.5"
+                                >
+                                    {isCooldownActive ? (
+                                        <span className="tabular-nums">{cooldownRemaining}s</span>
+                                    ) : (
+                                        <RefreshIcon size={16} className={loading ? 'animate-spin' : ''} />
+                                    )}
+                                </Button>
+                            </span>
                         </Tooltip>
                     </div>
 
-                    <div className="mb-6 flex gap-6 border-b border-[#00f3ff]/20">
+                    {/* Pestañas: mismo tratamiento fino que el navbar - el estado
+                        activo lo lleva una hairline de 1px, no un subrayado grueso. */}
+                    <div className="mb-6 flex gap-7 border-b border-white/[0.07]">
                         {[
                             { label: 'Mercado (BUY/SELL)', value: '' },
                             { label: 'Minería (MINE)', value: 'MINER' },
@@ -296,15 +310,21 @@ export default function TransactionsPage() {
                                 role="tab"
                                 aria-selected={filterType === tab.value}
                                 onClick={() => handleFilterChange(tab.value)}
-                                className="relative pb-3 text-sm font-bold transition-colors"
-                                style={{ color: filterType === tab.value ? '#00f3ff' : 'rgba(255,255,255,0.6)' }}
+                                className={cn(
+                                    'relative pb-3 text-[0.6875rem] font-semibold uppercase leading-none tracking-[0.14em]',
+                                    'transition-colors duration-200 focus-visible:outline-none',
+                                    filterType === tab.value
+                                        ? 'text-[#00f3ff]'
+                                        : 'text-white/55 hover:text-white focus-visible:text-white'
+                                )}
                             >
                                 {tab.label}
                                 {filterType === tab.value && (
                                     <motion.div
                                         layoutId="transactions-tab-indicator"
-                                        className="absolute inset-x-0 -bottom-px h-0.5 bg-[#00f3ff]"
-                                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                                        className="absolute inset-x-0 -bottom-px h-px bg-[#00f3ff]"
+                                        style={{ boxShadow: '0 0 8px rgba(0,243,255,0.8)' }}
+                                        transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
                                     />
                                 )}
                             </button>
