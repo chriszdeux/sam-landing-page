@@ -29,7 +29,15 @@ const SPARK_POOL = 420;
 const DUST_POOL = 90;
 const CONNECTION_DIST = 150;
 
-interface Node { x: number; y: number; vx: number; vy: number; size: number; ci: number }
+interface Node {
+  x: number; y: number; vx: number; vy: number; size: number; ci: number;
+  // Titileo: cada nodo late con su propia fase y frecuencia, así la red
+  // respira en desorden en vez de pulsar toda junta.
+  phase: number; freq: number; tw: number;
+  // Sólo algunos nodos son galaxias; si todos lo fueran la red se volvería
+  // ruido y taparía el contenido.
+  galaxy: boolean; rot: number; rotSpeed: number; tilt: number;
+}
 interface Dust { x: number; y: number; vx: number; vy: number; size: number; depth: number }
 interface Spark { x: number; y: number; vx: number; vy: number; life: number; max: number; size: number; ci: number }
 interface Pt { x: number; y: number }
@@ -48,6 +56,56 @@ function makeGlow(color: string, r = 24): HTMLCanvasElement {
   grad.addColorStop(1, color + '00');
   g.fillStyle = grad;
   g.fillRect(0, 0, r * 2, r * 2);
+  return c;
+}
+
+// Galaxia espiral pre-renderizada una sola vez. En el loop sólo se rota y
+// escala con drawImage: dibujar los brazos punto por punto cada frame, por 80
+// nodos, sería inviable.
+function makeGalaxy(color: string, r = 56): HTMLCanvasElement {
+  const c = document.createElement('canvas');
+  c.width = c.height = r * 2;
+  const g = c.getContext('2d')!;
+  g.translate(r, r);
+
+  // Halo del disco
+  const halo = g.createRadialGradient(0, 0, 0, 0, 0, r);
+  halo.addColorStop(0, color + '8c');
+  halo.addColorStop(0.45, color + '33');
+  halo.addColorStop(1, color + '00');
+  g.fillStyle = halo;
+  g.fillRect(-r, -r, r * 2, r * 2);
+
+  // Dos brazos espirales trazados con puntos que se atenúan hacia afuera
+  g.globalCompositeOperation = 'lighter';
+  const ARMS = 3;
+  for (let arm = 0; arm < ARMS; arm++) {
+    const base = (arm / ARMS) * Math.PI * 2;
+    for (let i = 0; i < 170; i++) {
+      const f = i / 170;
+      const a = base + f * 2.5;              // enrollado mas cerrado = brazos definidos
+      const rad = f * r * 0.92;
+      const spread = 0.7 + f * 1.3;          // menos dispersion: los brazos no se empastan
+      const px = Math.cos(a) * rad + (Math.random() - 0.5) * spread;
+      const py = Math.sin(a) * rad * 0.62 + (Math.random() - 0.5) * spread;
+      g.globalAlpha = (1 - f) * 0.9;
+      g.fillStyle = color;
+      g.beginPath();
+      g.arc(px, py, 1.15 - f * 0.45, 0, Math.PI * 2);
+      g.fill();
+    }
+  }
+
+  // Núcleo
+  g.globalAlpha = 1;
+  const core = g.createRadialGradient(0, 0, 0, 0, 0, r * 0.22);
+  core.addColorStop(0, '#ffffff');
+  core.addColorStop(0.4, color);
+  core.addColorStop(1, color + '00');
+  g.fillStyle = core;
+  g.beginPath();
+  g.arc(0, 0, r * 0.22, 0, Math.PI * 2);
+  g.fill();
   return c;
 }
 
@@ -82,6 +140,7 @@ export const ParticleBackground = () => {
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const glows = [makeGlow(NODE_COLORS[0]), makeGlow(NODE_COLORS[1]), makeGlow('#ffffff')];
+    const galaxies = [makeGalaxy(NODE_COLORS[0]), makeGalaxy(NODE_COLORS[1])];
 
     let width = 0;
     let height = 0;
@@ -113,6 +172,13 @@ export const ParticleBackground = () => {
         vy: (Math.random() - 0.5) * 14,
         size: Math.random() * 2 + 1,
         ci: Math.random() < 0.72 ? 0 : 1,
+        phase: Math.random() * Math.PI * 2,
+        freq: 0.5 + Math.random() * 1.7,
+        tw: 1,
+        galaxy: Math.random() < 0.16,
+        rot: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.22,
+        tilt: 0.45 + Math.random() * 0.5,
       }));
 
       // Polvo: tres profundidades que se mueven a distinta velocidad -> parallax.
@@ -292,6 +358,8 @@ export const ParticleBackground = () => {
         p.y += p.vy * dt;
         if (p.x < 0 || p.x > width) p.vx *= -1;
         if (p.y < 0 || p.y > height) p.vy *= -1;
+        // 0.45..1 — nunca llega a apagarse del todo
+        p.tw = 0.725 + 0.275 * Math.sin(t * p.freq + p.phase);
       }
 
       // ── Conexiones (grilla espacial; j>i ya evita pares repetidos) ──
@@ -334,12 +402,37 @@ export const ParticleBackground = () => {
       }
       ctx.globalAlpha = 1;
 
+      // ── Nodos: titileo propio, y unos pocos girando como galaxias ──
+      ctx.globalCompositeOperation = 'lighter';
       for (const p of nodes) {
-        ctx.fillStyle = NODE_COLORS[p.ci];
+        const tw = p.tw;
+        if (p.galaxy) {
+          p.rot += p.rotSpeed * dt;
+          const r = (15 + p.size * 9) * (0.94 + tw * 0.12);
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.scale(1, p.tilt);            // inclinación: se leen como discos, no como círculos
+          ctx.globalAlpha = 0.8 * tw;
+          ctx.drawImage(galaxies[p.ci], -r, -r, r * 2, r * 2);
+          ctx.restore();
+        } else {
+          const r = p.size * 4.2 * (0.7 + tw * 0.5);
+          ctx.globalAlpha = 0.5 * tw;
+          ctx.drawImage(glows[p.ci], p.x - r, p.y - r, r * 2, r * 2);
+        }
+      }
+      ctx.globalCompositeOperation = 'source-over';
+
+      // Núcleo sólido encima del glow, para que el nodo siga leyéndose nítido
+      for (const p of nodes) {
+        ctx.globalAlpha = 0.55 + 0.45 * p.tw;
+        ctx.fillStyle = p.galaxy ? '#ffffff' : NODE_COLORS[p.ci];
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.size * (p.galaxy ? 0.85 : 1), 0, Math.PI * 2);
         ctx.fill();
       }
+      ctx.globalAlpha = 1;
 
       // ── Rayos: trazo ancho tenue + núcleo fino, en vez de shadowBlur ──
       if (!reduced) {
