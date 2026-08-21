@@ -233,6 +233,20 @@ body {
   }
 }
 
+/* Usado por ParticleBackground: deriva lenta de las manchas de nebulosa.
+   Se animan por transform para que el compositor las maneje en GPU. */
+@keyframes nebulaDriftA {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33%      { transform: translate3d(18vw, 10vh, 0) scale(1.12); }
+  66%      { transform: translate3d(6vw, 26vh, 0) scale(0.95); }
+}
+
+@keyframes nebulaDriftB {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); }
+  40%      { transform: translate3d(-22vw, -12vh, 0) scale(0.92); }
+  75%      { transform: translate3d(-8vw, -24vh, 0) scale(1.15); }
+}
+
 /* Usado por Navbar/NavbarDrawer: pulso dorado del item "Operaciones" cuando el lab está encendido */
 @keyframes pulseGold {
   0% {
