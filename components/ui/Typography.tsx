@@ -106,7 +106,9 @@ export const Typography = ({
       ...motionSafe
     } = props;
     return (
-      <MotionTag variants={revealVariants!} className={classes} {...motionSafe}>
+      // data-reveal-item lo consume la regla de reduced-motion en app/layout.tsx.
+      // Si se quita, el destello del primer paint vuelve en silencio.
+      <MotionTag data-reveal-item variants={revealVariants!} className={classes} {...motionSafe}>
         {children}
       </MotionTag>
     );

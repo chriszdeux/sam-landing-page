@@ -37,6 +37,24 @@ export default function RootLayout({
   //# 1-Estructuración y renderizado visual del componente UI
   return (
     <html lang="es">
+      <head>
+        {/* Reduced-motion del revelado de texto (data-reveal-item lo estampa
+            components/ui/Typography.tsx).
+
+            Va inline y en <head> a propósito. El HTML del servidor siempre llega
+            con los estilos inline del estado "hidden" de framer-motion, porque el
+            servidor no puede leer la media query: el texto queda oculto antes de
+            que corra JS, así que ningún hook de React puede corregirlo a tiempo.
+            Esta regla lo anula en el primer paint sin depender de que globals.css
+            ya haya cargado.
+
+            El !important de autor gana a los estilos inline y también a las
+            animaciones WAAPI en el orden de cascada, así que framer no le puede
+            pelear. El selector apunta al item y NO a `[data-reveal] *`: el
+            descendiente universal mataría el transform de cualquier cosa dentro
+            de un Reveal (spinners, hovers con scale, el fondo galáctico). */}
+        <style>{`@media (prefers-reduced-motion: reduce){[data-reveal-item]{opacity:1 !important;transform:none !important}}`}</style>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
