@@ -1,24 +1,27 @@
 // 1-Selección de datos desde el estado global de Redux
-// 2-Selección de datos desde el estado global de Redux
+// 2-Definición de variantes de animación de entrada
 // 3-Estructuración y renderizado visual del componente UI
 
 'use client';
 
 import React from 'react';
+import { motion, useReducedMotion, type Variants } from 'framer-motion';
 import { Background } from '../../components/layout/Background';
 
 //# 1-Selección de datos desde el estado global de Redux
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
-import { TechFrame } from '../../components/ui/TechFrame';
 import { PageHeader } from '../../components/ui/PageHeader';
-import { Typography } from '../../components/ui/Typography';
 import { Button } from '../../components/ui/Button';
-import { Copy, BadgeCheck, ShieldOff } from 'lucide-react';
+import { SettingsPanel } from '../../components/settings/SettingsPanel';
+import { DataField } from '../../components/settings/DataField';
+import { IdentityCard } from '../../components/settings/IdentityCard';
+import { ShieldOff } from 'lucide-react';
 import { addNotification } from '../../lib/features/uiSlice';
 
 export default function SettingsPage() {
   const dispatch = useAppDispatch();
   const { userInfo } = useAppSelector((state) => state.auth);
+  const reduceMotion = useReducedMotion();
 
   const copyToClipboard = (text: string, label: string) => {
     if (!text) return;
@@ -29,135 +32,108 @@ export default function SettingsPage() {
     }));
   };
 
+  //# 2-Definición de variantes de animación de entrada
+  // Entrada escalonada: los paneles aparecen en el orden en que se leen, así el
+  // primer segundo de la página guía la lectura en vez de mostrar todo de golpe.
+  const containerVariants: Variants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: reduceMotion ? 0 : 0.09,
+        delayChildren: reduceMotion ? 0 : 0.1,
+      },
+    },
+  };
 
+  // Misma variante para bloques que no son SettingsPanel (tarjeta de identidad).
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: reduceMotion ? 0 : 14 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: reduceMotion ? 0 : 0.4, ease: [0.22, 1, 0.36, 1] },
+    },
+  };
 
   //# 3-Estructuración y renderizado visual del componente UI
   return (
     <div className="relative min-h-screen">
       <Background />
-      <div className="relative z-[1] mx-auto w-full max-w-[1200px] px-4 pb-20 pt-32 sm:px-6 lg:px-8">
+      <div className="relative z-[1] mx-auto w-full max-w-[1100px] px-4 pb-20 pt-32 sm:px-6 lg:px-8">
         <PageHeader
             title="CONFIGURACIÓN DE CUENTA"
             subtitle="Administra tu perfil personal, preferencias y seguridad del sistema."
             color="#00f3ff"
         />
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
-            {}
-            <div className="md:col-span-4">
-                <TechFrame>
-                    <div className="flex flex-col items-center p-8 text-center">
-                         <div className="relative mb-6 h-[120px] w-[120px]">
-                             <div className="flex h-full w-full items-center justify-center rounded-full border-2 border-[#00f3ff] bg-primary text-5xl shadow-[0_0_20px_rgba(0,243,255,0.4)]">
-                                {userInfo?.username?.[0]?.toUpperCase() || 'U'}
-                            </div>
-                            <div
-                                className="absolute bottom-0 right-0 h-6 w-6 rounded-full border-2 border-black shadow-[0_0_10px_currentColor]"
-                                style={{
-                                    backgroundColor: userInfo?.confirmedAccount ? '#00e676' : '#ff1744',
-                                    color: userInfo?.confirmedAccount ? '#00e676' : '#ff1744',
-                                }}
-                            />
-                         </div>
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 items-start gap-5 md:grid-cols-12"
+        >
+            {/* Identidad */}
+            <motion.div variants={itemVariants} className="md:col-span-4">
+                <SettingsPanel label="Identidad">
+                    <IdentityCard
+                        initial={userInfo?.username?.[0]?.toUpperCase() || 'U'}
+                        fullName={`${userInfo?.name ?? ''} ${userInfo?.lastName ?? ''}`.trim() || 'Sin nombre'}
+                        username={userInfo?.username}
+                        confirmedAccount={userInfo?.confirmedAccount}
+                        isBanned={userInfo?.isBanned}
+                    />
+                </SettingsPanel>
+            </motion.div>
 
-                         <Typography variant="h5" component="p" className="mb-1 font-bold text-white">
-                             {userInfo?.name} {userInfo?.lastName}
-                         </Typography>
-                         <Typography variant="body1" component="p" className="mb-1 flex items-center gap-2 text-primary">
-                             @{userInfo?.username}
-                             {userInfo?.confirmedAccount && <BadgeCheck size={18} />}
-                         </Typography>
+            {/* motion.div y no div: las variantes solo se propagan a través de
+                componentes motion, con un div plano los paneles no escalonan. */}
+            <motion.div variants={containerVariants} className="flex flex-col gap-5 md:col-span-8">
 
-                         <div className="mt-4 w-full">
-                            <span
-                                className={
-                                  'inline-flex w-full items-center justify-center rounded-full border px-3 py-1.5 text-sm font-bold ' +
-                                  (userInfo?.isBanned
-                                    ? 'border-error text-error'
-                                    : 'border-success text-success')
-                                }
-                            >
-                                {userInfo?.isBanned ? "ACCESO DENEGADO" : "ACCESO AUTORIZADO"}
-                            </span>
-                         </div>
+                {/* Datos de usuario */}
+                <SettingsPanel label="Datos de usuario">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <DataField
+                            label="ID de usuario"
+                            display={userInfo?.id ? `${userInfo.id.substring(0, 12)}...` : 'N/A'}
+                            value={userInfo?.id}
+                            onCopy={() => copyToClipboard(userInfo?.id || '', 'ID de Usuario')}
+                            mono
+                        />
+                        <DataField
+                            label="Correo electrónico"
+                            display={userInfo?.email || 'N/A'}
+                            value={userInfo?.email}
+                            onCopy={() => copyToClipboard(userInfo?.email || '', 'Correo electrónico')}
+                        />
+                        <DataField
+                            label="Fecha de nacimiento"
+                            display={userInfo?.birthday || 'No definida'}
+                        />
+                        <DataField
+                            label="Código de referencia"
+                            display={userInfo?.referralCode || 'N/A'}
+                            value={userInfo?.referralCode}
+                            onCopy={() => copyToClipboard(userInfo?.referralCode || '', 'Código de Referencia')}
+                            mono
+                            valueClassName="font-bold text-[#ffb700]"
+                        />
                     </div>
-                </TechFrame>
-            </div>
+                </SettingsPanel>
 
-            {}
-            <div className="md:col-span-8">
-                <div className="flex flex-col gap-8">
+                {/* Seguridad */}
+                <SettingsPanel label="Zona de seguridad" accent="#ffcc80">
+                    <div className="flex flex-wrap items-center gap-4">
+                        <Button variant="outlined" color="error" startIcon={<ShieldOff size={16} />}>
+                            Cerrar Sesión en otros dispositivos
+                        </Button>
+                        <p className="text-[0.75rem] leading-snug text-white/40">
+                            Revoca las sesiones activas fuera de este navegador.
+                        </p>
+                    </div>
+                </SettingsPanel>
 
-                    {}
-                    <TechFrame color="#ff0055">
-                        <div className="p-8">
-                            <Typography variant="h6" component="p" className="mb-6 flex items-center gap-2 text-[#ff0055]">
-                                {'// DATOS DE USUARIO'}
-                            </Typography>
-
-                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                                <div>
-                                    <Typography variant="caption" component="p" className="text-foreground-muted">ID DE USUARIO</Typography>
-                                    <div
-                                        onClick={() => copyToClipboard(userInfo?.id || '', 'ID de Usuario')}
-                                        className="flex cursor-pointer items-center gap-2 text-white hover:text-primary"
-                                    >
-                                        <Typography variant="body1" component="p" className="font-mono">
-                                            {userInfo?.id ? `${userInfo.id.substring(0, 12)}...` : 'N/A'}
-                                        </Typography>
-                                        <Copy size={16} className="opacity-50" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <Typography variant="caption" component="p" className="text-foreground-muted">CORREO ELECTRÓNICO</Typography>
-                                    <div
-                                        onClick={() => copyToClipboard(userInfo?.email || '', 'Correo electrónico')}
-                                        className="flex cursor-pointer items-center gap-2 text-white hover:text-primary"
-                                    >
-                                        <Typography variant="body1" component="p">
-                                            {userInfo?.email || 'N/A'}
-                                        </Typography>
-                                        <Copy size={16} className="opacity-50" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <Typography variant="caption" component="p" className="text-foreground-muted">FECHA DE NACIMIENTO</Typography>
-                                    <Typography variant="body1" component="p" className="text-white">{userInfo?.birthday || 'No definida'}</Typography>
-                                </div>
-                                <div>
-                                    <Typography variant="caption" component="p" className="text-foreground-muted">CÓDIGO DE REFERENCIA</Typography>
-                                    <div
-                                        onClick={() => copyToClipboard(userInfo?.referralCode || '', 'Código de Referencia')}
-                                        className="flex cursor-pointer items-center gap-2 font-bold text-[#ffb700]"
-                                    >
-                                        <Typography variant="body1" component="p" className="font-mono">
-                                            {userInfo?.referralCode || 'N/A'}
-                                        </Typography>
-                                        <Copy size={16} className="opacity-50" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </TechFrame>
-
-                    {}
-                    {}
-
-                     {}
-                     <TechFrame color="#ffb700">
-                        <div className="flex flex-col gap-4 p-8">
-                            <Typography variant="h6" component="p" className="mb-2 text-[#ffb700]">
-                                {'// ZONA DE SEGURIDAD'}
-                            </Typography>
-                            <div className="flex flex-wrap gap-4">
-                                <Button variant="outlined" color="error" startIcon={<ShieldOff size={18} />}>Cerrar Sesión en otros dispositivos</Button>
-                            </div>
-                        </div>
-                     </TechFrame>
-
-                </div>
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
       </div>
     </div>
   );
