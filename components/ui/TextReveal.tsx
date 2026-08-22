@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext } from 'react';
-import { motion, useReducedMotion, type Variants } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 
 /**
  * Revelado de texto al entrar en pantalla.
@@ -16,9 +16,14 @@ import { motion, useReducedMotion, type Variants } from 'framer-motion';
  * y el escalonado se perdería.
  */
 
-// El contexto lleva las variantes, no un booleano: así el scope decide si el
-// item se mueve o se queda quieto, sin que Typography tenga que saber nada de
-// reduced-motion.
+// El contexto lleva las variantes en vez de un booleano para que Typography no
+// tenga que saber nada del revelado más allá de "aplicá esto".
+//
+// reduced-motion NO se decide acá: se resuelve con una media query CSS en
+// app/layout.tsx. El servidor no puede leer la media query, así que su HTML
+// siempre sale con los estilos inline del estado "hidden" de framer-motion, y
+// el texto queda oculto antes de que corra un solo byte de JS. Ningún hook de
+// React llega antes que eso; el CSS sí.
 const RevealScopeCtx = createContext<Variants | null>(null);
 
 export const useRevealVariants = () => useContext(RevealScopeCtx);
@@ -34,15 +39,6 @@ export const revealItem: Variants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
 };
 
-// Con reduced-motion el texto ya nace en su posición final. Se mantienen las
-// mismas claves de variante para no cambiar el tipo de elemento renderizado:
-// alternar entre motion.div y div deja los estilos inline que framer ya
-// escribió, y el texto queda invisible para siempre.
-const staticItem: Variants = {
-  hidden: { opacity: 1, y: 0 },
-  show: { opacity: 1, y: 0 },
-};
-
 interface RevealProps {
   children: React.ReactNode;
   className?: string;
@@ -54,11 +50,10 @@ interface RevealProps {
 }
 
 export const Reveal = ({ children, className, style, margin = '-80px', repeat = false }: RevealProps) => {
-  const reduced = useReducedMotion();
-
   return (
-    <RevealScopeCtx.Provider value={reduced ? staticItem : revealItem}>
+    <RevealScopeCtx.Provider value={revealItem}>
       <motion.div
+        data-reveal
         initial="hidden"
         whileInView="show"
         viewport={{ once: !repeat, margin }}
