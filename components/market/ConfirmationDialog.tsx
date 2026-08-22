@@ -10,6 +10,14 @@ import { Button } from '../ui/Button';
 import { Shield, AlertTriangle, Zap } from 'lucide-react';
 import { EnvVariables } from '@/lib/constants/variables';
 
+// Mismo semáforo que components/market/TransactionForm.tsx: el marco, el icono,
+// el monto y el CTA de confirmación salen del token del tipo de operación.
+const SEMANTIC = {
+    BUY: { color: 'success', hex: '#a5d6a7' },
+    SELL: { color: 'error', hex: '#ef9a9a' },
+    TRANSFER: { color: 'warning', hex: '#ffcc80' },
+} as const;
+
 interface ConfirmationDialogProps {
     open: boolean;
     onClose: () => void;
@@ -33,6 +41,8 @@ export const ConfirmationDialog = ({
     quantity,
     fee
 }: ConfirmationDialogProps) => {
+    const accentColor = SEMANTIC[transactionType].hex;
+    const confirmColor = SEMANTIC[transactionType].color;
 
     //# 2-Renderizar diálogo modal
     return (
@@ -41,13 +51,13 @@ export const ConfirmationDialog = ({
             onClose={onClose}
             className="w-full max-w-[600px]"
         >
-            <TechFrame color={transactionType === 'BUY' ? '#00f3ff' : '#ff0055'}>
+            <TechFrame color={accentColor}>
                 <div className="bg-[rgba(10,15,30,0.95)] p-8 backdrop-blur-2xl">
                     <div className="mb-8 text-center">
                         {transactionType === 'BUY' ? (
-                            <Zap size={48} color="#00f3ff" style={{ marginBottom: 16 }} />
+                            <Zap size={48} color={accentColor} style={{ marginBottom: 16 }} />
                         ) : (
-                            <Shield size={48} color="#ff0055" style={{ marginBottom: 16 }} />
+                            <Shield size={48} color={accentColor} style={{ marginBottom: 16 }} />
                         )}
                         <Typography variant="h5" className="font-bold tracking-[2px] text-white">
                             CONFIRMAR TRANSACCIÓN
@@ -61,7 +71,7 @@ export const ConfirmationDialog = ({
                         <div className="relative overflow-hidden rounded border border-white/10 bg-white/[0.03] p-6">
                             <div
                                 className="absolute left-0 top-0 h-full w-1"
-                                style={{ backgroundColor: transactionType === 'BUY' ? '#00f3ff' : '#ff0055' }}
+                                style={{ backgroundColor: accentColor }}
                             />
 
                             <div className="grid grid-cols-2 gap-4">
@@ -89,7 +99,7 @@ export const ConfirmationDialog = ({
                                     <Typography
                                         variant="h6"
                                         className="font-bold"
-                                        style={{ color: transactionType === 'BUY' ? '#00f3ff' : '#ff0055' }}
+                                        style={{ color: accentColor }}
                                     >
                                         {transactionType === 'BUY' ? `$${amount.toLocaleString()}` : `${quantity.toLocaleString()} ${cryptoSymbol}`}
                                     </Typography>
@@ -113,24 +123,19 @@ export const ConfirmationDialog = ({
                         <div className="mt-4 flex gap-4">
                             <Button
                                 fullWidth
+                                size="large"
+                                variant="outlined"
+                                color="primary"
                                 onClick={onClose}
-                                sx={{ color: 'rgba(255,255,255,0.5)', py: 1.5 }}
                             >
                                 CANCELAR
                             </Button>
                             <Button
                                 fullWidth
-                                onClick={onConfirm}
+                                size="large"
                                 variant="contained"
-                                sx={{
-                                    bgcolor: transactionType === 'BUY' ? '#00f3ff' : '#ff0055',
-                                    color: transactionType === 'BUY' ? '#000' : '#fff',
-                                    fontWeight: 'bold',
-                                    py: 1.5,
-                                    '&:hover': {
-                                        bgcolor: transactionType === 'BUY' ? '#00d0db' : '#e6004c',
-                                    }
-                                }}
+                                color={confirmColor}
+                                onClick={onConfirm}
                             >
                                 EJECUTAR_PROTOCOLO
                             </Button>

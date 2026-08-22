@@ -109,25 +109,17 @@ export const MarketTableView = ({ cryptos, onTrade, onRowClick }: MarketTableVie
                   <div className="flex justify-center gap-2">
                     <Button
                       variant="outlined"
+                      color="success"
                       size="small"
                       onClick={(e) => onTrade(e, 'BUY', crypto.id)}
-                      sx={{
-                        borderColor: 'rgba(0, 230, 118, 0.3)',
-                        color: '#00e676',
-                        '&:hover': { borderColor: '#00e676', bgcolor: 'rgba(0, 230, 118, 0.1)' },
-                      }}
                     >
                       Compra
                     </Button>
                     <Button
                       variant="outlined"
+                      color="error"
                       size="small"
                       onClick={(e) => onTrade(e, 'SELL', crypto.id)}
-                      sx={{
-                        borderColor: 'rgba(255, 23, 68, 0.3)',
-                        color: '#ff1744',
-                        '&:hover': { borderColor: '#ff1744', bgcolor: 'rgba(255, 23, 68, 0.1)' },
-                      }}
                     >
                       Venta
                     </Button>

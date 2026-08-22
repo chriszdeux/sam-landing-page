@@ -151,7 +151,7 @@ export const MarketTable = () => {
                   <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
                     <div className="flex flex-row justify-center gap-2">
                       <Button
-                        variant="contained"
+                        variant="outlined"
                         color="success"
                         size="small"
                         onClick={(e) => {

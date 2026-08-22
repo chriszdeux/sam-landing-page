@@ -28,7 +28,6 @@
 //# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { CustomButton } from '../../../components/ui/CustomButton';
 import { motion } from 'framer-motion';
 import { Background } from '../../../components/layout/Background';
 import { Typography } from '../../../components/ui/Typography';
@@ -49,6 +48,15 @@ import { Input } from '../../../components/ui/Input';
 import { EnvVariables } from '../../../lib/constants/variables';
 import { TaoIcon } from '../../../components/ui/TaoIcon';
 import { formatHash } from '../../../lib/utils/formatHash';
+
+// Mismo semáforo que components/market/TransactionForm.tsx: un solo token por
+// tipo de operación alimenta el acento del panel, el total y el CTA, para que
+// compra/venta no queden con un neón distinto al del botón.
+const SEMANTIC = {
+    BUY: { color: 'success', hex: '#a5d6a7' },
+    SELL: { color: 'error', hex: '#ef9a9a' },
+    TRANSFER: { color: 'warning', hex: '#ffcc80' },
+} as const;
 
 interface TradeFormData {
   walletId: string;
@@ -406,13 +414,14 @@ const TradeContent = () => {
     ...(userInfo?.walletsSaved || [])
   ].filter((v, i, a) => a.findIndex(t => t.walletAddress === v.walletAddress) === i);
 
-  const modeAccentColor = mode === 'BUY' ? '#00e676' : mode === 'SELL' ? '#ff1744' : '#ffab00';
+  const modeAccentColor = SEMANTIC[mode].hex;
+  const modeButtonColor = SEMANTIC[mode].color;
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-4 pt-[120px] pb-20 sm:px-6 lg:px-8">
         {/* Top Header */}
         <div className="mb-8">
-            <Button startIcon={<ArrowLeft size={18} />} onClick={() => router.back()} sx={{ mr: 2, color: 'text.secondary', mb: 2 }}>
+            <Button startIcon={<ArrowLeft size={18} />} onClick={() => router.back()} color="primary" className="mb-2 mr-2">
                 Atrás
             </Button>
             <PageHeader
@@ -430,11 +439,7 @@ const TradeContent = () => {
                     <div
                         className="p-8 transition-all duration-[400ms] ease-in-out"
                         style={{
-                            background: mode === 'BUY'
-                              ? 'linear-gradient(135deg, rgba(0, 230, 118, 0.05) 0%, rgba(10, 10, 15, 0.98) 100%)'
-                              : mode === 'SELL'
-                                ? 'linear-gradient(135deg, rgba(255, 23, 68, 0.05) 0%, rgba(10, 10, 15, 0.98) 100%)'
-                                : 'linear-gradient(135deg, rgba(255, 171, 0, 0.05) 0%, rgba(10, 10, 15, 0.98) 100%)'
+                            background: `linear-gradient(135deg, ${modeAccentColor}0d 0%, rgba(10, 10, 15, 0.98) 100%)`
                         }}
                     >
                         <Typography variant="caption" className="mb-1 block font-bold tracking-[1px] text-white/50">
@@ -464,34 +469,24 @@ const TradeContent = () => {
                                 <Typography variant="caption" className="mb-1 block font-bold tracking-[1px] text-white/50">
                                     MODO DE OPERACIÓN
                                 </Typography>
-                                <div className="flex rounded-xl border border-white/[0.08] bg-black/40 p-1">
+                                <div className="flex gap-2 rounded-xl border border-white/[0.08] bg-black/40 p-1">
+                                    {/* El modo activo se marca con el relleno (contained), no con
+                                        otro color: compra siempre verde, venta siempre roja. */}
                                     <Button
                                         fullWidth
+                                        variant={mode === 'BUY' ? 'contained' : 'outlined'}
+                                        color="success"
                                         disabled={status === 'PROCESSING' || status === 'SUCCESS'}
                                         onClick={() => handleModeChange('BUY')}
-                                        sx={{
-                                            borderRadius: '8px',
-                                            bgcolor: mode === 'BUY' ? 'rgba(0, 230, 118, 0.15)' : 'transparent',
-                                            color: mode === 'BUY' ? '#00e676' : 'rgba(255,255,255,0.5)',
-                                            border: mode === 'BUY' ? '1px solid rgba(0, 230, 118, 0.3)' : '1px solid transparent',
-                                            fontWeight: 'bold',
-                                            '&:hover': { bgcolor: mode === 'BUY' ? 'rgba(0, 230, 118, 0.2)' : 'rgba(255,255,255,0.05)' }
-                                        }}
                                     >
                                         COMPRAR
                                     </Button>
                                     <Button
                                         fullWidth
+                                        variant={mode === 'SELL' ? 'contained' : 'outlined'}
+                                        color="error"
                                         disabled={status === 'PROCESSING' || status === 'SUCCESS'}
                                         onClick={() => handleModeChange('SELL')}
-                                        sx={{
-                                            borderRadius: '8px',
-                                            bgcolor: mode === 'SELL' ? 'rgba(255, 23, 68, 0.15)' : 'transparent',
-                                            color: mode === 'SELL' ? '#ff1744' : 'rgba(255,255,255,0.5)',
-                                            border: mode === 'SELL' ? '1px solid rgba(255, 23, 68, 0.3)' : '1px solid transparent',
-                                            fontWeight: 'bold',
-                                            '&:hover': { bgcolor: mode === 'SELL' ? 'rgba(255, 23, 68, 0.2)' : 'rgba(255,255,255,0.05)' }
-                                        }}
                                     >
                                         VENDER
                                     </Button>
@@ -557,7 +552,7 @@ const TradeContent = () => {
                                     <Typography
                                         variant="body1"
                                         className="font-mono text-[1.1rem] font-bold"
-                                        style={{ color: mode === 'BUY' ? '#00e676' : '#ff1744' }}
+                                        style={{ color: modeAccentColor }}
                                     >
                                         Total: {(form.quantity * customPrice).toLocaleString()} {coinName}
                                     </Typography>
@@ -572,7 +567,6 @@ const TradeContent = () => {
                                                 color="error"
                                                 disabled={status === 'PROCESSING' || status === 'SUCCESS'}
                                                 onClick={handleSetMax}
-                                                sx={{ minWidth: 'auto', padding: '2px 8px', fontSize: '0.7rem' }}
                                             >
                                                 MAX
                                             </Button>
@@ -606,19 +600,23 @@ const TradeContent = () => {
                         )}
 
                         {/* Botón de acción principal */}
-                        <CustomButton
-                            variant={mode === 'BUY' ? 'success' : mode === 'SELL' ? 'error' : 'warning'}
+                        {/* Compra = success, venta = error, transferencia = warning:
+                            el CTA comparte el token con el acento del panel. */}
+                        <Button
+                            variant="contained"
+                            size="large"
+                            color={modeButtonColor}
                             onClick={handlePreSubmit}
                             disabled={!form.walletId || status === 'PROCESSING' || status === 'SUCCESS' || networkFee === null || !!validationError}
                             startIcon={status === 'PROCESSING' ? <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current/30 border-t-current" /> : null}
                             glow
                             fullWidth
-                            sx={{ mt: 3, py: 1.25, fontSize: '0.85rem' }}
+                            className="mt-6"
                         >
                             {status === 'PROCESSING'
                                 ? 'Procesando Transacción...'
                                 : `CONFIRMAR ${mode === 'BUY' ? 'COMPRA' : mode === 'SELL' ? 'VENTA' : 'TRANSFERENCIA'}`}
-                        </CustomButton>
+                        </Button>
                     </div>
                 </TechFrame>
             </div>
@@ -749,7 +747,6 @@ const TradeContent = () => {
                             <Button
                                 variant="outlined"
                                 color="success"
-                                sx={{ borderColor: '#00ff88', color: '#00ff88', '&:hover': { bgcolor: 'rgba(0, 255, 136, 0.1)', borderColor: '#00ff88' } }}
                                 onClick={() => {
                                     const redirectParam = searchParams.get('redirect');
                                     if (redirectParam === 'detail' && form.cryptoId) {
@@ -787,7 +784,6 @@ const TradeContent = () => {
                                 variant="contained"
                                 color="error"
                                 onClick={() => setStatus('IDLE')}
-                                sx={{ bgcolor: '#ff1744', color: '#fff', '&:hover': { bgcolor: '#b2102f' } }}
                             >
                                 Reintentar
                             </Button>

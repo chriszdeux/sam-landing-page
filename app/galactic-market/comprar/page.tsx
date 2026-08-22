@@ -174,15 +174,14 @@ export default function ComprarModulosPage() {
                         </div>
                       </Tooltip>
 
+                      {/* El acento del módulo ya lo lleva el TechFrame; el botón
+                          de compra usa el verde semántico como en toda la app. */}
                       <Button
                         variant="contained"
+                        color="success"
                         size="small"
                         disabled={buyingId === listing.listingId}
                         onClick={() => handleBuy(listing.listingId)}
-                        sx={{
-                          bgcolor: getColor(listing.moduleData?.type || ''),
-                          '&:hover': { bgcolor: getColor(listing.moduleData?.type || ''), filter: 'brightness(1.2)' }
-                        }}
                       >
                         {buyingId === listing.listingId ? (
                           <div className="h-5 w-5 animate-spin rounded-full border-2 border-current/30 border-t-current" />
