@@ -95,37 +95,22 @@ export default function MarketPage() {
         <div className="mt-8 mb-8 flex items-center justify-between">
           <Typography variant="h4" className="text-white">Activos Listados</Typography>
           <div className="flex gap-2">
+            {/* La vista activa se marca con el relleno, no con otro color. */}
             <Button
-              variant="outlined"
+              variant={viewMode === 'cards' ? 'contained' : 'outlined'}
+              color="info"
               size="small"
               onClick={() => setViewMode('cards')}
               startIcon={<Grid3x3 size={18} />}
-              sx={{
-                borderColor: viewMode === 'cards' ? '#00f3ff' : 'rgba(255, 255, 255, 0.1)',
-                color: viewMode === 'cards' ? '#00f3ff' : 'rgba(255, 255, 255, 0.5)',
-                bgcolor: viewMode === 'cards' ? 'rgba(0, 243, 255, 0.05)' : 'transparent',
-                '&:hover': {
-                  borderColor: '#00f3ff',
-                  bgcolor: 'rgba(0, 243, 255, 0.1)',
-                }
-              }}
             >
               Tarjetas
             </Button>
             <Button
-              variant="outlined"
+              variant={viewMode === 'table' ? 'contained' : 'outlined'}
+              color="info"
               size="small"
               onClick={() => setViewMode('table')}
               startIcon={<List size={18} />}
-              sx={{
-                borderColor: viewMode === 'table' ? '#00f3ff' : 'rgba(255, 255, 255, 0.1)',
-                color: viewMode === 'table' ? '#00f3ff' : 'rgba(255, 255, 255, 0.5)',
-                bgcolor: viewMode === 'table' ? 'rgba(0, 243, 255, 0.05)' : 'transparent',
-                '&:hover': {
-                  borderColor: '#00f3ff',
-                  bgcolor: 'rgba(0, 243, 255, 0.1)',
-                }
-              }}
             >
               Tabla
             </Button>
@@ -225,25 +210,17 @@ export default function MarketPage() {
                     <div className="z-[1] mt-auto grid w-full grid-cols-2 gap-2">
                         <Button
                             variant="outlined"
+                            color="success"
                             size="small"
                             onClick={(e) => handleTransaction(e, 'BUY', crypto.id)}
-                            sx={{
-                                borderColor: 'rgba(0, 230, 118, 0.3)',
-                                color: '#00e676',
-                                '&:hover': { borderColor: '#00e676', bgcolor: 'rgba(0, 230, 118, 0.1)' }
-                            }}
                         >
                             COMPRAR
                         </Button>
                         <Button
                             variant="outlined"
+                            color="error"
                             size="small"
                             onClick={(e) => handleTransaction(e, 'SELL', crypto.id)}
-                            sx={{
-                                borderColor: 'rgba(255, 23, 68, 0.3)',
-                                color: '#ff1744',
-                                '&:hover': { borderColor: '#ff1744', bgcolor: 'rgba(255, 23, 68, 0.1)' }
-                            }}
                         >
                             VENDER
                         </Button>

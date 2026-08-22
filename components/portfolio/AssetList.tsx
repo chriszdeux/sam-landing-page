@@ -82,35 +82,25 @@ export const AssetList: React.FC<AssetListProps> = ({ assets, totalValue }) => {
                         <div className="flex w-full justify-between gap-4 border-t border-white/10 pt-4 md:w-auto md:justify-start md:border-l md:border-t-0 md:pl-8 md:pt-0">
                             <Button
                                 variant="outlined"
+                                color="success"
                                 size="small"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleTransaction(asset.id, 'BUY');
                                 }}
-                                sx={{
-                                    borderColor: 'rgba(0, 230, 118, 0.3)',
-                                    color: '#00e676',
-                                    flex: { xs: 1, md: 'none' },
-                                    minWidth: { xs: 'auto', md: 100 },
-                                    '&:hover': { borderColor: '#00e676', bgcolor: 'rgba(0, 230, 118, 0.1)' }
-                                }}
+                                className="flex-1 md:flex-none md:min-w-[100px]"
                             >
                                 COMPRAR
                             </Button>
                             <Button
                                 variant="outlined"
+                                color="error"
                                 size="small"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleTransaction(asset.id, 'SELL');
                                 }}
-                                sx={{
-                                    borderColor: 'rgba(255, 23, 68, 0.3)',
-                                    color: '#ff1744',
-                                    flex: { xs: 1, md: 'none' },
-                                    minWidth: { xs: 'auto', md: 100 },
-                                    '&:hover': { borderColor: '#ff1744', bgcolor: 'rgba(255, 23, 68, 0.1)' }
-                                }}
+                                className="flex-1 md:flex-none md:min-w-[100px]"
                             >
                                 VENDER
                             </Button>
