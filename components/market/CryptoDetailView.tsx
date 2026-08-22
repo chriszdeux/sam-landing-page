@@ -82,10 +82,13 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
 
             <div className="mx-auto w-full max-w-[1536px] px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col gap-8">
+                    {/* `sx` era código muerto post-migración de MUI: el ancho
+                        ajustado ahora sale de w-fit y el color del prop `color`. */}
                     <Button
                         startIcon={<ArrowLeft />}
                         onClick={() => router.back()}
-                        sx={{ color: 'text.secondary', width: 'fit-content', '&:hover': { color: 'primary.main' } }}
+                        color="primary"
+                        className="w-fit"
                     >
                         Volver al Mercado
                     </Button>
@@ -184,46 +187,42 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                         <div className="lg:col-span-4">
                             <div className="flex flex-col gap-8">
                                 <div className="flex flex-row gap-4">
+                                    {/* Convención del repo: compra = success, venta = error.
+                                        Los `sx` con hex hardcodeados eran código muerto. */}
                                     <Button
                                         fullWidth
                                         variant="contained"
+                                        color="success"
                                         startIcon={<ShoppingCart />}
                                         onClick={() => handleTransaction('BUY')}
-                                        sx={{
-                                            bgcolor: '#00ff88',
-                                            color: '#000',
-                                            fontWeight: 'bold',
-                                            '&:hover': { bgcolor: '#00cc6a' }
-                                        }}
                                     >
                                         Comprar
                                     </Button>
                                     <Button
                                         fullWidth
                                         variant="outlined"
+                                        color="error"
                                         startIcon={<DollarSign />}
                                         onClick={() => handleTransaction('SELL')}
-                                        sx={{
-                                            color: '#ff0055',
-                                            borderColor: '#ff0055',
-                                            fontWeight: 'bold',
-                                            '&:hover': {
-                                                bgcolor: 'rgba(255, 0, 85, 0.1)',
-                                                borderColor: '#ff0055'
-                                            }
-                                        }}
                                     >
                                         Vender
                                     </Button>
                                 </div>
                                 <div>
-                                    <Typography variant="h6" className="mb-4 inline-block border-b-2 border-primary pb-1 text-white">
+                                    {/* Etiqueta de sección en el estilo del proyecto
+                                        (uppercase chico + tracking) en vez del subrayado
+                                        de 2px, que competía con las hairlines del panel. */}
+                                    <Typography
+                                        variant="caption"
+                                        component="h2"
+                                        className="mb-3 block text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-white/50"
+                                    >
                                         Estadísticas de Mercado
                                     </Typography>
                                     <CryptoStats financial={crypto.financial} color={color} />
                                 </div>
 
-                                <Card glowColor={crypto.additionalInfo?.pColor || color} sx={{ p: 3, border: `1px solid ${crypto.additionalInfo?.pColor || 'rgba(255,255,255,0.1)'}40` }}>
+                                <Card glowColor={crypto.additionalInfo?.pColor || color} className="p-6">
                                     <Typography variant="h6" className="mb-4 flex items-center gap-2 text-white">
                                         Sobre {crypto.identification.name}
                                         {crypto.additionalInfo?.pColor && (
