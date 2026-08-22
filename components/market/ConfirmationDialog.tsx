@@ -54,10 +54,13 @@ export const ConfirmationDialog = ({
             <TechFrame color={accentColor}>
                 <div className="bg-[rgba(10,15,30,0.95)] p-8 backdrop-blur-2xl">
                     <div className="mb-8 text-center">
+                        {/* mx-auto es necesario: el preflight de Tailwind pone
+                            svg { display: block }, y text-center no centra un
+                            bloque, así que el ícono quedaba pegado a la izquierda. */}
                         {transactionType === 'BUY' ? (
-                            <Zap size={48} color={accentColor} style={{ marginBottom: 16 }} />
+                            <Zap size={48} color={accentColor} className="mx-auto mb-4" />
                         ) : (
-                            <Shield size={48} color={accentColor} style={{ marginBottom: 16 }} />
+                            <Shield size={48} color={accentColor} className="mx-auto mb-4" />
                         )}
                         <Typography variant="h5" className="font-bold tracking-[2px] text-white">
                             CONFIRMAR TRANSACCIÓN
