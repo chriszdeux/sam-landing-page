@@ -2,7 +2,8 @@
 
 import React, { useEffect } from 'react';
 import { Typography } from '../../ui/Typography';
-import { CustomButton } from '../../ui/CustomButton';
+import { Button } from '../../ui/Button';
+import { Tooltip } from '../../ui/Tooltip';
 import {
     Tag,
     Coins,
@@ -196,16 +197,30 @@ export const BlocksModule = () => {
                     <Tag style={{ color: networkColor }} /> HISTORIAL DE BLOQUES MINADOS
                 </Typography>
 
-                <CustomButton
-                    variant="info"
-                    onClick={handleRefresh}
-                    disabled={isCooldownActive || isLoading}
-                    startIcon={<RefreshCw />}
-                    sx={{ color: networkColor, borderColor: `${networkColor}40`, '&:hover': { borderColor: networkColor } }}
-                    glow
-                >
-                    {isCooldownActive ? `${cooldownRemaining}s` : 'Refrescar'}
-                </CustomButton>
+                <Tooltip content={isCooldownActive ? `Espero ${cooldownRemaining}s` : 'Actualizar historial de bloques'}>
+                    {/* El span mantiene el tooltip activo aunque el botón esté
+                        deshabilitado: un disabled no emite eventos de puntero y el
+                        mensaje de cooldown es justo el que importa mostrar. */}
+                    <span>
+                        {/* El sx anterior pintaba el botón con networkColor; el Button
+                            compartido trabaja con una paleta fija, así que el acento
+                            queda en "info" (#00f3ff, el color por defecto de red). */}
+                        <Button
+                            color={isCooldownActive ? 'warning' : 'info'}
+                            size="small"
+                            onClick={handleRefresh}
+                            disabled={isCooldownActive || isLoading}
+                            startIcon={<RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />}
+                            aria-label="Actualizar historial de bloques"
+                        >
+                            {isCooldownActive ? (
+                                <span className="tabular-nums">{cooldownRemaining}s</span>
+                            ) : (
+                                'Refrescar'
+                            )}
+                        </Button>
+                    </span>
+                </Tooltip>
             </div>
 
             {/* Blocks Table View */}
