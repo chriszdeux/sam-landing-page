@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { CustomButton } from '../ui/CustomButton';
+import { Button } from '../ui/Button';
+import { Tooltip } from '../ui/Tooltip';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '../../lib/hooks';
@@ -64,15 +65,14 @@ export const FinancialPanel = React.memo(() => {
             </TechFrame>
 
             {/* Operations Block */}
-            <CustomButton
-                variant="info"
+            <Button
+                color="info"
+                size="large"
                 fullWidth
                 onClick={() => router.push('/market')}
-                glow
-                sx={{ py: 1.25, fontSize: '0.85rem' }}
             >
                 Ir al Mercado
-            </CustomButton>
+            </Button>
 
             {/* Assets List Block */}
             <TechFrame color="rgba(255,255,255,0.1)">
@@ -81,22 +81,39 @@ export const FinancialPanel = React.memo(() => {
                         <Typography variant="h6" className="font-bold text-white">
                             ACTIVOS PRINCIPALES
                         </Typography>
-                        <div className="flex gap-2">
-                            <CustomButton
-                                variant="info"
-                                onClick={handleRefresh}
-                                disabled={isCooldownActive}
-                                startIcon={<RefreshCw size={16} />}
-                                glow
-                            >
-                                {isCooldownActive ? `${cooldownRemaining}s` : 'Refrescar'}
-                            </CustomButton>
-                            <CustomButton
-                                variant="neutral"
+                        {/* items-center para que ambos botones queden alineados
+                            entre sí y con el título de la sección. */}
+                        <div className="flex items-center gap-2">
+                            <Tooltip content={isCooldownActive ? `Espero ${cooldownRemaining}s` : 'Actualizar activos'}>
+                                {/* El span mantiene el tooltip activo aunque el botón
+                                    esté deshabilitado: un disabled no emite eventos de
+                                    puntero y el cooldown es justo el mensaje que importa. */}
+                                <span>
+                                    <Button
+                                        color={isCooldownActive ? 'warning' : 'info'}
+                                        size="small"
+                                        onClick={handleRefresh}
+                                        disabled={isCooldownActive}
+                                        startIcon={<RefreshCw size={14} />}
+                                        aria-label="Actualizar activos"
+                                    >
+                                        {isCooldownActive ? (
+                                            <span className="tabular-nums">{cooldownRemaining}s</span>
+                                        ) : (
+                                            'Refrescar'
+                                        )}
+                                    </Button>
+                                </span>
+                            </Tooltip>
+                            {/* Acción secundaria: el blanco de `primary` reemplaza al
+                                variant "neutral" del botón legacy. */}
+                            <Button
+                                color="primary"
+                                size="small"
                                 onClick={() => router.push('/operaciones/assets')}
                             >
                                 Ver todo
-                            </CustomButton>
+                            </Button>
                         </div>
                     </div>
 
