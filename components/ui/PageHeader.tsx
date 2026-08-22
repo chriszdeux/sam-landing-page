@@ -2,9 +2,11 @@
 // 2-Renderizar encabezado con título animado
 
 //# 1-Definir componente de encabezado de página
+'use client';
+
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Typography } from './Typography';
+import { Reveal } from './TextReveal';
 
 interface PageHeaderProps {
   title: string;
@@ -18,11 +20,9 @@ export const PageHeader = ({ title, highlight, subtitle, color = '#00f3ff' }: Pa
   //# 2-Renderizar encabezado con título animado
   return (
     <div className="relative mb-16 text-center">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+      {/* Reveal en vez del motion.div propio: así el título y el subtítulo
+          entran escalonados en lugar de moverse como un solo bloque. */}
+      <Reveal>
         <div className="mb-4 flex items-center justify-center gap-4">
             <div className="h-0.5 w-[60px]" style={{ background: `linear-gradient(90deg, transparent, ${color})` }} />
             <div className="h-2.5 w-2.5 rotate-45" style={{ backgroundColor: color, boxShadow: `0 0 10px ${color}` }} />
@@ -61,7 +61,7 @@ export const PageHeader = ({ title, highlight, subtitle, color = '#00f3ff' }: Pa
               {subtitle}
             </Typography>
         </div>
-      </motion.div>
+      </Reveal>
     </div>
   );
 };

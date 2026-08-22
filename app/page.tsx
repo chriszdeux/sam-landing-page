@@ -13,6 +13,8 @@ import { openModal } from '../lib/features/uiSlice';
 import { useAppDispatch, useAppSelector } from '../lib/hooks';
 import { RootState } from '../lib/store';
 import { HomeSection } from '../components/sections/HomeSection';
+import { Reveal } from '../components/ui/TextReveal';
+import { SectionScroller } from '../components/layout/SectionScroller';
 import {
   LyncoreFeaturesGrid,
   OperationsFeaturesGrid,
@@ -31,13 +33,13 @@ export default function Home() {
       <Background />
 
       {/* ——— HERO ——— */}
-      <div className="relative flex min-h-screen items-center overflow-hidden">
+      <div id="inicio" data-scroll-section="Inicio" className="relative flex min-h-screen items-center overflow-hidden">
         {/* Glowing orbs */}
         <div className="absolute top-[20%] left-[10%] h-[400px] w-[400px] rounded-full bg-[#00f3ff]/[0.04] blur-[120px]" />
         <div className="absolute bottom-[20%] right-[10%] h-[300px] w-[300px] rounded-full bg-[#ff0055]/[0.04] blur-[100px]" />
 
         <div className="relative z-[2] mx-auto w-full max-w-[1536px] px-4 pt-24 pb-16 sm:px-6 lg:px-8">
-          <div>
+          <Reveal>
             <div className="mb-5 flex flex-row items-center gap-2">
               <div className="h-0.5 w-8 bg-[#00f3ff] shadow-[0_0_10px_#00f3ff]" />
               <Typography variant="overline" className="text-[0.65rem] font-bold tracking-[4px] text-[#00f3ff]">
@@ -111,7 +113,7 @@ export default function Home() {
                 </Button>
               </div>
             )}
-          </div>
+          </Reveal>
         </div>
       </div>
 
@@ -181,6 +183,7 @@ export default function Home() {
       </HomeSection>
 
       <Footer />
+      <SectionScroller />
     </main>
   );
 }

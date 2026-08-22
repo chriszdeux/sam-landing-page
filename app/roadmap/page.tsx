@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { ParticleBackground } from '@/components/ui/ParticleBackground';
 import { roadmapData } from '@/lib/data/roadmap';
 import { RoadmapNode } from '@/components/ui/RoadmapNode';
+import { Reveal } from '@/components/ui/TextReveal';
 
 export default function RoadmapPage() {
   return (
@@ -38,11 +39,11 @@ export default function RoadmapPage() {
           </div>
         </div>
 
-        <div className="mt-20 text-center">
+        <Reveal className="mt-20 text-center">
             <Typography variant="body2" className="italic text-white/40">
                 * El Roadmap está sujeto a cambios basados en el consenso de la red y avances tecnológicos.
             </Typography>
-        </div>
+        </Reveal>
       </div>
     </div>
   );

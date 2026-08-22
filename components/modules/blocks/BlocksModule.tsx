@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { Typography } from '../../ui/Typography';
+import { Reveal } from '../../ui/TextReveal';
 import { Button } from '../../ui/Button';
 import { Tooltip } from '../../ui/Tooltip';
 import {
@@ -172,14 +173,14 @@ export const BlocksModule = () => {
                             />
                         )}
                     </div>
-                    <div>
+                    <Reveal>
                         <Typography variant="h4" className="font-bold text-white">
                             Ledger de Red: {selectedNetwork.identification.name}
                         </Typography>
                         <Typography variant="body2" className="font-mono text-white/50">
                             NETWORK ID: {selectedNetwork.id}
                         </Typography>
-                    </div>
+                    </Reveal>
                 </div>
                 <div>
                     <span
@@ -193,9 +194,14 @@ export const BlocksModule = () => {
 
             {/* Header & Refresh Action */}
             <div className="mb-1 flex items-center justify-between border-b border-white/5 pb-2">
-                <Typography variant="h6" className="flex items-center gap-2 font-bold text-white">
-                    <Tag style={{ color: networkColor }} /> HISTORIAL DE BLOQUES MINADOS
-                </Typography>
+                {/* Reveal propio: el encabezado de arriba depende de que haya red
+                    seleccionada, y sin datos la página quedaba sin ninguna
+                    transición de texto. */}
+                <Reveal>
+                    <Typography variant="h6" className="flex items-center gap-2 font-bold text-white">
+                        <Tag style={{ color: networkColor }} /> HISTORIAL DE BLOQUES MINADOS
+                    </Typography>
+                </Reveal>
 
                 <Tooltip content={isCooldownActive ? `Espero ${cooldownRemaining}s` : 'Actualizar historial de bloques'}>
                     {/* El span mantiene el tooltip activo aunque el botón esté

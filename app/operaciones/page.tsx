@@ -12,6 +12,7 @@ import { OperationsCanvasBg } from "../../components/dashboard/OperationsCanvasB
 import { EmptyLabState } from '../../components/dashboard/EmptyLabState';
 import { Background } from '../../components/layout/Background';
 import { Typography } from '../../components/ui/Typography';
+import { Reveal } from '@/components/ui/TextReveal';
 import { RootState } from '../../lib/store';
 
 export default function DashboardPage() {
@@ -48,14 +49,14 @@ export default function DashboardPage() {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                 >
-                    <div className="mb-12 mt-8">
+                    <Reveal className="mb-12 mt-8">
                         <Typography variant="h3" className="mb-1 font-black uppercase tracking-[4px] text-white">
                             Centro de <span className="text-[#00f3ff]">Operaciones</span>
                         </Typography>
                         <Typography variant="body1" className="tracking-wide text-white/50">
                             Gestión unificada de activos, laboratorio y protocolos de red.
                         </Typography>
-                    </div>
+                    </Reveal>
 
                     {!labId ? (
                         <EmptyLabState />

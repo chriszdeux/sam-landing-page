@@ -17,6 +17,7 @@ import { transactionsPageColumns } from '../../components/market/transactionsPag
 import { RootState } from '../../lib/store';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { PageHeader } from '../../components/ui/PageHeader';
+import { Reveal } from '../../components/ui/TextReveal';
 import { motion } from 'framer-motion';
 import { formatHash } from '../../lib/utils/formatHash';
 import { useRefreshCooldown } from '../../lib/useRefreshCooldown';
@@ -211,14 +212,14 @@ export default function TransactionsPage() {
                     {/* Blockchain Hash Metric Widget */}
                     <div className="relative mb-8 flex flex-col items-center justify-between gap-4 overflow-hidden rounded-lg border border-[#00f3ff]/20 bg-[#00f3ff]/[0.03] p-6 shadow-[0_0_15px_rgba(0,243,255,0.05)] sm:flex-row">
                         <div className="absolute -right-[50px] -top-[50px] z-0 h-[100px] w-[100px] bg-[#00f3ff] opacity-10 blur-[50px]" />
-                        <div className="relative z-[1] self-start">
+                        <Reveal className="relative z-[1] self-start">
                             <Typography variant="subtitle2" className="mb-1 font-bold uppercase tracking-[1.5px] text-[#00f3ff]">
                                 Hash Total Disponible en Blockchain
                             </Typography>
                             <Typography variant="body2" className="text-white/60">
                                 Auditoría macro consolidada del total de hash disponible para procesamiento en la red.
                             </Typography>
-                        </div>
+                        </Reveal>
                         <div className="relative z-[1] flex items-center gap-4">
                             <Typography variant="h3" className="font-mono font-black text-white [text-shadow:0_0_10px_rgba(255,255,255,0.2)]">
                                 {formatHash(fluctuatedHash, chronoBurstFreqTypes)}
@@ -233,14 +234,14 @@ export default function TransactionsPage() {
 
                     {/* Pending Queues Widget */}
                     <div className="mb-8 flex flex-col items-center justify-between gap-6 rounded-lg border border-[#ffaa00]/20 bg-[#ffaa00]/[0.03] p-6 shadow-[0_0_15px_rgba(255,170,0,0.05)] sm:flex-row">
-                        <div className="self-start">
+                        <Reveal className="self-start">
                             <Typography variant="subtitle2" className="mb-1 font-bold uppercase tracking-[1.5px] text-[#ffaa00]">
                                 Colas de Transacciones Pendientes (Red)
                             </Typography>
                             <Typography variant="body2" className="text-white/60">
                                 Transacciones en espera de inyección de energía para su confirmación en el bloque actual.
                             </Typography>
-                        </div>
+                        </Reveal>
 
                         <div className="flex flex-row gap-6">
                             <div className="min-w-[80px] text-center">
