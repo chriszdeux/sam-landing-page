@@ -18,6 +18,7 @@ import { useRouter } from 'next/navigation';
 import { Background } from '../../components/layout/Background';
 import { TechFrame } from '../../components/ui/TechFrame';
 import { PageHeader } from '../../components/ui/PageHeader';
+import { Reveal } from '../../components/ui/TextReveal';
 import { Button } from '../../components/ui/Button';
 import { Typography } from '../../components/ui/Typography';
 import { motion } from 'framer-motion';
@@ -92,7 +93,7 @@ export default function MarketPage() {
 
         <BlockchainDataDisplay network={selectedNetwork} />
 
-        <div className="mt-8 mb-8 flex items-center justify-between">
+        <Reveal className="mt-8 mb-8 flex items-center justify-between">
           <Typography variant="h4" className="text-white">Activos Listados</Typography>
           <div className="flex gap-2">
             {/* La vista activa se marca con el relleno, no con otro color. */}
@@ -115,7 +116,7 @@ export default function MarketPage() {
               Tabla
             </Button>
           </div>
-        </div>
+        </Reveal>
 
         {isLoading ? (
             <div className="my-20 flex justify-center">

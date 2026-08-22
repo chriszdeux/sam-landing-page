@@ -1,5 +1,9 @@
+'use client';
+
 import React from 'react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils/cn';
+import { useRevealVariants } from './TextReveal';
 
 type Variant =
   | 'h1'
@@ -50,11 +54,27 @@ const variantTag: Record<Variant, React.ElementType> = {
   button: 'span',
 };
 
+// Creadas a nivel de módulo a propósito: generar el componente motion dentro
+// del render lo recrearía en cada pasada y remontaría el nodo.
+const MOTION_TAGS = {
+  h1: motion.h1, h2: motion.h2, h3: motion.h3, h4: motion.h4, h5: motion.h5, h6: motion.h6,
+  p: motion.p, span: motion.span, div: motion.div, li: motion.li, strong: motion.strong,
+} as const;
+
+// Solo títulos y texto corrido entran en el revelado. `caption` y `button`
+// quedan fuera: son etiquetas de UI y celdas de tabla, y escalonarlas haría
+// aparecer los datos de a uno.
+const REVEALABLE: ReadonlySet<Variant> = new Set([
+  'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'subtitle1', 'subtitle2', 'body1', 'body2', 'overline',
+]);
+
 interface TypographyProps extends React.HTMLAttributes<HTMLElement> {
   variant?: Variant;
   component?: React.ElementType;
   className?: string;
   children?: React.ReactNode;
+  /** Deja este texto fuera del revelado aunque esté dentro de un Reveal. */
+  noReveal?: boolean;
 }
 
 export const Typography = ({
@@ -62,11 +82,38 @@ export const Typography = ({
   component,
   className,
   children,
+  noReveal,
   ...props
 }: TypographyProps) => {
   const Tag = component || variantTag[variant];
+  const revealVariants = useRevealVariants();
+  const classes = cn(variantClasses[variant], className);
+
+  const MotionTag =
+    revealVariants && !noReveal && REVEALABLE.has(variant) && typeof Tag === 'string'
+      ? MOTION_TAGS[Tag as keyof typeof MOTION_TAGS]
+      : undefined;
+
+  // Hereda las variantes del Reveal por contexto; no lleva whileInView propio.
+  if (MotionTag) {
+    // framer-motion redefine estos handlers con otra firma que los del DOM, así
+    // que no pueden pasar por el spread. Se descartan en vez de castear: un
+    // cast escondería el desajuste en lugar de resolverlo.
+    const {
+      onAnimationStart: _as, onAnimationEnd: _ae, onAnimationIteration: _ai,
+      onDrag: _d, onDragStart: _ds, onDragEnd: _de, onDragEnter: _den,
+      onDragExit: _dx, onDragLeave: _dl, onDragOver: _do, onDrop: _dr,
+      ...motionSafe
+    } = props;
+    return (
+      <MotionTag variants={revealVariants!} className={classes} {...motionSafe}>
+        {children}
+      </MotionTag>
+    );
+  }
+
   return (
-    <Tag className={cn(variantClasses[variant], className)} {...props}>
+    <Tag className={classes} {...props}>
       {children}
     </Tag>
   );

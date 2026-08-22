@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from '../ui/Button';
 import { Typography } from '../ui/Typography';
+import { Reveal } from '../ui/TextReveal';
 import { cn } from '@/lib/utils/cn';
 
 interface HomeSectionProps {
@@ -27,7 +28,7 @@ export const HomeSection = ({
   id, accentColor, tag, Icon, title, titleHighlight, description, futureLine,
   actionLabel, actionHref, onAction, reverse = false, children, fullWidth = false
 }: HomeSectionProps) => (
-  <section id={id} className="relative" style={{ borderTop: `1px solid ${accentColor}12` }}>
+  <section id={id} data-scroll-section={titleHighlight || title} className="relative" style={{ borderTop: `1px solid ${accentColor}12` }}>
     <div
       className={cn(
         'relative flex items-center py-20 md:py-28',
@@ -48,7 +49,7 @@ export const HomeSection = ({
           )}
         >
           {/* Text content */}
-          <div className={cn('w-full flex-1', !fullWidth && 'md:max-w-[580px]')}>
+          <Reveal className={cn('w-full flex-1', !fullWidth && 'md:max-w-[580px]')}>
             <div className="mb-5 flex flex-row items-center gap-3">
               <div
                 className="flex items-center justify-center rounded-[10px] p-2"
@@ -164,7 +165,7 @@ export const HomeSection = ({
                 </Button>
               )
             )}
-          </div>
+          </Reveal>
 
           {/* Visual panel */}
           {!fullWidth && (

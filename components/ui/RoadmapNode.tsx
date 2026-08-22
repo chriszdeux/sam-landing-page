@@ -10,6 +10,7 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { Typography } from "./Typography";
+import { Reveal } from "./TextReveal";
 
 // Mapping string icons to Lucide components
 const iconMap: Record<string, any> = {
@@ -88,7 +89,7 @@ export const RoadmapNode: React.FC<RoadmapNodeProps> = ({
           </motion.div>
 
           {/* Main Info */}
-          <div className="flex-1">
+          <Reveal className="flex-1">
             <Typography variant="overline" component="p" className="font-bold" style={{ color: isActive ? '#00f3ff' : undefined }}>
               {phase} • {status}
             </Typography>
@@ -122,7 +123,7 @@ export const RoadmapNode: React.FC<RoadmapNodeProps> = ({
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </Reveal>
         </div>
       </motion.div>
     </div>
