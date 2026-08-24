@@ -1,65 +1,66 @@
 // 1-Lógica principal y renderizado del módulo
 
 import React from 'react';
-import { Box, Typography, Modal as MuiModal, IconButton } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { X } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Dialog } from '../ui/Dialog';
+import { Typography } from '../ui/Typography';
 
 export const FeatureModal = ({ open, onClose, title, description, content, image, color }: { open: boolean; onClose: () => void; title: string; description: string; content?: string; image?: string; color: string }) => (
-  <MuiModal open={open} onClose={onClose} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-    <Box sx={{ 
-      bgcolor: '#1a1a1a', 
-      border: `1px solid ${color}`, 
-      borderRadius: 4, 
-      maxWidth: 800, 
-      width: '90%',
-      maxHeight: '90vh',
-      overflowY: 'auto',
-      mx: 2, 
-      position: 'relative',
-      boxShadow: `0 0 50px ${color}20`,
-      outline: 'none',
-      display: 'flex',
-      flexDirection: { xs: 'column', md: 'row' }
-    }}>
-      <IconButton onClick={onClose} sx={{ position: 'absolute', top: 8, right: 8, zIndex: 10, color: 'white', bgcolor: 'rgba(0,0,0,0.5)', '&:hover': { bgcolor: 'rgba(0,0,0,0.8)' } }}>
-        <Close />
-      </IconButton>
-      
+  <Dialog
+    open={open}
+    onClose={onClose}
+    className="mx-4 w-[90%] max-w-[800px]"
+  >
+    <div
+      className="relative flex max-h-[90vh] w-full flex-col overflow-y-auto rounded-2xl outline-none md:flex-row"
+      style={{
+        backgroundColor: '#1a1a1a',
+        border: `1px solid ${color}`,
+        boxShadow: `0 0 50px ${color}20`,
+      }}
+    >
+      <button
+        onClick={onClose}
+        className="absolute right-2 top-2 z-10 rounded-full bg-black/50 p-2 text-white hover:bg-black/80"
+      >
+        <X size={20} />
+      </button>
+
       {image && (
-        <Box sx={{ width: { xs: '100%', md: '40%' }, height: { xs: 200, md: 'auto' }, position: 'relative', overflow: 'hidden' }}>
-            <motion.img 
-              src={image} 
-              alt={title} 
+        <div className="relative h-[200px] w-full overflow-hidden md:h-auto md:w-[40%]">
+            <motion.img
+              src={image}
+              alt={title}
               initial={{ scale: 1.1 }}
               animate={{ scale: 1.2, x: [0, -10, 0], y: [0, -5, 0] }}
               transition={{ duration: 20, repeat: Infinity, repeatType: "mirror", ease: "linear" }}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+              className="h-full w-full object-cover"
             />
-            <Box sx={{ position: 'absolute', inset: 0, background: `linear-gradient(to right, ${color}20, transparent)` }} />
-        </Box>
+            <div className="absolute inset-0" style={{ background: `linear-gradient(to right, ${color}20, transparent)` }} />
+        </div>
       )}
 
-      <Box sx={{ p: { xs: 3, md: 5 }, flex: 1 }}>
-        <Typography variant="overline" color={color} fontWeight="bold" letterSpacing={2}>
+      <div className="flex-1 p-6 md:p-10">
+        <Typography variant="overline" className="font-bold tracking-[2px]" style={{ color }}>
             DETALLE DEL SISTEMA
         </Typography>
-        <Typography variant="h4" color="white" gutterBottom fontWeight="bold" sx={{ mt: 1, mb: 3 }}>
+        <Typography variant="h4" className="mb-6 mt-2 font-bold text-white">
             {title}
         </Typography>
-        
+
         {content ? (
             content.split('\n\n').map((paragraph, index) => (
-                <Typography key={index} variant="body1" color="text.secondary" paragraph sx={{ lineHeight: 1.8, fontSize: '1.05rem' }}>
+                <Typography key={index} variant="body1" component="p" className="mb-4 text-[1.05rem] leading-[1.8] text-foreground-muted">
                     {paragraph}
                 </Typography>
             ))
         ) : (
-            <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.8 }}>
+            <Typography variant="body1" className="leading-[1.8] text-foreground-muted">
                 {description}
             </Typography>
         )}
-      </Box>
-    </Box>
-  </MuiModal>
+      </div>
+    </div>
+  </Dialog>
 );

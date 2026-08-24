@@ -9,17 +9,15 @@
 
 //# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Grid } from '@mui/material';
 import { motion } from 'framer-motion';
-import { Backpack, TrendingUp, LocalAtm } from '@mui/icons-material';
+import { Backpack, TrendingUp, Landmark } from 'lucide-react';
+import { Typography } from '../ui/Typography';
 
 export const PortfolioAnimation = ({ color, variant = 'balance' }: { color: string, variant?: 'balance' | 'inventory' | 'stats' }) => {
-    
-    
+
     //# 2-Gestión de estado local para balance
     const [balance, setBalance] = useState(1000);
-    
-    
+
     //# 3-Gestión de estado local para assets
     const [assets, setAssets] = useState<{name: string, value: number, percentage: number}[]>([
         { name: 'LYN', value: 80, percentage: 80 },
@@ -27,33 +25,29 @@ export const PortfolioAnimation = ({ color, variant = 'balance' }: { color: stri
         { name: 'IXNN', value: 5, percentage: 5 }
     ]);
 
-    
-    
     //# 4-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         const interval = setInterval(() => {
             setBalance(prev => prev + Math.random() * 10 - 2);
             setAssets(prev => prev.map(asset => ({ ...asset, value: asset.value + Math.random() * 2 - 1 })));
         }, 1000);
-        
-        
+
         //# 5-Estructuración y renderizado visual del componente UI
         return () => clearInterval(interval);
     }, []);
 
     if (variant === 'inventory') {
         const items = ['Engine V2', 'Shield Mk1', 'Laser Cannon', 'Mining Drone', 'Fuel Cell', 'Nav Module'];
-        
-        
+
         //# 6-Estructuración y renderizado visual del componente UI
         return (
-             <Box sx={{ width: '100%', height: '100%', p: 4, bgcolor: 'rgba(0,0,0,0.8)', color: 'white', display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="overline" color={color} fontWeight="bold" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Backpack fontSize="small" /> Inventory Storage
+             <div className="flex h-full w-full flex-col bg-black/80 p-8 text-white">
+                <Typography variant="overline" component="p" className="mb-4 flex items-center gap-2 font-bold" style={{ color }}>
+                    <Backpack size={16} /> Inventory Storage
                 </Typography>
-                <Grid container spacing={2}>
+                <div className="grid grid-cols-2 gap-4">
                     {items.map((item, i) => (
-                        <Grid size={{ xs: 6 }} key={i}>
+                        <div key={i}>
                             <motion.div
                                 whileHover={{ scale: 1.05 }}
                                 style={{
@@ -68,26 +62,25 @@ export const PortfolioAnimation = ({ color, variant = 'balance' }: { color: stri
                                     gap: 8
                                 }}
                             >
-                                <Box sx={{ width: 40, height: 40, bgcolor: color, borderRadius: 1 }} />
-                                <Typography variant="caption" align="center">{item}</Typography>
+                                <div className="h-10 w-10 rounded" style={{ backgroundColor: color }} />
+                                <Typography variant="caption" component="p" className="text-center">{item}</Typography>
                             </motion.div>
-                        </Grid>
+                        </div>
                     ))}
-                </Grid>
-             </Box>
+                </div>
+             </div>
         );
     }
 
     if (variant === 'stats') {
-        
-        
+
         //# 7-Estructuración y renderizado visual del componente UI
         return (
-            <Box sx={{ width: '100%', height: '100%', p: 4, bgcolor: 'rgba(0,0,0,0.8)', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <Typography variant="overline" color={color} fontWeight="bold" sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <TrendingUp fontSize="small" /> Performance Metrics
+            <div className="flex h-full w-full flex-col justify-center bg-black/80 p-8 text-white">
+                <Typography variant="overline" component="p" className="mb-8 flex items-center gap-2 font-bold" style={{ color }}>
+                    <TrendingUp size={16} /> Performance Metrics
                 </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'flex-end', height: 200, gap: 2 }}>
+                <div className="flex h-[200px] items-end gap-4">
                     {[65, 40, 75, 50, 90, 85].map((h, i) => (
                         <motion.div
                             key={i}
@@ -101,44 +94,36 @@ export const PortfolioAnimation = ({ color, variant = 'balance' }: { color: stri
                                 position: 'relative'
                             }}
                         >
-                            <Typography variant="caption" sx={{ position: 'absolute', top: -20, left: '50%', transform: 'translateX(-50%)', color: color }}>
+                            <Typography
+                                variant="caption"
+                                component="p"
+                                className="absolute -top-5 left-1/2 -translate-x-1/2"
+                                style={{ color }}
+                            >
                                 {h}%
                             </Typography>
                         </motion.div>
                     ))}
-                </Box>
-                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
-                    <Box>
-                        <Typography variant="caption" color="gray">Monthly ROI</Typography>
-                        <Typography variant="h5" color={color}>+24.5%</Typography>
-                    </Box>
-                    <Box>
-                        <Typography variant="caption" color="gray">Staking APY</Typography>
-                        <Typography variant="h5" color={color}>12.8%</Typography>
-                    </Box>
-                </Box>
-            </Box>
+                </div>
+                <div className="mt-8 flex justify-between">
+                    <div>
+                        <Typography variant="caption" component="p" className="text-gray-400">Monthly ROI</Typography>
+                        <Typography variant="h5" component="p" style={{ color }}>+24.5%</Typography>
+                    </div>
+                    <div>
+                        <Typography variant="caption" component="p" className="text-gray-400">Staking APY</Typography>
+                        <Typography variant="h5" component="p" style={{ color }}>12.8%</Typography>
+                    </div>
+                </div>
+            </div>
         );
     }
 
-    
-    
-    
     //# 8-Estructuración y renderizado visual del componente UI
     return (
-        <Box sx={{ 
-            width: '100%', 
-            height: '100%', 
-            p: 4, 
-            display: 'flex', 
-            flexDirection: 'column', 
-            justifyContent: 'center', 
-            alignItems: 'center',
-            bgcolor: 'rgba(0,0,0,0.8)',
-            color: 'white'
-        }}>
-            <Typography variant="overline" color={color} fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <LocalAtm fontSize="small" /> Total Balance
+        <div className="flex h-full w-full flex-col items-center justify-center bg-black/80 p-8 text-white">
+            <Typography variant="overline" component="p" className="flex items-center gap-2 font-bold" style={{ color }}>
+                <Landmark size={16} /> Total Balance
             </Typography>
             <motion.h1
                 animate={{ scale: [1, 1.05, 1] }}
@@ -148,28 +133,31 @@ export const PortfolioAnimation = ({ color, variant = 'balance' }: { color: stri
                 ${balance.toFixed(2)}
             </motion.h1>
 
-            <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <div className="flex w-full flex-col gap-4">
                 {assets.map((asset, i) => (
-                    <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Box sx={{ width: 40, height: 40, borderRadius: '50%', bgcolor: color, opacity: 0.2 + (i * 0.2), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div key={i} className="flex items-center gap-4">
+                        <div
+                            className="flex h-10 w-10 items-center justify-center rounded-full"
+                            style={{ backgroundColor: color, opacity: 0.2 + (i * 0.2) }}
+                        >
                             {asset.name[0]}
-                        </Box>
-                        <Box sx={{ flex: 1 }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                                <Typography variant="body2">{asset.name}</Typography>
-                                <Typography variant="body2" color={color}>{asset.value.toFixed(1)}%</Typography>
-                            </Box>
-                            <Box sx={{ width: '100%', height: 4, bgcolor: 'rgba(255,255,255,0.1)', borderRadius: 2 }}>
-                                <motion.div 
-                                    initial={{ width: 0 }} 
-                                    animate={{ width: `${asset.value}%` }} 
-                                    style={{ height: '100%', backgroundColor: color, borderRadius: 2 }} 
+                        </div>
+                        <div className="flex-1">
+                            <div className="mb-1 flex justify-between">
+                                <Typography variant="body2" component="p">{asset.name}</Typography>
+                                <Typography variant="body2" component="p" style={{ color }}>{asset.value.toFixed(1)}%</Typography>
+                            </div>
+                            <div className="h-1 w-full rounded-lg bg-white/10">
+                                <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${asset.value}%` }}
+                                    style={{ height: '100%', backgroundColor: color, borderRadius: 2 }}
                                 />
-                            </Box>
-                        </Box>
-                    </Box>
+                            </div>
+                        </div>
+                    </div>
                 ))}
-            </Box>
-        </Box>
+            </div>
+        </div>
     );
 };

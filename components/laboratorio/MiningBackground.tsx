@@ -1,22 +1,20 @@
 "use client";
 
 import React from 'react';
-import { Box } from '@mui/material';
 import { motion } from 'framer-motion';
 
 export const MiningBackground = () => {
     return (
-        <Box sx={{ position: 'fixed', inset: 0, overflow: 'hidden', zIndex: -1, bgcolor: '#050a14' }}>
+        <div className="fixed inset-0 -z-10 overflow-hidden bg-[#050a14]">
             {/* Base grid */}
-            <Box sx={{ 
-                position: 'absolute', 
-                inset: 0, 
-                opacity: 0.15, 
-                backgroundImage: `linear-gradient(#00f3ff30 1px, transparent 1px), linear-gradient(90deg, #00f3ff30 1px, transparent 1px)`, 
-                backgroundSize: '50px 50px',
-                zIndex: 2,
-                transform: 'perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px)',
-            }} />
+            <div
+                className="absolute inset-0 z-[2] opacity-[0.15]"
+                style={{
+                    backgroundImage: `linear-gradient(#00f3ff30 1px, transparent 1px), linear-gradient(90deg, #00f3ff30 1px, transparent 1px)`,
+                    backgroundSize: '50px 50px',
+                    transform: 'perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px)',
+                }}
+            />
 
             {/* Glowing Orbs representing processing nodes */}
             <motion.div
@@ -57,6 +55,6 @@ export const MiningBackground = () => {
                     pointerEvents: 'none'
                 }}
             />
-        </Box>
+        </div>
     );
 };

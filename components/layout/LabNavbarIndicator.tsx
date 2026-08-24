@@ -1,11 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Box, Typography, Tooltip } from '@mui/material';
-import { Bolt } from '@mui/icons-material';
+import { Zap } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAppSelector } from '../../lib/hooks';
 import { RootState } from '../../lib/store';
-import { motion } from 'framer-motion';
+import { Typography } from '../ui/Typography';
+import { Tooltip } from '../ui/Tooltip';
 import { formatHash } from '../../lib/utils/formatHash';
 
 export const LabNavbarIndicator = () => {
@@ -25,41 +26,31 @@ export const LabNavbarIndicator = () => {
             prev.chronoBurstFreqTypes === next.chronoBurstFreqTypes
         );
     });
-    
+
     if (!indicatorData) return null;
 
     const { hashAvailable, isPoweredOn, chronoBurstFreqTypes } = indicatorData;
     const formattedHash = formatHash(hashAvailable, chronoBurstFreqTypes);
 
     return (
-        <Tooltip title={`Hash Disponible: ${formattedHash}`}>
-            <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 1, 
-                px: 1.5, 
-                py: 0.5, 
-                bgcolor: 'rgba(255,255,255,0.03)', 
-                borderRadius: 1,
-                border: '1px solid rgba(255,255,255,0.05)',
-                cursor: 'default'
-            }}>
+        <Tooltip content={`Hash Disponible: ${formattedHash}`}>
+            <div className="flex cursor-default items-center gap-2 rounded border border-white/5 bg-white/[0.03] px-3 py-1">
                 <motion.div
-                    animate={isPoweredOn ? { 
+                    animate={isPoweredOn ? {
                         color: ['#00f3ff', '#fff', '#00f3ff'],
                         scale: [1, 1.1, 1]
                     } : { color: 'rgba(255,255,255,0.2)' }}
                     transition={{ repeat: Infinity, duration: 2 }}
                 >
-                    <Bolt sx={{ fontSize: 18 }} />
+                    <Zap size={18} />
                 </motion.div>
-                
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Typography variant="caption" sx={{ color: '#00f3ff', fontWeight: 'bold', fontSize: '0.75rem', fontFamily: 'monospace' }}>
+
+                <div className="flex items-center">
+                    <Typography variant="caption" className="font-mono text-xs font-bold text-[#00f3ff]">
                         {formattedHash}
                     </Typography>
-                </Box>
-            </Box>
+                </div>
+            </div>
         </Tooltip>
     );
 };

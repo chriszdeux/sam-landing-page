@@ -3,15 +3,24 @@
 
 //# 1-Definir componente de formulario de transacción
 import React from 'react';
-import { Box, MenuItem, Paper, Typography, Button, CircularProgress, SelectChangeEvent, Alert, Chip } from '@mui/material';
-import { CustomButton } from '../ui/CustomButton';
+import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
+import { Typography } from '../ui/Typography';
 import { Cryptocurrency } from '../../lib/types/crypto';
 import { TaoIcon } from '../ui/TaoIcon';
 import { formatHash } from '../../lib/utils/formatHash';
 import { useAppSelector } from '../../lib/hooks';
 import { RootState } from '../../lib/store';
-import { LocalFireDepartment, SwapHoriz, TrendingUp } from '@mui/icons-material';
+import { Flame, ArrowLeftRight, TrendingUp } from 'lucide-react';
+
+// Semáforo único para compra / venta / transferencia: el mismo token alimenta
+// el acento del encabezado, el borde del input y el color del CTA, para que el
+// formulario no mezcle un neón vivo con un botón de otra paleta.
+const SEMANTIC = {
+    BUY: { color: 'success', hex: '#a5d6a7' },
+    SELL: { color: 'error', hex: '#ef9a9a' },
+    TRANSFER: { color: 'warning', hex: '#ffcc80' },
+} as const;
 
 interface TradeFormData {
   walletId: string;
@@ -23,7 +32,7 @@ interface TradeFormData {
 interface TransactionFormProps {
     transactionType: 'BUY' | 'SELL' | 'TRANSFER';
     form: TradeFormData;
-    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => void;
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
     cryptos: Cryptocurrency[];
     selectedCrypto?: Cryptocurrency;
     onSubmit: () => void;
@@ -49,216 +58,180 @@ export const TransactionForm = ({
     const networkDifficulty = 3; // Base difficulty factor for hash cost estimate
     const estimatedHashCost = fee != null ? fee * networkDifficulty * 1000 : null;
     const formattedHashCost = estimatedHashCost != null ? formatHash(estimatedHashCost, chronoBurstFreqTypes) : null;
-    const accentColor = transactionType === 'BUY' ? '#00e676' : transactionType === 'SELL' ? '#ff1744' : '#ffab00';
+    const accentColor = SEMANTIC[transactionType].hex;
+    const submitColor = SEMANTIC[transactionType].color;
 
     //# 2-Renderizar formulario con validación y costos
     return (
-        <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3, mt: 4 }}>
-                <Box sx={{ width: 4, height: 24, bgcolor: accentColor, borderRadius: 1, boxShadow: `0 0 8px ${accentColor}` }} />
-                <Typography variant="h6" sx={{ color: accentColor, fontWeight: 'bold', letterSpacing: 1.5, textTransform: 'uppercase', fontSize: '0.85rem' }}>
+        <div>
+            <div className="mb-6 mt-8 flex items-center gap-4">
+                <div className="h-6 w-1 rounded" style={{ backgroundColor: accentColor, boxShadow: `0 0 8px ${accentColor}` }} />
+                <Typography variant="h6" className="text-[0.85rem] font-bold uppercase tracking-[1.5px]" style={{ color: accentColor }}>
                     Detalles de la Transacción
                 </Typography>
-                <Chip
-                    label={transactionType === 'BUY' ? 'COMPRA' : transactionType === 'SELL' ? 'VENTA' : 'TRANSFERENCIA'}
-                    icon={transactionType === 'BUY' ? <TrendingUp style={{ fontSize: 14 }} /> : transactionType === 'SELL' ? <SwapHoriz style={{ fontSize: 14 }} /> : undefined}
-                    size="small"
-                    sx={{ bgcolor: `${accentColor}15`, color: accentColor, border: `1px solid ${accentColor}40`, fontWeight: 'bold', fontSize: '0.65rem' }}
-                />
-            </Box>
+                <span
+                    className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[0.65rem] font-bold"
+                    style={{ backgroundColor: `${accentColor}15`, color: accentColor, border: `1px solid ${accentColor}40` }}
+                >
+                    {transactionType === 'BUY' ? <TrendingUp size={14} /> : transactionType === 'SELL' ? <ArrowLeftRight size={14} /> : null}
+                    {transactionType === 'BUY' ? 'COMPRA' : transactionType === 'SELL' ? 'VENTA' : 'TRANSFERENCIA'}
+                </span>
+            </div>
 
             {transactionType === 'TRANSFER' && (
-                <Alert severity="warning" sx={{ mb: 3, bgcolor: 'transparent', color: '#ffb700' }}>
+                <div className="mb-6 rounded border-l-4 border-warning bg-transparent p-3 text-[#ffb700]">
                     Las transferencias entre billeteras tienen un costo de red del 0.5%.
-                </Alert>
+                </div>
             )}
-            
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 4 }}>
-                <Box>
+
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+                <div>
                     <Input
                         select
                         label="Activo / Criptomoneda"
                         name="cryptoId"
                         value={form.cryptoId}
                         onChange={onChange}
-                        fullWidth
-                        containerSx={{
-                            '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
-                            mb: 3
-                        }}
+                        containerClassName="mb-6"
                     >
                         {cryptos.map((crypto) => (
-                            <MenuItem key={crypto.id} value={crypto.id}>
+                            <option key={crypto.id} value={crypto.id}>
                                 {crypto.identification.symbol} - {crypto.identification.name}
-                            </MenuItem>
+                            </option>
                         ))}
                     </Input>
 
-                    <Paper sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <Typography variant="caption" color="text.secondary">PRECIO DE MERCADO</Typography>
-                        <Typography variant="h4" color="white" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <div className="rounded-paper border border-border bg-white/5 p-4">
+                        <Typography variant="caption" className="text-foreground-muted">PRECIO DE MERCADO</Typography>
+                        <Typography variant="h4" className="flex items-center gap-2 font-bold text-white">
                             {selectedCrypto?.financial.price.toLocaleString() || '0.00'} <TaoIcon size={24} />
                         </Typography>
-                        <Typography variant="body2" color={(selectedCrypto?.financial.change24h || 0) > 0 ? 'success.main' : 'error.main'}>
+                        <Typography variant="body2" className={(selectedCrypto?.financial.change24h || 0) > 0 ? 'text-success' : 'text-error'}>
                             {selectedCrypto?.financial.change24h || 0}% (24h)
                         </Typography>
-                    </Paper>
-                </Box>
+                    </div>
+                </div>
 
-                <Box>
+                <div>
                         {transactionType === 'BUY' && (
-                            <Box>
+                            <div>
                                 <Input
                                     label="Monto a Invertir (CR)"
                                     name="amount"
                                     type="number"
                                     value={form.amount}
                                     onChange={onChange}
-                                    fullWidth
                                     autoFocus
                                     inputProps={{ min: 0 }}
-                                    containerSx={{
-                                        '& .MuiInputLabel-root': { color: '#00f3ff' },
-                                        mb: 2
-                                    }}
-                                    sx={{
-                                        '& .MuiInputBase-input': { 
-                                            color: 'white', 
-                                            fontSize: '1.5rem',
-                                            borderColor: 'rgba(0, 243, 255, 0.3)',
-                                            '&:hover': { borderColor: '#00f3ff' },
-                                            '&:focus': { borderColor: '#00f3ff', boxShadow: '0 0 0 0.2rem rgba(0, 243, 255, 0.25)' }
-                                        },
-                                    }}
+                                    containerClassName="mb-4"
+                                    className="border-[#a5d6a7]/30 text-[1.5rem] text-white hover:border-[#a5d6a7] focus:border-[#a5d6a7] focus:shadow-[0_0_0_3px_rgba(165,214,167,0.18)]"
                                 />
-                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mb: 2, gap: 1 }}>
-                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                <div className="mb-4 flex items-center justify-end gap-2">
+                                    <Typography variant="caption" className="text-foreground-muted">
                                         Liquidez Disponible: {selectedCrypto?.financial.supplyToTrade ? selectedCrypto.financial.supplyToTrade.toLocaleString() : '0'} {selectedCrypto?.identification.symbol}
                                     </Typography>
-                                </Box>
-                            </Box>
+                                </div>
+                            </div>
                         )}
 
                     {transactionType === 'SELL' && (
-                        <Box>
+                        <div>
                             <Input
                                 label="Cantidad a Vender (Unidades)"
                                 name="quantity"
                                 type="number"
                                 value={form.quantity}
                                 onChange={onChange}
-                                fullWidth
                                 autoFocus
                                 inputProps={{ min: 0, max: availableQuantity }}
-                                containerSx={{
-                                    '& .MuiInputLabel-root': { color: '#ff1744' },
-                                    mb: 1
-                                }}
-                                sx={{
-                                    '& .MuiInputBase-input': { 
-                                        color: 'white', 
-                                        fontSize: '1.5rem',
-                                        borderColor: 'rgba(255, 23, 68, 0.3)',
-                                        '&:hover': { borderColor: '#ff1744' },
-                                        '&:focus': { borderColor: '#ff1744', boxShadow: '0 0 0 0.2rem rgba(255, 23, 68, 0.25)' }
-                                    },
-                                }}
+                                containerClassName="mb-2"
+                                className="border-[#ef9a9a]/30 text-[1.5rem] text-white hover:border-[#ef9a9a] focus:border-[#ef9a9a] focus:shadow-[0_0_0_3px_rgba(239,154,154,0.18)]"
                             />
-                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mb: 2, gap: 1 }}>
-                                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                            <div className="mb-4 flex items-center justify-end gap-2">
+                                <Typography variant="caption" className="text-foreground-muted">
                                     Disponible: {availableQuantity?.toLocaleString()} {selectedCrypto?.identification.symbol}
                                 </Typography>
                                 {onSetMax && (
-                                    <Button 
-                                        size="small" 
-                                        variant="outlined" 
+                                    <Button
+                                        size="small"
+                                        variant="outlined"
                                         color="error"
                                         onClick={onSetMax}
-                                        sx={{ 
-                                            minWidth: 'auto', 
-                                            padding: '2px 8px', 
-                                            fontSize: '0.7rem' 
-                                        }}
                                     >
                                         MAX
                                     </Button>
                                 )}
-                            </Box>
-                        </Box>
+                            </div>
+                        </div>
                     )}
 
                         {transactionType === 'TRANSFER' && (
                             <Input
                             label="Dirección de Destino"
                             name="recipientAddress"
-                            fullWidth
-                            
-                            sx={{ mb: 2, '& input': { color: 'white' } }}
+                            containerClassName="mb-4"
+                            className="text-white"
                         />
                         )}
-                    
 
-                    <Box sx={{
-                        p: 2.5, borderRadius: 2,
-                        bgcolor: `${accentColor}08`,
-                        border: `1px solid ${accentColor}30`,
-                        position: 'relative',
-                        overflow: 'hidden',
-                    }}>
+
+                    <div
+                        className="relative overflow-hidden rounded-lg p-5"
+                        style={{ backgroundColor: `${accentColor}08`, border: `1px solid ${accentColor}30` }}
+                    >
                         {/* Glow */}
-                        <Box sx={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', bgcolor: accentColor, filter: 'blur(30px)', opacity: 0.1 }} />
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-                            <Box>
-                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'block', letterSpacing: 1, mb: 0.5, fontSize: '0.65rem' }}>RECIBIRÁS</Typography>
+                        <div className="absolute -right-5 -top-5 h-20 w-20 rounded-full opacity-10 blur-[30px]" style={{ backgroundColor: accentColor }} />
+                        <div className="mb-3 flex items-start justify-between">
+                            <div>
+                                <Typography variant="caption" className="mb-1 block text-[0.65rem] tracking-wide text-white/40">RECIBIRÁS</Typography>
                                 {transactionType === 'BUY' ? (
-                                    <Typography variant="h5" sx={{ color: 'white', fontWeight: 900, fontFamily: 'monospace' }}>
-                                        +{(form.amount / (selectedCrypto?.financial.price || 1)).toFixed(6)} <Box component="span" sx={{ color: accentColor, fontSize: '0.8em' }}>{selectedCrypto?.identification.symbol}</Box>
+                                    <Typography variant="h5" className="font-mono font-black text-white">
+                                        +{(form.amount / (selectedCrypto?.financial.price || 1)).toFixed(6)} <span className="text-[0.8em]" style={{ color: accentColor }}>{selectedCrypto?.identification.symbol}</span>
                                     </Typography>
                                 ) : (
-                                    <Typography variant="h5" sx={{ color: 'white', fontWeight: 900, display: 'flex', alignItems: 'center', gap: 1, fontFamily: 'monospace' }}>
+                                    <Typography variant="h5" className="flex items-center gap-2 font-mono font-black text-white">
                                         +{(form.quantity * (selectedCrypto?.financial.price || 0)).toLocaleString()} <TaoIcon size={20} />
                                     </Typography>
                                 )}
-                            </Box>
-                            <Box sx={{ textAlign: 'right' }}>
-                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', display: 'block', letterSpacing: 1, mb: 0.5, fontSize: '0.65rem' }}>TARIFA CR</Typography>
-                                <Typography variant="body2" sx={{ color: accentColor, fontWeight: 'bold', fontFamily: 'monospace' }}>
+                            </div>
+                            <div className="text-right">
+                                <Typography variant="caption" className="mb-1 block text-[0.65rem] tracking-wide text-white/40">TARIFA CR</Typography>
+                                <Typography variant="body2" className="font-mono font-bold" style={{ color: accentColor }}>
                                     {fee === null ? '—' : `${fee} CR`}
                                 </Typography>
-                            </Box>
-                        </Box>
+                            </div>
+                        </div>
 
                         {/* Hash cost estimado */}
-                        <Box sx={{
-                            mt: 1.5, pt: 1.5,
-                            borderTop: '1px solid rgba(255,255,255,0.06)',
-                            display: 'flex', alignItems: 'center', gap: 1
-                        }}>
-                            <LocalFireDepartment sx={{ fontSize: 14, color: '#ff6d00' }} />
-                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.7rem' }}>
+                        <div className="mt-3 flex items-center gap-2 border-t border-white/[0.06] pt-3">
+                            <Flame size={14} className="text-[#ff6d00]" />
+                            <Typography variant="caption" className="text-[0.7rem] text-white/45">
                                 Costo de Hash estimado por dificultad de red:
                             </Typography>
-                            <Typography variant="caption" sx={{ color: '#ff6d00', fontWeight: 'bold', fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                            <Typography variant="caption" className="font-mono text-[0.75rem] font-bold text-[#ff6d00]">
                                 {formattedHashCost ?? '...'}
                             </Typography>
-                        </Box>
-                    </Box>
-                </Box>
-            </Box>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <CustomButton
-                variant={transactionType === 'BUY' ? 'success' : transactionType === 'SELL' ? 'error' : 'warning'}
+            {/* Compra = success, venta = error: el color del CTA es el mismo
+                semáforo que ya usan el acento y el badge de la cabecera. */}
+            <Button
+                variant="contained"
+                size="large"
+                color={submitColor}
                 onClick={onSubmit}
                 disabled={!form.walletId || isProcessing || fee === null}
-                startIcon={isProcessing ? <CircularProgress size={14} color="inherit" /> : null}
-                glow
+                startIcon={isProcessing ? <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" /> : null}
                 fullWidth
-                sx={{ mt: 4, py: 1.25, fontSize: '0.85rem' }}
+                className="mt-8"
             >
                 {isProcessing
                     ? 'Procesando Transacción...'
                     : `CONFIRMAR ${transactionType === 'BUY' ? 'COMPRA' : transactionType === 'SELL' ? 'VENTA' : 'TRANSFERENCIA'}`}
-            </CustomButton>
-        </Box>
+            </Button>
+        </div>
     );
 };

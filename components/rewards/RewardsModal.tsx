@@ -13,14 +13,14 @@
 
 //# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, CircularProgress } from '@mui/material';
+import { Gift, CheckCircle, Coins } from 'lucide-react';
 import { CustomButton } from '../ui/CustomButton';
+import { Typography } from '../ui/Typography';
 
 //# 2-Obtención del despachador para emitir acciones al store
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { fetchRewards, claimReward } from '../../lib/features/blockchain/actions';
 import { Reward } from '../../lib/features/blockchain/types';
-import { CardGiftcard, CheckCircle, MonetizationOn } from '@mui/icons-material';
 import { TechFrame } from '../ui/TechFrame';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
@@ -28,29 +28,32 @@ import { addNotification } from '../../lib/features/uiSlice';
 import { setRewardCooldown } from '../../lib/features/blockchain/reducer';
 import { Countdown } from './Countdown';
 
+const Spinner = ({ className = 'h-6 w-6 border-2' }: { className?: string }) => (
+    <div className={`animate-spin rounded-full border-white/20 border-t-[#00f3ff] ${className}`} />
+);
 
 export const RewardsModal = () => {
-    
+
     //# 3-Obtención del despachador para emitir acciones al store
     const dispatch = useAppDispatch();
-    
+
     //# 4-Selección de datos desde el estado global de Redux
     const { rewards, isLoading, error } = useAppSelector((state) => state.blockchain);
-    
+
     //# 5-Selección de datos desde el estado global de Redux
     const { userInfo } = useAppSelector((state) => state.auth);
-    
-    
+
+
     //# 6-Gestión de estado local para claiming id
     const [claimingId, setClaimingId] = useState<string | null>(null);
-    
-    
+
+
     //# 7-Control de visibilidad para interface de show success
     const [showSuccess, setShowSuccess] = useState<string | null>(null);
     const [, forceUpdate] = React.useReducer((x: number) => x + 1, 0);
 
-    
-    
+
+
     //# 8-Efecto secundario para sincronización del ciclo de vida
     // FIX: Use a ref-based guard to prevent the infinite loop caused by
     // having isLoading/error/rewards.length as effect dependencies.
@@ -95,8 +98,8 @@ export const RewardsModal = () => {
         fire(0.1, { spread: 120, startVelocity: 45, colors: ['#00f3ff', '#ffffff'] });
     };
 
-    
-    
+
+
     //# 9-Manejo de lógica de usuario para handleClaim
     const handleClaim = async (reward: Reward) => {
         if (!userInfo?.id) return;
@@ -108,21 +111,21 @@ export const RewardsModal = () => {
             const difference = nextClaimTime - Date.now();
             if (difference > 0) {
                 const remainingMinutes = Math.ceil(difference / (1000 * 60));
-                dispatch(addNotification({ 
-                    type: 'error', 
-                    message: `Reward not available. You need to wait ${remainingMinutes} minutes.` 
+                dispatch(addNotification({
+                    type: 'error',
+                    message: `Reward not available. You need to wait ${remainingMinutes} minutes.`
                 }));
                 return;
             }
         }
 
         setClaimingId(reward.id);
-        
+
         try {
             await dispatch(claimReward({ id: reward.id, userId: userInfo.id })).unwrap();
             triggerSuccessConfetti();
             setShowSuccess(`+${reward.amount} CRÉDITOS`);
-            
+
             setTimeout(() => {
                 setShowSuccess(null);
                 dispatch(fetchRewards());
@@ -146,40 +149,40 @@ export const RewardsModal = () => {
     };
 
     if (isLoading && rewards.length === 0) {
-        
-        
+
+
         //# 10-Estructuración y renderizado visual del componente UI
         return (
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 5, gap: 2 }}>
-                <CircularProgress sx={{ color: '#00f3ff' }} />
-                <Typography variant="overline" sx={{ color: '#00f3ff', letterSpacing: 4 }}>Sincronizando Recompensas...</Typography>
-            </Box>
+            <div className="flex flex-col items-center justify-center gap-4 p-10">
+                <Spinner />
+                <Typography variant="overline" className="tracking-[4px] text-[#00f3ff]">Sincronizando Recompensas...</Typography>
+            </div>
         );
     }
 
     if (error) {
-        
-        
+
+
         //# 11-Estructuración y renderizado visual del componente UI
         return (
-            <Box sx={{ p: 4, textAlign: 'center' }}>
-                <Typography color="error" sx={{ mb: 2 }}>ERROR_DE_ENLACE: {error}</Typography>
-                <CustomButton 
-                    variant="error" 
+            <div className="p-8 text-center">
+                <Typography className="mb-4 text-error">ERROR_DE_ENLACE: {error}</Typography>
+                <CustomButton
+                    variant="error"
                     onClick={() => dispatch(fetchRewards())}
                     glow
                 >
                     REINTENTAR_CONEXION
                 </CustomButton>
-            </Box>
+            </div>
         );
     }
 
-    
-    
+
+
     //# 12-Estructuración y renderizado visual del componente UI
     return (
-        <Box sx={{ position: 'relative' }}>
+        <div className="relative">
             <AnimatePresence>
                 {showSuccess && (
                     <motion.div
@@ -195,129 +198,104 @@ export const RewardsModal = () => {
                             pointerEvents: 'none'
                         }}
                     >
-                        <Box sx={{ 
-                            p: 3, 
-                            bgcolor: 'rgba(0, 243, 255, 0.2)', 
-                            backdropFilter: 'blur(20px)',
-                            border: '2px solid #00f3ff',
-                            borderRadius: '50%',
-                            boxShadow: '0 0 50px rgba(0, 243, 255, 0.5)',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            minWidth: 200
-                        }}>
-                            <CheckCircle sx={{ color: '#00f3ff', fontSize: 60, mb: 1 }} />
-                            <Typography variant="h4" sx={{ color: 'white', fontWeight: 'bold', textShadow: '0 0 10px #00f3ff' }}>
+                        <div className="flex min-w-[200px] flex-col items-center rounded-full border-2 border-[#00f3ff] bg-[#00f3ff]/20 p-6 shadow-[0_0_50px_rgba(0,243,255,0.5)] backdrop-blur-xl">
+                            <CheckCircle size={60} className="mb-2 text-[#00f3ff]" />
+                            <Typography variant="h4" className="font-bold text-white [text-shadow:0_0_10px_#00f3ff]">
                                 {showSuccess}
                             </Typography>
-                            <Typography variant="overline" sx={{ color: '#00f3ff', fontWeight: 'bold' }}>
+                            <Typography variant="overline" className="font-bold text-[#00f3ff]">
                                 RECOMPENSA_ADQUIRIDA
                             </Typography>
-                        </Box>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.5)', letterSpacing: 4, mb: 1, display: 'block' }}>
+            <Typography variant="overline" className="mb-2 block tracking-[4px] text-white/50">
                 {'// REWARD_CENTRAL_TERMINAL'}
             </Typography>
-            <Typography variant="h4" sx={{ color: 'white', fontWeight: 'bold', mb: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
-                <CardGiftcard sx={{ color: '#00f3ff' }} /> BOTÍN DISPONIBLE
+            <Typography variant="h4" className="mb-2 flex items-center gap-4 font-bold text-white">
+                <Gift className="text-[#00f3ff]" /> BOTÍN DISPONIBLE
             </Typography>
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', mb: 4 }}>
+            <Typography variant="body2" className="mb-8 text-white/60">
                 Optimiza tus activos mediante la ejecución de protocolos diarios y metas de sistema.
             </Typography>
 
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <div className="flex flex-col gap-6">
                 {rewards.length === 0 ? (
-                    <Box sx={{ p: 6, textAlign: 'center', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: 2 }}>
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>
+                    <div className="rounded-lg border border-dashed border-white/10 p-12 text-center">
+                        <Typography variant="caption" className="italic text-white/30">
                             No se han detectado paquetes de recompensa activos en la red.
                         </Typography>
-                    </Box>
+                    </div>
                 ) : (
                     rewards.map((reward) => {
                         const userReward = userInfo?.rewards?.find((r) => r.id === reward.id) || userInfo?.rewards?.[0];
                         const lastClaimedAt = userReward?.claimedAt;
-                        
+
                         const intervalVal = Number(reward.interval) || 1;
-                        const nextClaimTime = lastClaimedAt 
+                        const nextClaimTime = lastClaimedAt
                             ? new Date(lastClaimedAt).getTime() + (intervalVal * 60 * 1000)
                             : null;
-                            
+
                         const isClaimedPersisted = !!nextClaimTime && Date.now() < nextClaimTime;
                         const isClaimedSession = !!(reward.nextClaimTime && Date.now() < reward.nextClaimTime);
-                        
+
                         const isClaimedNow = isClaimedPersisted || isClaimedSession || !!reward.isClaimed;
                         const targetTime = isClaimedSession ? (reward.nextClaimTime || 0) : (nextClaimTime || 0);
 
                         return (
                         <TechFrame key={reward.id} color={isClaimedNow ? 'rgba(255,255,255,0.2)' : '#00f3ff'}>
-                            <Box sx={{ 
-                                p: 3, 
-                                display: 'flex', 
-                                flexDirection: { xs: 'column', sm: 'row' },
-                                alignItems: { xs: 'flex-start', sm: 'center' },
-                                gap: 3,
-                                bgcolor: isClaimedNow ? 'rgba(255,255,255,0.02)' : 'rgba(0, 243, 255, 0.03)',
-                                transition: 'all 0.3s'
-                            }}>
-                                <Box sx={{ 
-                                    width: 60, 
-                                    height: 60, 
-                                    borderRadius: 1, 
-                                    bgcolor: isClaimedNow ? 'rgba(255,255,255,0.05)' : 'rgba(0, 243, 255, 0.1)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    border: `1px solid ${isClaimedNow ? 'rgba(255,255,255,0.1)' : 'rgba(0, 243, 255, 0.2)'}`
-                                }}>
-                                    <MonetizationOn sx={{ color: isClaimedNow ? 'rgba(255,255,255,0.3)' : '#00f3ff', fontSize: 32 }} />
-                                </Box>
+                            <div
+                                className="flex flex-col items-start gap-6 p-6 transition-all duration-300 sm:flex-row sm:items-center"
+                                style={{ backgroundColor: isClaimedNow ? 'rgba(255,255,255,0.02)' : 'rgba(0, 243, 255, 0.03)' }}
+                            >
+                                <div
+                                    className="flex h-[60px] w-[60px] items-center justify-center rounded"
+                                    style={{
+                                        backgroundColor: isClaimedNow ? 'rgba(255,255,255,0.05)' : 'rgba(0, 243, 255, 0.1)',
+                                        border: `1px solid ${isClaimedNow ? 'rgba(255,255,255,0.1)' : 'rgba(0, 243, 255, 0.2)'}`,
+                                    }}
+                                >
+                                    <Coins size={32} style={{ color: isClaimedNow ? 'rgba(255,255,255,0.3)' : '#00f3ff' }} />
+                                </div>
 
-                                <Box sx={{ flex: 1 }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                                        <Typography variant="h6" sx={{ color: isClaimedNow ? 'rgba(255,255,255,0.4)' : 'white', fontWeight: 'bold' }}>
+                                <div className="flex-1">
+                                    <div className="mb-1 flex items-center gap-2">
+                                        <Typography
+                                            variant="h6"
+                                            className="font-bold"
+                                            style={{ color: isClaimedNow ? 'rgba(255,255,255,0.4)' : 'white' }}
+                                        >
                                             {reward.name}
                                         </Typography>
-                                        <Box sx={{ 
-                                            px: 1, 
-                                            py: 0.2, 
-                                            bgcolor: 'rgba(255,255,255,0.05)', 
-                                            border: '1px solid rgba(255,255,255,0.1)', 
-                                            borderRadius: 0.5 
-                                        }}>
-                                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 'bold', fontSize: '0.6rem' }}>
+                                        <div className="rounded-sm border border-white/10 bg-white/5 px-2 py-0.5">
+                                            <Typography variant="caption" className="text-[0.6rem] font-bold text-white/50">
                                                 {reward.rewardType || 'SISTEMA'}
                                             </Typography>
-                                        </Box>
-                                    </Box>
-                                    <Typography variant="body2" sx={{ color: isClaimedNow ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.6)' }}>
+                                        </div>
+                                    </div>
+                                    <Typography
+                                        variant="body2"
+                                        style={{ color: isClaimedNow ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.6)' }}
+                                    >
                                         {reward.description}
                                     </Typography>
-                                </Box>
+                                </div>
 
-                                <Box sx={{ 
-                                    textAlign: { xs: 'left', sm: 'right' }, 
-                                    minWidth: 140,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: { xs: 'flex-start', sm: 'flex-end' },
-                                    gap: 1
-                                }}>
-                                    <Typography variant="h5" sx={{ 
-                                        color: isClaimedNow ? 'rgba(255,255,255,0.2)' : '#00ff88', 
-                                        fontWeight: 'bold', 
-                                        fontFamily: 'monospace'
-                                    }}>
+                                <div className="flex min-w-[140px] flex-col items-start gap-2 text-left sm:items-end sm:text-right">
+                                    <Typography
+                                        variant="h5"
+                                        className="font-mono font-bold"
+                                        style={{ color: isClaimedNow ? 'rgba(255,255,255,0.2)' : '#00ff88' }}
+                                    >
                                         +{reward.amount} CR
                                     </Typography>
 
                                     {isClaimedNow && targetTime > 0 && (
-                                        <Countdown 
-                                            targetDate={targetTime} 
-                                            onComplete={forceUpdate} 
+                                        <Countdown
+                                            targetDate={targetTime}
+                                            onComplete={forceUpdate}
                                         />
                                     )}
 
@@ -327,18 +305,17 @@ export const RewardsModal = () => {
                                         disabled={isClaimedNow || claimingId === reward.id}
                                         onClick={() => handleClaim(reward)}
                                         glow={!isClaimedNow}
-                                        startIcon={claimingId === reward.id ? <CircularProgress size={14} color="inherit" /> : null}
+                                        startIcon={claimingId === reward.id ? <Spinner className="h-3.5 w-3.5 border-[1.5px]" /> : null}
                                     >
                                         {claimingId === reward.id ? 'Reclamando...' : (isClaimedNow ? 'ADQUIRIDO' : 'RECLAMAR')}
                                     </CustomButton>
-                                </Box>
-                            </Box>
+                                </div>
+                            </div>
                         </TechFrame>
                         );
                     })
                 )}
-            </Box>
-        </Box>
+            </div>
+        </div>
     );
 };
-

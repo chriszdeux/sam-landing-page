@@ -1,6 +1,8 @@
 import React from "react";
-import { Box, Typography, Button, IconButton, Paper, Stack, Drawer, Divider, LinearProgress, Grid, CircularProgress } from "@mui/material";
-import { Close, Settings, DeleteForever, Speed, Thermostat, Timer } from "@mui/icons-material";
+import { X, Settings, Trash2, Gauge, Thermometer, Timer } from "lucide-react";
+import { Drawer } from "../ui/Drawer";
+import { Typography } from "../ui/Typography";
+import { Button } from "../ui/Button";
 import { SlotMachine } from "./LaboratorioMetersSection";
 import { getCBUnit, getCBDivisor } from "../../lib/constants/blockchainFrequencies";
 
@@ -24,111 +26,97 @@ export function LaboratorioHardwareDetailDrawer({ open, onClose, slot, onUninsta
 
   return (
     <Drawer
-      anchor="right"
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: { 
-          width: { xs: '100%', sm: 400 }, 
-          bgcolor: 'rgba(10, 12, 16, 0.95)', 
-          backdropFilter: 'blur(15px)',
-          borderLeft: `1px solid ${color}`,
-          color: '#fff'
-        }
-      }}
+      side="right"
+      className="w-full bg-[rgba(10,12,16,0.95)] text-white backdrop-blur-lg sm:w-[400px]"
     >
-      <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5" fontWeight="bold" sx={{ color: color, textTransform: 'uppercase', letterSpacing: 1 }}>
-          Hardware Detalle
-        </Typography>
-        <IconButton onClick={onClose} sx={{ color: 'text.secondary', '&:hover': { color: '#ff0055' } }}>
-          <Close />
-        </IconButton>
-      </Box>
-      <Divider sx={{ borderColor: `${color}30` }} />
-      
-      <Box sx={{ p: 3, flex: 1, overflowY: 'auto' }}>
-        <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>{slot.name}</Typography>
-        <Typography variant="body1" sx={{ color: color, fontWeight: 700, mb: 4 }}>
-          {performance}
-        </Typography>
+      <div style={{ borderLeft: `1px solid ${color}` }} className="flex h-full flex-col">
+        <div className="flex items-center justify-between p-6">
+          <Typography variant="h5" className="font-bold uppercase tracking-wide" style={{ color }}>
+            Hardware Detalle
+          </Typography>
+          <button onClick={onClose} className="text-foreground-muted transition-colors hover:text-[#ff0055]">
+            <X size={20} />
+          </button>
+        </div>
+        <hr className="border-t" style={{ borderColor: `${color}30` }} />
 
-        <Stack spacing={4}>
-          {/* Vida Util */}
-          <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'rgba(255,255,255,0.7)' }}>
-                <Timer sx={{ fontSize: 18 }} /> Vida Útil
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{Math.round(lifePercent)}%</Typography>
-            </Box>
-            <LinearProgress 
-              variant="determinate" 
-              value={lifePercent} 
-              sx={{ 
-                height: 8, 
-                borderRadius: 4, 
-                bgcolor: 'rgba(255,255,255,0.1)',
-                '& .MuiLinearProgress-bar': { bgcolor: lifePercent < 20 ? '#ff0055' : color }
-              }} 
-            />
-          </Box>
+        <div className="flex-1 overflow-y-auto p-6">
+          <Typography variant="h4" className="mb-1 font-bold">{slot.name}</Typography>
+          <Typography variant="body1" className="mb-8 font-bold" style={{ color }}>
+            {performance}
+          </Typography>
 
-          {/* Efficiency & Temp */}
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 6 }}>
-              <Paper sx={{ p: 2, bgcolor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
-                <Typography variant="caption" display="block" sx={{ color: 'rgba(255,255,255,0.5)', mb: 1 }}>
-                  <Speed sx={{ fontSize: 16, verticalAlign: 'middle', mr: 0.5 }} /> EFICIENCIA
+          <div className="flex flex-col gap-8">
+            {/* Vida Util */}
+            <div>
+              <div className="mb-1 flex justify-between">
+                <Typography variant="body2" className="flex items-center gap-1 text-white/70">
+                  <Timer size={18} /> Vida Útil
                 </Typography>
-                <Typography variant="h6" sx={{ color: '#00e676' }}>{efficiency}%</Typography>
-              </Paper>
-            </Grid>
-            <Grid size={{ xs: 6 }}>
-              <Paper sx={{ p: 2, bgcolor: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
-                <Typography variant="caption" display="block" sx={{ color: 'rgba(255,255,255,0.5)', mb: 1 }}>
-                  <Thermostat sx={{ fontSize: 16, verticalAlign: 'middle', mr: 0.5 }} /> CALOR
+                <Typography variant="body2" className="font-bold">{Math.round(lifePercent)}%</Typography>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full"
+                  style={{ width: `${lifePercent}%`, backgroundColor: lifePercent < 20 ? '#ff0055' : color }}
+                />
+              </div>
+            </div>
+
+            {/* Efficiency & Temp */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-paper border border-white/10 bg-black/30 p-4 text-center">
+                <Typography variant="caption" component="span" className="mb-1 block text-white/50">
+                  <Gauge size={16} className="mr-1 inline-block align-middle" /> EFICIENCIA
                 </Typography>
-                <Typography variant="h6" sx={{ color: (slot.temperature || 0) > 75 ? '#ff0055' : '#ffaa00' }}>
+                <Typography variant="h6" className="text-[#00e676]">{efficiency}%</Typography>
+              </div>
+              <div className="rounded-paper border border-white/10 bg-black/30 p-4 text-center">
+                <Typography variant="caption" component="span" className="mb-1 block text-white/50">
+                  <Thermometer size={16} className="mr-1 inline-block align-middle" /> CALOR
+                </Typography>
+                <Typography variant="h6" style={{ color: (slot.temperature || 0) > 75 ? '#ff0055' : '#ffaa00' }}>
                   {slot.temperature || 0}°C
                 </Typography>
-              </Paper>
-            </Grid>
-          </Grid>
+              </div>
+            </div>
 
-          <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', my: 2 }} />
+            <hr className="my-2 border-t border-white/10" />
 
-          {/* Actions */}
-          <Stack spacing={2}>
-            <Button 
-              fullWidth 
-              variant="contained" 
-              startIcon={isMaintenanceLoading ? <CircularProgress size={20} sx={{ color: '#fff' }} /> : <Settings />}
-              onClick={() => onMaintenance()}
-              disabled={isMaintenanceLoading}
-              sx={{ 
-                bgcolor: 'rgba(255,255,255,0.05)', 
-                color: '#fff',
-                py: 1.5,
-                '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' },
-                '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.02)', color: 'rgba(255,255,255,0.2)' }
-              }}
-            >
-              {isMaintenanceLoading ? "Procesando..." : "Mantenimiento"}
-            </Button>
-            <Button 
-              fullWidth 
-              variant="outlined" 
-              color="error"
-              startIcon={<DeleteForever />}
-              onClick={() => onUninstall()}
-              sx={{ py: 1.5, border: '1px solid #ff0055', color: '#ff0055', '&:hover': { bgcolor: 'rgba(255,0,85,0.1)', border: '1px solid #ff0055' } }}
-            >
-              Desinstalar
-            </Button>
-          </Stack>
-        </Stack>
-      </Box>
+            {/* Actions */}
+            <div className="flex flex-col gap-4">
+              <Button
+                fullWidth
+                variant="contained"
+                startIcon={isMaintenanceLoading ? <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white" /> : <Settings />}
+                onClick={() => onMaintenance()}
+                disabled={isMaintenanceLoading}
+                sx={{
+                  bgcolor: 'rgba(255,255,255,0.05)',
+                  color: '#fff',
+                  py: 1.5,
+                  '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' },
+                  '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.02)', color: 'rgba(255,255,255,0.2)' }
+                }}
+              >
+                {isMaintenanceLoading ? "Procesando..." : "Mantenimiento"}
+              </Button>
+              <Button
+                fullWidth
+                variant="outlined"
+                color="error"
+                startIcon={<Trash2 />}
+                onClick={() => onUninstall()}
+                sx={{ py: 1.5, border: '1px solid #ff0055', color: '#ff0055', '&:hover': { bgcolor: 'rgba(255,0,85,0.1)', border: '1px solid #ff0055' } }}
+              >
+                Desinstalar
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
     </Drawer>
   );
 }

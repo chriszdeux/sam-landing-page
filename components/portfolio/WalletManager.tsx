@@ -12,13 +12,12 @@
 
 'use client';
 
-import React, { useState } from 'react';
-import { Box, Typography, Grid, Avatar, Button, Snackbar, Alert, IconButton } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { PlusCircle, Wallet, Copy, Trash2 } from 'lucide-react';
+import { cn } from '@/lib/utils/cn';
+import { Typography } from '../ui/Typography';
+import { Button } from '../ui/Button';
 import { TechFrame } from '../ui/TechFrame';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { AddWalletDialog } from './AddWalletDialog';
 
 //# 1-Obtención del despachador para emitir acciones al store
@@ -44,6 +43,12 @@ export const WalletManager = () => {
     
     //# 7-Gestión de estado local para snackbar
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+
+    useEffect(() => {
+        if (!snackbar.open) return;
+        const timeout = setTimeout(() => setSnackbar((s) => ({ ...s, open: false })), 6000);
+        return () => clearTimeout(timeout);
+    }, [snackbar.open]);
 
     
     
@@ -99,20 +104,20 @@ export const WalletManager = () => {
     
     //# 11-Estructuración y renderizado visual del componente UI
     return (
-        <Box sx={{ mb: 8 }}>
+        <div className="mb-16">
             {}
-            <Box sx={{ overflowX: 'hidden', p: 1 }}>
-                
+            <div className="overflow-x-hidden p-2">
+
                 {}
-                <Grid container spacing={4} sx={{ display: 'flex', flexWrap: 'wrap-reverse' }}>
-                    <Grid size={{ xs: 12 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                             <Typography variant="overline" sx={{ color: '#00f3ff', fontWeight: 'bold', letterSpacing: 2 }}>
+                <div className="flex flex-wrap-reverse gap-8">
+                    <div className="w-full">
+                        <div className="mb-4 flex items-center justify-between">
+                             <Typography variant="overline" className="font-bold tracking-[2px] text-[#00f3ff]">
                                 {'// MIS_BILLETERAS'}
                             </Typography>
                             <Button
                                 variant="outlined"
-                                startIcon={<AddCircleOutlineIcon />}
+                                startIcon={<PlusCircle size={16} />}
                                 onClick={() => setOpenDialog(true)}
                                 size="small"
                                 sx={{
@@ -124,114 +129,67 @@ export const WalletManager = () => {
                             >
                                 NUEVA WALLET
                             </Button>
-                        </Box>
-                        
-                        <Box sx={{ 
-                            display: 'flex', 
-                            gap: 2, 
-                            overflowX: 'auto', 
-                            pb: 2,
-                            px: { xs: 0, md: 1 },
-                            '::-webkit-scrollbar': { height: 6 },
-                            '::-webkit-scrollbar-track': {  background: 'rgba(255, 255, 255, 0.05)' },
-                            '::-webkit-scrollbar-thumb': { background: '#00f3ff', borderRadius: 4 }
-                        }}>
-                            {userInfo.wallets && userInfo.wallets.map((wallet, index) => (
-                                <Box key={index} sx={{ minWidth: { xs: 280, sm: 320 }, maxWidth: { xs: '85vw', sm: 320 } }}>
-                                    <TechFrame color="#00f3ff">
-                                        <Box sx={{ 
-                                            p: { xs: 2, sm: 3 },
-                                            height: 180,
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            justifyContent: 'space-between',
-                                            position: 'relative',
-                                            background: 'linear-gradient(135deg, rgba(0, 243, 255, 0.1) 0%, rgba(0,0,0,0) 100%)',
-                                            transition: 'transform 0.2s',
-                                            '&:hover': { transform: 'translateY(-4px)' }
-                                        }}>
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                                <Box>
-                                                    <Box sx={{ 
-                                                        width: 40, 
-                                                        height: 28, 
-                                                        bgcolor: 'rgba(255, 215, 0, 0.15)', 
-                                                        border: '1px solid rgba(255, 215, 0, 0.3)', 
-                                                        borderRadius: 1, 
-                                                        mb: 2,
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center'
-                                                    }}>
-                                                        <Box sx={{ width: 20, height: 16, border: '1px solid rgba(255, 215, 0, 0.4)', borderRadius: 0.5 }} />
-                                                    </Box>
-                                                </Box>
-                                                <AccountBalanceWalletIcon sx={{ 
-                                                    color: 'rgba(255,255,255,0.1)', 
-                                                    fontSize: { xs: 40, sm: 60 }, 
-                                                    position: 'absolute', 
-                                                    top: 10, 
-                                                    right: 10 
-                                                }} />
-                                            </Box>
+                        </div>
 
-                                            <Box>
-                                                <Typography variant="h6" sx={{ 
-                                                    fontWeight: 'bold', 
-                                                    color: 'white', 
-                                                    mb: 0.5, 
-                                                    letterSpacing: 1,
-                                                    fontSize: { xs: '1rem', sm: '1.25rem' }
-                                                }}>
+                        <div className="flex gap-4 overflow-x-auto px-0 pb-4 md:px-2">
+                            {userInfo.wallets && userInfo.wallets.map((wallet, index) => (
+                                <div key={index} className="w-[280px] max-w-[85vw] flex-shrink-0 sm:w-[320px] sm:max-w-[320px]">
+                                    <TechFrame color="#00f3ff">
+                                        <div className="group relative flex h-[180px] flex-col justify-between bg-gradient-to-br from-[#00f3ff]/10 to-transparent p-4 transition-transform duration-200 hover:-translate-y-1 sm:p-6">
+                                            <div className="flex items-start justify-between">
+                                                <div>
+                                                    <div className="mb-4 flex h-7 w-10 items-center justify-center rounded border border-[#ffd700]/30 bg-[#ffd700]/[0.15]">
+                                                        <div className="h-4 w-5 rounded-sm border border-[#ffd700]/40" />
+                                                    </div>
+                                                </div>
+                                                <Wallet size={48} className="absolute right-2.5 top-2.5 text-white/10" />
+                                            </div>
+
+                                            <div>
+                                                <Typography variant="h6" className="mb-1 text-base font-bold tracking-wide text-white sm:text-xl">
                                                     {wallet.label.toUpperCase()}
                                                 </Typography>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <Typography variant="caption" sx={{ 
-                                                        fontFamily: 'monospace', 
-                                                        color: 'rgba(0, 243, 255, 0.8)', 
-                                                        fontSize: { xs: '0.7rem', sm: '0.8rem' }, 
-                                                        letterSpacing: 1 
-                                                    }}>
+                                                <div className="flex items-center gap-2">
+                                                    <Typography variant="caption" className="font-mono text-[0.7rem] tracking-wide text-[#00f3ff]/80 sm:text-[0.8rem]">
                                                         {wallet.walletAddress.substring(0, 8)} •••• {wallet.walletAddress.substring(wallet.walletAddress.length - 6)}
                                                     </Typography>
-                                                    <IconButton 
-                                                        size="small" 
+                                                    <button
                                                         onClick={() => handleCopyToClipboard(wallet.walletAddress)}
-                                                        sx={{ color: '#00f3ff', p: 0.5 }}
+                                                        className="rounded p-1 text-[#00f3ff]"
                                                     >
-                                                        <ContentCopyIcon sx={{ fontSize: 14 }} />
-                                                    </IconButton>
-                                                </Box>
-                                            </Box>
-                                        </Box>
+                                                        <Copy size={14} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </TechFrame>
-                                </Box>
+                                </div>
                             ))}
-                            
+
                             {(!userInfo.wallets || userInfo.wallets.length === 0) && (
-                                <Box sx={{ minWidth: { xs: 280, sm: 320 }, height: 180, display: 'flex', alignItems: 'center', justifyItems: 'center' }}>
-                                    <Button 
-                                        variant="outlined" 
-                                        fullWidth 
+                                <div className="flex h-[180px] w-[280px] items-center sm:w-[320px]">
+                                    <Button
+                                        variant="outlined"
+                                        fullWidth
                                         sx={{ height: '100%', borderStyle: 'dashed', borderColor: 'rgba(255,255,255,0.1)', color: 'text.secondary' }}
                                         onClick={() => setOpenDialog(true)}
                                     >
                                         Agregar Primera Wallet
                                     </Button>
-                                </Box>
+                                </div>
                             )}
-                        </Box>
-                    </Grid>
+                        </div>
+                    </div>
 
                     {}
-                    <Grid size={{ xs: 12 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                            <Typography variant="overline" sx={{ color: '#ce93d8', fontWeight: 'bold', letterSpacing: 4 }}>
+                    <div className="w-full">
+                        <div className="mb-4 flex items-center justify-between">
+                            <Typography variant="overline" className="font-bold tracking-[4px] text-[#ce93d8]">
                                 {'// EXTERNAL_LINKS'}
                             </Typography>
-                        </Box>
-                        
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        </div>
+
+                        <div className="flex flex-col gap-4">
                             <AnimatePresence>
                                 {userInfo.walletsSaved && userInfo.walletsSaved.length > 0 ? (
                                     userInfo.walletsSaved.map((wallet) => (
@@ -242,79 +200,75 @@ export const WalletManager = () => {
                                             exit={{ opacity: 0, x: -20 }}
                                             transition={{ duration: 0.2 }}
                                         >
-                                            <Box sx={{ position: 'relative' }}>
+                                            <div className="relative">
                                                 <TechFrame color="#ce93d8">
-                                                    <Box sx={{ 
-                                                        p: 2, 
-                                                        display: 'flex', 
-                                                        alignItems: 'center',
-                                                        position: 'relative'
-                                                    }}>
-                                                        <Avatar sx={{ 
-                                                            width: 36, 
-                                                            height: 36, 
-                                                            bgcolor: 'rgba(206, 147, 216, 0.1)', 
-                                                            border: '1px solid #ce93d8',
-                                                            color: '#ce93d8', 
-                                                            mr: 2,
-                                                            fontSize: '1rem',
-                                                            fontWeight: 'bold'
-                                                        }}>
+                                                    <div className="relative flex items-center p-4">
+                                                        <div className="mr-4 flex h-9 w-9 items-center justify-center rounded-full border border-[#ce93d8] bg-[#ce93d8]/10 text-base font-bold text-[#ce93d8]">
                                                             {wallet.label.charAt(0).toUpperCase()}
-                                                        </Avatar>
-                                                        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                                                            <Typography variant="body2" sx={{ color: 'white', fontWeight: 'bold', lineHeight: 1.2 }}>
+                                                        </div>
+                                                        <div className="min-w-0 flex-1">
+                                                            <Typography variant="body2" className="font-bold leading-tight text-white">
                                                                 {wallet.label}
                                                             </Typography>
-                                                            <Typography variant="caption" sx={{ color: 'rgba(206, 147, 216, 0.6)', fontFamily: 'monospace', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                            <Typography variant="caption" className="block overflow-hidden text-ellipsis font-mono text-[#ce93d8]/60">
                                                                 {wallet.walletAddress.substring(0, 6)}...{wallet.walletAddress.substring(wallet.walletAddress.length - 4)}
                                                             </Typography>
-                                                        </Box>
-                                                        <Box sx={{ display: 'flex' }}>
-                                                            <IconButton 
-                                                                size="small" 
+                                                        </div>
+                                                        <div className="flex">
+                                                            <button
                                                                 onClick={() => handleCopyToClipboard(wallet.walletAddress)}
-                                                                sx={{ color: 'rgba(255,255,255,0.3)', '&:hover': { color: 'white' } }}
+                                                                className="rounded p-1 text-white/30 hover:text-white"
                                                             >
-                                                                <ContentCopyIcon sx={{ fontSize: 14 }} />
-                                                            </IconButton>
-                                                            <IconButton 
-                                                                size="small"
+                                                                <Copy size={14} />
+                                                            </button>
+                                                            <button
                                                                 onClick={() => handleRemoveWallet(wallet.walletAddress)}
-                                                                sx={{ color: 'rgba(255,0,0,0.3)', '&:hover': { color: '#ff4444' } }}
+                                                                className="rounded p-1 text-red-500/30 hover:text-red-500"
                                                             >
-                                                                <DeleteOutlineIcon sx={{ fontSize: 14 }} />
-                                                            </IconButton>
-                                                        </Box>
-                                                    </Box>
+                                                                <Trash2 size={14} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
                                                 </TechFrame>
-                                            </Box>
+                                            </div>
                                         </motion.div>
                                     ))
                                 ) : (
-                                    <Box sx={{ p: 4, textAlign: 'center', bgcolor: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: 1 }}>
-                                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>
+                                    <div className="rounded border border-dashed border-white/10 bg-white/[0.02] p-8 text-center">
+                                        <Typography variant="caption" className="italic text-white/30">
                                             No hay wallets guardadas
                                         </Typography>
-                                    </Box>
+                                    </div>
                                 )}
                             </AnimatePresence>
-                        </Box>
-                    </Grid>
-                </Grid>
-            </Box>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <AddWalletDialog 
-                open={openDialog} 
-                onClose={() => setOpenDialog(false)} 
-                onAdd={handleAddWallet} 
+            <AddWalletDialog
+                open={openDialog}
+                onClose={() => setOpenDialog(false)}
+                onAdd={handleAddWallet}
             />
 
-            <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
-                <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
-                    {snackbar.message}
-                </Alert>
-            </Snackbar>
-        </Box>
+            <AnimatePresence>
+                {snackbar.open && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        className={cn(
+                            'fixed bottom-6 right-6 z-50 rounded-lg border px-4 py-3 text-sm shadow-lg',
+                            snackbar.severity === 'success'
+                                ? 'border-green-500/30 bg-green-950/90 text-green-200'
+                                : 'border-red-500/30 bg-red-950/90 text-red-200'
+                        )}
+                    >
+                        {snackbar.message}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
     );
 };

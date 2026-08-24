@@ -3,7 +3,6 @@
 // 3-Estructuración y renderizado visual del componente UI
 
 import React from 'react';
-import { Box } from '@mui/material';
 import { motion } from 'framer-motion';
 
 interface MiningAnimationProps {
@@ -98,7 +97,7 @@ const EnergyBeam = ({ start, end, color, delay = 0 }: { start: {x: number, y: nu
     
     //# 2-Estructuración y renderizado visual del componente UI
     return (
-        <Box sx={{
+        <div style={{
             position: 'absolute',
             top: `calc(50% + ${start.y}px)`,
             left: `calc(50% + ${start.x}px)`,
@@ -172,7 +171,7 @@ const EnergyBeam = ({ start, end, color, delay = 0 }: { start: {x: number, y: nu
                     repeatDelay: (TRAVEL_DURATION + PAUSE_DURATION) - PULSE_DURATION
                 }}
             />
-        </Box>
+        </div>
     );
 };
 
@@ -199,16 +198,16 @@ export const MiningAnimation = ({ color = '#00E5FF' }: MiningAnimationProps) => 
     
     //# 3-Estructuración y renderizado visual del componente UI
     return (
-        <Box sx={{ 
-            position: 'absolute', 
-            inset: 0, 
+        <div style={{
+            position: 'absolute',
+            inset: 0,
             overflow: 'hidden',
             perspective: '1000px',
             opacity: 0.8,
             maskImage: 'linear-gradient(to bottom, black 20%, transparent 100%)',
             WebkitMaskImage: 'linear-gradient(to bottom, black 20%, transparent 100%)',
             zIndex: 0
-        }}>
+        } as React.CSSProperties}>
            
             {}
             {connections.map((conn, i) => (
@@ -242,8 +241,8 @@ export const MiningAnimation = ({ color = '#00E5FF' }: MiningAnimationProps) => 
                     backgroundSize: '100px 100px',
                     transform: 'perspective(500px) rotateX(60deg) translateY(100px) translateZ(-200px)',
                     zIndex: -1
-                }} 
+                }}
              />
-        </Box>
+        </div>
     );
 };

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Box, Typography, Button, Dialog } from '@mui/material';
+import { PlusCircle } from 'lucide-react';
+import { Dialog } from '../ui/Dialog';
 import { TechFrame } from '../ui/TechFrame';
 import { Input } from '../ui/Input';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { Typography } from '../ui/Typography';
+import { Button } from '../ui/Button';
 
 interface AddWalletDialogProps {
     open: boolean;
@@ -21,56 +23,46 @@ export const AddWalletDialog: React.FC<AddWalletDialogProps> = ({ open, onClose,
     };
 
     return (
-        <Dialog 
-            open={open} 
+        <Dialog
+            open={open}
             onClose={onClose}
-            maxWidth="sm"
-            fullWidth
-            PaperProps={{
-                sx: {
-                    bgcolor: 'transparent',
-                    boxShadow: 'none',
-                    backgroundImage: 'none',
-                }
-            }}
+            className="w-full max-w-[600px]"
         >
             <TechFrame color="#00f3ff">
-                <Box sx={{ p: 4, bgcolor: 'rgba(10, 15, 30, 0.95)', backdropFilter: 'blur(10px)' }}>
-                    <Typography variant="h5" sx={{ color: '#00f3ff', fontWeight: 'bold', mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <AddCircleOutlineIcon /> REGISTRAR NUEVA WALLET
+                <div className="bg-[rgba(10,15,30,0.95)] p-8 backdrop-blur-md">
+                    <Typography variant="h5" className="mb-6 flex items-center gap-4 font-bold text-[#00f3ff]">
+                        <PlusCircle /> REGISTRAR NUEVA WALLET
                     </Typography>
-                    
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                        <Box>
-                            <Typography variant="overline" sx={{ color: 'text.secondary', display: 'block', mb: 1 }}>ETIQUETA_SISTEMA</Typography>
+
+                    <div className="flex flex-col gap-6">
+                        <div>
+                            <Typography variant="overline" className="mb-2 block text-foreground-muted">ETIQUETA_SISTEMA</Typography>
                             <Input
                                 autoFocus
                                 placeholder="Ej. Principal, Trading, Reserva"
-                                fullWidth
                                 value={label}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLabel(e.target.value)}
                             />
-                        </Box>
-                        <Box>
-                            <Typography variant="overline" sx={{ color: 'text.secondary', display: 'block', mb: 1 }}>DIRECCION_DE_ENLACE</Typography>
+                        </div>
+                        <div>
+                            <Typography variant="overline" className="mb-2 block text-foreground-muted">DIRECCION_DE_ENLACE</Typography>
                             <Input
                                 placeholder="0x..."
-                                fullWidth
                                 value={walletAddress}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWalletAddress(e.target.value)}
                             />
-                        </Box>
-                    </Box>
+                        </div>
+                    </div>
 
-                    <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-                        <Button 
-                            onClick={onClose} 
+                    <div className="mt-8 flex justify-end gap-4">
+                        <Button
+                            onClick={onClose}
                             sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: 'white' } }}
                         >
                             Abortar
                         </Button>
-                        <Button 
-                            onClick={handleSubmit} 
+                        <Button
+                            onClick={handleSubmit}
                             variant="contained"
                             sx={{
                                 bgcolor: '#00f3ff',
@@ -82,8 +74,8 @@ export const AddWalletDialog: React.FC<AddWalletDialogProps> = ({ open, onClose,
                         >
                             Vincular Portafolio
                         </Button>
-                    </Box>
-                </Box>
+                    </div>
+                </div>
             </TechFrame>
         </Dialog>
     );

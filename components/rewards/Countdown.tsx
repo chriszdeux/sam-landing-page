@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Typography } from '../ui/Typography';
 
 interface CountdownProps {
     targetDate: number;
@@ -30,19 +30,10 @@ export const Countdown = ({ targetDate, onComplete }: CountdownProps) => {
     if (!timeLeft) return null;
 
     return (
-        <Box sx={{ 
-            bgcolor: 'rgba(0,0,0,0.6)',
-            px: 1.5,
-            py: 0.5,
-            borderRadius: 1,
-            border: '1px solid rgba(255,255,255,0.1)',
-            display: 'inline-block',
-            mt: 0.5,
-            mb: 0.5
-        }}>
-            <Typography variant="caption" sx={{ color: '#00e676', fontWeight: 'bold', fontFamily: 'monospace' }}>
+        <div className="mt-1 mb-1 inline-block rounded border border-white/10 bg-black/60 px-3 py-1">
+            <Typography variant="caption" className="font-mono font-bold text-[#00e676]">
                 {timeLeft}
             </Typography>
-        </Box>
+        </div>
     );
 };
