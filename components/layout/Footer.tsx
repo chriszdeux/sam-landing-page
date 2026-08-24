@@ -1,67 +1,105 @@
-// 1-Definir estructura visual del pie de página
-// 2-Renderizar enlaces rápidos y redes sociales
-// 3-Mostrar información de derechos de autor
+'use client';
 
-//# 1-Definir estructura visual del pie de página
 import React from 'react';
-import { Box, Container, Grid, Typography, IconButton, Stack } from '@mui/material';
-import { Twitter, GitHub, LinkedIn } from '@mui/icons-material';
+import { Twitter, Github, Linkedin } from 'lucide-react';
+import Link from 'next/link';
 import { EnvVariables } from '@/lib/constants/variables';
+import { Typography } from '../ui/Typography';
 
 export const Footer = () => {
-  
-  //# 2-Renderizar enlaces rápidos y redes sociales
   return (
-    <Box component="footer" sx={{ bgcolor: 'background.paper', py: 6, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-      <Container maxWidth="lg">
-        <Grid container spacing={4}>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Typography variant="h6" color="primary" gutterBottom>
+    <footer
+      className="relative border-t border-[#00f3ff]/10 bg-[#04040a] py-16 before:absolute before:inset-x-0 before:top-0 before:h-0.5 before:bg-gradient-to-r before:from-transparent before:via-[#00f3ff] before:to-transparent before:opacity-50 before:content-['']"
+    >
+      <div className="mx-auto w-full max-w-[1536px] px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-12">
+          {/* Logo & Description */}
+          <div className="sm:col-span-2 md:col-span-5">
+            <Typography
+              variant="h5"
+              className="mb-1 font-black tracking-[2px] text-[#00f3ff] [text-shadow:0_0_15px_rgba(0,243,255,0.3)]"
+            >
               {EnvVariables.project.toUpperCase()}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Explora el universo, recolecta recursos y construye tu imperio en esta simulación de cripto-economía de próxima generación.
+            <Typography variant="body2" className="leading-[1.8] text-white/60 md:pr-10">
+              Soberanía criptográfica e infraestructura de supervivencia en el yermo galáctico.
+              El ledger de sedimento inmutable para una civilización descentralizada y libre del control fiat.
             </Typography>
-          </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Typography variant="h6" color="text.primary" gutterBottom>
-              Enlaces Rápidos
+          </div>
+
+          {/* Quick Links */}
+          <div className="sm:col-span-1 md:col-span-3">
+            <Typography variant="subtitle1" className="mb-4 font-bold tracking-[1px] text-white">
+              Protocolos Rápidos
             </Typography>
-            <Stack spacing={1}>
-              {['Inicio', 'Historia', 'Mecánicas', 'Recursos'].map((item) => (
-                <Typography key={item} variant="body2" color="text.secondary" sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>
-                  {item}
-                </Typography>
+            <div className="flex flex-col gap-3">
+              {[
+                { name: 'Inicio', path: '/' },
+                { name: '¿Qué es Lyncore?', path: '/que-es-lyncore' },
+                { name: 'Historia', path: '/history' },
+                { name: 'Operaciones', path: '/operaciones' }
+              ].map((link) => (
+                <Link key={link.name} href={link.path} className="no-underline">
+                  <Typography
+                    variant="body2"
+                    className="cursor-pointer text-white/50 transition-colors duration-200 hover:text-[#00f3ff]"
+                  >
+                    {link.name}
+                  </Typography>
+                </Link>
               ))}
-            </Stack>
-          </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Typography variant="h6" color="text.primary" gutterBottom>
-              Síguenos
+            </div>
+          </div>
+
+          {/* Status & Socials */}
+          <div className="sm:col-span-1 md:col-span-4">
+            <Typography variant="subtitle1" className="mb-4 font-bold tracking-[1px] text-white">
+              Soporte de Flota
             </Typography>
-            <Stack direction="row" spacing={1}>
-              <IconButton color="primary" aria-label="twitter">
-                <Twitter />
-              </IconButton>
-              <IconButton color="primary" aria-label="github">
-                <GitHub />
-              </IconButton>
-              <IconButton color="primary" aria-label="linkedin">
-                <LinkedIn />
-              </IconButton>
-            </Stack>
-          </Grid>
-        </Grid>
-        {/* //# 3-Mostrar información de derechos de autor */}
-        <Box sx={{ mt: 5, pt: 3, borderTop: '1px solid rgba(255,255,255,0.1)', textAlign: 'center', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
-          <Typography variant="body2" color="text.secondary">
-            © {new Date().getFullYear()} {EnvVariables.project}. Todos los derechos reservados.
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                <div className="h-2 w-2 rounded-full bg-[#00ff88] shadow-[0_0_10px_#00ff88]" />
+                <Typography variant="caption" className="font-bold tracking-[1.5px] text-[#00ff88]">
+                  LEDGER: CONECTADO
+                </Typography>
+              </div>
+              <div className="flex flex-row gap-3">
+                {[
+                  { icon: <Twitter size={20} />, label: 'Twitter', color: '#00f3ff' },
+                  { icon: <Github size={20} />, label: 'GitHub', color: '#ffffff' },
+                  { icon: <Linkedin size={20} />, label: 'LinkedIn', color: '#0a66c2' }
+                ].map((social, index) => (
+                  <button
+                    key={index}
+                    aria-label={social.label}
+                    className="rounded-full border border-white/10 p-2 text-white/60 transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/[0.02]"
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = social.color;
+                      e.currentTarget.style.borderColor = social.color;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = '';
+                      e.currentTarget.style.borderColor = '';
+                    }}
+                  >
+                    {social.icon}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom copyright */}
+        <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-white/5 pt-8 text-center">
+          <Typography variant="body2" className="text-white/40">
+            © {new Date().getFullYear()} Lyncore Protocol. Todos los derechos reservados bajo la regla del ledger.
           </Typography>
-          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>
-            v0.1.0
+          <Typography variant="caption" className="font-mono text-white/20">
+            v0.2.0-apocalypse
           </Typography>
-        </Box>
-      </Container>
-    </Box>
+        </div>
+      </div>
+    </footer>
   );
 };

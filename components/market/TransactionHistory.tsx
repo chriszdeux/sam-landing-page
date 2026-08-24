@@ -8,7 +8,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Typography } from '../../components/ui/Typography';
 
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { fetchTransactions } from '../../lib/features/transactions/actions';
@@ -56,7 +56,7 @@ export const TransactionHistory = ({ walletId }: TransactionHistoryProps) => {
             const raw = value as number;
             if (!raw || raw === 0) {
               return (
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)' }}>
+                <Typography variant="caption" className="text-white/30">
                   —
                 </Typography>
               );
@@ -64,7 +64,7 @@ export const TransactionHistory = ({ walletId }: TransactionHistoryProps) => {
             return (
               <Typography
                 variant="caption"
-                sx={{ color: '#00f3ff', fontFamily: 'monospace', fontWeight: 'bold' }}
+                className="font-mono font-bold text-[#00f3ff]"
               >
                 {formatHash(raw * 1000000, chronoBurstFreqTypes)}
               </Typography>
@@ -78,13 +78,13 @@ export const TransactionHistory = ({ walletId }: TransactionHistoryProps) => {
 
   //# 5-Renderizar tabla de transacciones
   return (
-    <Box sx={{ width: '100%' }}>
-      <Typography variant="h6" sx={{ mb: 2, color: 'text.secondary' }}>Últimas Transacciones</Typography>
-      <CustomTable 
-         columns={syncedColumns} 
-         data={transactionData} 
-         pageSize={10} 
+    <div className="w-full">
+      <Typography variant="h6" className="mb-4 text-foreground-muted">Últimas Transacciones</Typography>
+      <CustomTable
+         columns={syncedColumns}
+         data={transactionData}
+         pageSize={10}
       />
-    </Box>
+    </div>
   );
 };

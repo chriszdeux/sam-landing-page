@@ -5,8 +5,8 @@
 'use client';
 
 import React from 'react';
-import { Box, Typography, Stack, CardContent } from '@mui/material';
-import { Newspaper } from '@mui/icons-material';
+import { Typography } from '../ui/Typography';
+import { Newspaper } from 'lucide-react';
 import { Card } from '../ui/Card';
 
 const newsItems = [
@@ -16,33 +16,33 @@ const newsItems = [
 ];
 
 export const CryptoNews = ({ name }: { name: string }) => {
-  
+
   //# 2-Renderizar lista de noticias
   return (
-    <Box>
-        <Typography variant="h6" sx={{ mb: 2, color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Newspaper fontSize="small" /> Noticias sobre {name}
+    <div>
+        <Typography variant="h6" className="mb-4 flex items-center gap-2 text-foreground-muted">
+            <Newspaper size={18} /> Noticias sobre {name}
         </Typography>
-        <Stack spacing={2}>
+        <div className="flex flex-col gap-4">
             {newsItems.map((item) => (
                 <Card key={item.id} sx={{ color: '#fff' }}>
-                    <CardContent>
-                        <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-                            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                    <div className="p-4">
+                        <div className="flex flex-row items-start justify-between">
+                            <Typography variant="subtitle1" className="font-bold text-primary">
                                 {item.title}
                             </Typography>
-                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                            <Typography variant="caption" className="text-foreground-muted">
                                 {item.date}
                             </Typography>
-                        </Stack>
-                        <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
+                        </div>
+                        <Typography variant="body2" className="mt-2 text-foreground-muted">
                             {item.summary}
                         </Typography>
-                    </CardContent>
+                    </div>
                 </Card>
             ))}
-        </Stack>
+        </div>
 
-    </Box>
+    </div>
   );
 };

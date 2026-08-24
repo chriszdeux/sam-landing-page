@@ -8,9 +8,9 @@
 'use client';
 
 import React, { use } from 'react';
-import { Box, Typography, Stack } from '@mui/material';
 import { ParticleBackground } from '../../../../components/ui/ParticleBackground';
 import { useRouter } from 'next/navigation';
+import { Typography } from '../../../../components/ui/Typography';
 
 //# 1-Obtención del despachador para emitir acciones al store
 import { useAppSelector, useAppDispatch } from '../../../../lib/hooks';
@@ -19,26 +19,26 @@ import { setSelectedNetwork } from '../../../../lib/features/blockchain/reducer'
 export default function NetworkConnectingPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const router = useRouter();
-    
+
     //# 2-Obtención del despachador para emitir acciones al store
     const dispatch = useAppDispatch();
-    
+
     //# 3-Selección de datos desde el estado global de Redux
     const { networks } = useAppSelector((state) => state.blockchain);
     const network = networks.find(n => n.id === id);
 
-    
-    
+
+
     //# 4-Efecto secundario para sincronización del ciclo de vida
     React.useEffect(() => {
         if (network) {
             const timer = setTimeout(() => {
                 dispatch(setSelectedNetwork(network));
                 router.push('/');
-            }, 6000); 
+            }, 6000);
 
-            
-            
+
+
             //# 5-Estructuración y renderizado visual del componente UI
             return () => clearTimeout(timer);
         }
@@ -48,145 +48,102 @@ export default function NetworkConnectingPage({ params }: { params: Promise<{ id
 
     const color = network.additionalInfo.color || '#00f3ff';
 
-    
-    
+
+
     //# 6-Estructuración y renderizado visual del componente UI
     return (
-        <Box sx={{ 
-            minHeight: '100vh', 
-            bgcolor: '#000',
-            display: 'flex', 
-            flexDirection: 'column',
-            alignItems: 'center', 
-            justifyContent: 'center',
-            overflow: 'hidden',
-            position: 'relative'
-        }}>
+        <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black">
             <ParticleBackground />
-            
+
             {}
-            <Box sx={{
-                position: 'absolute',
-                inset: 0,
-                backgroundImage: `
-                    radial-gradient(circle at center, transparent 0%, #000 90%),
-                    repeating-linear-gradient(0deg, transparent, transparent 19px, ${color}10 20px),
-                    repeating-linear-gradient(90deg, transparent, transparent 19px, ${color}10 20px)
-                `,
-                backgroundSize: '100% 100%, 20px 20px, 20px 20px',
-                zIndex: 1,
-                pointerEvents: 'none'
-            }} />
+            <div
+                className="pointer-events-none absolute inset-0 z-[1]"
+                style={{
+                    backgroundImage: `
+                        radial-gradient(circle at center, transparent 0%, #000 90%),
+                        repeating-linear-gradient(0deg, transparent, transparent 19px, ${color}10 20px),
+                        repeating-linear-gradient(90deg, transparent, transparent 19px, ${color}10 20px)
+                    `,
+                    backgroundSize: '100% 100%, 20px 20px, 20px 20px',
+                }}
+            />
 
-            <Box sx={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                
+            <div className="relative z-10 flex flex-col items-center">
+
                 {}
-                <Box sx={{ position: 'relative', width: 300, height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 4 }}>
-                    
-                    {}
-                    <Box sx={{
-                        position: 'absolute',
-                        width: '100%',
-                        height: '100%',
-                        border: `1px dashed ${color}40`,
-                        borderRadius: '50%',
-                        animation: 'spin 20s linear infinite'
-                    }} />
-                    
-                    <Box sx={{
-                        position: 'absolute',
-                        width: '85%',
-                        height: '85%',
-                        borderTop: `4px solid ${color}`,
-                        borderBottom: `4px solid ${color}`,
-                        borderLeft: `1px solid transparent`,
-                        borderRight: `1px solid transparent`,
-                        borderRadius: '50%',
-                        animation: 'spinReverse 8s linear infinite',
-                        boxShadow: `0 0 20px ${color}40`
-                    }} />
-
-                    <Box sx={{
-                        position: 'absolute',
-                        width: '70%',
-                        height: '70%',
-                        border: `2px solid ${color}80`,
-                        borderRadius: '50%',
-                        borderLeftColor: 'transparent',
-                        borderRightColor: 'transparent',
-                        animation: 'spin 4s linear infinite'
-                    }} />
+                <div className="relative mb-8 flex h-[300px] w-[300px] items-center justify-center">
 
                     {}
-                    <Box sx={{
-                        width: 100,
-                        height: 100,
-                        position: 'relative',
-                        transformStyle: 'preserve-3d',
-                        animation: 'float 3s ease-in-out infinite'
-                    }}>
+                    <div
+                        className="absolute h-full w-full rounded-full border border-dashed [animation:spin_20s_linear_infinite]"
+                        style={{ borderColor: `${color}40` }}
+                    />
+
+                    <div
+                        className="absolute h-[85%] w-[85%] rounded-full border-l border-r border-transparent [animation:spinReverse_8s_linear_infinite]"
+                        style={{
+                            borderTop: `4px solid ${color}`,
+                            borderBottom: `4px solid ${color}`,
+                            boxShadow: `0 0 20px ${color}40`,
+                        }}
+                    />
+
+                    <div
+                        className="absolute h-[70%] w-[70%] rounded-full border-l-transparent border-r-transparent [animation:spin_4s_linear_infinite]"
+                        style={{ border: `2px solid ${color}80`, borderLeftColor: 'transparent', borderRightColor: 'transparent' }}
+                    />
+
+                    {}
+                    <div className="relative h-[100px] w-[100px] [animation:float_3s_ease-in-out_infinite] [transform-style:preserve-3d]">
                          {}
-                         <Box sx={{
-                             position: 'absolute',
-                             inset: 0,
-                             borderRadius: '50%',
-                             background: `radial-gradient(circle at center, ${color}, transparent)`,
-                             filter: 'blur(10px)',
-                             animation: 'pulse 1.5s ease-in-out infinite alternate'
-                         }} />
+                         <div
+                             className="absolute inset-0 rounded-full blur-[10px] [animation:pulse_1.5s_ease-in-out_infinite_alternate]"
+                             style={{ background: `radial-gradient(circle at center, ${color}, transparent)` }}
+                         />
                          {}
-                         <Typography variant="h2" sx={{ 
-                             position: 'absolute',
-                             top: '50%',
-                             left: '50%',
-                             transform: 'translate(-50%, -50%)',
-                             color: '#fff',
-                             fontWeight: 'bold',
-                             textShadow: `0 0 20px ${color}`,
-                             zIndex: 2
-                         }}>
+                         <Typography
+                            variant="h2"
+                            className="absolute left-1/2 top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2 font-bold text-white"
+                            style={{ textShadow: `0 0 20px ${color}` }}
+                         >
                              {network.identification.symbol[0]}
                          </Typography>
-                    </Box>
+                    </div>
 
                      {}
-                     <Box sx={{
-                         position: 'absolute',
-                         width: '120%',
-                         height: 2,
-                         background: `linear-gradient(90deg, transparent, ${color}, transparent)`,
-                         animation: 'scan 2s linear infinite',
-                         top: 0
-                     }} />
+                     <div
+                         className="absolute top-0 h-0.5 w-[120%] [animation:scan_2s_linear_infinite]"
+                         style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }}
+                     />
 
-                </Box>
+                </div>
 
                 {}
-                <Typography variant="h4" sx={{ 
-                    color: '#fff', 
-                    fontWeight: 900, 
-                    mb: 2, 
-                    letterSpacing: 4, 
-                    textTransform: 'uppercase',
-                    textShadow: `0 0 30px ${color}80` 
-                }}>
+                <Typography
+                    variant="h4"
+                    className="mb-4 font-black uppercase tracking-[4px] text-white"
+                    style={{ textShadow: `0 0 30px ${color}80` }}
+                >
                     ESTABLECIENDO ENLACE
                 </Typography>
 
-                <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
-                    <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: color, boxShadow: `0 0 10px ${color}`, animation: 'blink 0.5s infinite' }} />
-                    <Typography variant="h6" sx={{ color: color, fontFamily: 'monospace' }}>
+                <div className="mb-2 flex flex-row items-center gap-4">
+                    <div
+                        className="h-2.5 w-2.5 rounded-full [animation:blink_0.5s_infinite]"
+                        style={{ backgroundColor: color, boxShadow: `0 0 10px ${color}` }}
+                    />
+                    <Typography variant="h6" className="font-mono" style={{ color }}>
                          PROTOCOL: {network.identification.name.toUpperCase()}
                     </Typography>
-                </Stack>
-                
-                <Box sx={{ width: 300, mt: 4 }}>
-                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', mb: 1, fontFamily: 'monospace' }}>
+                </div>
+
+                <div className="mt-8 w-[300px]">
+                    <Typography variant="caption" className="block font-mono text-white/50">
                         ENCRIPTANDO CANAL... [====================]
                     </Typography>
-                </Box>
+                </div>
 
-            </Box>
+            </div>
 
             <style jsx global>{`
                 @keyframes spin {
@@ -217,6 +174,6 @@ export default function NetworkConnectingPage({ params }: { params: Promise<{ id
                     50% { opacity: 0.3; }
                 }
             `}</style>
-        </Box>
+        </div>
     );
 }

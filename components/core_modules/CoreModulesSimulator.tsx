@@ -1,20 +1,14 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Box, Typography, Paper, Chip, Switch, FormControlLabel, Button, Alert, Tooltip } from '@mui/material';
-import { 
-  ElectricBolt, 
-  Nature, 
-  Groups, 
-  Science, 
-  AddCircleOutline,
-  InfoOutlined
-} from '@mui/icons-material';
+import { Zap, Leaf, Users, Info } from 'lucide-react';
 import { StationModule } from '../../lib/types/core_modules';
 import { ModuleModuleModuleAnchorModal } from './ModuleAnchorModal';
 import api, { hadesApi } from '../../lib/api';
-import { CircularProgress } from '@mui/material';
 import { calculateResources } from '../../lib/utils/core_modules_logic';
+import { Typography } from '../ui/Typography';
+import { Button } from '../ui/Button';
+import { cn } from '@/lib/utils/cn';
 
 // Initial data for the simulator
 const INITIAL_MODULES: StationModule[] = [
@@ -98,8 +92,8 @@ export const CoreModulesSimulator: React.FC = () => {
   }, []);
 
   // Resource Calculations
-  const resources = useMemo(() => 
-    calculateResources(stationModules, serverResources), 
+  const resources = useMemo(() =>
+    calculateResources(stationModules, serverResources),
   [stationModules, serverResources]);
 
   useEffect(() => {
@@ -137,7 +131,7 @@ export const CoreModulesSimulator: React.FC = () => {
     pt.x = e.clientX;
     pt.y = e.clientY;
     const cursor = pt.matrixTransform(svg.getScreenCTM()?.inverse());
-    
+
     const xPos = Math.round(cursor.x / GRID_SIZE);
     const yPos = Math.round(cursor.y / -GRID_SIZE);
 
@@ -145,10 +139,10 @@ export const CoreModulesSimulator: React.FC = () => {
     const existing = stationModules.find(m => m.positionCoordinates?.xPos === xPos && m.positionCoordinates?.yPos === yPos);
     if (!existing) {
       // Check if neighboring any module
-      const hasNeighbor = stationModules.some(m => 
+      const hasNeighbor = stationModules.some(m =>
         m.positionCoordinates && (Math.abs(m.positionCoordinates.xPos - xPos) + Math.abs(m.positionCoordinates.yPos - yPos) === 1)
       );
-      
+
       if (hasNeighbor || stationModules.length === 0) {
         setSelectedCoord({ x: xPos, y: yPos });
         setIsModalOpen(true);
@@ -174,7 +168,7 @@ export const CoreModulesSimulator: React.FC = () => {
     const newModules = [...stationModules, newMod];
     setStationModules(newModules);
     setLogs(prev => [...prev, `[SISTEMA] Módulo ${invModule.moduleType.toUpperCase()} anclado con éxito.`]);
-    
+
     await saveState(newModules);
   };
 
@@ -194,7 +188,7 @@ export const CoreModulesSimulator: React.FC = () => {
 
 
   return (
-    <Box sx={{ p: 0, height: '650px', display: 'flex', gap: 2 }}>
+    <div className="flex h-[650px] gap-4">
       <style>{`
         @keyframes pulseHologram {
           0% { opacity: 0.3; }
@@ -204,94 +198,88 @@ export const CoreModulesSimulator: React.FC = () => {
       `}</style>
 
       {/* Main Container */}
-      <Paper 
-        elevation={0}
-        sx={{ 
-          flex: 1, 
-          bgcolor: 'rgba(10, 15, 25, 0.4)', 
-          border: '1px solid rgba(0, 243, 255, 0.2)',
-          borderRadius: 4,
-          position: 'relative',
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-          backdropFilter: 'blur(10px)',
-          p: 3
-        }}
-      >
+      <div className="relative flex flex-1 flex-col overflow-hidden rounded-2xl border border-[#00f3ff]/20 bg-[rgba(10,15,25,0.4)] p-6 backdrop-blur-md">
         {/* Header HUD */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2, zIndex: 2 }}>
+        <div className="z-[2] mb-4 flex items-start justify-between">
           {/* Resource Gauges */}
-          <Box sx={{ display: 'flex', gap: 3 }}>
-            <ResourceGauge 
-              icon={<ElectricBolt sx={{ fontSize: 18 }} />} 
-              label="ENERGY" 
-              value={`${resources.energy} GW`} 
-              color={resources.energy < 0 ? "#ff4444" : "#ffd700"} 
+          <div className="flex gap-6">
+            <ResourceGauge
+              icon={<Zap size={18} />}
+              label="ENERGY"
+              value={`${resources.energy} GW`}
+              color={resources.energy < 0 ? "#ff4444" : "#ffd700"}
             />
-            <ResourceGauge 
-              icon={<Nature sx={{ fontSize: 18 }} />} 
-              label="OXYGEN" 
-              value={`${resources.oxygen}%`} 
-              color={resources.oxygen < 20 ? "#ff4444" : "#22FF44"} 
+            <ResourceGauge
+              icon={<Leaf size={18} />}
+              label="OXYGEN"
+              value={`${resources.oxygen}%`}
+              color={resources.oxygen < 20 ? "#ff4444" : "#22FF44"}
             />
-            <ResourceGauge 
-              icon={<Groups sx={{ fontSize: 18 }} />} 
-              label="CREW" 
-              value={resources.crew} 
-              color="#C0C0C0" 
+            <ResourceGauge
+              icon={<Users size={18} />}
+              label="CREW"
+              value={resources.crew}
+              color="#C0C0C0"
             />
-              <ResourceGauge 
-               icon={<InfoOutlined sx={{ fontSize: 18 }} />} 
-               label="INTEGRITY" 
-               value={`${(resources.integrity || 0).toFixed(1)}%`} 
-               color={(resources.integrity || 0) < 50 ? "#ff4444" : "#00f3ff"} 
+              <ResourceGauge
+               icon={<Info size={18} />}
+               label="INTEGRITY"
+               value={`${(resources.integrity || 0).toFixed(1)}%`}
+               color={(resources.integrity || 0) < 50 ? "#ff4444" : "#00f3ff"}
              />
-          </Box>
+          </div>
 
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            <FormControlLabel
-              control={<Switch checked={debugMode} onChange={(e) => setDebugMode(e.target.checked)} color="warning" size="small" />}
-              label={<Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', fontWeight: 'bold' }}>DEBUG</Typography>}
-            />
+          <div className="flex items-center gap-4">
+            <label className="flex cursor-pointer items-center gap-2">
+              <button
+                role="switch"
+                aria-checked={debugMode}
+                onClick={() => setDebugMode((d) => !d)}
+                className={cn(
+                  'relative h-5 w-9 rounded-full transition-colors',
+                  debugMode ? 'bg-[#ffab00]' : 'bg-white/20'
+                )}
+              >
+                <span
+                  className={cn(
+                    'absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform',
+                    debugMode ? 'translate-x-[18px]' : 'translate-x-0.5'
+                  )}
+                />
+              </button>
+              <Typography variant="caption" className="font-bold text-white/60">DEBUG</Typography>
+            </label>
             <Button size="small" variant="outlined" color="error" onClick={applyDamage} sx={{ fontSize: '0.7rem' }}>
               RAD TEST
             </Button>
-            <Chip label="SHIELD: 16.2%" size="small" sx={{ bgcolor: 'rgba(0, 243, 255, 0.1)', color: '#00f3ff', border: '1px solid rgba(0, 243, 255, 0.3)', fontWeight: 'bold', fontSize: '0.7rem' }} />
-          </Box>
-        </Box>
+            <span className="inline-flex items-center rounded-full border border-[#00f3ff]/30 bg-[#00f3ff]/10 px-2.5 py-0.5 text-[0.7rem] font-bold text-[#00f3ff]">
+              SHIELD: 16.2%
+            </span>
+          </div>
+        </div>
 
         {collisionWarning && (
-          <Alert severity="error" sx={{ mb: 2, zIndex: 2, py: 0, bgcolor: 'rgba(211, 47, 47, 0.2)', border: '1px solid #d32f2f', color: '#ff4444' }}>
+          <div className="z-[2] mb-4 rounded border border-[#d32f2f] bg-[rgba(211,47,47,0.2)] px-3 py-2 text-sm text-[#ff4444]">
             {collisionWarning}
-          </Alert>
+          </div>
         )}
 
         {/* Workspace */}
-        <Box 
-          sx={{ 
-            flex: 1, 
-            position: 'relative', 
-            border: '1px solid rgba(255,255,255,0.05)', 
-            borderRadius: 3, 
-            bgcolor: 'rgba(0,0,0,0.2)',
-            overflow: 'hidden',
-            cursor: 'crosshair'
-          }}
-        >
+        <div className="relative flex-1 cursor-crosshair overflow-hidden rounded-xl border border-white/5 bg-black/20">
           {/* Grid Background */}
-          <Box sx={{ 
-            position: 'absolute', inset: 0, 
-            backgroundImage: `linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px)`, 
-            backgroundSize: `${GRID_SIZE}px ${GRID_SIZE}px`,
-            backgroundPosition: 'center center',
-          }} />
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px)`,
+              backgroundSize: `${GRID_SIZE}px ${GRID_SIZE}px`,
+              backgroundPosition: 'center center',
+            }}
+          />
 
           {/* SVG Engine */}
-          <Box 
-            component="svg" 
+          <svg
             onClick={handleGridClick}
-            sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} 
+            className="absolute inset-0 h-full w-full"
             viewBox="-480 -300 960 600"
           >
             {/* Draw connections */}
@@ -299,7 +287,7 @@ export const CoreModulesSimulator: React.FC = () => {
               if (mod.status !== 'active' || !mod.positionCoordinates) return null;
               const x1 = mod.positionCoordinates.xPos * GRID_SIZE;
               const y1 = mod.positionCoordinates.yPos * -GRID_SIZE;
-              
+
               return [
                 { nx: 0, ny: 1, prop: 'northConnected' },
                 { nx: 1, ny: 0, prop: 'eastConnected' }
@@ -320,7 +308,7 @@ export const CoreModulesSimulator: React.FC = () => {
               const y = mod.positionCoordinates.yPos * -GRID_SIZE;
               const config = SHAPE_CONFIG[mod.shapeType!];
               const isPending = mod.status === 'pendingConfirmation';
-              
+
               return (
                 <g key={mod.moduleId} style={{ cursor: 'pointer' }}>
                   {config.render(x, y, mod.moduleId, isPending)}
@@ -340,70 +328,62 @@ export const CoreModulesSimulator: React.FC = () => {
                 </g>
               );
             })}
-          </Box>
-        </Box>
-      </Paper>
+          </svg>
+        </div>
+      </div>
 
       {/* Logs HUD */}
-      <Paper
-        elevation={0}
-        sx={{
-          width: '280px',
-          bgcolor: 'rgba(5, 5, 10, 0.8)',
-          border: '1px solid rgba(0, 243, 255, 0.2)',
-          borderRadius: 4,
-          backdropFilter: 'blur(10px)',
-          p: 2,
-          display: 'flex',
-          flexDirection: 'column'
-        }}
-      >
-        <Typography variant="overline" sx={{ color: '#00f3ff', fontWeight: 'bold', borderBottom: '1px solid rgba(0, 243, 255, 0.1)', pb: 1, mb: 1, display: 'block' }}>
+      <div className="flex w-[280px] flex-col rounded-2xl border border-[#00f3ff]/20 bg-[rgba(5,5,10,0.8)] p-4 backdrop-blur-md">
+        <Typography variant="overline" component="p" className="mb-2 block border-b border-[#00f3ff]/10 pb-2 font-bold text-[#00f3ff]">
           TECHNICAL LOGS // CORE_MODULES
         </Typography>
-        <Box sx={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column-reverse', gap: 1 }}>
+        <div className="flex flex-1 flex-col-reverse gap-2 overflow-y-auto">
           {logs.map((log, i) => (
-            <Typography key={i} variant="caption" sx={{ color: log.includes('ERROR') ? '#ff4444' : log.includes('SOLICITUD') ? '#ffd700' : 'rgba(255,255,255,0.5)', fontFamily: 'monospace', fontSize: '0.65rem' }}>
+            <Typography
+              key={i}
+              variant="caption"
+              component="p"
+              className="font-mono text-[0.65rem]"
+              style={{ color: log.includes('ERROR') ? '#ff4444' : log.includes('SOLICITUD') ? '#ffd700' : 'rgba(255,255,255,0.5)' }}
+            >
               {log}
             </Typography>
           ))}
-        </Box>
-      </Paper>
+        </div>
+      </div>
 
-      <ModuleModuleModuleAnchorModal 
-        open={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+      <ModuleModuleModuleAnchorModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
         onSelect={handleModuleSelect}
         coordinate={selectedCoord}
       />
-    </Box>
+    </div>
   );
 };
 
 function ResourceGauge({ icon, label, value, color }: { icon: React.ReactNode, label: string, value: string | number, color: string }) {
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, minWidth: 100 }}>
-      <Box sx={{ 
-        p: 0.8, 
-        borderRadius: '50%', 
-        bgcolor: `${color}15`, 
-        border: `1px solid ${color}33`, 
-        color: color,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        boxShadow: `0 0 10px ${color}11`
-      }}>
+    <div className="flex min-w-[100px] items-center gap-3">
+      <div
+        className="flex items-center justify-center rounded-full p-2"
+        style={{
+          backgroundColor: `${color}15`,
+          border: `1px solid ${color}33`,
+          color: color,
+          boxShadow: `0 0 10px ${color}11`,
+        }}
+      >
         {icon}
-      </Box>
-      <Box>
-        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 'bold', display: 'block', lineHeight: 1, fontSize: '0.6rem' }}>
+      </div>
+      <div>
+        <Typography variant="caption" component="p" className="block text-[0.6rem] font-bold leading-none text-white/40">
           {label}
         </Typography>
-        <Typography variant="body2" sx={{ color: 'white', fontWeight: '900', fontSize: '0.9rem', letterSpacing: 0.5 }}>
+        <Typography variant="body2" component="p" className="text-[0.9rem] font-black tracking-wide text-white">
           {value}
         </Typography>
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }

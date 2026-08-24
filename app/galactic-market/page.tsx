@@ -1,90 +1,73 @@
 "use client";
 
-import { Box, Container, Typography, Paper, Grid } from "@mui/material";
-import { ShoppingCart, SwapHoriz, Analytics } from "@mui/icons-material";
+import React from "react";
+import { ShoppingCart, ArrowLeftRight, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { Typography } from "../../components/ui/Typography";
 
 export default function GalacticMarketPage() {
   return (
-    <Box sx={{ minHeight: '100vh', pt: 15, pb: 10, bgcolor: '#05050c' }}>
-      <Container maxWidth="lg">
+    <div className="min-h-screen bg-[#05050c] pt-[120px] pb-20">
+      <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <Typography variant="h2" sx={{ color: 'white', fontWeight: 'bold', mb: 2, textAlign: 'center' }}>
+          <Typography variant="h2" className="mb-4 text-center font-bold text-white">
             MERCADO <span style={{ color: '#00f3ff' }}>GALÁCTICO</span>
           </Typography>
-          <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.6)', mb: 8, textAlign: 'center' }}>
+          <Typography variant="h6" className="mb-16 text-center text-white/60">
             Central de intercambio de módulos y recursos para sistemas CORE_MODULES-8.
           </Typography>
 
-          <Grid container spacing={4}>
-            <Grid size={{ xs: 12, md: 4 }}>
-              <Link href="/galactic-market/comprar" style={{ textDecoration: 'none' }}>
-                <MarketCard 
-                  icon={<ShoppingCart sx={{ fontSize: 40, color: '#00f3ff' }} />}
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
+            <div className="md:col-span-4">
+              <Link href="/galactic-market/comprar" className="no-underline">
+                <MarketCard
+                  icon={<ShoppingCart size={40} color="#00f3ff" />}
                   title="COMPRAR MÓDULOS"
                   description="Adquiere planos y estructuras para expandir tu estación."
                 />
               </Link>
-            </Grid>
-            <Grid size={{ xs: 12, md: 4 }}>
-              <Link href="/galactic-market/exchange" style={{ textDecoration: 'none' }}>
-                <MarketCard 
-                  icon={<SwapHoriz sx={{ fontSize: 40, color: '#ffd700' }} />}
+            </div>
+            <div className="md:col-span-4">
+              <Link href="/galactic-market/exchange" className="no-underline">
+                <MarketCard
+                  icon={<ArrowLeftRight size={40} color="#ffd700" />}
                   title="EXCHANGE"
                   description="Intercambia recursos y módulos con otros usuarios."
                 />
               </Link>
-            </Grid>
-            <Grid size={{ xs: 12, md: 4 }}>
-              <Link href="/galactic-market/stats" style={{ textDecoration: 'none' }}>
-                <MarketCard 
-                  icon={<Analytics sx={{ fontSize: 40, color: '#ff0055' }} />}
+            </div>
+            <div className="md:col-span-4">
+              <Link href="/galactic-market/stats" className="no-underline">
+                <MarketCard
+                  icon={<BarChart3 size={40} color="#ff0055" />}
                   title="ESTADÍSTICAS"
                   description="Analiza las tendencias del mercado y el valor de tus activos."
                 />
               </Link>
-            </Grid>
-          </Grid>
-          
-          <Paper sx={{ mt: 8, p: 4, bgcolor: 'rgba(0, 243, 255, 0.05)', border: '1px dashed rgba(0, 243, 255, 0.3)', textAlign: 'center', borderRadius: 4 }}>
-            <Typography variant="h5" sx={{ color: '#00f3ff', fontWeight: 'bold' }}>
+            </div>
+          </div>
+
+          <div className="mt-16 rounded-2xl border border-dashed border-[rgba(0,243,255,0.3)] bg-[rgba(0,243,255,0.05)] p-8 text-center">
+            <Typography variant="h5" className="font-bold text-[#00f3ff]">
               MODO CONSTRUCCIÓN CENTRALIZADO
             </Typography>
-            <Typography sx={{ color: 'white', mt: 1 }}>
+            <Typography className="mt-2 text-white">
               Los procesos de compra (Phase 1 & Phase 2) han sido trasladados aquí para optimizar el rendimiento del simulador.
             </Typography>
-          </Paper>
+          </div>
         </motion.div>
-      </Container>
-    </Box>
+      </div>
+    </div>
   );
 }
 
 function MarketCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
   return (
-    <Paper sx={{ 
-      p: 4, 
-      height: '100%', 
-      bgcolor: 'rgba(255,255,255,0.03)', 
-      border: '1px solid rgba(255,255,255,0.1)', 
-      borderRadius: 4,
-      transition: 'all 0.3s',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      textAlign: 'center',
-      cursor: 'pointer',
-      '&:hover': {
-        transform: 'translateY(-5px)',
-        bgcolor: 'rgba(255,255,255,0.05)',
-        borderColor: 'rgba(0, 243, 255, 0.3)',
-        boxShadow: '0 0 20px rgba(0, 243, 255, 0.1)'
-      }
-    }}>
-      <Box sx={{ mb: 2 }}>{icon}</Box>
-      <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>{title}</Typography>
-      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>{description}</Typography>
-    </Paper>
+    <div className="flex h-full cursor-pointer flex-col items-center rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-[rgba(0,243,255,0.3)] hover:bg-white/5 hover:shadow-[0_0_20px_rgba(0,243,255,0.1)]">
+      <div className="mb-4">{icon}</div>
+      <Typography variant="h6" className="mb-2 font-bold text-white">{title}</Typography>
+      <Typography variant="body2" className="text-white/60">{description}</Typography>
+    </div>
   );
 }

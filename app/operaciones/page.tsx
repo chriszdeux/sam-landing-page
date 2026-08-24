@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Box, Container, Grid, Typography, CircularProgress } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { fetchLaboratoryInterface } from '../../lib/features/labs/actions';
@@ -12,6 +11,8 @@ import { ControlRewardsPanel } from '../../components/dashboard/ControlRewardsPa
 import { OperationsCanvasBg } from "../../components/dashboard/OperationsCanvasBg";
 import { EmptyLabState } from '../../components/dashboard/EmptyLabState';
 import { Background } from '../../components/layout/Background';
+import { Typography } from '../../components/ui/Typography';
+import { Reveal } from '@/components/ui/TextReveal';
 import { RootState } from '../../lib/store';
 
 export default function DashboardPage() {
@@ -31,9 +32,9 @@ export default function DashboardPage() {
 
     if (authStatus === 'loading' || (labId && labStatus === 'loading')) {
         return (
-            <Box sx={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: '#0a0a0a' }}>
-                <CircularProgress sx={{ color: '#00f3ff' }} />
-            </Box>
+            <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-[#00f3ff]" />
+            </div>
         );
     }
 
@@ -42,57 +43,43 @@ export default function DashboardPage() {
             <Background />
             <OperationsCanvasBg />
 
-            <Container maxWidth="xl" sx={{
-                position: 'relative',
-                zIndex: 10,
-                py: { xs: 12, md: 8 },
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                minHeight: '100vh'
-            }}>
+            <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1536px] flex-col justify-center px-4 py-24 sm:px-6 md:py-16 lg:px-8">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                 >
-                    <Box sx={{ mb: 6, mt: 4 }}>
-                        <Typography variant="h3" sx={{
-                            color: '#fff',
-                            fontWeight: 900,
-                            textTransform: 'uppercase',
-                            letterSpacing: 4,
-                            mb: 1
-                        }}>
-                            Centro de <Box component="span" sx={{ color: '#00f3ff' }}>Operaciones</Box>
+                    <Reveal className="mb-12 mt-8">
+                        <Typography variant="h3" className="mb-1 font-black uppercase tracking-[4px] text-white">
+                            Centro de <span className="text-[#00f3ff]">Operaciones</span>
                         </Typography>
-                        <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.5)', letterSpacing: 1 }}>
+                        <Typography variant="body1" className="tracking-wide text-white/50">
                             Gestión unificada de activos, laboratorio y protocolos de red.
                         </Typography>
-                    </Box>
+                    </Reveal>
 
                     {!labId ? (
                         <EmptyLabState />
                     ) : (
-                        <Grid container spacing={4}>
+                        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                             {/* Column 1: Financial */}
-                            <Grid size={{ xs: 12, lg: 4 }} sx={{ order: { xs: 2, lg: 1 } }}>
+                            <div className="order-2 lg:order-1">
                                 <FinancialPanel />
-                            </Grid>
+                            </div>
 
                             {/* Column 2: Laboratory State */}
-                            <Grid size={{ xs: 12, lg: 4 }} sx={{ order: { xs: 3, lg: 2 } }}>
+                            <div className="order-3 lg:order-2">
                                 <LabMetersPanel />
-                            </Grid>
+                            </div>
 
                             {/* Column 3: Control & Rewards */}
-                            <Grid size={{ xs: 12, lg: 4 }} sx={{ order: { xs: 1, lg: 3 } }}>
+                            <div className="order-1 lg:order-3">
                                 <ControlRewardsPanel />
-                            </Grid>
-                        </Grid>
+                            </div>
+                        </div>
                     )}
                 </motion.div>
-            </Container>
+            </div>
         </main>
     );
 }

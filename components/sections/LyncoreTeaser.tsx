@@ -1,7 +1,7 @@
 "use client";
 
-import { Box, Typography, Stack } from "@mui/material";
 import { motion } from "framer-motion";
+import { Typography } from "../ui/Typography";
 
 const floatingOrb = (color: string, top: string, left: string, size: number, delay: number) => (
   <motion.div
@@ -23,30 +23,17 @@ const floatingOrb = (color: string, top: string, left: string, size: number, del
 
 export function LyncoreTeaser() {
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        bgcolor: "#050a14",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#050a14]">
       {/* Background grid */}
-      <Box
-        sx={{
-          position: "absolute",
-          inset: 0,
-          opacity: 0.1,
+      <div
+        className="absolute inset-0 z-0 opacity-10"
+        style={{
           backgroundImage: `
             linear-gradient(#00f3ff25 1px, transparent 1px),
             linear-gradient(90deg, #00f3ff25 1px, transparent 1px)
           `,
           backgroundSize: "60px 60px",
           transform: "perspective(600px) rotateX(55deg) translateY(-80px)",
-          zIndex: 0,
         }}
       />
 
@@ -59,12 +46,9 @@ export function LyncoreTeaser() {
       <motion.div
         animate={{ y: ["-100%", "100%"] }}
         transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+        className="pointer-events-none absolute inset-0 z-[1]"
         style={{
-          position: "absolute",
-          inset: 0,
           background: "linear-gradient(to bottom, transparent, rgba(0,243,255,0.04) 50%, transparent)",
-          pointerEvents: "none",
-          zIndex: 1,
         }}
       />
 
@@ -73,19 +57,13 @@ export function LyncoreTeaser() {
         initial={{ opacity: 0, scale: 0.92, y: 30 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.9, ease: "easeOut" }}
-        style={{ position: "relative", zIndex: 2 }}
+        className="relative z-[2]"
       >
-        <Box
-          sx={{
-            px: { xs: 4, sm: 8 },
-            py: { xs: 6, sm: 8 },
-            borderRadius: 5,
+        <div
+          className="max-w-[640px] rounded-[20px] border border-[#00f3ff]/[0.15] px-8 py-12 text-center backdrop-blur-[20px] sm:px-16"
+          style={{
             background: "rgba(255,255,255,0.03)",
-            backdropFilter: "blur(20px)",
-            border: "1px solid rgba(0,243,255,0.15)",
             boxShadow: "0 0 60px rgba(0,243,255,0.08), 0 0 120px rgba(176,0,255,0.05)",
-            textAlign: "center",
-            maxWidth: 640,
           }}
         >
           {/* Logo / Name */}
@@ -96,17 +74,7 @@ export function LyncoreTeaser() {
           >
             <Typography
               variant="h2"
-              sx={{
-                fontWeight: 900,
-                letterSpacing: 6,
-                textTransform: "uppercase",
-                background: "linear-gradient(135deg, #00f3ff 0%, #ffb700 60%, #ffffff 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-                mb: 1,
-                fontSize: { xs: "2.8rem", sm: "4rem" },
-              }}
+              className="mb-1 text-[2.8rem] sm:text-[4rem] font-black uppercase tracking-[6px] bg-gradient-to-br from-[#00f3ff] via-[#ffb700] via-60% to-white bg-clip-text text-transparent [-webkit-text-fill-color:transparent]"
             >
               Lyncore
             </Typography>
@@ -118,13 +86,9 @@ export function LyncoreTeaser() {
             animate={{ scaleX: 1 }}
             transition={{ delay: 0.5, duration: 0.6, ease: "easeOut" }}
           >
-            <Box
-              sx={{
-                height: 2,
-                background: "linear-gradient(90deg, transparent, #00f3ff, #ffb700, transparent)",
-                borderRadius: 1,
-                mb: 3,
-              }}
+            <div
+              className="mb-6 h-0.5 rounded"
+              style={{ background: "linear-gradient(90deg, transparent, #00f3ff, #ffb700, transparent)" }}
             />
           </motion.div>
 
@@ -134,22 +98,16 @@ export function LyncoreTeaser() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.7, duration: 0.6 }}
           >
-            <Stack direction="row" justifyContent="center" alignItems="center" spacing={1.5} sx={{ mb: 3 }}>
+            <div className="mb-6 flex flex-row items-center justify-center gap-3">
               <motion.div
                 animate={{ opacity: [1, 0.3, 1] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
-                <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "#00f3ff", boxShadow: "0 0 10px #00f3ff" }} />
+                <div className="h-2 w-2 rounded-full bg-[#00f3ff] shadow-[0_0_10px_#00f3ff]" />
               </motion.div>
               <Typography
                 variant="h5"
-                sx={{
-                  fontWeight: 700,
-                  letterSpacing: 8,
-                  color: "#fff",
-                  textTransform: "uppercase",
-                  fontSize: { xs: "1rem", sm: "1.4rem" },
-                }}
+                className="text-[1rem] sm:text-[1.4rem] font-bold uppercase tracking-[8px] text-white"
               >
                 PRÓXIMAMENTE
               </Typography>
@@ -157,9 +115,9 @@ export function LyncoreTeaser() {
                 animate={{ opacity: [1, 0.3, 1] }}
                 transition={{ duration: 1.5, repeat: Infinity, delay: 0.75 }}
               >
-                <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "#ffb700", boxShadow: "0 0 10px #ffb700" }} />
+                <div className="h-2 w-2 rounded-full bg-[#ffb700] shadow-[0_0_10px_#ffb700]" />
               </motion.div>
-            </Stack>
+            </div>
           </motion.div>
 
           {/* Tagline */}
@@ -170,18 +128,13 @@ export function LyncoreTeaser() {
           >
             <Typography
               variant="body1"
-              sx={{
-                color: "rgba(255,255,255,0.5)",
-                letterSpacing: 2,
-                fontStyle: "italic",
-                fontSize: { xs: "0.85rem", sm: "1rem" },
-              }}
+              className="text-[0.85rem] sm:text-[1rem] italic tracking-[2px] text-white/50"
             >
-              Su simulador de blockchain y exploración.
+              Ledger de supervivencia del yermo digital.
             </Typography>
           </motion.div>
-        </Box>
+        </div>
       </motion.div>
-    </Box>
+    </div>
   );
 }

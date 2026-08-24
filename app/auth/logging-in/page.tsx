@@ -9,8 +9,8 @@
 
 //# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useEffect, useRef } from 'react';
-import { Box, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
+import { Typography } from '../../../components/ui/Typography';
 
 export default function LoggingIn() {
     const router = useRouter();
@@ -80,65 +80,26 @@ export default function LoggingIn() {
 
     //# 6-Estructuración y renderizado visual del componente UI
     return (
-        <Box sx={{
-            minHeight: '100vh',
-            bgcolor: '#000',
-            position: 'relative',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            overflow: 'hidden'
-        }}>
+        <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black">
             <canvas
                 ref={canvasRef}
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    opacity: 0.3
-                }}
+                className="absolute left-0 top-0 opacity-30"
             />
 
-            <Box sx={{ position: 'relative', zIndex: 10, textAlign: 'center' }}>
-                <Box sx={{
-                    position: 'relative',
-                    width: 100,
-                    height: 100,
-                    mx: 'auto',
-                    mb: 4,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <Box sx={{
-                        position: 'absolute',
-                        width: '100%',
-                        height: '100%',
-                        border: '2px solid #00f3ff',
-                        borderRadius: '50%',
-                        borderTopColor: 'transparent',
-                        animation: 'spin 1s linear infinite'
-                    }} />
-                    <Box sx={{
-                        position: 'absolute',
-                        width: '70%',
-                        height: '70%',
-                        border: '2px solid #ff0055',
-                        borderRadius: '50%',
-                        borderBottomColor: 'transparent',
-                        animation: 'spin-reverse 1.5s linear infinite'
-                    }} />
-                    <Typography variant="h3" sx={{ color: 'white', fontWeight: 'bold' }}>S</Typography>
-                </Box>
+            <div className="relative z-10 text-center">
+                <div className="relative mx-auto mb-8 flex h-[100px] w-[100px] items-center justify-center">
+                    <div className="absolute h-full w-full rounded-full border-2 border-[#00f3ff] [border-top-color:transparent] [animation:spin_1s_linear_infinite]" />
+                    <div className="absolute h-[70%] w-[70%] rounded-full border-2 border-[#ff0055] [border-bottom-color:transparent] [animation:spin-reverse_1.5s_linear_infinite]" />
+                    <Typography variant="h3" className="font-bold text-white">S</Typography>
+                </div>
 
-                <Typography variant="h4" sx={{ color: 'white', fontWeight: 'bold', mb: 1, textShadow: '0 0 10px #00f3ff', letterSpacing: 2 }}>
+                <Typography variant="h4" className="mb-1 font-bold tracking-[2px] text-white [text-shadow:0_0_10px_#00f3ff]">
                     ESTABLECIENDO ENLACE
                 </Typography>
-                <Typography variant="body1" sx={{ color: '#00f3ff', fontFamily: 'monospace' }}>
+                <Typography variant="body1" className="font-mono text-[#00f3ff]">
                     DESCIFRANDO CLAVES DE ACCESO...
                 </Typography>
-            </Box>
+            </div>
 
             <style jsx global>{`
                 @keyframes spin {
@@ -150,6 +111,6 @@ export default function LoggingIn() {
                     100% { transform: rotate(-360deg); }
                 }
             `}</style>
-        </Box>
+        </div>
     );
 }

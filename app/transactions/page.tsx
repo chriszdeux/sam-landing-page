@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Container, Box, Typography, Stack, Tabs, Tab, IconButton, Tooltip } from '@mui/material';
 import { Background } from '../../components/layout/Background';
 import { Input } from '../../components/ui/Input';
-import { CustomButton } from '../../components/ui/CustomButton';
-import SearchIcon from '@mui/icons-material/Search';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import LaunchIcon from '@mui/icons-material/Launch';
+import { Button } from '../../components/ui/Button';
+import { Typography } from '../../components/ui/Typography';
+import { cn } from '@/lib/utils/cn';
+import { Tooltip } from '../../components/ui/Tooltip';
+import { Search as SearchIcon, RefreshCw as RefreshIcon, ExternalLink as LaunchIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 import { fetchTransactions } from '../../lib/features/transactions/actions';
@@ -17,6 +17,7 @@ import { transactionsPageColumns } from '../../components/market/transactionsPag
 import { RootState } from '../../lib/store';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { PageHeader } from '../../components/ui/PageHeader';
+import { Reveal } from '../../components/ui/TextReveal';
 import { motion } from 'framer-motion';
 import { formatHash } from '../../lib/utils/formatHash';
 import { useRefreshCooldown } from '../../lib/useRefreshCooldown';
@@ -111,7 +112,7 @@ export default function TransactionsPage() {
         }
     };
 
-    const handleFilterChange = (event: React.SyntheticEvent, newValue: string) => {
+    const handleFilterChange = (newValue: string) => {
         setFilterType(newValue);
         setPage(0);
         dispatch(clearTransactions());
@@ -145,9 +146,9 @@ export default function TransactionsPage() {
                     ...col,
                     render: ({ value }: { value: any }) => {
                         const raw = value as number;
-                        if (!raw || raw === 0) return <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)' }}>—</Typography>;
+                        if (!raw || raw === 0) return <Typography variant="caption" className="text-white/30">—</Typography>;
                         return (
-                            <Typography variant="caption" sx={{ color: '#00f3ff', fontFamily: 'monospace', fontWeight: 'bold' }}>
+                            <Typography variant="caption" className="font-mono font-bold text-[#00f3ff]">
                                 {formatHash(raw * 1000000, chronoBurstFreqTypes)}
                             </Typography>
                         );
@@ -174,24 +175,17 @@ export default function TransactionsPage() {
             render: ({ row }: { row: any }) => {
                 const symbol = row.financialInfo?.symbol;
                 const cryptoId = symbolMap[symbol] || row.blockchainId || row.financialInfo?.cryptoId || row.cryptoId;
-                if (!cryptoId) return <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)' }}>—</Typography>;
+                if (!cryptoId) return <Typography variant="caption" className="text-white/30">—</Typography>;
                 return (
-                    <IconButton
+                    <Button
                         size="small"
+                        color="info"
+                        aria-label="Ver activo en el mercado"
                         onClick={() => router.push(`/market/${cryptoId}`)}
-                        sx={{ 
-                            color: '#00f3ff', 
-                            border: '1px solid rgba(0, 243, 255, 0.2)',
-                            bgcolor: 'rgba(0, 243, 255, 0.05)',
-                            p: 0.5,
-                            '&:hover': { 
-                                bgcolor: 'rgba(0, 243, 255, 0.15)',
-                                borderColor: '#00f3ff'
-                            } 
-                        }}
+                        className="[&>div]:px-2 [&>div]:py-1.5"
                     >
-                        <LaunchIcon sx={{ fontSize: 14 }} />
-                    </IconButton>
+                        <LaunchIcon size={14} />
+                    </Button>
                 );
             }
         });
@@ -203,7 +197,7 @@ export default function TransactionsPage() {
         <main className='min-h-screen relative pb-20'>
             <Background />
 
-            <Container maxWidth='xl' sx={{ pt: { xs: 12, md: 16 }, position: 'relative', zIndex: 10 }}>
+            <div className="relative z-10 mx-auto w-full max-w-[1536px] px-4 pt-24 sm:px-6 md:pt-32 lg:px-8">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -216,158 +210,127 @@ export default function TransactionsPage() {
                     />
 
                     {/* Blockchain Hash Metric Widget */}
-                    <Box sx={{
-                        mb: 4,
-                        p: 3,
-                        bgcolor: 'rgba(0, 243, 255, 0.03)',
-                        border: '1px solid rgba(0, 243, 255, 0.2)',
-                        borderRadius: 2,
-                        boxShadow: '0 0 15px rgba(0, 243, 255, 0.05)',
-                        position: 'relative',
-                        overflow: 'hidden',
-                        display: 'flex',
-                        flexDirection: { xs: 'column', sm: 'row' },
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        gap: 2
-                    }}>
-                        <Box sx={{
-                            position: 'absolute',
-                            top: -50,
-                            right: -50,
-                            width: 100,
-                            height: 100,
-                            bgcolor: '#00f3ff',
-                            filter: 'blur(50px)',
-                            opacity: 0.1,
-                            zIndex: 0
-                        }} />
-                        <Box sx={{ position: 'relative', zIndex: 1, alignSelf: 'flex-start' }}>
-                            <Typography variant="subtitle2" sx={{ color: '#00f3ff', fontWeight: 'bold', letterSpacing: 1.5, textTransform: 'uppercase', mb: 0.5 }}>
+                    <div className="relative mb-8 flex flex-col items-center justify-between gap-4 overflow-hidden rounded-lg border border-[#00f3ff]/20 bg-[#00f3ff]/[0.03] p-6 shadow-[0_0_15px_rgba(0,243,255,0.05)] sm:flex-row">
+                        <div className="absolute -right-[50px] -top-[50px] z-0 h-[100px] w-[100px] bg-[#00f3ff] opacity-10 blur-[50px]" />
+                        <Reveal className="relative z-[1] self-start">
+                            <Typography variant="subtitle2" className="mb-1 font-bold uppercase tracking-[1.5px] text-[#00f3ff]">
                                 Hash Total Disponible en Blockchain
                             </Typography>
-                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+                            <Typography variant="body2" className="text-white/60">
                                 Auditoría macro consolidada del total de hash disponible para procesamiento en la red.
                             </Typography>
-                        </Box>
-                        <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Typography variant="h3" sx={{ color: '#fff', fontWeight: 900, fontFamily: 'monospace', textShadow: '0 0 10px rgba(255,255,255,0.2)' }}>
+                        </Reveal>
+                        <div className="relative z-[1] flex items-center gap-4">
+                            <Typography variant="h3" className="font-mono font-black text-white [text-shadow:0_0_10px_rgba(255,255,255,0.2)]">
                                 {formatHash(fluctuatedHash, chronoBurstFreqTypes)}
                             </Typography>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, px: 1, py: 0.25, bgcolor: 'rgba(0, 255, 136, 0.08)', border: '1px solid rgba(0, 255, 136, 0.3)', borderRadius: 1 }}>
-                                <Typography variant="caption" sx={{ color: '#00ff88', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 0.25, fontSize: '0.75rem' }}>
+                            <div className="flex items-center gap-1 rounded border border-[#00ff88]/30 bg-[#00ff88]/[0.08] px-2 py-0.5">
+                                <Typography variant="caption" className="flex items-center gap-0.5 text-xs font-bold text-[#00ff88]">
                                     <span style={{ fontSize: '10px' }}>▲</span> +{hashVariation.toFixed(2)}%
                                 </Typography>
-                            </Box>
-                        </Box>
-                    </Box>
+                            </div>
+                        </div>
+                    </div>
 
                     {/* Pending Queues Widget */}
-                    <Box sx={{
-                        mb: 4,
-                        p: 3,
-                        bgcolor: 'rgba(255, 170, 0, 0.03)',
-                        border: '1px solid rgba(255, 170, 0, 0.2)',
-                        borderRadius: 2,
-                        boxShadow: '0 0 15px rgba(255, 170, 0, 0.05)',
-                        display: 'flex',
-                        flexDirection: { xs: 'column', sm: 'row' },
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        gap: 3
-                    }}>
-                        <Box sx={{ alignSelf: 'flex-start' }}>
-                            <Typography variant="subtitle2" sx={{ color: '#ffaa00', fontWeight: 'bold', letterSpacing: 1.5, textTransform: 'uppercase', mb: 0.5 }}>
+                    <div className="mb-8 flex flex-col items-center justify-between gap-6 rounded-lg border border-[#ffaa00]/20 bg-[#ffaa00]/[0.03] p-6 shadow-[0_0_15px_rgba(255,170,0,0.05)] sm:flex-row">
+                        <Reveal className="self-start">
+                            <Typography variant="subtitle2" className="mb-1 font-bold uppercase tracking-[1.5px] text-[#ffaa00]">
                                 Colas de Transacciones Pendientes (Red)
                             </Typography>
-                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+                            <Typography variant="body2" className="text-white/60">
                                 Transacciones en espera de inyección de energía para su confirmación en el bloque actual.
                             </Typography>
-                        </Box>
+                        </Reveal>
 
-                        <Stack direction="row" spacing={3}>
-                            <Box sx={{ textAlign: 'center', minWidth: 80 }}>
-                                <Typography variant="caption" sx={{ color: '#00ff88', fontWeight: 'bold', display: 'block' }}>COMPRA</Typography>
-                                <Typography variant="h5" sx={{ color: '#fff', fontWeight: 900, fontFamily: 'monospace' }}>{buyQueue}</Typography>
-                            </Box>
-                            <Box sx={{ textAlign: 'center', minWidth: 80 }}>
-                                <Typography variant="caption" sx={{ color: '#ff0055', fontWeight: 'bold', display: 'block' }}>VENTA</Typography>
-                                <Typography variant="h5" sx={{ color: '#fff', fontWeight: 900, fontFamily: 'monospace' }}>{sellQueue}</Typography>
-                            </Box>
-                            <Box sx={{ textAlign: 'center', minWidth: 80 }}>
-                                <Typography variant="caption" sx={{ color: '#00f3ff', fontWeight: 'bold', display: 'block' }}>TRANSF.</Typography>
-                                <Typography variant="h5" sx={{ color: '#fff', fontWeight: 900, fontFamily: 'monospace' }}>{transferQueue}</Typography>
-                            </Box>
-                        </Stack>
-                    </Box>
+                        <div className="flex flex-row gap-6">
+                            <div className="min-w-[80px] text-center">
+                                <Typography variant="caption" className="block font-bold text-[#00ff88]">COMPRA</Typography>
+                                <Typography variant="h5" className="font-mono font-black text-white">{buyQueue}</Typography>
+                            </div>
+                            <div className="min-w-[80px] text-center">
+                                <Typography variant="caption" className="block font-bold text-[#ff0055]">VENTA</Typography>
+                                <Typography variant="h5" className="font-mono font-black text-white">{sellQueue}</Typography>
+                            </div>
+                            <div className="min-w-[80px] text-center">
+                                <Typography variant="caption" className="block font-bold text-[#00f3ff]">TRANSF.</Typography>
+                                <Typography variant="h5" className="font-mono font-black text-white">{transferQueue}</Typography>
+                            </div>
+                        </div>
+                    </div>
 
-                    <Box sx={{ mb: 4, display: 'flex', gap: 2 }}>
+                    {/* items-center + mb-0: el margen propio del Input estiraba la
+                        fila y dejaba los botones desalineados respecto al campo. */}
+                    <div className="mb-8 flex items-center gap-3">
                         <Input
                             placeholder='Buscar por billetera...'
                             value={walletSearch}
                             onChange={(e) => setWalletSearch(e.target.value)}
-                            fullWidth
+                            containerClassName="mb-0 flex-1"
                         />
-                        <CustomButton 
-                            variant='info' 
+                        <Button
+                            color="info"
+                            size="large"
                             onClick={handleSearch}
-                            startIcon={<SearchIcon />}
-                            sx={{ minWidth: 150 }}
-                            glow
+                            startIcon={<SearchIcon size={15} />}
+                            className="min-w-[150px]"
                         >
                             BUSCAR
-                        </CustomButton>
-                        <Tooltip title={isCooldownActive ? `Espero ${cooldownRemaining}s` : "Actualizar Transacciones"}>
+                        </Button>
+                        <Tooltip content={isCooldownActive ? `Espero ${cooldownRemaining}s` : "Actualizar Transacciones"}>
+                            {/* El span mantiene el tooltip activo aunque el botón
+                                esté deshabilitado durante el cooldown. */}
                             <span>
-                                <IconButton
+                                <Button
+                                    color={isCooldownActive ? 'warning' : 'info'}
+                                    size="large"
                                     onClick={handleRefresh}
                                     disabled={isCooldownActive}
-                                    sx={{
-                                        color: '#00f3ff',
-                                        border: '1px solid rgba(0, 243, 255, 0.2)',
-                                        bgcolor: 'rgba(0, 243, 255, 0.05)',
-                                        p: 1.5,
-                                        width: 48,
-                                        height: 48,
-                                        '&:hover': {
-                                            bgcolor: 'rgba(0, 243, 255, 0.15)',
-                                            borderColor: '#00f3ff',
-                                            boxShadow: '0 0 10px rgba(0, 243, 255, 0.3)'
-                                        },
-                                        '&.Mui-disabled': {
-                                            color: 'rgba(255, 255, 255, 0.3)',
-                                            borderColor: 'rgba(255, 255, 255, 0.1)',
-                                            bgcolor: 'rgba(255, 255, 255, 0.02)'
-                                        }
-                                    }}
+                                    aria-label="Actualizar transacciones"
+                                    className="[&>div]:px-3.5"
                                 >
                                     {isCooldownActive ? (
-                                        <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: '0.75rem', color: '#ffaa00' }}>
-                                            {cooldownRemaining}s
-                                        </Typography>
+                                        <span className="tabular-nums">{cooldownRemaining}s</span>
                                     ) : (
-                                        <RefreshIcon className={loading ? "animate-spin" : ""} />
+                                        <RefreshIcon size={16} className={loading ? 'animate-spin' : ''} />
                                     )}
-                                </IconButton>
+                                </Button>
                             </span>
                         </Tooltip>
-                    </Box>
+                    </div>
 
-                    <Box sx={{ borderBottom: 1, borderColor: 'rgba(0, 243, 255, 0.2)', mb: 3 }}>
-                        <Tabs
-                            value={filterType}
-                            onChange={handleFilterChange}
-                            textColor="inherit"
-                            sx={{
-                                '& .MuiTab-root': { color: 'rgba(255,255,255,0.6)', fontWeight: 'bold' },
-                                '& .Mui-selected': { color: '#00f3ff' },
-                                '& .MuiTabs-indicator': { backgroundColor: '#00f3ff' }
-                            }}
-                        >
-                            <Tab label="Mercado (BUY/SELL)" value="" />
-                            <Tab label="Minería (MINE)" value="MINER" />
-                        </Tabs>
-                    </Box>
+                    {/* Pestañas: mismo tratamiento fino que el navbar - el estado
+                        activo lo lleva una hairline de 1px, no un subrayado grueso. */}
+                    <div className="mb-6 flex gap-7 border-b border-white/[0.07]">
+                        {[
+                            { label: 'Mercado (BUY/SELL)', value: '' },
+                            { label: 'Minería (MINE)', value: 'MINER' },
+                        ].map((tab) => (
+                            <button
+                                key={tab.value}
+                                role="tab"
+                                aria-selected={filterType === tab.value}
+                                onClick={() => handleFilterChange(tab.value)}
+                                className={cn(
+                                    'relative pb-3 text-[0.6875rem] font-semibold uppercase leading-none tracking-[0.14em]',
+                                    'transition-colors duration-200 focus-visible:outline-none',
+                                    filterType === tab.value
+                                        ? 'text-[#00f3ff]'
+                                        : 'text-white/55 hover:text-white focus-visible:text-white'
+                                )}
+                            >
+                                {tab.label}
+                                {filterType === tab.value && (
+                                    <motion.div
+                                        layoutId="transactions-tab-indicator"
+                                        className="absolute inset-x-0 -bottom-px h-px bg-[#00f3ff]"
+                                        style={{ boxShadow: '0 0 8px rgba(0,243,255,0.8)' }}
+                                        transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
+                                    />
+                                )}
+                            </button>
+                        ))}
+                    </div>
 
                     <CustomTable
                         columns={syncedColumns}
@@ -381,7 +344,7 @@ export default function TransactionsPage() {
                         totalRows={total}
                     />
                 </motion.div>
-            </Container>
+            </div>
         </main>
     );
 }

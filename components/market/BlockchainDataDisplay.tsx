@@ -4,7 +4,7 @@
 
 //# 1-Definir componente de visualización de datos blockchain
 import React from 'react';
-import { Box, Typography, Paper, Avatar } from '@mui/material';
+import { Typography } from '../ui/Typography';
 import { motion } from 'framer-motion';
 import { BlockchainInterface } from '../../lib/types/blockchain';
 
@@ -15,12 +15,12 @@ interface BlockchainDataDisplayProps {
 export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ network }) => {
 
   if (!network) {
-    
+
     //# 2-Renderizar estado vacío
     return (
-        <Paper sx={{ p: 4, bgcolor: 'rgba(10,12,16,0.8)', border: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
-            <Typography color="text.secondary">Seleccione una red para ver sus datos.</Typography>
-        </Paper>
+        <div className="rounded-paper border border-white/10 bg-[rgba(10,12,16,0.8)] p-8 text-center">
+            <Typography className="text-foreground-muted">Seleccione una red para ver sus datos.</Typography>
+        </div>
     );
   }
 
@@ -39,26 +39,18 @@ export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ ne
 
   //# 3-Renderizar datos de la red con animaciones
   return (
-    <Box sx={{ width: '100%', mb: 6 }}>
+    <div className="mb-12 w-full">
         <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
         >
 
-            <Paper 
-                elevation={0}
-                sx={{ 
-                    p: 3, 
-                    mb: 3, 
+            <div
+                className="relative mb-6 flex items-center gap-6 overflow-hidden border border-white/5 p-6"
+                style={{
                     background: `linear-gradient(90deg, rgba(10,12,16,0.9) 0%, ${color}15 100%)`,
-                    border: '1px solid rgba(255,255,255,0.05)',
                     borderLeft: `4px solid ${color}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 3,
-                    position: 'relative',
-                    overflow: 'hidden'
                 }}
             >
 
@@ -78,51 +70,62 @@ export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ ne
                     transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                 />
 
-                 <motion.div 
+                 <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ 
-                        scale: 1, 
+                    animate={{
+                        scale: 1,
                         opacity: 1,
-                        boxShadow: [`0 0 20px ${color}40`, `0 0 40px ${color}60`, `0 0 20px ${color}40`] 
+                        boxShadow: [`0 0 20px ${color}40`, `0 0 40px ${color}60`, `0 0 20px ${color}40`]
                     }}
-                    transition={{ 
+                    transition={{
                         type: "spring", stiffness: 200,
                         boxShadow: { duration: 3, repeat: Infinity, ease: "easeInOut" }
                     }}
                  >
-                    <Avatar 
-                        src={identification.image} 
-                        sx={{ width: 80, height: 80, border: `2px solid ${color}`, borderRadius: '24%' }}
+                    <div
+                        className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-[24%] text-2xl font-bold text-white"
+                        style={{ border: `2px solid ${color}` }}
                     >
-                        {identification.symbol[0]}
-                    </Avatar>
+                        <span className="absolute inset-0 flex items-center justify-center">{identification.symbol[0]}</span>
+                        {identification.image && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                                src={identification.image}
+                                alt={identification.symbol}
+                                className="relative h-full w-full object-cover"
+                                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                            />
+                        )}
+                    </div>
                  </motion.div>
-                
-                 <Box sx={{ zIndex: 1 }}>
-                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                        <Typography variant="h3" sx={{ fontWeight: 'bold', color: 'white', letterSpacing: 1, lineHeight: 1 }}>
+
+                 <div className="z-[1]">
+                     <div className="mb-1 flex items-center gap-2">
+                        <Typography variant="h3" className="font-bold leading-none tracking-wide text-white">
                             {identification.name}
                         </Typography>
                         <motion.div
                             animate={{ opacity: [1, 0.3, 1] }}
                             transition={{ duration: 2, repeat: Infinity }}
                         >
-                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: color, boxShadow: `0 0 10px ${color}` }} />
+                            <span className="block h-2 w-2 rounded-full" style={{ backgroundColor: color, boxShadow: `0 0 10px ${color}` }} />
                         </motion.div>
-                     </Box>
-                     
-                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography component="span" variant="h6" sx={{ color, opacity: 0.8, fontWeight: 'bold' }}>{identification.symbol}</Typography>
-                        <Typography variant="body2" sx={{ color: 'text.secondary', fontFamily: 'monospace', opacity: 0.6 }}>
+                     </div>
+
+                     <div className="flex items-center gap-2">
+                        <Typography component="span" variant="h6" className="font-bold opacity-80" style={{ color }}>{identification.symbol}</Typography>
+                        <Typography variant="body2" className="font-mono text-foreground-muted opacity-60">
                             | MODULE ID: {network.id}
                         </Typography>
-                     </Box>
-                 </Box>
+                     </div>
+                 </div>
 
-                 <Box component="img" src={identification.image} sx={{ position: 'absolute', top: -20, right: -20, opacity: 0.05, width: 300, height: 300 }} alt="" />
-            </Paper>
+                 {identification.image && (
+                     // eslint-disable-next-line @next/next/no-img-element
+                     <img src={identification.image} alt="" className="pointer-events-none absolute -top-5 -right-5 h-[300px] w-[300px] opacity-5" />
+                 )}
+            </div>
         </motion.div>
-    </Box>
+    </div>
   );
 };
-

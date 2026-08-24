@@ -14,14 +14,16 @@
 
 //# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, TextField, CircularProgress } from '@mui/material';
 import { useRouter } from 'next/navigation';
 
 //# 2-Obtención del despachador para emitir acciones al store
 import { useAppDispatch, useAppSelector } from '../../../lib/hooks';
 import { validateAccount, register as registerUser, login } from '../../../lib/features/auth/actions';
-import { CheckCircleOutline, LockOpen } from '@mui/icons-material';
+import { CheckCircle2, Unlock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Typography } from '../../../components/ui/Typography';
+import { Button } from '../../../components/ui/Button';
+import { Input } from '../../../components/ui/Input';
 
 export default function VerifyPage() {
 
@@ -113,36 +115,19 @@ export default function VerifyPage() {
 
         //# 9-Estructuración y renderizado visual del componente UI
         return (
-            <Box sx={{
-                minHeight: '100vh',
-                bgcolor: '#050505',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}>
-                <Box sx={{ position: 'relative', mb: 4 }}>
-                    <CircularProgress size={80} thickness={2} sx={{ color: '#00f3ff' }} />
-                    <CircularProgress
-                        size={80}
-                        thickness={2}
-                        sx={{
-                            color: 'rgba(0,243,255,0.2)',
-                            position: 'absolute',
-                            left: 0,
-                            animationDuration: '3s'
-                        }}
-                        disableShrink
-                    />
-                </Box>
+            <div className="flex min-h-screen flex-col items-center justify-center bg-[#050505]">
+                <div className="relative mb-8 h-20 w-20">
+                    <div className="absolute h-20 w-20 animate-spin rounded-full border-2 border-[#00f3ff] [border-right-color:transparent] [border-bottom-color:transparent]" />
+                    <div className="absolute h-20 w-20 rounded-full border-2 border-[#00f3ff]/20 [animation:spin_3s_linear_infinite] [border-left-color:transparent]" />
+                </div>
 
-                <Typography variant="h4" sx={{ color: 'white', fontWeight: 'bold', mb: 2 }}>
+                <Typography variant="h4" className="mb-4 font-bold text-white">
                     Creando tu identidad digital...
                 </Typography>
 
                 {error && (
-                    <Box sx={{ textAlign: 'center', mt: 2 }}>
-                        <Typography color="error">
+                    <div className="mt-4 text-center">
+                        <Typography component="p" className="text-error">
                             Error: {error}
                         </Typography>
                         <Button
@@ -151,9 +136,9 @@ export default function VerifyPage() {
                         >
                             Volver
                         </Button>
-                    </Box>
+                    </div>
                 )}
-            </Box>
+            </div>
         );
     }
 
@@ -162,59 +147,33 @@ export default function VerifyPage() {
 
         //# 10-Estructuración y renderizado visual del componente UI
         return (
-            <Box sx={{
-                minHeight: '100vh',
-                bgcolor: '#050505',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}>
+            <div className="flex min-h-screen flex-col items-center justify-center bg-[#050505]">
                 <motion.div
                     initial={{ scale: 0.5, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <Box sx={{
-                        width: 120,
-                        height: 120,
-                        borderRadius: '50%',
-                        bgcolor: 'rgba(0, 243, 255, 0.1)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        mb: 4,
-                        position: 'relative',
-                        border: '2px solid #00f3ff',
-                        boxShadow: '0 0 30px rgba(0,243,255,0.4)'
-                    }}>
-                        <CheckCircleOutline sx={{ fontSize: 60, color: '#00f3ff' }} />
+                    <div className="relative mb-8 flex h-[120px] w-[120px] items-center justify-center rounded-full border-2 border-[#00f3ff] bg-[#00f3ff]/10 shadow-[0_0_30px_rgba(0,243,255,0.4)]">
+                        <CheckCircle2 size={60} className="text-[#00f3ff]" />
 
                         { }
-                        <Box sx={{
-                            position: 'absolute',
-                            width: '100%',
-                            height: '100%',
-                            borderRadius: '50%',
-                            border: '1px dashed rgba(0,243,255,0.5)',
-                            animation: 'spin 4s linear infinite'
-                        }} />
+                        <div className="absolute h-full w-full rounded-full border border-dashed border-[#00f3ff]/50 [animation:spin_4s_linear_infinite]" />
                         <style jsx>{`
                             @keyframes spin {
                                 0% { transform: rotate(0deg); }
                                 100% { transform: rotate(360deg); }
                             }
                         `}</style>
-                    </Box>
+                    </div>
                 </motion.div>
 
-                <Typography variant="h4" sx={{ color: 'white', fontWeight: 'bold', mb: 2 }}>
+                <Typography variant="h4" className="mb-4 font-bold text-white">
                     Verificando Credenciales...
                 </Typography>
-                <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                <Typography variant="body1" className="text-white/70">
                     Estableciendo conexión segura
                 </Typography>
-            </Box>
+            </div>
         );
     }
 
@@ -223,77 +182,37 @@ export default function VerifyPage() {
 
     //# 11-Estructuración y renderizado visual del componente UI
     return (
-        <Box sx={{
-            minHeight: '100vh',
-            bgcolor: '#050510',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            p: 3
-        }}>
+        <div className="flex min-h-screen flex-col items-center justify-center bg-[#050510] p-6">
             { }
             <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.5 }}
             >
-                <Box sx={{
-                    bgcolor: 'rgba(255,255,255,0.05)',
-                    p: 6,
-                    borderRadius: 4,
-                    border: '1px solid rgba(0,243,255,0.2)',
-                    backdropFilter: 'blur(10px)',
-                    maxWidth: 400,
-                    width: '100%',
-                    textAlign: 'center',
-                    boxShadow: '0 0 30px rgba(0,243,255,0.1)'
-                }}>
-                    <Box sx={{
-                        width: 80,
-                        height: 80,
-                        borderRadius: '50%',
-                        bgcolor: 'rgba(0,243,255,0.1)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        mx: 'auto',
-                        mb: 4,
-                        border: '1px solid rgba(0,243,255,0.3)'
-                    }}>
-                        <LockOpen sx={{ fontSize: 40, color: '#00f3ff' }} />
-                    </Box>
+                <div className="w-full max-w-[400px] rounded-2xl border border-[#00f3ff]/20 bg-white/5 p-12 text-center shadow-[0_0_30px_rgba(0,243,255,0.1)] backdrop-blur-md">
+                    <div className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-full border border-[#00f3ff]/30 bg-[#00f3ff]/10">
+                        <Unlock size={40} className="text-[#00f3ff]" />
+                    </div>
 
-                    <Typography variant="h4" color="white" fontWeight="bold" gutterBottom>
+                    <Typography variant="h4" className="mb-2 font-bold text-white">
                         Verificación
                     </Typography>
 
-                    <Typography variant="body2" color="rgba(255,255,255,0.7)" sx={{ mb: 4 }}>
+                    <Typography variant="body2" className="mb-8 text-white/70">
                         {registrationData ? 'Registro iniciado. ' : ''}Ingrese el código enviado a tu correo.
                     </Typography>
 
                     <form onSubmit={handleSubmit}>
-                        <TextField
-                            fullWidth
-                            variant="outlined"
+                        <Input
                             placeholder="Código"
                             value={code}
                             onChange={(e) => setCode(e.target.value)}
-                            sx={{
-                                mb: 3,
-                                '& .MuiOutlinedInput-root': {
-                                    color: 'white',
-                                    bgcolor: 'rgba(0,0,0,0.3)',
-                                    '& fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
-                                    '&:hover fieldset': { borderColor: '#00f3ff' },
-                                    '&.Mui-focused fieldset': { borderColor: '#00f3ff' },
-                                }
-                            }}
-                            inputProps={{ style: { textAlign: 'center', letterSpacing: 4, fontWeight: 'bold' } }}
+                            containerClassName="mb-6"
+                            className="bg-black/30 text-center tracking-[4px] font-bold text-white"
                         />
 
                         {error && (
-                            <Typography color="error" variant="caption" display="block" sx={{ mb: 2 }}>
+                            <Typography component="p" variant="caption" className="mb-4 block text-error">
                                 {error}
                             </Typography>
                         )}
@@ -314,8 +233,8 @@ export default function VerifyPage() {
                             {status === 'loading' ? 'Confirmando...' : 'Confirmar Cuenta'}
                         </Button>
                     </form>
-                </Box>
+                </div>
             </motion.div>
-        </Box>
+        </div>
     );
 }

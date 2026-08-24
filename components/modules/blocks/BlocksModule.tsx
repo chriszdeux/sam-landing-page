@@ -1,16 +1,18 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Box, Typography, Paper, CircularProgress, Chip, Avatar } from '@mui/material';
-import { CustomButton } from '../../ui/CustomButton';
-import { 
-    Tag, 
-    MonetizationOn, 
-    Engineering, 
+import { Typography } from '../../ui/Typography';
+import { Reveal } from '../../ui/TextReveal';
+import { Button } from '../../ui/Button';
+import { Tooltip } from '../../ui/Tooltip';
+import {
+    Tag,
+    Coins,
+    HardHat,
     CheckCircle,
     PlayCircle,
-    Refresh
-} from '@mui/icons-material';
+    RefreshCw
+} from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../../lib/hooks';
 import { fetchBlocksHistory } from '../../../lib/features/blockchain/actions';
 import { RootState } from '../../../lib/store';
@@ -23,7 +25,7 @@ export const BlocksModule = () => {
 
     const networkColor = selectedNetwork?.additionalInfo?.color || '#00f3ff';
     const blockchainId = selectedNetwork?.id;
-    
+
     const { isCooldownActive, cooldownRemaining, triggerRefresh } = useRefreshCooldown();
 
     useEffect(() => {
@@ -45,7 +47,7 @@ export const BlocksModule = () => {
             label: 'Índice',
             key: (row: any) => row.index,
             render: ({ value }: { value: any }) => (
-                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 'bold', color: networkColor }}>
+                <Typography variant="body2" className="font-mono font-bold" style={{ color: networkColor }}>
                     #{value}
                 </Typography>
             )
@@ -54,7 +56,7 @@ export const BlocksModule = () => {
             label: 'Hash del Bloque',
             key: (row: any) => row.id,
             render: ({ value }: { value: any }) => (
-                <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'rgba(255,255,255,0.85)' }}>
+                <Typography variant="body2" className="font-mono text-white/85">
                     {value.slice(0, 16)}...{value.slice(-8)}
                 </Typography>
             )
@@ -63,7 +65,7 @@ export const BlocksModule = () => {
             label: 'Dificultad',
             key: (row: any) => row.difficulty,
             render: ({ value }: { value: any }) => (
-                <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#ffb700', fontWeight: 'bold' }}>
+                <Typography variant="body2" className="font-mono font-bold text-[#ffb700]">
                     {value}
                 </Typography>
             )
@@ -72,8 +74,8 @@ export const BlocksModule = () => {
             label: 'Mineros',
             key: (row: any) => row.miners?.length ?? 0,
             render: ({ value }: { value: any }) => (
-                <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'white', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <Engineering sx={{ fontSize: 14, color: 'rgba(255,255,255,0.5)' }} /> {value}
+                <Typography variant="body2" className="flex items-center gap-1 font-mono text-white">
+                    <HardHat size={14} className="text-white/50" /> {value}
                 </Typography>
             )
         },
@@ -82,24 +84,24 @@ export const BlocksModule = () => {
             key: (row: any) => {
                 const buyCount = typeof row.buyCount === 'number'
                     ? row.buyCount
-                    : (typeof row.transactionsBuyQueue === 'number' 
-                        ? row.transactionsBuyQueue 
+                    : (typeof row.transactionsBuyQueue === 'number'
+                        ? row.transactionsBuyQueue
                         : Array.isArray(row.transactionsBuyQueue) ? row.transactionsBuyQueue.length : 0);
                 const sellCount = typeof row.sellCount === 'number'
                     ? row.sellCount
-                    : (typeof row.transactionsSellQueue === 'number' 
-                        ? row.transactionsSellQueue 
+                    : (typeof row.transactionsSellQueue === 'number'
+                        ? row.transactionsSellQueue
                         : Array.isArray(row.transactionsSellQueue) ? row.transactionsSellQueue.length : 0);
                 const transferCount = typeof row.transferCount === 'number'
                     ? row.transferCount
-                    : (typeof row.transactionsTransferQueue === 'number' 
-                        ? row.transactionsTransferQueue 
+                    : (typeof row.transactionsTransferQueue === 'number'
+                        ? row.transactionsTransferQueue
                         : Array.isArray(row.transactionsTransferQueue) ? row.transactionsTransferQueue.length : 0);
 
                 return buyCount + sellCount + transferCount;
             },
             render: ({ value }: { value: any }) => (
-                <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#00f3ff', fontWeight: 'bold' }}>
+                <Typography variant="body2" className="font-mono font-bold text-[#00f3ff]">
                     {value} TXs
                 </Typography>
             )
@@ -108,8 +110,8 @@ export const BlocksModule = () => {
             label: 'Recompensa',
             key: (row: any) => row.minerRewards ?? 0,
             render: ({ value }: { value: any }) => (
-                <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#00e676', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <MonetizationOn sx={{ fontSize: 14 }} /> {Number(value).toFixed(4)}
+                <Typography variant="body2" className="flex items-center gap-1 font-mono font-bold text-[#00e676]">
+                    <Coins size={14} /> {Number(value).toFixed(4)}
                 </Typography>
             )
         },
@@ -117,45 +119,26 @@ export const BlocksModule = () => {
             label: 'Estado',
             key: (row: any) => row.nextBlock === null,
             render: ({ value }: { value: any }) => value ? (
-                <Chip 
-                    icon={<PlayCircle style={{ color: networkColor, fontSize: 14 }} />}
-                    label="ACTIVO" 
-                    size="small"
-                    sx={{ 
-                        bgcolor: `${networkColor}10`, 
-                        color: networkColor,
-                        borderColor: networkColor,
-                        borderWidth: 1,
-                        borderStyle: 'solid',
-                        fontWeight: 'bold',
-                        fontSize: '0.65rem'
-                    }} 
-                />
+                <span
+                    className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[0.65rem] font-bold"
+                    style={{ backgroundColor: `${networkColor}10`, color: networkColor, borderColor: networkColor }}
+                >
+                    <PlayCircle size={14} style={{ color: networkColor }} /> ACTIVO
+                </span>
             ) : (
-                <Chip 
-                    icon={<CheckCircle style={{ color: '#00e676', fontSize: 14 }} />}
-                    label="CONFIRMADO" 
-                    size="small"
-                    sx={{ 
-                        bgcolor: 'rgba(0, 230, 118, 0.05)', 
-                        color: '#00e676',
-                        borderColor: 'rgba(0, 230, 118, 0.3)',
-                        borderWidth: 1,
-                        borderStyle: 'solid',
-                        fontWeight: 'bold',
-                        fontSize: '0.65rem'
-                    }} 
-                />
+                <span className="inline-flex items-center gap-1 rounded-full border border-[#00e676]/30 bg-[#00e676]/5 px-2 py-0.5 text-[0.65rem] font-bold text-[#00e676]">
+                    <CheckCircle size={14} className="text-[#00e676]" /> CONFIRMADO
+                </span>
             )
         }
     ], [networkColor]);
 
     if (!selectedNetwork) {
         return (
-            <Paper sx={{ p: 4, bgcolor: 'rgba(10,12,16,0.8)', border: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
-                <CircularProgress sx={{ color: '#00f3ff', mb: 2 }} />
-                <Typography color="text.secondary">Cargando red seleccionada...</Typography>
-            </Paper>
+            <div className="rounded border border-white/10 bg-[rgba(10,12,16,0.8)] p-8 text-center">
+                <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-[#00f3ff]/20 border-t-[#00f3ff]" />
+                <Typography className="text-foreground-muted">Cargando red seleccionada...</Typography>
+            </div>
         );
     }
 
@@ -163,79 +146,98 @@ export const BlocksModule = () => {
     const sortedBlocks = [...blocksHistory].sort((a, b) => b.index - a.index);
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div className="flex flex-col gap-8">
             {/* Network Banner */}
-            <Paper 
-                elevation={0}
-                sx={{ 
-                    p: 3, 
+            <div
+                className="flex flex-wrap items-center justify-between gap-6 rounded-2xl border p-6"
+                style={{
                     background: `linear-gradient(90deg, rgba(10,12,16,0.9) 0%, ${networkColor}15 100%)`,
-                    border: `1px solid ${networkColor}20`,
-                    borderRadius: 4,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    flexWrap: 'wrap',
-                    gap: 3
+                    borderColor: `${networkColor}20`,
                 }}
             >
-                <Box display="flex" alignItems="center" gap={3}>
-                    <Avatar 
-                        src={selectedNetwork.identification.image} 
-                        sx={{ width: 64, height: 64, border: `2px solid ${networkColor}` }}
+                <div className="flex items-center gap-6">
+                    <div
+                        className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 font-bold text-white"
+                        style={{ borderColor: networkColor }}
                     >
-                        {selectedNetwork.identification.symbol[0]}
-                    </Avatar>
-                    <Box>
-                        <Typography variant="h4" color="white" fontWeight="bold">
+                        <span className="absolute inset-0 flex items-center justify-center">
+                            {selectedNetwork.identification.symbol[0]}
+                        </span>
+                        {selectedNetwork.identification.image && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                                src={selectedNetwork.identification.image}
+                                alt={selectedNetwork.identification.name}
+                                className="relative h-full w-full object-cover"
+                                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                            />
+                        )}
+                    </div>
+                    <Reveal>
+                        <Typography variant="h4" className="font-bold text-white">
                             Ledger de Red: {selectedNetwork.identification.name}
                         </Typography>
-                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.5)', fontFamily: 'monospace' }}>
+                        <Typography variant="body2" className="font-mono text-white/50">
                             NETWORK ID: {selectedNetwork.id}
                         </Typography>
-                    </Box>
-                </Box>
-                <Box>
-                    <Chip 
-                        label="EXPLORADOR DE BLOQUES" 
-                        sx={{ 
-                            bgcolor: `${networkColor}20`, 
-                            color: networkColor, 
-                            border: `1px solid ${networkColor}`,
-                            fontWeight: 'bold',
-                            letterSpacing: 1.5
-                        }} 
-                    />
-                </Box>
-            </Paper>
+                    </Reveal>
+                </div>
+                <div>
+                    <span
+                        className="inline-flex items-center rounded-full border px-3 py-1 text-sm font-bold tracking-[1.5px]"
+                        style={{ backgroundColor: `${networkColor}20`, color: networkColor, borderColor: networkColor }}
+                    >
+                        EXPLORADOR DE BLOQUES
+                    </span>
+                </div>
+            </div>
 
             {/* Header & Refresh Action */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1, pb: 1, borderBottom: 1, borderColor: 'rgba(255, 255, 255, 0.05)' }}>
-                <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Tag sx={{ color: networkColor }} /> HISTORIAL DE BLOQUES MINADOS
-                </Typography>
-                
-                <CustomButton
-                    variant="info"
-                    onClick={handleRefresh}
-                    disabled={isCooldownActive || isLoading}
-                    startIcon={<Refresh />}
-                    sx={{ color: networkColor, borderColor: `${networkColor}40`, '&:hover': { borderColor: networkColor } }}
-                    glow
-                >
-                    {isCooldownActive ? `${cooldownRemaining}s` : 'Refrescar'}
-                </CustomButton>
-            </Box>
+            <div className="mb-1 flex items-center justify-between border-b border-white/5 pb-2">
+                {/* Reveal propio: el encabezado de arriba depende de que haya red
+                    seleccionada, y sin datos la página quedaba sin ninguna
+                    transición de texto. */}
+                <Reveal>
+                    <Typography variant="h6" className="flex items-center gap-2 font-bold text-white">
+                        <Tag style={{ color: networkColor }} /> HISTORIAL DE BLOQUES MINADOS
+                    </Typography>
+                </Reveal>
+
+                <Tooltip content={isCooldownActive ? `Espero ${cooldownRemaining}s` : 'Actualizar historial de bloques'}>
+                    {/* El span mantiene el tooltip activo aunque el botón esté
+                        deshabilitado: un disabled no emite eventos de puntero y el
+                        mensaje de cooldown es justo el que importa mostrar. */}
+                    <span>
+                        {/* El sx anterior pintaba el botón con networkColor; el Button
+                            compartido trabaja con una paleta fija, así que el acento
+                            queda en "info" (#00f3ff, el color por defecto de red). */}
+                        <Button
+                            color={isCooldownActive ? 'warning' : 'info'}
+                            size="small"
+                            onClick={handleRefresh}
+                            disabled={isCooldownActive || isLoading}
+                            startIcon={<RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />}
+                            aria-label="Actualizar historial de bloques"
+                        >
+                            {isCooldownActive ? (
+                                <span className="tabular-nums">{cooldownRemaining}s</span>
+                            ) : (
+                                'Refrescar'
+                            )}
+                        </Button>
+                    </span>
+                </Tooltip>
+            </div>
 
             {/* Blocks Table View */}
-            <Box>
-                <CustomTable 
+            <div>
+                <CustomTable
                     columns={blocksColumns}
                     data={sortedBlocks}
                     loading={isLoading}
                     pageSize={10}
                 />
-            </Box>
-        </Box>
+            </div>
+        </div>
     );
 };

@@ -5,23 +5,22 @@
 // 5-Estructuración y renderizado visual del componente UI
 
 import React from 'react';
-import { Box, Typography, Container, Grid, Stack } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Mechanic } from '../../lib/data/mechanics';
+import { Typography } from '../ui/Typography';
 
 //# 1-Selección de datos desde el estado global de Redux
 import { useSelector } from 'react-redux';
 import { BlockchainState } from '@/lib/features/blockchain/types';
 
 export const ProbePulse = ({ color }: { color: string }) => {
-  
-  
+
   //# 2-Estructuración y renderizado visual del componente UI
   return (
-    <Box sx={{ position: 'relative', width: 300, height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div className="relative flex h-[300px] w-[300px] items-center justify-center">
       {}
-      <Box sx={{ width: 16, height: 16, borderRadius: '50%', bgcolor: color, zIndex: 10, boxShadow: `0 0 20px ${color}` }} />
-      
+      <div style={{ width: 16, height: 16, borderRadius: '50%', backgroundColor: color, zIndex: 10, boxShadow: `0 0 20px ${color}` }} />
+
       {}
       {[0, 1, 2].map((i) => (
         <motion.div
@@ -51,7 +50,7 @@ export const ProbePulse = ({ color }: { color: string }) => {
             }}
         />
       ))}
-      
+
       {}
        <motion.div
             style={{
@@ -75,63 +74,58 @@ export const ProbePulse = ({ color }: { color: string }) => {
             animate={{ rotate: -360 }}
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
        />
-    </Box>
+    </div>
   )
 }
 
 export const LayoutType1 = ({ mechanic }: { mechanic: Mechanic }) => {
-  
-  
+
   //# 3-Selección de datos desde el estado global de Redux
   const { networks } = useSelector((state: { blockchain: BlockchainState }) => state.blockchain);
-   
-   
+
    //# 4-Estructuración y renderizado visual del componente UI
    return (
-     <Container maxWidth="xl" sx={{ pt: 20 }}>
-    <Grid container spacing={8} alignItems="center">
-      <Grid size={{ xs: 12, md: 6 }}>
+     <div className="mx-auto w-full max-w-[1536px] px-4 pt-40 sm:px-6 lg:px-8">
+    <div className="grid grid-cols-1 items-center gap-16 md:grid-cols-12">
+      <div className="md:col-span-6">
         <motion.div initial={{ x: -50, opacity: 0 }} animate={{ x: 0, opacity: 1 }}>
-          <Typography variant="overline" color={mechanic.color} sx={{ letterSpacing: 3, fontWeight: 'bold' }}>
+          <Typography variant="overline" className="font-bold tracking-[3px]" style={{ color: mechanic.color }}>
              MECÁNICA PRINCIPAL
           </Typography>
-          <Typography variant="h1" sx={{ mt: 2, mb: 4, fontWeight: 800, fontSize: { xs: '3rem', md: '5rem' } }}>
+          <Typography variant="h1" className="mb-8 mt-4 text-[3rem] font-extrabold md:text-[5rem]">
             {mechanic.title}
           </Typography>
-          <Typography variant="h5" color="text.secondary" sx={{ mb: 4, lineHeight: 1.6 }}>
+          <Typography variant="h5" className="mb-8 leading-[1.6] text-foreground-muted">
             {mechanic.content.paragraphs[0]}
           </Typography>
-          <Stack direction="row" spacing={2} sx={{ mb: 6 }}>
-            <Box sx={{ p: 2, border: '1px solid rgba(255,255,255,0.1)', borderRadius: 2 }}>
-                <Typography variant="caption" color="text.secondary">{mechanic.content.statLabel}</Typography>
-                <Typography variant="h4" color="white" fontWeight="bold">{mechanic.content.statValue}</Typography>
-            </Box>
-          </Stack>
+          <div className="mb-12 flex flex-row gap-4">
+            <div className="rounded-lg border border-white/10 p-4">
+                <Typography variant="caption" component="p" className="text-foreground-muted">{mechanic.content.statLabel}</Typography>
+                <Typography variant="h4" component="p" className="font-bold text-white">{mechanic.content.statValue}</Typography>
+            </div>
+          </div>
         </motion.div>
-      </Grid>
-      <Grid size={{ xs: 12, md: 6 }}>
+      </div>
+      <div className="md:col-span-6">
         <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2 }}>
-            <Box sx={{ 
-                height: 500, 
-                bgcolor: 'rgba(255,255,255,0.03)', 
-                borderRadius: 8,
-                position: 'relative',
-                overflow: 'hidden',
-                border: `1px solid ${mechanic.color}40`,
-                boxShadow: `0 0 50px ${mechanic.color}20`
-            }}>
-                <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+            <div
+                className="relative h-[500px] overflow-hidden rounded-[32px] bg-white/[0.03]"
+                style={{
+                    border: `1px solid ${mechanic.color}40`,
+                    boxShadow: `0 0 50px ${mechanic.color}20`,
+                }}
+            >
+                <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
                      {}
                      {[...Array(20)].map((_, i) => {
-                        
+
                         const top = ((i * 17) % 100);
                         const left = ((i * 23) % 100);
                         const delay = (i % 5);
-                        
-                        
+
                         //# 5-Estructuración y renderizado visual del componente UI
                         return (
-                        <motion.div 
+                        <motion.div
                             key={i}
                             style={{
                                 position: 'absolute',
@@ -146,42 +140,45 @@ export const LayoutType1 = ({ mechanic }: { mechanic: Mechanic }) => {
                         />
                      )})}
                      <ProbePulse color={mechanic.color} />
-                </Box>
+                </div>
                 {}
-                <Box sx={{ position: 'absolute', bottom: 30, left: 30, right: 30, p: 3, bgcolor: 'rgba(0,0,0,0.8)', borderRadius: 4, backdropFilter: 'blur(10px)' }}>
-                    <Typography variant="subtitle2" color={mechanic.color}>Estado del Sistema - {networks[0]?.isActive ? "Operativo" : "No operativo"}</Typography>
-                    <Box sx={{ height: 4, bgcolor: 'rgba(255,255,255,0.1)', mt: 1, borderRadius: 2 }}>
-                        <Box sx={{ width: '70%', height: '100%', bgcolor: mechanic.color, borderRadius: 2 }} />
-                    </Box>
-                </Box>
-            </Box>
+                <div className="absolute bottom-[30px] left-[30px] right-[30px] rounded-2xl bg-black/80 p-6 backdrop-blur-md">
+                    <Typography variant="subtitle2" component="p" style={{ color: mechanic.color }}>Estado del Sistema - {networks[0]?.isActive ? "Operativo" : "No operativo"}</Typography>
+                    <div className="mt-2 h-1 rounded-lg bg-white/10">
+                        <div className="h-full rounded-lg" style={{ width: '70%', backgroundColor: mechanic.color }} />
+                    </div>
+                </div>
+            </div>
         </motion.div>
-      </Grid>
-    </Grid>
-    
-    <Box sx={{ mt: 10 }}>
-        <Grid container spacing={4}>
+      </div>
+    </div>
+
+    <div className="mt-20">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
             {mechanic.content.paragraphs.slice(1).map((p: string, i: number) => (
-                <Grid size={{ xs: 12, md: 6 }} key={i}>
-                    <Typography fontSize="1.1rem" color="text.secondary" lineHeight={1.8}>{p}</Typography>
-                </Grid>
+                <div className="md:col-span-6" key={i}>
+                    <Typography component="p" className="text-[1.1rem] leading-[1.8] text-foreground-muted">{p}</Typography>
+                </div>
             ))}
-        </Grid>
-    </Box>
-    
-    <Box sx={{ mt: 10, mb: 10 }}>
-        <Typography variant="h4" gutterBottom>Características Clave</Typography>
-        <Grid container spacing={2} sx={{ mt: 2 }}>
+        </div>
+    </div>
+
+    <div className="mb-20 mt-20">
+        <Typography variant="h4" component="p" className="mb-2">Características Clave</Typography>
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
             {mechanic.content.features.map((f, i) => (
-                <Grid size={{ xs: 12, sm: 6, md: 3 }} key={i}>
-                    <Box sx={{ p: 3, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, borderLeft: `4px solid ${mechanic.color}`, height: '100%' }}>
-                        <Typography fontWeight="bold" gutterBottom>{f.title}</Typography>
-                        <Typography variant="body2" color="text.secondary">{f.description}</Typography>
-                    </Box>
-                </Grid>
+                <div className="md:col-span-1" key={i}>
+                    <div
+                        className="h-full rounded-lg bg-white/[0.02] p-6"
+                        style={{ borderLeft: `4px solid ${mechanic.color}` }}
+                    >
+                        <Typography component="p" className="mb-2 font-bold">{f.title}</Typography>
+                        <Typography variant="body2" component="p" className="text-foreground-muted">{f.description}</Typography>
+                    </div>
+                </div>
             ))}
-        </Grid>
-    </Box>
-  </Container>
+        </div>
+    </div>
+  </div>
    )
 }

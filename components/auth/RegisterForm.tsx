@@ -7,7 +7,7 @@
 'use client';
 
 import React from 'react';
-import { Typography, Alert, Grid, CircularProgress, Box } from '@mui/material';
+import { Typography } from '../ui/Typography';
 import { motion } from 'framer-motion';
 
 import { useForm } from 'react-hook-form';
@@ -62,55 +62,54 @@ export const RegisterForm = () => {
 
   //# 4-Renderizar formulario con validación Zod
   return (
-    <form onSubmit={handleSubmit(onSubmit)} style={{ height: '100%' }}>
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} style={{ height: '100%' }}>
+    <form onSubmit={handleSubmit(onSubmit)} className="h-full">
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="h-full">
 
 
-        <Box sx={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div className="relative flex h-full flex-col">
 
 
-          <Box sx={{ position: 'relative', zIndex: 1, flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div className="relative z-[1] flex flex-grow flex-col justify-center">
             <TechFrame color="#ff0055">
-              <Box sx={{ p: 4, bgcolor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)' }}>
-                <Box sx={{ mb: 4, textAlign: 'center' }}>
-                  <Typography variant="overline" sx={{ color: '#ff0055', letterSpacing: 3, display: 'block', mb: 1 }}>
+              <div className="bg-black/80 p-8 backdrop-blur-md">
+                <div className="mb-8 text-center">
+                  <Typography variant="overline" className="mb-1 block tracking-[3px] text-[#ff0055]">
                     {'// NEW USER REGISTRATION'}
                   </Typography>
-                  <Typography variant="h4" gutterBottom sx={{
-                    color: 'white',
-                    textTransform: 'uppercase',
-                    fontWeight: 'bold',
-                    textShadow: '0 0 20px rgba(255, 0, 85, 0.5)',
-                  }}>
+                  <Typography variant="h4" className="font-bold uppercase text-white [text-shadow:0_0_20px_rgba(255,0,85,0.5)]">
                     REGISTRO
                   </Typography>
-                </Box>
+                </div>
 
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, md: 6 }}>
-                    <Input label="Nombre" error={!!errors.name} helperText={errors.name?.message} fullWidth {...register('name')} />
-                  </Grid>
-                  <Grid size={{ xs: 12, md: 6 }}>
-                    <Input label="Apellido" error={!!errors.lastName} helperText={errors.lastName?.message} fullWidth {...register('lastName')} />
-                  </Grid>
-                  <Grid size={{ xs: 12 }}>
-                    <Input label="Usuario" error={!!errors.username} helperText={errors.username?.message} fullWidth {...register('username')} />
-                  </Grid>
-                  <Grid size={{ xs: 12 }}>
-                    <Input label="Email" type="email" error={!!errors.email} helperText={errors.email?.message} fullWidth {...register('email')} />
-                  </Grid>
-                  <Grid size={{ xs: 12 }}>
-                    <Input label="Contraseña" type="password" error={!!errors.password} helperText={errors.password?.message} fullWidth {...register('password')} />
-                  </Grid>
-                  <Grid size={{ xs: 12 }}>
-                    <Input label="Fecha de Nacimiento" type="date" error={!!errors.birthday} helperText={errors.birthday?.message} fullWidth {...register('birthday')} />
-                  </Grid>
-                  <Grid size={{ xs: 12 }}>
-                    <Input label="Código de Referencia (Opcional)" error={!!errors.referralCode} helperText={errors.referralCode?.message} fullWidth {...register('referralCode')} />
-                  </Grid>
-                </Grid>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
+                  <div className="md:col-span-6">
+                    <Input label="Nombre" error={!!errors.name} helperText={errors.name?.message} {...register('name')} />
+                  </div>
+                  <div className="md:col-span-6">
+                    <Input label="Apellido" error={!!errors.lastName} helperText={errors.lastName?.message} {...register('lastName')} />
+                  </div>
+                  <div className="md:col-span-12">
+                    <Input label="Usuario" error={!!errors.username} helperText={errors.username?.message} {...register('username')} />
+                  </div>
+                  <div className="md:col-span-12">
+                    <Input label="Email" type="email" error={!!errors.email} helperText={errors.email?.message} {...register('email')} />
+                  </div>
+                  <div className="md:col-span-12">
+                    <Input label="Contraseña" type="password" error={!!errors.password} helperText={errors.password?.message} {...register('password')} />
+                  </div>
+                  <div className="md:col-span-12">
+                    <Input label="Fecha de Nacimiento" type="date" error={!!errors.birthday} helperText={errors.birthday?.message} {...register('birthday')} />
+                  </div>
+                  <div className="md:col-span-12">
+                    <Input label="Código de Referencia (Opcional)" error={!!errors.referralCode} helperText={errors.referralCode?.message} {...register('referralCode')} />
+                  </div>
+                </div>
 
-                {error && <Alert severity="error" sx={{ mt: 3, bgcolor: 'rgba(255, 0, 85, 0.1)', border: '1px solid #ff0055', color: '#ffcdd2' }}>{error}</Alert>}
+                {error && (
+                  <div className="mt-6 rounded border border-[#ff0055] bg-[#ff0055]/10 p-3 text-sm text-[#ffcdd2]">
+                    {error}
+                  </div>
+                )}
 
                 <Button type="submit" variant="contained" fullWidth glow sx={{
                   mt: 4,
@@ -124,12 +123,14 @@ export const RegisterForm = () => {
                     boxShadow: '0 0 20px rgba(255, 0, 85, 0.6)'
                   }
                 }} disabled={status === 'loading'}>
-                  {status === 'loading' ? <CircularProgress size={24} color="inherit" /> : 'CONFIRMAR REGISTRO'}
+                  {status === 'loading' ? (
+                    <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                  ) : 'CONFIRMAR REGISTRO'}
                 </Button>
-              </Box>
+              </div>
             </TechFrame>
-          </Box>
-        </Box>
+          </div>
+        </div>
       </motion.div>
     </form>
   );
