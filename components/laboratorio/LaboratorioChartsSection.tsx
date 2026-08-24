@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Grid, Paper, Box, Typography, IconButton } from "@mui/material";
-import { PushPin, PushPinOutlined } from "@mui/icons-material";
+import { Pin } from "lucide-react";
 import { motion } from "framer-motion";
+import { Typography } from "../ui/Typography";
 import { PowerChart, TemperatureChart, EnergyCostChart } from "./LaboratorioCharts";
 
 export function LaboratorioChartsSection() {
@@ -13,10 +13,10 @@ export function LaboratorioChartsSection() {
     setPinnedChart(prev => prev === chartId ? null : chartId);
   };
 
-  const getGridSize = (chartId: string) => {
-    if (pinnedChart === chartId) return { xs: 12, lg: 12 };
-    if (pinnedChart !== null) return { xs: 12, lg: 6 }; // If another chart is pinned, the remaining two stack side-by-side underneath
-    return { xs: 12, lg: 4 }; // Default: 3 columns
+  const getGridClassName = (chartId: string) => {
+    if (pinnedChart === chartId) return 'col-span-12';
+    if (pinnedChart !== null) return 'col-span-12 lg:col-span-6'; // If another chart is pinned, the remaining two stack side-by-side underneath
+    return 'col-span-12 lg:col-span-4'; // Default: 3 columns
   };
 
   const getChartHeight = (chartId: string) => {
@@ -24,123 +24,111 @@ export function LaboratorioChartsSection() {
   };
 
   return (
-    <Grid container spacing={4} sx={{ mb: 4 }}>
+    <div className="mb-8 grid grid-cols-12 gap-8">
       {/* Power Chart */}
-      <Grid size={getGridSize('power')} sx={{ transition: 'all 0.5s ease-in-out' }}>
+      <div className={`${getGridClassName('power')} transition-all duration-500 ease-in-out`}>
         <motion.div layout initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.2 }} style={{ height: '100%' }}>
-          <Paper variant="outlined" sx={{ 
-            p: 3, height: '100%', minHeight: getChartHeight('power'), 
-            bgcolor: 'rgba(10, 15, 30, 0.8)', 
-            backdropFilter: 'blur(20px)', 
-            borderColor: 'rgba(0, 243, 255, 0.15)',
-            borderRadius: 4,
-            boxShadow: 'inset 0 0 20px rgba(0,243,255,0.02), 0 8px 32px rgba(0,0,0,0.4)',
-            position: 'relative',
-            overflow: 'hidden',
-            transition: 'all 0.5s ease-in-out'
-          }}>
-            <Box sx={{ position: 'absolute', top: 0, left: 0, width: 4, height: '100%', bgcolor: '#00f3ff', opacity: 0.8 }} />
-            
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-              <Typography variant="h6" sx={{ color: '#00f3ff', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', fontSize: '0.9rem' }}>
+          <div
+            className="relative h-full overflow-hidden rounded-2xl border p-6 transition-all duration-500 ease-in-out"
+            style={{
+              minHeight: getChartHeight('power'),
+              backgroundColor: 'rgba(10, 15, 30, 0.8)',
+              backdropFilter: 'blur(20px)',
+              borderColor: 'rgba(0, 243, 255, 0.15)',
+              boxShadow: 'inset 0 0 20px rgba(0,243,255,0.02), 0 8px 32px rgba(0,0,0,0.4)',
+            }}
+          >
+            <div className="absolute left-0 top-0 h-full w-1 bg-[#00f3ff] opacity-80" />
+
+            <div className="mb-4 flex items-start justify-between">
+              <Typography variant="h6" className="text-[0.9rem] font-semibold uppercase tracking-wide text-[#00f3ff]">
                 Poder Energético
               </Typography>
-              <IconButton 
-                size="small" 
-                onClick={() => handlePin('power')} 
-                sx={{ 
-                  color: pinnedChart === 'power' ? '#00f3ff' : 'rgba(255,255,255,0.3)',
-                  '&:hover': { color: '#00f3ff', bgcolor: 'rgba(0, 243, 255, 0.1)' }
-                }}
+              <button
+                onClick={() => handlePin('power')}
+                className="rounded p-1 transition-colors hover:bg-[#00f3ff]/10 hover:text-[#00f3ff]"
+                style={{ color: pinnedChart === 'power' ? '#00f3ff' : 'rgba(255,255,255,0.3)' }}
               >
-                {pinnedChart === 'power' ? <PushPin fontSize="small" /> : <PushPinOutlined fontSize="small" />}
-              </IconButton>
-            </Box>
+                <Pin size={16} fill={pinnedChart === 'power' ? 'currentColor' : 'none'} />
+              </button>
+            </div>
 
-            <Box sx={{ position: 'absolute', top: 70, left: 24, right: 24, bottom: 24 }}>
+            <div className="absolute bottom-6 left-6 right-6 top-[70px]">
               <PowerChart />
-            </Box>
-          </Paper>
+            </div>
+          </div>
         </motion.div>
-      </Grid>
+      </div>
 
       {/* Temperature Chart */}
-      <Grid size={getGridSize('temp')} sx={{ transition: 'all 0.5s ease-in-out' }}>
+      <div className={`${getGridClassName('temp')} transition-all duration-500 ease-in-out`}>
         <motion.div layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }} style={{ height: '100%' }}>
-          <Paper variant="outlined" sx={{ 
-            p: 3, height: '100%', minHeight: getChartHeight('temp'), 
-            bgcolor: 'rgba(10, 15, 30, 0.8)', 
-            backdropFilter: 'blur(20px)', 
-            borderColor: 'rgba(255, 0, 85, 0.15)',
-            borderRadius: 4,
-            boxShadow: 'inset 0 0 20px rgba(255,0,85,0.02), 0 8px 32px rgba(0,0,0,0.4)',
-            position: 'relative',
-            overflow: 'hidden',
-            transition: 'all 0.5s ease-in-out'
-          }}>
-            <Box sx={{ position: 'absolute', top: 0, left: 0, width: 4, height: '100%', bgcolor: '#ff0055', opacity: 0.8 }} />
-            
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-              <Typography variant="h6" sx={{ color: '#ff0055', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', fontSize: '0.9rem' }}>
+          <div
+            className="relative h-full overflow-hidden rounded-2xl border p-6 transition-all duration-500 ease-in-out"
+            style={{
+              minHeight: getChartHeight('temp'),
+              backgroundColor: 'rgba(10, 15, 30, 0.8)',
+              backdropFilter: 'blur(20px)',
+              borderColor: 'rgba(255, 0, 85, 0.15)',
+              boxShadow: 'inset 0 0 20px rgba(255,0,85,0.02), 0 8px 32px rgba(0,0,0,0.4)',
+            }}
+          >
+            <div className="absolute left-0 top-0 h-full w-1 bg-[#ff0055] opacity-80" />
+
+            <div className="mb-4 flex items-start justify-between">
+              <Typography variant="h6" className="text-[0.9rem] font-semibold uppercase tracking-wide text-[#ff0055]">
                 Temperatura Central
               </Typography>
-              <IconButton 
-                size="small" 
-                onClick={() => handlePin('temp')} 
-                sx={{ 
-                  color: pinnedChart === 'temp' ? '#ff0055' : 'rgba(255,255,255,0.3)',
-                  '&:hover': { color: '#ff0055', bgcolor: 'rgba(255, 0, 85, 0.1)' }
-                }}
+              <button
+                onClick={() => handlePin('temp')}
+                className="rounded p-1 transition-colors hover:bg-[#ff0055]/10 hover:text-[#ff0055]"
+                style={{ color: pinnedChart === 'temp' ? '#ff0055' : 'rgba(255,255,255,0.3)' }}
               >
-                {pinnedChart === 'temp' ? <PushPin fontSize="small" /> : <PushPinOutlined fontSize="small" />}
-              </IconButton>
-            </Box>
+                <Pin size={16} fill={pinnedChart === 'temp' ? 'currentColor' : 'none'} />
+              </button>
+            </div>
 
-            <Box sx={{ position: 'absolute', top: 70, left: 24, right: 24, bottom: 24 }}>
+            <div className="absolute bottom-6 left-6 right-6 top-[70px]">
               <TemperatureChart />
-            </Box>
-          </Paper>
+            </div>
+          </div>
         </motion.div>
-      </Grid>
+      </div>
 
       {/* Energy Cost Chart */}
-      <Grid size={getGridSize('cost')} sx={{ transition: 'all 0.5s ease-in-out' }}>
+      <div className={`${getGridClassName('cost')} transition-all duration-500 ease-in-out`}>
         <motion.div layout initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.4 }} style={{ height: '100%' }}>
-          <Paper variant="outlined" sx={{ 
-            p: 3, height: '100%', minHeight: getChartHeight('cost'), 
-            bgcolor: 'rgba(10, 15, 30, 0.8)', 
-            backdropFilter: 'blur(20px)', 
-            borderColor: 'rgba(0, 230, 118, 0.15)',
-            borderRadius: 4,
-            boxShadow: 'inset 0 0 20px rgba(0,230,118,0.02), 0 8px 32px rgba(0,0,0,0.4)',
-            position: 'relative',
-            overflow: 'hidden',
-            transition: 'all 0.5s ease-in-out'
-          }}>
-            <Box sx={{ position: 'absolute', top: 0, left: 0, width: 4, height: '100%', bgcolor: '#00e676', opacity: 0.8 }} />
-            
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-              <Typography variant="h6" sx={{ color: '#00e676', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', fontSize: '0.9rem' }}>
+          <div
+            className="relative h-full overflow-hidden rounded-2xl border p-6 transition-all duration-500 ease-in-out"
+            style={{
+              minHeight: getChartHeight('cost'),
+              backgroundColor: 'rgba(10, 15, 30, 0.8)',
+              backdropFilter: 'blur(20px)',
+              borderColor: 'rgba(0, 230, 118, 0.15)',
+              boxShadow: 'inset 0 0 20px rgba(0,230,118,0.02), 0 8px 32px rgba(0,0,0,0.4)',
+            }}
+          >
+            <div className="absolute left-0 top-0 h-full w-1 bg-[#00e676] opacity-80" />
+
+            <div className="mb-4 flex items-start justify-between">
+              <Typography variant="h6" className="text-[0.9rem] font-semibold uppercase tracking-wide text-[#00e676]">
                 Costo Energético
               </Typography>
-              <IconButton 
-                size="small" 
-                onClick={() => handlePin('cost')} 
-                sx={{ 
-                  color: pinnedChart === 'cost' ? '#00e676' : 'rgba(255,255,255,0.3)',
-                  '&:hover': { color: '#00e676', bgcolor: 'rgba(0, 230, 118, 0.1)' }
-                }}
+              <button
+                onClick={() => handlePin('cost')}
+                className="rounded p-1 transition-colors hover:bg-[#00e676]/10 hover:text-[#00e676]"
+                style={{ color: pinnedChart === 'cost' ? '#00e676' : 'rgba(255,255,255,0.3)' }}
               >
-                {pinnedChart === 'cost' ? <PushPin fontSize="small" /> : <PushPinOutlined fontSize="small" />}
-              </IconButton>
-            </Box>
+                <Pin size={16} fill={pinnedChart === 'cost' ? 'currentColor' : 'none'} />
+              </button>
+            </div>
 
-            <Box sx={{ position: 'absolute', top: 70, left: 24, right: 24, bottom: 24 }}>
+            <div className="absolute bottom-6 left-6 right-6 top-[70px]">
               <EnergyCostChart />
-            </Box>
-          </Paper>
+            </div>
+          </div>
         </motion.div>
-      </Grid>
-    </Grid>
+      </div>
+    </div>
   );
 }

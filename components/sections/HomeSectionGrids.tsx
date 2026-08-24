@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { Box, Typography, Stack, Grid } from '@mui/material';
 import { Compass, Cpu, Wallet, Users, Activity, Rocket, Blocks, BarChart3 } from 'lucide-react';
+import { Typography } from '../ui/Typography';
 
 export const LyncoreFeaturesGrid = () => (
-  <Grid container spacing={3} sx={{ mt: 1 }}>
+  <div className="mt-2 grid grid-cols-12 gap-6">
     {[
       { text: 'Exploración Galáctica', desc: 'Explora planetas hostiles y recolecta recursos para tus naves y bases.', icon: Compass },
       { text: 'Contratos de Energía', desc: 'Crea estructuras y realiza acuerdos de suministro energético entre usuarios.', icon: Cpu },
@@ -14,39 +14,26 @@ export const LyncoreFeaturesGrid = () => (
     ].map((item, idx) => {
       const Icon = item.icon;
       return (
-        <Grid size={{ xs: 12, sm: 6, md: 3 }} key={idx}>
-          <Box sx={{
-            p: 2.5,
-            borderRadius: 2,
-            bgcolor: 'rgba(255, 255, 255, 0.02)',
-            border: '1px solid rgba(0, 243, 255, 0.1)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 1,
-            '&:hover': {
-              bgcolor: 'rgba(0, 243, 255, 0.04)',
-              borderColor: 'rgba(0, 243, 255, 0.3)',
-            },
-            transition: 'all 0.2s ease-in-out'
-          }}>
-            <Stack direction="row" spacing={1.5} alignItems="center">
+        <div className="col-span-12 sm:col-span-6 md:col-span-3" key={idx}>
+          <div className="flex flex-col gap-2 rounded-lg border border-[#00f3ff]/10 bg-white/[0.02] p-5 transition-all duration-200 ease-in-out hover:border-[#00f3ff]/30 hover:bg-[#00f3ff]/[0.04]">
+            <div className="flex flex-row items-center gap-3">
               <Icon size={18} color="#00f3ff" />
-              <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 'bold' }}>
+              <Typography variant="subtitle2" className="font-bold text-white">
                 {item.text}
               </Typography>
-            </Stack>
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+            </div>
+            <Typography variant="caption" className="text-foreground-muted">
               {item.desc}
             </Typography>
-          </Box>
-        </Grid>
+          </div>
+        </div>
       );
     })}
-  </Grid>
+  </div>
 );
 
 export const OperationsFeaturesGrid = () => (
-  <Grid container spacing={3} sx={{ mt: 1 }}>
+  <div className="mt-2 grid grid-cols-12 gap-6">
     {[
       { text: 'Visualizar tus activos', icon: Wallet, desc: 'Control centralizado de wallets, balances y recursos recolectados.' },
       { text: 'Inyectar hash a la red', icon: Activity, desc: 'Asegura la red procesando y firmando bloques con tu hash local.' },
@@ -57,95 +44,62 @@ export const OperationsFeaturesGrid = () => (
     ].map((item, idx) => {
       const Icon = item.icon;
       return (
-        <Grid size={{ xs: 12, sm: 6, md: 4 }} key={idx}>
-          <Box sx={{
-            p: 2.5,
-            borderRadius: 2,
-            bgcolor: 'rgba(255, 255, 255, 0.02)',
-            border: '1px solid rgba(0, 230, 118, 0.1)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 1,
-            '&:hover': {
-              bgcolor: 'rgba(0, 230, 118, 0.04)',
-              borderColor: 'rgba(0, 230, 118, 0.3)',
-            },
-            transition: 'all 0.2s ease-in-out'
-          }}>
-            <Stack direction="row" spacing={1.5} alignItems="center">
+        <div className="col-span-12 sm:col-span-6 md:col-span-4" key={idx}>
+          <div className="flex flex-col gap-2 rounded-lg border border-[#00e676]/10 bg-white/[0.02] p-5 transition-all duration-200 ease-in-out hover:border-[#00e676]/30 hover:bg-[#00e676]/[0.04]">
+            <div className="flex flex-row items-center gap-3">
               <Icon size={18} color="#00e676" />
-              <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 'bold' }}>
+              <Typography variant="subtitle2" className="font-bold text-white">
                 {item.text}
               </Typography>
-            </Stack>
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+            </div>
+            <Typography variant="caption" className="text-foreground-muted">
               {item.desc}
             </Typography>
-          </Box>
-        </Grid>
+          </div>
+        </div>
       );
     })}
-  </Grid>
+  </div>
 );
 
 export const MarketFeaturesGrid = () => (
-  <Grid container spacing={3} sx={{ mt: 1 }}>
+  <div className="mt-2 grid grid-cols-12 gap-6">
     {[
       { text: 'Intercambio Galáctico', desc: 'Comercio instantáneo de tokens, naves y recursos en tiempo real.' },
       { text: 'Liquidez Extrema', desc: 'Sistemas de orden inmediata respaldados por las pools de red.' },
       { text: 'Transferencias Seguras', desc: 'Envío directo de activos entre billeteras seguras del yermo.' }
     ].map((item, idx) => (
-      <Grid size={{ xs: 12, md: 4 }} key={idx}>
-        <Box sx={{
-          p: 2.5,
-          borderRadius: 2,
-          bgcolor: 'rgba(255, 255, 255, 0.02)',
-          border: '1px solid rgba(255, 171, 0, 0.1)',
-          '&:hover': {
-            bgcolor: 'rgba(255, 171, 0, 0.04)',
-            borderColor: 'rgba(255, 171, 0, 0.3)',
-          },
-          transition: 'all 0.25s ease'
-        }}>
-          <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
+      <div className="col-span-12 md:col-span-4" key={idx}>
+        <div className="rounded-lg border border-[#ffab00]/10 bg-white/[0.02] p-5 transition-all duration-[250ms] ease-in-out hover:border-[#ffab00]/30 hover:bg-[#ffab00]/[0.04]">
+          <Typography variant="subtitle2" className="mb-2 font-bold text-white">
             ✨ {item.text}
           </Typography>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+          <Typography variant="caption" className="text-foreground-muted">
             {item.desc}
           </Typography>
-        </Box>
-      </Grid>
+        </div>
+      </div>
     ))}
-  </Grid>
+  </div>
 );
 
 export const LedgerFeaturesGrid = () => (
-  <Grid container spacing={3} sx={{ mt: 1 }}>
+  <div className="mt-2 grid grid-cols-12 gap-6">
     {[
       { text: 'Bloques Elásticos', desc: 'Los bloques ajustan su capacidad un 25% para optimizar el rendimiento.' },
       { text: 'Ledger Inmutable', desc: 'Registro inalterable firmado por consenso de red y forja solar.' },
       { text: 'Auditoría en Tiempo Real', desc: 'Visualiza y sigue transacciones conforme se sellan al vacío.' }
     ].map((item, idx) => (
-      <Grid size={{ xs: 12, md: 4 }} key={idx}>
-        <Box sx={{
-          p: 2.5,
-          borderRadius: 2,
-          bgcolor: 'rgba(255, 255, 255, 0.02)',
-          border: '1px solid rgba(255, 0, 85, 0.1)',
-          '&:hover': {
-            bgcolor: 'rgba(255, 0, 85, 0.04)',
-            borderColor: 'rgba(255, 0, 85, 0.3)',
-          },
-          transition: 'all 0.25s ease'
-        }}>
-          <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
+      <div className="col-span-12 md:col-span-4" key={idx}>
+        <div className="rounded-lg border border-[#ff0055]/10 bg-white/[0.02] p-5 transition-all duration-[250ms] ease-in-out hover:border-[#ff0055]/30 hover:bg-[#ff0055]/[0.04]">
+          <Typography variant="subtitle2" className="mb-2 font-bold text-white">
             ⛓️ {item.text}
           </Typography>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+          <Typography variant="caption" className="text-foreground-muted">
             {item.desc}
           </Typography>
-        </Box>
-      </Grid>
+        </div>
+      </div>
     ))}
-  </Grid>
+  </div>
 );

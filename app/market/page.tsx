@@ -12,14 +12,15 @@
 
 //# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Grid, Container, Button, CircularProgress } from '@mui/material';
-import GridViewIcon from '@mui/icons-material/GridView';
-import ViewListIcon from '@mui/icons-material/ViewList';
+import { Grid3x3, List } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Background } from '../../components/layout/Background';
 import { TechFrame } from '../../components/ui/TechFrame';
 import { PageHeader } from '../../components/ui/PageHeader';
+import { Reveal } from '../../components/ui/TextReveal';
+import { Button } from '../../components/ui/Button';
+import { Typography } from '../../components/ui/Typography';
 import { motion } from 'framer-motion';
 import { TaoIcon } from '../../components/ui/TaoIcon';
 
@@ -34,24 +35,24 @@ import { MarketTableView } from '../../components/market/MarketTableView';
 export default function MarketPage() {
   const router = useRouter();
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
-  
+
   //# 3-Obtención del despachador para emitir acciones al store
   const dispatch = useDispatch<AppDispatch>();
-  
-  
+
+
   //# 4-Selección de datos desde el estado global de Redux
   const { cryptos, isLoading, error } = useSelector((state: RootState) => state.market);
-  
-  
+
+
   //# 5-Selección de datos desde el estado global de Redux
   const { selectedNetwork } = useSelector((state: RootState) => state.blockchain);
-  
-  
+
+
   //# 6-Selección de datos desde el estado global de Redux
   const { token } = useSelector((state: RootState) => state.auth);
 
-  
-  
+
+
   //# 7-Efecto secundario para sincronización del ciclo de vida
   useEffect(() => {
     if (selectedNetwork?.id) {
@@ -59,12 +60,12 @@ export default function MarketPage() {
     }
   }, [dispatch, selectedNetwork?.id]);
 
-  
-  
+
+
   //# 8-Manejo de lógica de usuario para handleTransaction
   const handleTransaction = (e: React.MouseEvent, type: 'BUY' | 'SELL' | 'TRANSFER', cryptoId: string) => {
     e.stopPropagation();
-    
+
     if (!token) {
         dispatch(addNotification({
             type: 'warning',
@@ -76,68 +77,53 @@ export default function MarketPage() {
     router.push(`/market/trade?type=${type}&cryptoId=${cryptoId}&redirect=market`);
   };
 
-  
-  
+
+
   //# 9-Estructuración y renderizado visual del componente UI
   return (
-    <Box sx={{ minHeight: '100vh', position: 'relative' }}>
+    <div className="relative min-h-screen">
       <Background />
-      
-      <Container maxWidth="xl" sx={{ pt: 16, pb: 10, position: 'relative', zIndex: 1 }}>
-        <PageHeader 
-            title="Mercado Galáctico" 
+
+      <div className="relative z-[1] mx-auto w-full max-w-[1536px] px-4 pt-32 pb-20 sm:px-6 lg:px-8">
+        <PageHeader
+            title="Mercado Galáctico"
             subtitle="Intercambia activos digitales en tiempo real a través del sistema multi-cadena."
             color="#00f3ff"
         />
 
         <BlockchainDataDisplay network={selectedNetwork} />
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, mt: 4 }}>
-          <Typography variant="h4" sx={{ color: 'white', m: 0 }}>Activos Listados</Typography>
-          <Box sx={{ display: 'flex', gap: 1 }}>
+        <Reveal className="mt-8 mb-8 flex items-center justify-between">
+          <Typography variant="h4" className="text-white">Activos Listados</Typography>
+          <div className="flex gap-2">
+            {/* La vista activa se marca con el relleno, no con otro color. */}
             <Button
-              variant="outlined"
+              variant={viewMode === 'cards' ? 'contained' : 'outlined'}
+              color="info"
               size="small"
               onClick={() => setViewMode('cards')}
-              startIcon={<GridViewIcon />}
-              sx={{
-                borderColor: viewMode === 'cards' ? '#00f3ff' : 'rgba(255, 255, 255, 0.1)',
-                color: viewMode === 'cards' ? '#00f3ff' : 'rgba(255, 255, 255, 0.5)',
-                bgcolor: viewMode === 'cards' ? 'rgba(0, 243, 255, 0.05)' : 'transparent',
-                '&:hover': {
-                  borderColor: '#00f3ff',
-                  bgcolor: 'rgba(0, 243, 255, 0.1)',
-                }
-              }}
+              startIcon={<Grid3x3 size={18} />}
             >
               Tarjetas
             </Button>
             <Button
-              variant="outlined"
+              variant={viewMode === 'table' ? 'contained' : 'outlined'}
+              color="info"
               size="small"
               onClick={() => setViewMode('table')}
-              startIcon={<ViewListIcon />}
-              sx={{
-                borderColor: viewMode === 'table' ? '#00f3ff' : 'rgba(255, 255, 255, 0.1)',
-                color: viewMode === 'table' ? '#00f3ff' : 'rgba(255, 255, 255, 0.5)',
-                bgcolor: viewMode === 'table' ? 'rgba(0, 243, 255, 0.05)' : 'transparent',
-                '&:hover': {
-                  borderColor: '#00f3ff',
-                  bgcolor: 'rgba(0, 243, 255, 0.1)',
-                }
-              }}
+              startIcon={<List size={18} />}
             >
               Tabla
             </Button>
-          </Box>
-        </Box>
-        
+          </div>
+        </Reveal>
+
         {isLoading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', my: 10 }}>
-                <CircularProgress color="primary" />
-            </Box>
+            <div className="my-20 flex justify-center">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-[#00f3ff]" />
+            </div>
         ) : error ? (
-            <Typography align="center" color="error">Error al cargar datos: {error}</Typography>
+            <Typography className="text-center text-error">Error al cargar datos: {error}</Typography>
         ) : viewMode === 'table' ? (
             <MarketTableView
               cryptos={cryptos}
@@ -145,10 +131,10 @@ export default function MarketPage() {
               onRowClick={(id) => router.push(`/market/${id}`)}
             />
         ) : (
-            <Grid container spacing={4}>
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
             {cryptos.map((crypto, index) => (
-                <Grid size={{ xs: 12, sm: 6, md: 3 }} key={crypto.id}>
-                <motion.div 
+                <motion.div
+                    key={crypto.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
@@ -158,154 +144,95 @@ export default function MarketPage() {
                     onClick={() => router.push(`/market/${crypto.id}`)}
                     color={crypto.additionalInfo?.pColor || '#00f3ff'}
                     className="h-full w-full"
-                    sx={{
-                        height: '100%',
-                    }}
                 >
-                    <Box sx={{
-                        height: '100%',
-                        width: '100%',
-                        p: 3,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'space-between', 
-                        position: 'relative'
-                    }}>
-                    <Box sx={{
-                        position: 'absolute',
-                        top: '30%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: '180px',
-                        height: '180px',
-                        borderRadius: '50%',
-                        background: crypto.additionalInfo?.pColor || 'primary.main',
-                        filter: 'blur(80px)',
-                        opacity: 0.15,
-                        zIndex: 0,
-                        pointerEvents: 'none'
-                    }} />
+                    <div className="relative flex h-full w-full flex-col items-center justify-between p-6">
+                    <div
+                        className="pointer-events-none absolute left-1/2 top-[30%] z-0 h-[180px] w-[180px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-[0.15] blur-[80px]"
+                        style={{ background: crypto.additionalInfo?.pColor || 'var(--primary)' }}
+                    />
 
-                    <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1, zIndex: 1 }}>
-                        <Box sx={{ textAlign: 'left' }}>
-                             <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold', lineHeight: 1.1 }}>{crypto.identification.symbol}</Typography>
-                             <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>{crypto.identification.name}</Typography>
-                        </Box>
-                        <Box sx={{ 
-                            px: 1, py: 0.5, 
-                            borderRadius: 1, 
-                            bgcolor: 'rgba(255,255,255,0.03)', 
-                            border: '1px solid rgba(255,255,255,0.05)',
-                            fontSize: '0.65rem',
-                            color: 'text.secondary',
-                            fontWeight: 'bold',
-                            letterSpacing: 1
-                        }}>
+                    <div className="z-[1] mb-2 flex w-full items-start justify-between">
+                        <div className="text-left">
+                             <Typography variant="h6" className="font-bold leading-[1.1] text-white">{crypto.identification.symbol}</Typography>
+                             <Typography variant="caption" className="text-[0.7rem] text-foreground-muted">{crypto.identification.name}</Typography>
+                        </div>
+                        <div className="rounded border border-white/5 bg-white/[0.03] px-2 py-1 text-[0.65rem] font-bold tracking-wide text-foreground-muted">
                             COIN
-                        </Box>
-                    </Box>
+                        </div>
+                    </div>
 
-                    <Box sx={{ 
-                        width: 160, 
-                        height: 160, 
-                        my: 2,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 1,
-                        position: 'relative',
-                        transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                        filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.3))',
-                        '&:hover': { 
-                            transform: 'scale(1.1) translateY(-5px)' 
-                        }
-                    }}>
+                    <div className="group relative z-[1] my-4 flex h-[160px] w-[160px] items-center justify-center transition-transform duration-[400ms] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] hover:scale-110 hover:-translate-y-1 [filter:drop-shadow(0_10px_20px_rgba(0,0,0,0.3))]">
                         {crypto.identification.image128 ? (
-                             <Image 
-                                src={crypto.identification.image128} 
-                                alt={crypto.identification.name} 
+                             <Image
+                                src={crypto.identification.image128}
+                                alt={crypto.identification.name}
                                 fill
                                 sizes="160px"
-                                style={{ objectFit: 'contain', borderRadius: '24%' }} 
+                                style={{ objectFit: 'contain', borderRadius: '24%' }}
                             />
                         ) : (
-                             <Box sx={{
-                                width: 120,
-                                height: 120,
-                                borderRadius: '24%',
-                                bgcolor: crypto.additionalInfo?.pColor || 'primary.main',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '3.5rem',
-                                fontWeight: 'bold',
-                                color: '#fff',
-                                boxShadow: `0 0 30px ${(crypto.additionalInfo?.pColor || '#00f3ff')}40`
-                            }}>
+                             <div
+                                className="flex h-[120px] w-[120px] items-center justify-center rounded-[24%] text-[3.5rem] font-bold text-white"
+                                style={{
+                                    backgroundColor: crypto.additionalInfo?.pColor || 'var(--primary)',
+                                    boxShadow: `0 0 30px ${(crypto.additionalInfo?.pColor || '#00f3ff')}40`,
+                                }}
+                            >
                                 {crypto.identification.symbol[0]}
-                            </Box>
+                            </div>
                         )}
-                    </Box>
-                    
+                    </div>
 
-                    <Box sx={{ textAlign: 'center', mb: 3, zIndex: 1, width: '100%' }}>
-                        <Typography variant="h4" fontWeight="bold" sx={{ color: 'white', mb: 0.5, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+
+                    <div className="z-[1] mb-6 w-full text-center">
+                        <Typography variant="h4" className="mb-1 flex items-center justify-center gap-2 font-bold text-white">
                             {(crypto.financial.price || 0).toLocaleString(undefined, { maximumFractionDigits: 5 })}
                             <TaoIcon size={28} />
                         </Typography>
-                        
-                        <Box sx={{ 
-                            display: 'inline-flex', 
-                            alignItems: 'center', 
-                            justifyContent: 'center', 
-                            px: 1.5, 
-                            py: 0.5, 
-                            borderRadius: 10,
-                            bgcolor: (crypto.financial.change24h || 0) >= 0 ? 'rgba(0, 255, 157, 0.08)' : 'rgba(255, 51, 51, 0.08)',
-                            border: `1px solid ${(crypto.financial.change24h || 0) >= 0 ? 'rgba(0, 255, 157, 0.2)' : 'rgba(255, 51, 51, 0.2)'}`
-                        }}>
-                             <Typography variant="body2" fontWeight="bold" sx={{ color: (crypto.financial.change24h || 0) >= 0 ? '#00ff9d' : '#ff3333' }}>
+
+                        <div
+                            className="inline-flex items-center justify-center rounded-full border px-3 py-1"
+                            style={{
+                                backgroundColor: (crypto.financial.change24h || 0) >= 0 ? 'rgba(0, 255, 157, 0.08)' : 'rgba(255, 51, 51, 0.08)',
+                                borderColor: (crypto.financial.change24h || 0) >= 0 ? 'rgba(0, 255, 157, 0.2)' : 'rgba(255, 51, 51, 0.2)',
+                            }}
+                        >
+                             <Typography
+                                variant="body2"
+                                className="font-bold"
+                                style={{ color: (crypto.financial.change24h || 0) >= 0 ? '#00ff9d' : '#ff3333' }}
+                             >
                                 {(crypto.financial.change24h || 0) > 0 ? '+' : ''}{(crypto.financial.change24h || 0).toFixed(2)}%
                              </Typography>
-                            <Typography variant="caption" sx={{ color: 'text.secondary', ml: 0.5 }}>24h</Typography>
-                        </Box>
-                    </Box>
+                            <Typography variant="caption" className="ml-1 text-foreground-muted">24h</Typography>
+                        </div>
+                    </div>
 
-                    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, width: '100%', mt: 'auto', zIndex: 1 }}>
-                        <Button 
-                            variant="outlined" 
-                            size="small" 
+                    <div className="z-[1] mt-auto grid w-full grid-cols-2 gap-2">
+                        <Button
+                            variant="outlined"
+                            color="success"
+                            size="small"
                             onClick={(e) => handleTransaction(e, 'BUY', crypto.id)}
-                            sx={{ 
-                                borderColor: 'rgba(0, 230, 118, 0.3)',
-                                color: '#00e676',
-                                '&:hover': { borderColor: '#00e676', bgcolor: 'rgba(0, 230, 118, 0.1)' }
-                            }}
                         >
                             COMPRAR
                         </Button>
-                        <Button 
-                            variant="outlined" 
-                            size="small" 
+                        <Button
+                            variant="outlined"
+                            color="error"
+                            size="small"
                             onClick={(e) => handleTransaction(e, 'SELL', crypto.id)}
-                            sx={{ 
-                                borderColor: 'rgba(255, 23, 68, 0.3)',
-                                color: '#ff1744',
-                                '&:hover': { borderColor: '#ff1744', bgcolor: 'rgba(255, 23, 68, 0.1)' }
-                            }}
                         >
                             VENDER
                         </Button>
-                    </Box>
-                    </Box>
+                    </div>
+                    </div>
                 </TechFrame>
                 </motion.div>
-                </Grid>
             ))}
-            </Grid>
+            </div>
         )}
-      </Container>
-    </Box>
+      </div>
+    </div>
   );
 }

@@ -4,7 +4,7 @@
 
 //# 1-Definir componente de selección de wallet
 import React from 'react';
-import { Box, Typography, Stack } from '@mui/material';
+import { Typography } from '../ui/Typography';
 import { Card } from '../ui/Card';
 import { User, WalletInterface } from '../../lib/features/auth/types';
 
@@ -24,12 +24,12 @@ export const WalletSelector = ({ userInfo, walletsInfo, selectedWalletId, onSele
 
     //# 2-Renderizar selector de wallet con grid
     return (
-        <Box>
-            <Typography variant="h6" color="primary.main" gutterBottom sx={{ mb: 2, borderBottom: '1px solid rgba(0,243,255,0.2)', display: 'inline-block', pb: 1 }}>
+        <div>
+            <Typography variant="h6" className="mb-4 inline-block border-b border-[#00f3ff]/20 pb-2 text-primary">
                 1. SELECCIONAR WALLET
             </Typography>
-            
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} useFlexGap sx={{ flexWrap: 'wrap' }}>
+
+            <div className="flex flex-col flex-wrap gap-6 md:flex-row">
                 {allWallets.map((wallet, index) => {
                     const isSelected = selectedWalletId === wallet.walletAddress;
                     const walletAssetsCount = (walletsInfo && (userInfo?.wallet?.walletAddress === wallet.walletAddress || userInfo?.wallets?.[0]?.walletAddress === wallet.walletAddress || userInfo?.walletsSaved?.[0]?.walletAddress === wallet.walletAddress)) 
@@ -50,39 +50,39 @@ export const WalletSelector = ({ userInfo, walletsInfo, selectedWalletId, onSele
                                 bgcolor: isSelected ? 'rgba(0, 243, 255, 0.05)' : undefined,
                             }}
                         >
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                                <Typography variant="h6" color="white" fontWeight="bold">{wallet.label}</Typography>
-                                {isSelected && <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: '#00f3ff', boxShadow: '0 0 10px #00f3ff' }} />}
-                            </Box>
-                            <Typography variant="caption" color="text.secondary" fontFamily="monospace" sx={{ display: 'block', mb: 2 }}>
+                            <div className="mb-4 flex items-center justify-between">
+                                <Typography variant="h6" className="font-bold text-white">{wallet.label}</Typography>
+                                {isSelected && <div className="h-2.5 w-2.5 rounded-full bg-[#00f3ff] shadow-[0_0_10px_#00f3ff]" />}
+                            </div>
+                            <Typography variant="caption" className="mb-4 block font-mono text-foreground-muted">
                                 {wallet.walletAddress.substring(0, 12)}...
                             </Typography>
-                            
-                            <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
-                                <Box sx={{ flex: 1, bgcolor: 'rgba(0,0,0,0.3)', p: 1, borderRadius: 1 }}>
-                                    <Typography variant="caption" color="text.secondary">Dinero</Typography>
-                                    <Typography variant="body1" color="success.main" fontWeight="bold">
+
+                            <div className="mt-2 flex gap-4">
+                                <div className="flex-1 rounded bg-black/30 p-2">
+                                    <Typography variant="caption" className="text-foreground-muted">Dinero</Typography>
+                                    <Typography variant="body1" className="font-bold text-success">
                                         ${userInfo?.balance?.toLocaleString() || 0}
                                     </Typography>
-                                </Box>
-                                <Box sx={{ flex: 1, bgcolor: 'rgba(0,0,0,0.3)', p: 1, borderRadius: 1 }}>
-                                    <Typography variant="caption" color="text.secondary">Activos</Typography>
-                                    <Typography variant="body1" color="primary.main" fontWeight="bold">
+                                </div>
+                                <div className="flex-1 rounded bg-black/30 p-2">
+                                    <Typography variant="caption" className="text-foreground-muted">Activos</Typography>
+                                    <Typography variant="body1" className="font-bold text-primary">
                                         {walletAssetsCount}
                                     </Typography>
-                                </Box>
-                            </Box>
-                            
+                                </div>
+                            </div>
+
                             {isSelected && (
-                                <Box sx={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: 4, bgcolor: '#00f3ff' }} />
+                                <div className="absolute bottom-0 left-0 h-1 w-full bg-[#00f3ff]" />
                             )}
                         </Card>
                     );
                 })}
                 {allWallets.length === 0 && (
-                    <Typography color="text.secondary">No se encontraron wallets asociadas.</Typography>
+                    <Typography className="text-foreground-muted">No se encontraron wallets asociadas.</Typography>
                 )}
-            </Stack>
-        </Box>
+            </div>
+        </div>
     );
 };

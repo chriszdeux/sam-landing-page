@@ -6,7 +6,6 @@
 
 //# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useEffect, useState } from 'react';
-import { Box } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Block {
@@ -17,13 +16,10 @@ interface Block {
 }
 
 export const TransactionsAnimation = ({ color }: { color: string }) => {
-    
-    
+
     //# 2-Gestión de estado local para blocks
     const [blocks, setBlocks] = useState<Block[]>([]);
-    
-    
-    
+
     //# 3-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         const interval = setInterval(() => {
@@ -37,26 +33,14 @@ export const TransactionsAnimation = ({ color }: { color: string }) => {
                 return [newBlock, ...prev].slice(0, 10);
             });
         }, 800);
-        
-        
+
         //# 4-Estructuración y renderizado visual del componente UI
         return () => clearInterval(interval);
     }, []);
 
-    
-    
     //# 5-Estructuración y renderizado visual del componente UI
     return (
-        <Box sx={{ 
-            width: '100%', 
-            height: '100%', 
-            position: 'relative',
-            overflow: 'hidden',
-            p: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 2
-        }}>
+        <div className="relative flex h-full w-full flex-col gap-4 overflow-hidden p-8">
             <AnimatePresence>
                 {blocks.map((block) => (
                     <motion.div
@@ -77,18 +61,18 @@ export const TransactionsAnimation = ({ color }: { color: string }) => {
                             fontFamily: 'monospace'
                         }}
                     >
-                        <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: color, boxShadow: `0 0 10px ${color}` }} />
-                        <Box sx={{ color: 'white' }}>Block #{block.hash}</Box>
-                        <Box sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem' }}>{block.from} → {block.to}</Box>
+                        <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: color, boxShadow: `0 0 10px ${color}` }} />
+                        <div style={{ color: 'white' }}>Block #{block.hash}</div>
+                        <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem' }}>{block.from} → {block.to}</div>
                     </motion.div>
                 ))}
             </AnimatePresence>
-            
+
             {}
             <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: -1 }}>
                 <line x1="10%" y1="0" x2="10%" y2="100%" stroke={color} strokeOpacity="0.1" strokeDasharray="5,5" />
                 <line x1="90%" y1="0" x2="90%" y2="100%" stroke={color} strokeOpacity="0.1" strokeDasharray="5,5" />
             </svg>
-        </Box>
+        </div>
     );
 };

@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, CircularProgress, Typography } from '@mui/material';
 import { Background } from '../../components/layout/Background';
+import { Typography } from '../../components/ui/Typography';
 
 export default function PortfolioRedirect() {
     const router = useRouter();
@@ -15,12 +15,12 @@ export default function PortfolioRedirect() {
     return (
         <main className="min-h-screen relative flex flex-col items-center justify-center">
             <Background />
-            <Box sx={{ position: 'relative', zIndex: 10, textAlign: 'center' }}>
-                <CircularProgress sx={{ mb: 2, color: '#00f3ff' }} />
-                <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.5)', letterSpacing: 2 }}>
+            <div className="relative z-10 text-center">
+                <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-white/10" style={{ borderTopColor: '#00f3ff' }} />
+                <Typography variant="body1" className="tracking-[2px] text-white/50">
                     REDIRECCIONANDO AL CENTRO DE OPERACIONES...
                 </Typography>
-            </Box>
+            </div>
         </main>
     );
 }

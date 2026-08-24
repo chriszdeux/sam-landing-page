@@ -2,8 +2,8 @@
 
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Box, Typography } from '@mui/material';
-import { CheckCircleOutline, ErrorOutline, InfoOutlined } from '@mui/icons-material';
+import { CheckCircle2, AlertCircle, Info } from 'lucide-react';
+import { Typography } from '../ui/Typography';
 
 interface StationToastProps {
   message: string;
@@ -12,11 +12,11 @@ interface StationToastProps {
   duration?: number;
 }
 
-export const StationToast: React.FC<StationToastProps> = ({ 
-  message, 
-  type = 'success', 
-  onClose, 
-  duration = 4000 
+export const StationToast: React.FC<StationToastProps> = ({
+  message,
+  type = 'success',
+  onClose,
+  duration = 4000
 }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -32,19 +32,13 @@ export const StationToast: React.FC<StationToastProps> = ({
   };
 
   const icons = {
-    success: <CheckCircleOutline sx={{ color: colors.success }} />,
-    error: <ErrorOutline sx={{ color: colors.error }} />,
-    info: <InfoOutlined sx={{ color: colors.info }} />
+    success: <CheckCircle2 color={colors.success} />,
+    error: <AlertCircle color={colors.error} />,
+    info: <Info color={colors.info} />
   };
 
   return (
-    <Box sx={{ 
-      position: 'fixed', 
-      bottom: 40, 
-      right: 40, 
-      zIndex: 9999,
-      pointerEvents: 'none'
-    }}>
+    <div className="pointer-events-none fixed bottom-10 right-10 z-[9999]">
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0, x: 100, scale: 0.8 }}
@@ -66,36 +60,22 @@ export const StationToast: React.FC<StationToastProps> = ({
             minWidth: '300px'
           }}
         >
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            width: 32,
-            height: 32,
-            borderRadius: '50%',
-            bgcolor: `${colors[type]}11`
-          }}>
+          <div
+            className="flex items-center justify-center rounded-full"
+            style={{ width: 32, height: 32, backgroundColor: `${colors[type]}11` }}
+          >
             {icons[type]}
-          </Box>
-          <Box>
-            <Typography sx={{ 
-              color: 'white', 
-              fontSize: '0.9rem', 
-              fontWeight: 600, 
-              letterSpacing: '0.5px',
-              textTransform: 'uppercase'
-            }}>
+          </div>
+          <div>
+            <Typography component="p" className="text-[0.9rem] font-semibold uppercase tracking-[0.5px] text-white">
               {type === 'success' ? 'SISTEMA STATION-8' : 'ALERTA DEL SISTEMA'}
             </Typography>
-            <Typography sx={{ 
-              color: 'rgba(255, 255, 255, 0.7)', 
-              fontSize: '0.85rem' 
-            }}>
+            <Typography component="p" className="text-[0.85rem] text-white/70">
               {message}
             </Typography>
-          </Box>
+          </div>
         </motion.div>
       </AnimatePresence>
-    </Box>
+    </div>
   );
 };

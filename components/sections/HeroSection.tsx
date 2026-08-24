@@ -4,7 +4,6 @@
 
 import React, { useRef } from 'react';
 import Link from 'next/link';
-import { Box, Typography, Stack, Grid } from '@mui/material';
 import { Rocket, Globe, Shield, Activity, Zap } from 'lucide-react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
@@ -12,6 +11,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Button } from '../ui/Button';
 import { TechFrame } from '../ui/TechFrame';
 import { Section } from '../ui/Section';
+import { Typography } from '../ui/Typography';
 import { openModal } from '../../lib/features/uiSlice';
 
 //# 1-Obtención del despachador para emitir acciones al store
@@ -25,7 +25,7 @@ export const HeroSection = () => {
   
   //# 2-Obtención del despachador para emitir acciones al store
   const dispatch = useAppDispatch();
-  const container = useRef<HTMLElement | null>(null);
+  const container = useRef<HTMLDivElement | null>(null);
   const { project } = EnvVariables;
 
   useGSAP(() => {
@@ -60,63 +60,35 @@ export const HeroSection = () => {
     <Section id="home" className="relative min-h-[90vh] flex items-center overflow-hidden">
       {/* Background with radial gradient instead of video */}
 
-      <Box ref={container} sx={{ position: 'relative', zIndex: 3, width: '100%' }}>
-        <Grid container spacing={4} alignItems="center">
-          <Grid size={{ xs: 12, md: 7 }}>
-            <Box className="hero-content">
-              <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
-                <Box sx={{ width: 40, height: 2, bgcolor: '#00f3ff', boxShadow: '0 0 10px #00f3ff' }} />
-                <Typography variant="overline" sx={{ color: '#00f3ff', fontWeight: 'bold', letterSpacing: 4, display: 'flex', alignItems: 'center', gap: 1 }}>
+      <div ref={container} className="relative z-[3] w-full">
+        <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-12">
+          <div className="md:col-span-7">
+            <div className="hero-content">
+              <div className="mb-4 flex flex-row items-center gap-2">
+                <div className="h-0.5 w-10 bg-[#00f3ff] shadow-[0_0_10px_#00f3ff]" />
+                <Typography variant="overline" className="flex items-center gap-2 text-[#00f3ff] font-bold tracking-[4px]">
                    <Activity size={14} /> ESTADO: TRANSMISIÓN_ACTIVA
                 </Typography>
-              </Stack>
+              </div>
 
-              <Typography variant="h1" sx={{
-                fontSize: { xs: '3rem', md: '5.5rem' },
-                mb: 1,
-                fontWeight: 900,
-                lineHeight: 1,
-                textTransform: 'uppercase',
-                background: 'linear-gradient(to right, #fff 20%, #00f3ff 50%, #fff 80%)',
-                backgroundSize: '200% auto',
-                backgroundClip: 'text',
-                textFillColor: 'transparent',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                animation: 'shine 4s linear infinite',
-                filter: 'drop-shadow(0 0 15px rgba(0, 243, 255, 0.3))',
-                '@keyframes shine': {
-                  'to': { backgroundPosition: '200% center' }
-                }
-              }}>
+              <Typography
+                variant="h1"
+                className="mb-1 text-[3rem] md:text-[5.5rem] font-black leading-none uppercase bg-gradient-to-r from-white via-[#00f3ff] to-white bg-[length:200%_auto] bg-clip-text text-transparent [-webkit-text-fill-color:transparent] [filter:drop-shadow(0_0_15px_rgba(0,243,255,0.3))] animate-[shine_4s_linear_infinite]"
+              >
                 {project}
               </Typography>
-              
-              <Typography variant="h4" sx={{ 
-                mb: 4, 
-                color: 'rgba(255,255,255,0.9)', 
-                fontWeight: 700,
-                letterSpacing: -0.5,
-                textShadow: '0 2px 10px rgba(0,0,0,0.5)'
-              }}>
-                La soberanía ya no es planetaria; <Box component="span" sx={{ color: '#00f3ff', textShadow: '0 0 10px #00f3ff' }}>es galáctica.</Box>
+
+              <Typography variant="h4" className="mb-8 text-white/90 font-bold tracking-[-0.5px] [text-shadow:0_2px_10px_rgba(0,0,0,0.5)]">
+                La soberanía ya no es planetaria; <span className="text-[#00f3ff] [text-shadow:0_0_10px_#00f3ff]">es galáctica.</span>
               </Typography>
 
-              <Typography variant="body1" sx={{ 
-                mb: 6, 
-                maxWidth: 600, 
-                color: 'rgba(255,255,255,0.7)', 
-                fontSize: '1.15rem',
-                lineHeight: 1.8,
-                borderLeft: '2px solid rgba(0, 243, 255, 0.3)',
-                pl: 3
-              }}>
-                Vive la evolución de {project}: desde el subsuelo de Guadalajara hasta la colonización de Alfa Centauri. 
-                Una economía viva donde el valor (<TaoIcon size={20} />) y la energía 
+              <Typography variant="body1" className="mb-12 max-w-[600px] text-white/70 text-[1.15rem] leading-[1.8] border-l-2 border-[#00f3ff]/30 pl-6">
+                Vive la evolución de {project}: desde el subsuelo de Guadalajara hasta la colonización de Alfa Centauri.
+                Una economía viva donde el valor (<TaoIcon size={20} />) y la energía
                  fluyen a través de una red interestelar soberana.
               </Typography>
 
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3}>
+              <div className="flex flex-col gap-6 sm:flex-row">
                 <Button
                   variant="contained"
                   color="secondary"
@@ -151,69 +123,54 @@ export const HeroSection = () => {
                 >
                   Explorar Mecánicas
                 </Button>
-              </Stack>
-            </Box>
-          </Grid>
+              </div>
+            </div>
+          </div>
 
-          <Grid size={{ xs: 12, md: 5 }}>
-            <Box className="hero-grid-container" sx={{ display: 'grid', gridTemplateColumns: 'repeat(1, 1fr)', gap: 3, maxWidth: '400px', ml: 'auto' }}>
+          <div className="md:col-span-5">
+            <div className="hero-grid-container ml-auto grid max-w-[400px] grid-cols-1 gap-6">
               {[
                 { icon: Globe, label: 'Expansión Interestelar', color: '#00f3ff', href: '/exploracion-infinita', desc: 'Explora sistemas solares únicos y reclama tu territorio.' },
                 { icon: Shield, label: `Protocolo ${project}`, color: '#ffb700', href: '/security', desc: 'Seguridad de grado militar en cada transacción galáctica.' },
               ].map((item, index) => (
-                <Box
+                <div
                   key={index}
                   className="hero-grid-item"
                 >
-                  <Link href={item.href} style={{ textDecoration: 'none' }}>
+                  <Link href={item.href} className="no-underline">
                     <TechFrame color={item.color} className="h-full">
-                      <Box sx={{
-                        p: 3,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 3,
-                        height: '100%',
-                      }}>
-                        <Box sx={{ 
-                          p: 1.5, 
-                          borderRadius: '12px', 
-                          bgcolor: `${item.color}15`, 
-                          border: `1px solid ${item.color}30`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          boxShadow: `0 0 15px ${item.color}20`
-                        }}>
+                      <div className="flex h-full items-center gap-6 p-6">
+                        <div
+                          className="flex items-center justify-center rounded-xl p-3"
+                          style={{
+                            backgroundColor: `${item.color}15`,
+                            border: `1px solid ${item.color}30`,
+                            boxShadow: `0 0 15px ${item.color}20`,
+                          }}
+                        >
                           <item.icon size={32} color={item.color} />
-                        </Box>
-                        <Box>
-                          <Typography 
-                            variant="h6" 
-                            fontWeight="bold" 
-                            color="white" 
-                            sx={{ 
-                              textTransform: 'uppercase',
-                              letterSpacing: 1,
-                              fontSize: '0.9rem',
-                              mb: 0.5
-                            }}
+                        </div>
+                        <div>
+                          <Typography
+                            variant="h6"
+                            className="mb-1 uppercase tracking-[1px] text-[0.9rem] font-bold text-white"
                           >
                             {item.label}
                           </Typography>
-                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', lineHeight: 1.4, display: 'block' }}>
+                          <Typography variant="caption" className="block text-[0.75rem] leading-[1.4] text-white/50">
                             {item.desc}
                           </Typography>
-                        </Box>
+                        </div>
                         <Zap size={16} color={item.color} style={{ marginLeft: 'auto', opacity: 0.5 }} />
-                      </Box>
+                      </div>
                     </TechFrame>
                   </Link>
-                </Box>
+                </div>
               ))}
-            </Box>
-          </Grid>
-        </Grid>
-      </Box>
+            </div>
+          </div>
+        </div>
+      </div>
     </Section>
   );
 };

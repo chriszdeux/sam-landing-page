@@ -7,7 +7,8 @@
 'use client';
 
 import React from 'react';
-import { Box, CircularProgress, Stack, Button, Typography } from '@mui/material';
+import { Button } from '../ui/Button';
+import { Typography } from '../ui/Typography';
 import { motion } from 'framer-motion';
 import {
   Chart as ChartJS,
@@ -111,7 +112,7 @@ const CandlestickChart = ({ data, color }: { data: Candle[], color: string }) =>
     const candleWidth = Math.max(4, (width - padding.left - padding.right) / data.length * 0.6);
 
     return (
-        <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+        <div className="relative h-full w-full">
             <svg
                 ref={svgRef}
                 viewBox={`0 0 ${width} ${height}`}
@@ -201,41 +202,31 @@ const CandlestickChart = ({ data, color }: { data: Candle[], color: string }) =>
 
             {/* Candlestick Tooltip */}
             {hoveredCandle && hoverX !== null && (
-                <Box sx={{
-                    position: 'absolute',
-                    top: 10,
-                    left: hoverX > width / 2 ? '10px' : 'auto',
-                    right: hoverX <= width / 2 ? '10px' : 'auto',
-                    bgcolor: 'rgba(10, 10, 20, 0.9)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: 2,
-                    p: 1.5,
-                    color: '#fff',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-                    fontSize: '0.75rem',
-                    pointerEvents: 'none',
-                    zIndex: 10,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 0.5,
-                    fontFamily: 'monospace',
-                    borderLeft: `3px solid ${hoveredCandle.close >= hoveredCandle.open ? '#00ff88' : '#ff0055'}`
-                }}>
-                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 'bold' }}>
+                <div
+                    className="absolute z-10 flex flex-col gap-1 rounded-lg border border-white/10 p-3 font-mono text-xs text-white shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-md"
+                    style={{
+                        top: 10,
+                        left: hoverX > width / 2 ? '10px' : 'auto',
+                        right: hoverX <= width / 2 ? '10px' : 'auto',
+                        backgroundColor: 'rgba(10, 10, 20, 0.9)',
+                        pointerEvents: 'none',
+                        borderLeft: `3px solid ${hoveredCandle.close >= hoveredCandle.open ? '#00ff88' : '#ff0055'}`,
+                    }}
+                >
+                    <Typography variant="caption" className="font-bold text-white/50">
                         {hoveredCandle.label}
                     </Typography>
-                    <Box sx={{ display: 'flex', gap: 2 }}>
+                    <div className="flex gap-4">
                         <span style={{ color: '#00ff88' }}>O: {hoveredCandle.open.toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
                         <span style={{ color: '#ff0055' }}>C: {hoveredCandle.close.toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
-                    </Box>
-                    <Box sx={{ display: 'flex', gap: 2 }}>
+                    </div>
+                    <div className="flex gap-4">
                         <span>H: {hoveredCandle.high.toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
                         <span>L: {hoveredCandle.low.toLocaleString(undefined, { maximumFractionDigits: 4 })}</span>
-                    </Box>
-                </Box>
+                    </div>
+                </div>
             )}
-        </Box>
+        </div>
     );
 };
 
@@ -297,9 +288,9 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
 
     if (isLoading && !isDataLoaded) {
         return (
-            <Box sx={{ width: '100%', height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 4 }}>
-                <CircularProgress color="primary" />
-            </Box>
+            <div className="flex h-[400px] w-full items-center justify-center rounded-2xl bg-white/[0.02]">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+            </div>
         );
     }
 
@@ -411,8 +402,8 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
     };
 
     return (
-        <Stack spacing={2} sx={{ width: '100%' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+        <div className="flex w-full flex-col gap-4">
+            <div className="flex justify-end gap-2">
                 <Button
                     size="small"
                     variant="outlined"
@@ -447,11 +438,11 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
                 >
                     VELAS
                 </Button>
-            </Box>
+            </div>
 
-            <Box sx={{ width: '100%', height: 400, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 4, border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden', position: 'relative', p: 2 }}>
+            <div className="relative h-[400px] w-full overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02] p-4">
                 {chartType === 'line' ? (
-                    <Box sx={{ width: '100%', height: '100%' }}>
+                    <div className="h-full w-full">
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -500,7 +491,7 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
                                 minWidth: '150px'
                             }}
                         />
-                    </Box>
+                    </div>
                 ) : (
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -511,7 +502,7 @@ export const CryptoChart = ({ color, cryptoId, range = '1d' }: CryptoChartProps)
                         <CandlestickChart data={candles} color={color} />
                     </motion.div>
                 )}
-            </Box>
-        </Stack>
+            </div>
+        </div>
     );
 };

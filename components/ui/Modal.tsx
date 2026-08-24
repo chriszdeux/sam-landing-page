@@ -7,8 +7,9 @@
 'use client';
 
 import React from 'react';
-import { Modal as MuiModal, Box, IconButton, Fade, Backdrop } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
+import { X } from 'lucide-react';
+import { cn } from '@/lib/utils/cn';
+import { Dialog } from './Dialog';
 
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { closeModal } from '../../lib/features/uiSlice';
@@ -16,37 +17,13 @@ import { AuthModal } from '../auth/AuthModal';
 import { ValidateAccountForm } from '../auth/ValidateAccountForm';
 import { RewardsModal } from '../rewards/RewardsModal';
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: '90%',
-  maxWidth: 500,
-  maxHeight: '90vh',
-  overflowY: 'auto',
-  bgcolor: 'rgba(10, 15, 30, 0.95)',
-  backdropFilter: 'blur(20px)',
-  border: '1px solid rgba(0, 243, 255, 0.3)',
-  boxShadow: '0 0 30px rgba(0, 243, 255, 0.2), inset 0 0 20px rgba(0, 243, 255, 0.05)',
-  borderRadius: 4,
-  p: 4,
-  outline: 'none',
-};
-
 export const Modal = ({ children }: { children?: React.ReactNode }) => {
-  
+
   //# 2-Obtener estado y despachador del modal
   const dispatch = useAppDispatch();
   const { isModalOpen, activeModalContent } = useAppSelector((state) => state.ui);
 
   const isAuthModal = ['login', 'register'].includes(activeModalContent || '');
-
-  const dynamicStyle = {
-    ...style,
-    maxWidth: isAuthModal ? 900 : 500,
-    p: isAuthModal ? 0 : 4,
-  };
 
   //# 3-Renderizar contenido dinámico según tipo
   const renderContent = () => {
@@ -63,39 +40,24 @@ export const Modal = ({ children }: { children?: React.ReactNode }) => {
         return children;
     }
   };
-  
+
   //# 4-Renderizar estructura del modal con transición
   return (
-    <MuiModal
+    <Dialog
       open={isModalOpen}
       onClose={() => dispatch(closeModal())}
-      closeAfterTransition
-      slots={{ backdrop: Backdrop }}
-      slotProps={{
-        backdrop: {
-          timeout: 500,
-          sx: { backdropFilter: 'blur(5px)', backgroundColor: 'rgba(0, 0, 0, .8)', },
-        },
-      }}
+      className={cn(
+        'relative max-h-[90vh] overflow-y-auto rounded-2xl border border-[#00f3ff]/30 bg-[rgba(10,15,30,0.95)] shadow-[0_0_30px_rgba(0,243,255,0.2),inset_0_0_20px_rgba(0,243,255,0.05)] outline-none backdrop-blur-xl',
+        isAuthModal ? 'max-w-[900px] p-0' : 'max-w-[500px] p-8'
+      )}
     >
-      <Fade in={isModalOpen}>
-        <Box sx={dynamicStyle}>
-          <IconButton
-            onClick={() => dispatch(closeModal())}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-              zIndex: 10,
-              color: 'text.secondary',
-              '&:hover': { color: 'primary.main' },
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-          {renderContent()}
-        </Box>
-      </Fade>
-    </MuiModal>
+      <button
+        onClick={() => dispatch(closeModal())}
+        className="absolute right-2 top-2 z-10 rounded-full p-1 text-foreground-muted transition-colors hover:text-primary"
+      >
+        <X size={20} />
+      </button>
+      {renderContent()}
+    </Dialog>
   );
 };

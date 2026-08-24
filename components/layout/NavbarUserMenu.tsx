@@ -8,20 +8,12 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import {
-  Typography,
-  Box,
-  Stack,
-  IconButton,
-} from "@mui/material";
-import {
-  Person as UserIcon,
-  Settings,
-  Logout,
-} from "@mui/icons-material";
+import { User as UserIcon, Settings, LogOut } from "lucide-react";
 import { TaoIcon } from "../ui/TaoIcon";
 import { Button } from "../ui/Button";
+import { NavLabel } from "./NavLabel";
 import { CountUp } from "../ui/CountUp";
+import { Typography } from "../ui/Typography";
 
 import { useAppDispatch } from "../../lib/hooks";
 import { openModal } from "../../lib/features/uiSlice";
@@ -43,15 +35,15 @@ export const NavbarUserMenu = ({
 }: NavbarUserMenuProps) => {
   //# 2-Obtención del despachador y router
   const router = useRouter();
-  
+
   const dispatch = useAppDispatch();
 
   if (userInfo) {
-    
-    
+
+
     //# 3-Renderizar menú para usuario autenticado
     return (
-      <Stack direction="row" spacing={2} alignItems="center">
+      <div className="flex flex-row items-center gap-4">
         <Button
           variant="text"
           onClick={() => router.push("/rewards")}
@@ -66,81 +58,47 @@ export const NavbarUserMenu = ({
 
         <Typography
           variant="body2"
-          sx={{
-            color: "primary.main",
-            display: "flex",
-            alignItems: "center",
-            gap: 0.5,
-          }}
+          className="flex items-center gap-1 text-primary"
         >
-          <UserIcon fontSize="small" />
+          <UserIcon size={18} />
           {userInfo.username}
         </Typography>
         <Typography
           component="div"
           variant="body2"
-          sx={{
-            display: 'none', // Ocultar por orden del PM
-            color: "text.secondary",
-            alignItems: "center",
-            gap: 0.5,
-            mr: 1,
-          }}
+          className="mr-2 hidden items-center gap-1 text-foreground-muted"
         >
-          <Box
-            sx={{
-              bgcolor: "rgba(0, 0, 0, 0.4)",
-              px: 2,
-              py: 0.5,
-              borderRadius: 2,
-              border: "1px solid rgba(255,255,255,0.1)",
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-            }}
-          >
+          <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/40 px-4 py-1">
             <CountUp to={userInfo.balance} />
             <TaoIcon size={12} />
-          </Box>
+          </div>
         </Typography>
 
-        <IconButton
+        <button
           onClick={() => router.push("/settings")}
-          sx={{
-            color: "text.secondary",
-            "&:hover": {
-              color: "primary.main",
-              transform: "rotate(90deg)",
-              transition: "all 0.3s",
-            },
-          }}
+          className="rounded-full p-2 text-foreground-muted transition-all duration-300 hover:rotate-90 hover:text-primary"
         >
-          <Settings />
-        </IconButton>
+          <Settings size={20} />
+        </button>
 
-        <IconButton
+        <button
           onClick={onLogoutClick}
-          sx={{
-            color: "error.main",
-            "&:hover": { bgcolor: "rgba(255,0,0,0.1)" },
-          }}
+          className="rounded-full p-2 text-error hover:bg-red-500/10"
         >
-          <Logout />
-        </IconButton>
-      </Stack>
+          <LogOut size={20} />
+        </button>
+      </div>
     );
   }
 
   //# 4-Renderizar botones de acceso para invitados
   return (
-    <Stack direction="row" spacing={1}>
-      <Button
-        variant="text"
-        size="small"
-        onClick={() => dispatch(openModal("login"))}
-      >
+    // El CTA enmarcado se reserva para "Registrarse"; "Entrar" queda como
+    // etiqueta fina para no tener dos botones compitiendo en el navbar.
+    <div className="flex flex-row items-center gap-1">
+      <NavLabel onClick={() => dispatch(openModal("login"))}>
         Entrar
-      </Button>
+      </NavLabel>
       <Button
         variant="contained"
         size="small"
@@ -148,6 +106,6 @@ export const NavbarUserMenu = ({
       >
         Registrarse
       </Button>
-    </Stack>
+    </div>
   );
 };
