@@ -3,13 +3,8 @@
 
 //# 1-Definir componente de diálogo de cierre de sesión
 import React from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Typography,
-} from "@mui/material";
+import { Dialog } from "../ui/Dialog";
+import { Typography } from "../ui/Typography";
 import { Button } from "../ui/Button";
 
 interface LogoutDialogProps {
@@ -23,44 +18,36 @@ export const LogoutDialog: React.FC<LogoutDialogProps> = ({
   onClose,
   onConfirm,
 }) => {
-  
   //# 2-Renderizar contenido y acciones del diálogo
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          bgcolor: "#0a0a1a",
-          border: "1px solid rgba(0, 243, 255, 0.3)",
-          boxShadow: "0 0 20px rgba(0, 243, 255, 0.2)",
-          backdropFilter: "blur(10px)",
-        },
-      }}
+      className="rounded-2xl border border-[#00f3ff]/30 bg-[#0a0a1a] shadow-[0_0_20px_rgba(0,243,255,0.2)] backdrop-blur-md"
     >
-      <DialogTitle sx={{ color: "white" }}>
-        ¿Confirmar cierre de sesión?
-      </DialogTitle>
-      <DialogContent>
-        <Typography sx={{ color: "text.secondary" }}>
+      <div className="p-6">
+        <Typography variant="h6" className="text-white">
+          ¿Confirmar cierre de sesión?
+        </Typography>
+        <Typography variant="body1" className="mt-3 text-foreground-muted">
           Estás a punto de desconectarte del sistema.
         </Typography>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} sx={{ color: "text.secondary" }}>
-          Cancelar
-        </Button>
-        <Button
-          onClick={() => {
-            onConfirm();
-            onClose();
-          }}
-          color="error"
-          variant="contained"
-        >
-          Cerrar Sesión
-        </Button>
-      </DialogActions>
+        <div className="mt-6 flex justify-end gap-2">
+          <Button onClick={onClose} sx={{ color: "text.secondary" }}>
+            Cancelar
+          </Button>
+          <Button
+            onClick={() => {
+              onConfirm();
+              onClose();
+            }}
+            color="error"
+            variant="contained"
+          >
+            Cerrar Sesión
+          </Button>
+        </div>
+      </div>
     </Dialog>
   );
 };

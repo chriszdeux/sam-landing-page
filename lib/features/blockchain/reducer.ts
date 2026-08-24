@@ -8,7 +8,7 @@
 //# 1-Importar dependencias y acciones
 import { createSlice } from '@reduxjs/toolkit';
 import { BlockchainState, Reward } from './types';
-import { BlockchainInterface } from '../../types/blockchain';
+import { BlockchainInterface, BlockchainProps } from '../../types/blockchain';
 import { fetchNetworks, fetchRewards, claimReward, fetchNextBlockTime, fetchBlocksHistory, fetchProcessingFrequencies } from './actions';
 import { injectPower } from '../labs/actions';
 
@@ -38,14 +38,22 @@ const blockchainSlice = createSlice({
             const { id, totalPowerMining, energy } = action.payload;
             const network = state.networks.find(n => n.id === id);
             if (network) {
-                if (!network.blockchainProps) network.blockchainProps = {} as any;
+                if (!network.blockchainProps) network.blockchainProps = {} as BlockchainProps;
                 if (totalPowerMining !== undefined) network.blockchainProps.totalPowerMining = totalPowerMining;
                 if (energy !== undefined) network.blockchainProps.energy = energy;
             }
             if (state.selectedNetwork && state.selectedNetwork.id === id) {
-                if (!state.selectedNetwork.blockchainProps) state.selectedNetwork.blockchainProps = {} as any;
+                if (!state.selectedNetwork.blockchainProps) state.selectedNetwork.blockchainProps = {} as BlockchainProps;
                 if (totalPowerMining !== undefined) state.selectedNetwork.blockchainProps.totalPowerMining = totalPowerMining;
                 if (energy !== undefined) state.selectedNetwork.blockchainProps.energy = energy;
+            }
+        },
+        setRewardCooldown: (state, action) => {
+            const { rewardId, nextClaimTime } = action.payload;
+            const rewardIndex = state.rewards.findIndex(r => r.id === rewardId);
+            if (rewardIndex !== -1) {
+                state.rewards[rewardIndex].isClaimed = true;
+                state.rewards[rewardIndex].nextClaimTime = nextClaimTime;
             }
         }
     },
@@ -125,7 +133,7 @@ const blockchainSlice = createSlice({
                 }
 
                 if (totalPowerMining !== undefined && state.selectedNetwork) {
-                    if (!state.selectedNetwork.blockchainProps) state.selectedNetwork.blockchainProps = {} as any;
+                    if (!state.selectedNetwork.blockchainProps) state.selectedNetwork.blockchainProps = {} as BlockchainProps;
                     state.selectedNetwork.blockchainProps.totalPowerMining = totalPowerMining;
                 }
 
@@ -154,5 +162,5 @@ const blockchainSlice = createSlice({
 });
 
 //# 6-Exportar acciones y reducer por defecto
-export const { setSelectedNetwork, updateNetworkPower } = blockchainSlice.actions;
+export const { setSelectedNetwork, updateNetworkPower, setRewardCooldown } = blockchainSlice.actions;
 export default blockchainSlice.reducer;

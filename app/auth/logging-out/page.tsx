@@ -11,7 +11,6 @@
 
 //# 1-Efecto secundario para sincronización del ciclo de vida
 import React, { useEffect, useRef } from 'react';
-import { Box, Typography, Container } from '@mui/material';
 import { useRouter } from 'next/navigation';
 
 //# 2-Obtención del despachador para emitir acciones al store
@@ -19,31 +18,32 @@ import { useAppDispatch } from '../../../lib/hooks';
 import { logout } from '../../../lib/features/auth';
 import { Background } from '../../../components/layout/Background';
 import { TechFrame } from '../../../components/ui/TechFrame';
+import { Typography } from '../../../components/ui/Typography';
 import { LogOut } from 'lucide-react';
 
 export default function LoggingOut() {
     const router = useRouter();
-    
+
     //# 3-Obtención del despachador para emitir acciones al store
     const dispatch = useAppDispatch();
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    
-    
+
+
     //# 4-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         dispatch(logout());
         const timer = setTimeout(() => {
             router.push('/');
         }, 4000);
-        
-        
+
+
         //# 5-Estructuración y renderizado visual del componente UI
         return () => clearTimeout(timer);
     }, [router, dispatch]);
 
-    
-    
+
+
     //# 6-Efecto secundario para sincronización del ciclo de vida
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -68,7 +68,7 @@ export default function LoggingOut() {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = '#ff0055'; 
+            ctx.fillStyle = '#ff0055';
             ctx.font = `${fontSize}px monospace`;
 
             for (let i = 0; i < drops.length; i++) {
@@ -83,102 +83,53 @@ export default function LoggingOut() {
         };
 
         const interval = setInterval(draw, 50);
-        
-        
+
+
         //# 7-Estructuración y renderizado visual del componente UI
         return () => clearInterval(interval);
     }, []);
 
-    
-    
+
+
     //# 8-Estructuración y renderizado visual del componente UI
     return (
-        <Box sx={{ minHeight: '100vh', bgcolor: '#000', position: 'relative', overflow: 'hidden' }}>
+        <div className="relative min-h-screen overflow-hidden bg-black">
             <Background />
-            <canvas 
-                ref={canvasRef} 
-                style={{ 
-                    position: 'absolute', 
-                    top: 0, 
-                    left: 0, 
-                    opacity: 0.15,
-                    zIndex: 1
-                }} 
+            <canvas
+                ref={canvasRef}
+                className="absolute left-0 top-0 z-[1] opacity-[0.15]"
             />
 
-            <Container maxWidth="sm" sx={{ 
-                height: '100vh', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                position: 'relative',
-                zIndex: 2
-            }}>
+            <div className="relative z-[2] mx-auto flex h-screen w-full max-w-[600px] items-center justify-center px-4">
                 <TechFrame color="#ff0055">
-                    <Box sx={{ 
-                        p: 6, 
-                        bgcolor: 'rgba(10, 5, 15, 0.9)', 
-                        backdropFilter: 'blur(10px)',
-                        textAlign: 'center'
-                    }}>
-                        <Box sx={{ 
-                            position: 'relative', 
-                            width: 100, 
-                            height: 100, 
-                            mx: 'auto', 
-                            mb: 4,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}>
-                             <Box sx={{
-                                position: 'absolute',
-                                width: '100%',
-                                height: '100%',
-                                border: '1px dashed #ff0055',
-                                borderRadius: '50%',
-                                animation: 'spin 8s linear infinite'
-                            }} />
+                    <div className="p-12 text-center backdrop-blur-md" style={{ backgroundColor: 'rgba(10, 5, 15, 0.9)' }}>
+                        <div className="relative mx-auto mb-8 flex h-[100px] w-[100px] items-center justify-center">
+                             <div className="absolute h-full w-full rounded-full border border-dashed border-[#ff0055] [animation:spin_8s_linear_infinite]" />
                             <LogOut size={40} color="#ff0055" />
-                        </Box>
+                        </div>
 
-                        <Typography variant="h4" sx={{ 
-                            color: 'white', 
-                            fontWeight: 'bold', 
-                            mb: 2, 
-                            letterSpacing: 4,
-                            textShadow: '0 0 20px rgba(255, 0, 85, 0.5)'
-                        }}>
+                        <Typography variant="h4" className="mb-4 font-bold tracking-[4px] text-white [text-shadow:0_0_20px_rgba(255,0,85,0.5)]">
                             DISCONNECTING
                         </Typography>
-                        
-                        <Typography variant="overline" sx={{ color: '#ff0055', letterSpacing: 6, display: 'block', mb: 3 }}>
+
+                        <Typography variant="overline" component="p" className="mb-6 block tracking-[6px] text-[#ff0055]">
                             {'// SECURE_TERMINATION_PROTOCOL'}
                         </Typography>
 
-                        <Box sx={{ width: '100%', height: 2, bgcolor: 'rgba(255, 255, 255, 0.05)', position: 'relative', overflow: 'hidden' }}>
-                            <Box sx={{ 
-                                position: 'absolute', 
-                                top: 0, 
-                                left: 0, 
-                                height: '100%', 
-                                width: '30%', 
-                                bgcolor: '#ff0055',
-                                boxShadow: '0 0 10px #ff0055',
-                                animation: 'loading 2s infinite ease-in-out'
-                            }} />
-                        </Box>
+                        <div className="relative h-0.5 w-full overflow-hidden bg-white/5">
+                            <div className="absolute top-0 h-full w-[30%] bg-[#ff0055] shadow-[0_0_10px_#ff0055] [animation:loading_2s_infinite_ease-in-out]" style={{ left: '-30%' }} />
+                        </div>
 
-                        <Typography variant="caption" sx={{ color: 'text.secondary', mt: 4, display: 'block', fontFamily: 'monospace' }}>
+                        <Typography variant="caption" component="p" className="mt-8 block font-mono text-foreground-muted">
                             Sincronizando estados locales... [DONE]
                             <br />
                             Cerrando túneles de encriptación... [DONE]
                             <br />
                             Liberando memoria volátil... [WAIT]
                         </Typography>
-                    </Box>
+                    </div>
                 </TechFrame>
-            </Container>
+            </div>
 
             <style jsx global>{`
                 @keyframes spin {
@@ -190,6 +141,6 @@ export default function LoggingOut() {
                     100% { left: 100%; }
                 }
             `}</style>
-        </Box>
+        </div>
     );
 }

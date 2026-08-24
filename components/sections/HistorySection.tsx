@@ -4,14 +4,15 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { Box, Typography, Divider, Grid } from '@mui/material';
 import Image from 'next/image';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Section } from '../ui/Section';
 import { Button } from '../ui/Button';
-import { PlayArrow as PlayIcon } from '@mui/icons-material';
+import { Typography } from '../ui/Typography';
+import { Play } from 'lucide-react';
+import { cn } from '@/lib/utils/cn';
 import { historyData } from '../../lib/data/history';
 import { EnvVariables } from '@/lib/constants/variables';
 import { CinematicStoryteller } from '../ui/CinematicStoryteller';
@@ -19,78 +20,59 @@ import { CinematicStoryteller } from '../ui/CinematicStoryteller';
 gsap.registerPlugin(ScrollTrigger);
 
 const TechFrame = ({ children, color = '#ff0055' }: { children: React.ReactNode; color?: string }) => (
-  <Box
-    sx={{
-      position: 'relative',
-      p: '4px',
+  <div
+    className="relative p-1"
+    style={{
       background: `linear-gradient(45deg, transparent 5%, ${color} 5%, ${color} 10%, transparent 10%, transparent 90%, ${color} 90%, ${color} 95%, transparent 95%)`,
       filter: `drop-shadow(0 0 5px ${color}80)`,
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        border: `1px solid ${color}40`,
-        clipPath: 'polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%)',
-        pointerEvents: 'none',
-      },
     }}
   >
-    <Box sx={{ 
-      position: 'relative', 
-      clipPath: 'polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%)',
-      bgcolor: 'rgba(0,0,0,0.7)',
-    }}>
+    <div
+      className="pointer-events-none absolute inset-0"
+      style={{
+        border: `1px solid ${color}40`,
+        clipPath: 'polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%)',
+      }}
+    />
+    <div
+      className="relative bg-black/70"
+      style={{ clipPath: 'polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%)' }}
+    >
       {children}
-      <Box sx={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '100%',
-        background: `linear-gradient(to bottom, transparent 50%, ${color}10 50%)`,
-        backgroundSize: '100% 4px',
-        pointerEvents: 'none',
-        zIndex: 2,
-      }} />
-    </Box>
-  </Box>
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-full"
+        style={{
+          background: `linear-gradient(to bottom, transparent 50%, ${color}10 50%)`,
+          backgroundSize: '100% 4px',
+        }}
+      />
+    </div>
+  </div>
 );
 
 const DataLog = ({ title, year, children, align = 'left' }: { title: string; year?: string; children: React.ReactNode; align?: 'left' | 'right' }) => (
-  <Box sx={{ 
-    textAlign: align, 
-    position: 'relative',
-    p: { xs: 2, md: 4 },
-    borderLeft: align === 'left' ? '2px solid #ff0055' : 'none',
-    borderRight: align === 'right' ? '2px solid #00f3ff' : 'none',
-    background: 'linear-gradient(90deg, rgba(255, 0, 85, 0.05) 0%, rgba(0,0,0,0) 100%)',
-    backdropFilter: 'blur(5px)',
-  }}>
-    <Typography variant="overline" sx={{ color: 'text.secondary', letterSpacing: 2, display: 'block', mb: 1, fontFamily: 'monospace' }}>
+  <div
+    className={cn(
+      'relative p-4 backdrop-blur-[5px] md:p-8',
+      align === 'left' ? 'border-l-2 border-[#ff0055] text-left' : 'border-r-2 border-[#00f3ff] text-right'
+    )}
+    style={{ background: 'linear-gradient(90deg, rgba(255, 0, 85, 0.05) 0%, rgba(0,0,0,0) 100%)' }}
+  >
+    <Typography variant="overline" className="mb-2 block font-mono tracking-[2px] text-[#b3b3b3]">
       {'// ARCHIVE RECORD: '}{year || 'UNKNOWN'}
     </Typography>
-    <Typography variant="h3" sx={{ 
-      mb: 3, 
-      color: 'white', 
-      textTransform: 'uppercase', 
-      fontWeight: 'bold',
-      textShadow: '0 0 10px rgba(255, 0, 85, 0.5)',
-      fontSize: { xs: '1.8rem', md: '2.5rem' }
-    }}>
+    <Typography variant="h3" className="mb-6 text-[1.8rem] font-bold uppercase text-white [text-shadow:0_0_10px_rgba(255,0,85,0.5)] md:text-[2.5rem]">
       {title}
     </Typography>
-    <Typography component="div" variant="body1" sx={{ fontSize: '1.1rem', color: 'gray', lineHeight: 1.8, fontFamily: 'monospace' }}>
+    <Typography component="div" variant="body1" className="font-mono text-[1.1rem] leading-[1.8] text-[gray]">
       {children}
     </Typography>
-  </Box>
+  </div>
 );
 
 export const HistorySection = () => {
   const [isCinematicOpen, setIsCinematicOpen] = useState(false);
-  const container = useRef<HTMLElement | null>(null);
+  const container = useRef<HTMLDivElement | null>(null);
   const { project } = EnvVariables;
 
   useGSAP(() => {
@@ -150,31 +132,31 @@ export const HistorySection = () => {
 
   }, { scope: container });
 
-  
-  
+
+
   //# 1-Estructuración y renderizado visual del componente UI
   return (
     <Section id="history" className="overflow-hidden">
-      <Box ref={container}>
-        <Box sx={{ mb: 12 }} className="history-main-title">
-          <Typography variant="h2" align="center" gutterBottom sx={{ 
-              color: 'white', 
-              textTransform: 'uppercase', 
-              fontWeight: 900,
-              textShadow: '0 0 20px rgba(0, 243, 255, 0.8)'    
-          }}>
+      <div ref={container}>
+        <div className="history-main-title mb-24">
+          <Typography
+            variant="h2"
+            component="h2"
+            className="mb-2 text-center font-black uppercase text-white"
+            style={{ textShadow: '0 0 20px rgba(0, 243, 255, 0.8)' }}
+          >
             Cronología {project}
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+          <div className="mb-4 flex justify-center">
             <Button
               variant="contained"
-              startIcon={<PlayIcon />}
+              startIcon={<Play />}
               onClick={() => setIsCinematicOpen(true)}
-              sx={{ 
+              sx={{
                 background: 'rgba(0, 243, 255, 0.05)',
                 backdropFilter: 'blur(10px)',
                 border: '1px solid rgba(0, 243, 255, 0.5)',
-                color: '#fff', 
+                color: '#fff',
                 fontWeight: '900',
                 textTransform: 'uppercase',
                 letterSpacing: 2,
@@ -191,52 +173,45 @@ export const HistorySection = () => {
             >
               Reproducir Historia
             </Button>
-          </Box>
-          <Divider sx={{ my: 4, borderColor: '#00f3ff', opacity: 0.3, maxWidth: '200px', mx: 'auto' }} />
-        </Box>
+          </div>
+          <hr className="my-8 mx-auto max-w-[200px] border-t opacity-30" style={{ borderColor: '#00f3ff' }} />
+        </div>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div className="flex flex-col gap-40">
           {historyData.map((eventData, yearIndex) => (
-            <Box key={eventData.year}>
+            <div key={eventData.year}>
 
-              <Box className="history-year-header" sx={{ textAlign: 'center', mb: 10 }}>
-                  <Typography variant="overline" sx={{ color: '#ffb700', letterSpacing: 8, fontSize: '1.2rem', display: 'block', mb: 2 }}>
-                      AÑO 
+              <div className="history-year-header mb-20 text-center">
+                  <Typography variant="overline" className="mb-4 block text-[1.2rem] tracking-[8px] text-[#ffb700]">
+                      AÑO
                   </Typography>
-                  <Typography variant="h3" sx={{ 
-                      fontSize: { xs: '1.8rem', md: '4rem' }, 
-                      fontWeight: 'bold', 
-                      mb: 3,
-                      color: 'white',
-                      textTransform: 'uppercase',
-                      hyphens: 'auto',
-                      wordBreak: 'break-word',
-                  }}>
+                  <Typography variant="h3" className="mb-6 text-[1.8rem] font-bold uppercase text-white hyphens-auto break-words md:text-[4rem]">
                       {eventData.title}
                   </Typography>
-                  <Typography variant="h5" color="text.secondary" sx={{ maxWidth: '800px', mx: 'auto', lineHeight: 1.6, fontFamily: 'monospace' }}>
+                  <Typography variant="h5" className="mx-auto max-w-[800px] font-mono leading-[1.6] text-[#b3b3b3]">
                       {eventData.description}
                   </Typography>
-              </Box>
+              </div>
 
-                  <Grid container spacing={{ xs: 2, md: 8 }} alignItems="center">
+                  <div className="grid grid-cols-1 items-center gap-4 md:grid-cols-12 md:gap-16">
                   {eventData.details.map((detail, index) => {
                       const isEven = index % 2 === 0;
-                      
-                      
-                      
+
+
+
                       //# 2-Estructuración y renderizado visual del componente UI
                       return (
                           <React.Fragment key={`${eventData.year}-${index}`}>
 
-                              <Grid 
-                                size={{ xs: 12, md: 6 }} 
-                                sx={{ order: isEven ? { xs: 2, md: 1 } : { xs: 2, md: 2 } }}
-                                className="history-text-block"
+                              <div
+                                className={cn(
+                                  'history-text-block md:col-span-6',
+                                  isEven ? 'order-2 md:order-1' : 'order-2 md:order-2'
+                                )}
                               >
-                                  <DataLog 
-                                      title={detail.heading} 
-                                      year={`${eventData.year}.${index + 1}`} 
+                                  <DataLog
+                                      title={detail.heading}
+                                      year={`${eventData.year}.${index + 1}`}
                                       align={isEven ? 'left' : 'right'}
                                   >
                                       {detail.paragraphs.map((p, i) => (
@@ -245,20 +220,16 @@ export const HistorySection = () => {
                                           </p>
                                       ))}
                                   </DataLog>
-                              </Grid>
+                              </div>
 
-                              <Grid 
-                                size={{ xs: 12, md: 6 }} 
-                                sx={{ order: isEven ? { xs: 1, md: 2 } : { xs: 1, md: 1 } }}
-                                className="history-image-block"
+                              <div
+                                className={cn(
+                                  'history-image-block md:col-span-6',
+                                  isEven ? 'order-1 md:order-2' : 'order-1 md:order-1'
+                                )}
                               >
                                   <TechFrame color={isEven ? '#00f3ff' : '#ffb700'}>
-                                      <Box className="glitch-effect" sx={{ 
-                                          position: 'relative', 
-                                          height: { xs: 300, md: 400 }, 
-                                          width: '100%',
-                                          overflow: 'hidden'
-                                      }}>
+                                      <div className="glitch-effect relative h-[300px] w-full overflow-hidden md:h-[400px]">
                                           {detail.image ? (
                                               <Image
                                                   src={detail.image}
@@ -266,60 +237,45 @@ export const HistorySection = () => {
                                                   fill
                                                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                                   className="holo-image"
-                                                  style={{ 
+                                                  style={{
                                                       objectFit: 'cover',
                                                       animationDelay: `${((yearIndex * 5 + index) * 0.7) % 5}s`
                                                   }}
                                               />
                                           ) : (
-                                              <Box sx={{ 
-                                                  height: '100%', 
-                                                  width: '100%', 
-                                                  display: 'flex', 
-                                                  alignItems: 'center', 
-                                                  justifyContent: 'center',
-                                                  background: `radial-gradient(circle at center, ${isEven ? 'rgba(0, 243, 255, 0.1)' : 'rgba(255, 183, 0, 0.1)'} 0%, transparent 70%)`
-                                              }}>
-                                                  <Typography sx={{ color: 'text.disabled', fontStyle: 'italic', p: 2, textAlign: 'center' }}>
+                                              <div
+                                                className="flex h-full w-full items-center justify-center"
+                                                style={{ background: `radial-gradient(circle at center, ${isEven ? 'rgba(0, 243, 255, 0.1)' : 'rgba(255, 183, 0, 0.1)'} 0%, transparent 70%)` }}
+                                              >
+                                                  <Typography className="p-4 text-center italic text-white/50">
                                                       [IMAGEN NO DISPONIBLE: {detail.imageCaption}]
                                                   </Typography>
-                                              </Box>
+                                              </div>
                                           )}
 
-                                          <Box sx={{
-                                              position: 'absolute',
-                                              bottom: 0,
-                                              left: 0,
-                                              right: 0,
-                                              p: 2,
-                                              background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)',
-                                              color: 'rgba(255,255,255,0.8)',
-                                              fontSize: '0.8rem',
-                                              fontFamily: 'monospace',
-                                              zIndex: 3,
-                                          }}>
+                                          <div className="absolute inset-x-0 bottom-0 z-[3] bg-gradient-to-t from-black/90 to-transparent p-4 font-mono text-[0.8rem] text-white/80">
                                               IMG_REF: {detail.imageCaption}
-                                          </Box>
-                                      </Box>
+                                          </div>
+                                      </div>
                                   </TechFrame>
-                              </Grid>
+                              </div>
                           </React.Fragment>
                       );
                   })}
-              </Grid>
+              </div>
 
               {yearIndex < historyData.length - 1 && (
-                   <Divider sx={{ mt: 16, borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+                   <hr className="mt-32 border-t" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
               )}
-            </Box>
+            </div>
           ))}
-        </Box>
-      </Box>
+        </div>
+      </div>
 
-      <CinematicStoryteller 
-        data={historyData} 
-        isOpen={isCinematicOpen} 
-        onClose={() => setIsCinematicOpen(false)} 
+      <CinematicStoryteller
+        data={historyData}
+        isOpen={isCinematicOpen}
+        onClose={() => setIsCinematicOpen(false)}
       />
     </Section>
   );

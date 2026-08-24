@@ -11,13 +11,9 @@
     "ia": "npx tsx scripts/ia_orchestrator.ts"
   },
   "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
     "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.2.2",
-    "@mui/icons-material": "^7.3.5",
-    "@mui/material": "^7.3.5",
-    "@mui/material-nextjs": "^7.3.5",
+    "@radix-ui/react-tooltip": "^1.2.16",
     "@reduxjs/toolkit": "^2.11.0",
     "@types/canvas-confetti": "^1.9.0",
     "axios": "^1.13.2",
@@ -39,7 +35,7 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^20",
@@ -50,7 +46,7 @@
     "eslint": "^9",
     "eslint-config-next": "^16.1.2",
     "jsdom": "^29.0.2",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.3"

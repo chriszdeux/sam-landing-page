@@ -2,185 +2,174 @@
 // 2-Estructuración y renderizado visual del componente UI
 
 import React from 'react';
-import { Box, Typography, Container, Grid, Stack } from '@mui/material';
 import { motion } from 'framer-motion';
-import { Settings } from '@mui/icons-material';
+import { Settings } from 'lucide-react';
 import { Mechanic } from '../../lib/data/mechanics';
 import { AnimationRegistry } from './AnimationRegistry';
+import { Typography } from '../ui/Typography';
+import { cn } from '@/lib/utils/cn';
 
 export const LayoutType3 = ({ mechanic }: { mechanic: Mechanic }) => {
-    
+
     const renderAnimation = (animationType?: string) => {
         if (!animationType) return null;
         const AnimationComponent = AnimationRegistry[animationType];
         if (!AnimationComponent) return null;
-        
+
         //# 1-Estructuración y renderizado visual del componente UI
         return <AnimationComponent color={mechanic.color} />;
     };
 
-    
-    
     //# 2-Estructuración y renderizado visual del componente UI
     return (
-    <Box sx={{ 
-        width: '100%',
-        minHeight: '100vh',
-        position: 'relative'
-    }}>
+    <div className="relative min-h-screen w-full">
         {}
         {mechanic.backgroundImage && (
-            <Box sx={{ 
-                position: 'fixed', 
-                inset: -20, 
-                backgroundImage: `url(${mechanic.backgroundImage})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                filter: 'blur(8px) contrast(1.1) brightness(0.6)',
-                zIndex: 0
-            }} />
+            <div
+                className="fixed z-0"
+                style={{
+                    inset: -20,
+                    backgroundImage: `url(${mechanic.backgroundImage})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    filter: 'blur(8px) contrast(1.1) brightness(0.6)',
+                }}
+            />
         )}
 
         {}
         {mechanic.backgroundImage && (
-            <Box sx={{ 
-                position: 'fixed', 
-                inset: 0, 
-                background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%)',
-                zIndex: 0 
-            }} />
+            <div
+                className="fixed inset-0 z-0"
+                style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%)' }}
+            />
         )}
 
-    <Container maxWidth="xl" sx={{ pt: 25, pb: 10, position: 'relative', zIndex: 1 }}>
-        
+    <div className="relative z-[1] mx-auto w-full max-w-[1536px] px-4 pb-20 pt-[200px] sm:px-6 lg:px-8">
+
         {}
-        <Box sx={{ textAlign: 'center', mb: 15 }}>
+        <div className="mb-[120px] text-center">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-                <Typography variant="h6" color={mechanic.color} gutterBottom sx={{ letterSpacing: 4 }}>MÓDULO DE GESTIÓN</Typography>
-                <Typography variant="h1" fontWeight="900" sx={{ mb: 4, textTransform: 'uppercase' }}>{mechanic.title}</Typography>
-                <Box sx={{ height: 4, width: 100, bgcolor: mechanic.color, mx: 'auto', mb: 6, borderRadius: 2 }} />
-                
-                <Container maxWidth="md">
-                    <Typography variant="h5" color="text.secondary" sx={{ mx: 'auto', lineHeight: 1.6 }}>
+                <Typography variant="h6" component="p" className="mb-2 tracking-[4px]" style={{ color: mechanic.color }}>MÓDULO DE GESTIÓN</Typography>
+                <Typography variant="h1" className="mb-8 font-black uppercase">{mechanic.title}</Typography>
+                <div className="mx-auto mb-12 h-1 w-[100px] rounded-lg" style={{ backgroundColor: mechanic.color }} />
+
+                <div className="mx-auto w-full max-w-[900px]">
+                    <Typography variant="h5" component="p" className="mx-auto leading-[1.6] text-foreground-muted">
                         {mechanic.content.heading}
                     </Typography>
-                </Container>
+                </div>
             </motion.div>
-        </Box>
+        </div>
 
         {}
-        <Grid container spacing={4} sx={{ mb: 20 }}>
+        <div className="mb-40 grid grid-cols-1 gap-8 md:grid-cols-12">
             {mechanic.content.paragraphs.map((p: string, i: number) => (
-                <Grid size={{ xs: 12, md: 4 }} key={i}>
-                    <motion.div 
-                        initial={{ opacity: 0, y: 20 }} 
-                        whileInView={{ opacity: 1, y: 0 }} 
+                <div className="md:col-span-4" key={i}>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: i * 0.2 }}
                     >
-                        <Box sx={{ 
-                            p: 4, 
-                            height: '100%',
-                            borderTop: `2px solid ${mechanic.color}40`,
-                            background: 'linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%)'
-                        }}>
-                             <Typography fontSize="1.1rem" color="text.secondary" lineHeight={1.8}>{p}</Typography>
-                        </Box>
+                        <div
+                            className="h-full p-8"
+                            style={{
+                                borderTop: `2px solid ${mechanic.color}40`,
+                                background: 'linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%)',
+                            }}
+                        >
+                             <Typography component="p" className="text-[1.1rem] leading-[1.8] text-foreground-muted">{p}</Typography>
+                        </div>
                     </motion.div>
-                </Grid>
+                </div>
             ))}
-        </Grid>
+        </div>
 
         {}
-        <Stack spacing={20}>
+        <div className="flex flex-col gap-40">
             {mechanic.content.features.map((f, i) => (
-                <Grid container spacing={8} alignItems="center" direction={i % 2 === 0 ? 'row' : 'row-reverse'} key={i}>
+                <div className={cn('flex flex-col items-center gap-16 md:flex-row', i % 2 !== 0 && 'md:flex-row-reverse')} key={i}>
                     {}
-                    <Grid size={{ xs: 12, md: 6 }}>
-                        <motion.div 
-                            initial={{ opacity: 0, x: i % 2 === 0 ? -50 : 50 }} 
-                            whileInView={{ opacity: 1, x: 0 }} 
+                    <div className="w-full md:w-1/2">
+                        <motion.div
+                            initial={{ opacity: 0, x: i % 2 === 0 ? -50 : 50 }}
+                            whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.8 }}
                         >
-                            <Box sx={{ 
-                                position: 'relative', 
-                                borderRadius: 8, 
-                                overflow: 'hidden',
-                                border: `1px solid ${mechanic.color}30`,
-                                boxShadow: `0 20px 50px ${mechanic.color}10`
-                            }}>
+                            <div
+                                className="relative overflow-hidden rounded-[32px]"
+                                style={{
+                                    border: `1px solid ${mechanic.color}30`,
+                                    boxShadow: `0 20px 50px ${mechanic.color}10`,
+                                }}
+                            >
                                 {}
                                 {f.modalImage ? (
-                                    <Box sx={{ height: 500, width: '100%', overflow: 'hidden' }}>
-                                        <motion.img 
-                                            src={f.modalImage} 
+                                    <div className="relative h-[500px] w-full overflow-hidden">
+                                        <motion.img
+                                            src={f.modalImage}
                                             alt={f.title}
                                             initial={{ scale: 1.1 }}
                                             animate={{ scale: 1.2, x: [0, -10, 0], y: [0, -5, 0] }}
                                             transition={{ duration: 20, repeat: Infinity, repeatType: "mirror", ease: "linear" }}
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                            className="h-full w-full object-cover"
                                         />
-                                        <Box sx={{ position: 'absolute', inset: 0, background: `linear-gradient(to top, #000 0%, transparent 50%)` }} />
-                                    </Box>
+                                        <div className="absolute inset-0" style={{ background: `linear-gradient(to top, #000 0%, transparent 50%)` }} />
+                                    </div>
                                 ) : (f.animationType ? (
-                                    <Box sx={{ height: 500, width: '100%', overflow: 'hidden' }}>
+                                    <div className="h-[500px] w-full overflow-hidden">
                                         {renderAnimation(f.animationType)}
-                                    </Box>
+                                    </div>
                                 ) : (
-                                    <Box sx={{ height: 500, bgcolor: `${mechanic.color}10`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <Settings sx={{ fontSize: 100, color: mechanic.color, opacity: 0.5 }} />
-                                    </Box>
+                                    <div className="flex h-[500px] items-center justify-center" style={{ backgroundColor: `${mechanic.color}10` }}>
+                                        <Settings size={100} style={{ color: mechanic.color }} className="opacity-50" />
+                                    </div>
                                 ))}
-                                
+
                                 {}
-                                <Typography sx={{ 
-                                    position: 'absolute', 
-                                    top: 20, 
-                                    left: 20, 
-                                    fontSize: '8rem', 
-                                    fontWeight: 900, 
-                                    color: 'white', 
-                                    opacity: 0.1,
-                                    lineHeight: 1
-                                }}>
+                                <Typography
+                                    component="p"
+                                    className="absolute left-5 top-5 text-[8rem] font-black leading-none text-white opacity-10"
+                                >
                                     0{i + 1}
                                 </Typography>
-                            </Box>
+                            </div>
                         </motion.div>
-                    </Grid>
+                    </div>
 
                     {}
-                    <Grid size={{ xs: 12, md: 6 }}>
-                        <motion.div 
-                             initial={{ opacity: 0, x: i % 2 === 0 ? 50 : -50 }} 
-                             whileInView={{ opacity: 1, x: 0 }} 
+                    <div className="w-full md:w-1/2">
+                        <motion.div
+                             initial={{ opacity: 0, x: i % 2 === 0 ? 50 : -50 }}
+                             whileInView={{ opacity: 1, x: 0 }}
                              viewport={{ once: true }}
                              transition={{ duration: 0.8, delay: 0.2 }}
                         >
-                            <Box>
-                                <Typography variant="overline" color={mechanic.color} fontWeight="bold" letterSpacing={2}>SISTEMA {i + 1}</Typography>
-                                <Typography variant="h3" fontWeight="bold" gutterBottom sx={{ mt: 1, mb: 4 }}>{f.title}</Typography>
-                                
+                            <div>
+                                <Typography variant="overline" component="p" className="font-bold tracking-[2px]" style={{ color: mechanic.color }}>SISTEMA {i + 1}</Typography>
+                                <Typography variant="h3" component="p" className="mb-8 mt-2 font-bold">{f.title}</Typography>
+
                                 {f.modalContent ? (
                                     f.modalContent.split('\n\n').map((paragraph, idx) => (
-                                        <Typography key={idx} paragraph color="text.secondary" sx={{ fontSize: '1.2rem', lineHeight: 1.8, mb: 3 }}>
+                                        <Typography key={idx} component="p" className="mb-6 text-[1.2rem] leading-[1.8] text-foreground-muted">
                                             {paragraph}
                                         </Typography>
                                     ))
                                 ) : (
-                                    <Typography paragraph color="text.secondary" sx={{ fontSize: '1.2rem', lineHeight: 1.8 }}>
+                                    <Typography component="p" className="text-[1.2rem] leading-[1.8] text-foreground-muted">
                                         {f.description}
                                     </Typography>
                                 )}
-                            </Box>
+                            </div>
                         </motion.div>
-                    </Grid>
-                </Grid>
+                    </div>
+                </div>
             ))}
-        </Stack>
+        </div>
 
-    </Container>
-    </Box>
+    </div>
+    </div>
     );
 };

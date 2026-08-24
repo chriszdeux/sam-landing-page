@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Button, IconButton, Paper, Stack, Drawer, Divider, CircularProgress } from "@mui/material";
-import { Close, ShoppingCartCheckout, LocalOffer, PowerSettingsNew } from "@mui/icons-material";
+import { X, ShoppingCart, Tag, Power } from "lucide-react";
+import { Drawer } from "../ui/Drawer";
+import { Typography } from "../ui/Typography";
+import { Button } from "../ui/Button";
 import api from "../../lib/api";
 
 export interface HardwareItem {
@@ -30,6 +32,62 @@ const TYPE_COLORS: Record<string, string> = {
   DEFAULT: "#00e676"
 };
 
+function HardwareCard({ hw, onBuy }: { hw: HardwareItem; onBuy: (hw: HardwareItem) => void }) {
+  const color = TYPE_COLORS[hw.type] || TYPE_COLORS.DEFAULT;
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="relative overflow-hidden rounded-xl bg-black/60 p-4 transition-all duration-300"
+      style={{
+        border: `1px solid ${hovered ? color : `${color}50`}`,
+        boxShadow: hovered ? `0 0 15px ${color}40` : 'none',
+        transform: hovered ? 'translateY(-2px)' : 'none',
+      }}
+    >
+      <div className="absolute left-0 top-0 h-full w-1" style={{ backgroundColor: color }} />
+
+      <div className="mb-1 flex items-start justify-between">
+        <div>
+          <Typography variant="h6" className="font-bold">{hw.name}</Typography>
+          <Typography variant="caption" className="mb-1 block text-white/50">
+            {hw.description}
+          </Typography>
+          <Typography variant="caption" className="flex items-center gap-1 text-white/80">
+            <Power size={14} /> Consumo: {hw.energyConsumption}W
+          </Typography>
+        </div>
+        <Typography variant="h6" className="ml-1 whitespace-nowrap font-bold" style={{ color }}>
+          {hw.hashRate} TH/s
+        </Typography>
+      </div>
+
+      <div className="mt-4 flex items-center justify-between">
+        <Typography variant="body1" className="flex items-center gap-1 font-bold">
+          <Tag size={16} className="text-foreground-muted" /> {hw.priceUSD.toLocaleString()} CR
+        </Typography>
+        <Button
+          variant="contained"
+          onClick={() => onBuy(hw)}
+          disabled={hw.stock <= 0}
+          sx={{
+            bgcolor: `${color}20`,
+            color: color,
+            border: `1px solid ${color}`,
+            '&:hover': { bgcolor: color, color: '#000', boxShadow: `0 0 10px ${color}` },
+            '&.Mui-disabled': { borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.2)' }
+          }}
+          startIcon={<ShoppingCart />}
+        >
+          {hw.stock > 0 ? "Instalar" : "Agotado"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export function LaboratorioMarketDrawer({ open, onClose, buyingSlotIndex, onBuy }: LaboratorioMarketDrawerProps) {
   const [catalog, setCatalog] = useState<HardwareItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -55,103 +113,40 @@ export function LaboratorioMarketDrawer({ open, onClose, buyingSlotIndex, onBuy 
 
   return (
     <Drawer
-      anchor="right"
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: { 
-          width: { xs: '100%', sm: 400 }, 
-          bgcolor: 'rgba(10, 12, 16, 0.95)', 
-          backdropFilter: 'blur(15px)',
-          borderLeft: '1px solid #00f3ff',
-          color: '#fff'
-        }
-      }}
+      side="right"
+      className="w-full border-l border-[#00f3ff] bg-[rgba(10,12,16,0.95)] text-white backdrop-blur-lg sm:w-[400px]"
     >
-      <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5" fontWeight="bold" sx={{ color: '#00f3ff', textTransform: 'uppercase', letterSpacing: 1 }}>
-          Hardware Market
-        </Typography>
-        <IconButton onClick={onClose} sx={{ color: 'text.secondary', '&:hover': { color: '#ff0055' } }}>
-          <Close />
-        </IconButton>
-      </Box>
-      <Divider sx={{ borderColor: 'rgba(0, 243, 255, 0.2)' }} />
-      
-      <Box sx={{ p: 3, overflowY: 'auto', flex: 1 }}>
-        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', mb: 3 }}>
-          Selecciona una máquina minera para asignar al Slot {buyingSlotIndex !== null ? buyingSlotIndex + 1 : ''}.
-        </Typography>
+      <div className="flex h-full flex-col">
+        <div className="flex items-center justify-between p-6">
+          <Typography variant="h5" className="font-bold uppercase tracking-wide text-[#00f3ff]">
+            Hardware Market
+          </Typography>
+          <button onClick={onClose} className="text-foreground-muted transition-colors hover:text-[#ff0055]">
+            <X size={20} />
+          </button>
+        </div>
+        <hr className="border-t border-[#00f3ff]/20" />
 
-        {loading ? (
-          <Box display="flex" justifyContent="center" mt={4}>
-            <CircularProgress sx={{ color: '#00f3ff' }} />
-          </Box>
-        ) : (
-          <Stack spacing={3}>
-            {catalog.map((hw) => {
-              const color = TYPE_COLORS[hw.type] || TYPE_COLORS.DEFAULT;
-              return (
-                <Paper 
-                  key={hw.id} 
-                  sx={{ 
-                    p: 2, 
-                    bgcolor: 'rgba(0,0,0,0.6)', 
-                    border: `1px solid ${color}50`, 
-                    borderRadius: 3,
-                    position: 'relative',
-                    overflow: 'hidden',
-                    transition: 'all 0.3s',
-                    '&:hover': {
-                      borderColor: color,
-                      boxShadow: `0 0 15px ${color}40`,
-                      transform: 'translateY(-2px)'
-                    }
-                  }}
-                >
-                  <Box sx={{ position: 'absolute', top: 0, left: 0, width: 4, height: '100%', bgcolor: color }} />
-                  
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                    <Box>
-                      <Typography variant="h6" fontWeight="bold">{hw.name}</Typography>
-                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', mb: 1 }}>
-                        {hw.description}
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <PowerSettingsNew sx={{ fontSize: 14 }} /> Consumo: {hw.energyConsumption}W
-                      </Typography>
-                    </Box>
-                    <Typography variant="h6" fontWeight="bold" sx={{ color: color, whiteSpace: 'nowrap', ml: 1 }}>
-                      {hw.hashRate} TH/s
-                    </Typography>
-                  </Box>
+        <div className="flex-1 overflow-y-auto p-6">
+          <Typography variant="body2" className="mb-6 text-white/60">
+            Selecciona una máquina minera para asignar al Slot {buyingSlotIndex !== null ? buyingSlotIndex + 1 : ''}.
+          </Typography>
 
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-                    <Typography variant="body1" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <LocalOffer sx={{ fontSize: 16, color: 'text.secondary' }} /> {hw.priceUSD.toLocaleString()} CR
-                    </Typography>
-                    <Button 
-                      variant="contained" 
-                      onClick={() => onBuy(hw)}
-                      disabled={hw.stock <= 0}
-                      sx={{ 
-                        bgcolor: `${color}20`, 
-                        color: color,
-                        border: `1px solid ${color}`,
-                        '&:hover': { bgcolor: color, color: '#000', boxShadow: `0 0 10px ${color}` },
-                        '&.Mui-disabled': { borderColor: 'rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.2)' }
-                      }}
-                      startIcon={<ShoppingCartCheckout />}
-                    >
-                      {hw.stock > 0 ? "Instalar" : "Agotado"}
-                    </Button>
-                  </Box>
-                </Paper>
-              );
-            })}
-          </Stack>
-        )}
-      </Box>
+          {loading ? (
+            <div className="mt-8 flex justify-center">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#00f3ff]/20 border-t-[#00f3ff]" />
+            </div>
+          ) : (
+            <div className="flex flex-col gap-6">
+              {catalog.map((hw) => (
+                <HardwareCard key={hw.id} hw={hw} onBuy={onBuy} />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </Drawer>
   );
 }

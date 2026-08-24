@@ -10,7 +10,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Typography, Alert, Stack, Box } from '@mui/material';
+import { Typography } from '../ui/Typography';
 
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { validateAccount } from '../../lib/features/auth';
@@ -26,11 +26,11 @@ const validateSchema = z.object({
 type ValidateFormInputs = z.infer<typeof validateSchema>;
 
 export const ValidateAccountForm = () => {
-  
+
   //# 2-Obtención del despachador y estado
   const dispatch = useAppDispatch();
   const { status, error } = useAppSelector((state) => state.auth);
-  
+
   //# 3-Definir esquema de validación y manejo de envío
   const {
     register,
@@ -50,50 +50,37 @@ export const ValidateAccountForm = () => {
 
   //# 4-Renderizar formulario de ingreso de código
   return (
-    <form onSubmit={handleSubmit(onSubmit)} style={{ height: '100%' }}>
-      <Box sx={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
-        <Box sx={{ position: 'relative', zIndex: 1, flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+    <form onSubmit={handleSubmit(onSubmit)} className="h-full">
+      <div className="relative flex h-full flex-col">
+        <div className="relative z-[1] flex flex-grow flex-col justify-center">
             <TechFrame color="#00f3ff">
-                <Box sx={{ p: 4, bgcolor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)' }}>
-                    <Box sx={{ mb: 4, textAlign: 'center' }}>
-                        <Typography variant="overline" sx={{ color: '#00f3ff', letterSpacing: 3, display: 'block', mb: 1 }}>
+                <div className="bg-black/80 p-8 backdrop-blur-md">
+                    <div className="mb-8 text-center">
+                        <Typography variant="overline" className="mb-1 block tracking-[3px] text-[#00f3ff]">
                             {'// SECURITY CHECK'}
                         </Typography>
-                        <Typography variant="h4" gutterBottom sx={{ 
-                            color: 'white', 
-                            textTransform: 'uppercase', 
-                            fontWeight: 'bold',
-                            textShadow: '0 0 20px rgba(0, 243, 255, 0.5)',
-                        }}>
+                        <Typography variant="h4" className="font-bold uppercase text-white [text-shadow:0_0_20px_rgba(0,243,255,0.5)]">
                             VALIDAR CUENTA
                         </Typography>
-                        <Typography variant="body2" align="center" color="text.secondary" sx={{ mb: 4, fontFamily: 'monospace' }}>
+                        <Typography variant="body2" className="mb-8 text-center font-mono text-foreground-muted">
                              Ingresa el código que enviamos a tu correo electrónico.
                         </Typography>
-                    </Box>
+                    </div>
 
-                    <Stack spacing={3}>
+                    <div className="flex flex-col gap-6">
                         <Input
                         id="code"
                         label="Código de Verificación"
                         placeholder="Ej: 123456"
                         error={!!errors.code}
                         helperText={errors.code?.message}
-                        fullWidth
                         {...register('code')}
                         />
 
                         {error && (
-                            <Alert 
-                                severity="error" 
-                                sx={{ 
-                                    bgcolor: 'rgba(255, 0, 85, 0.1)', 
-                                    border: '1px solid #ff0055',
-                                    color: '#ffcdd2'
-                                }}
-                            >
+                            <div className="rounded border border-[#ff0055] bg-[#ff0055]/10 p-3 text-sm text-[#ffcdd2]">
                                 {error}
-                            </Alert>
+                            </div>
                         )}
 
                         <Button type="submit" variant="contained" fullWidth glow disabled={status === 'loading'} sx={{
@@ -109,11 +96,11 @@ export const ValidateAccountForm = () => {
                         }}>
                         {status === 'loading' ? 'VALIDANDO...' : 'VALIDAR CUENTA'}
                         </Button>
-                    </Stack>
-                </Box>
+                    </div>
+                </div>
             </TechFrame>
-        </Box>
-      </Box>
+        </div>
+      </div>
     </form>
   );
 };

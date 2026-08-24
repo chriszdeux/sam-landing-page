@@ -1,13 +1,14 @@
 'use client';
 
 import React from 'react';
-import { Box, Typography, Stack, Avatar, IconButton, Divider, Container, Button } from '@mui/material';
-import { ArrowBack, Inventory, MonetizationOn } from '@mui/icons-material';
+import { ArrowLeft, Package, Coins } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '../../../lib/hooks';
 import { TechFrame } from '../../../components/ui/TechFrame';
 import { Background } from '../../../components/layout/Background';
+import { Typography } from '../../../components/ui/Typography';
+import { Button } from '../../../components/ui/Button';
 
 export default function AssetsPage() {
     const router = useRouter();
@@ -17,50 +18,35 @@ export default function AssetsPage() {
     return (
         <main className="min-h-screen relative pb-20">
             <Background />
-            
-            <Container maxWidth="xl" sx={{ pt: { xs: 12, md: 16 }, position: 'relative', zIndex: 10 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 6 }}>
-                    <Stack direction="row" spacing={3} alignItems="center">
-                        <IconButton 
-                            onClick={() => router.back()} 
-                            sx={{ 
-                                color: '#00f3ff', 
-                                border: '1px solid rgba(0, 243, 255, 0.3)',
-                                bgcolor: 'rgba(0, 243, 255, 0.05)',
-                                '&:hover': { bgcolor: 'rgba(0, 243, 255, 0.1)' }
-                            }}
+
+            <div className="relative z-10 mx-auto w-full max-w-[1536px] px-4 pt-24 sm:px-6 md:pt-32 lg:px-8">
+                <div className="mb-12 flex items-center justify-between">
+                    <div className="flex flex-row items-center gap-6">
+                        <button
+                            onClick={() => router.back()}
+                            className="rounded border border-[#00f3ff]/30 bg-[#00f3ff]/5 p-2 text-[#00f3ff] hover:bg-[#00f3ff]/10"
                         >
-                            <ArrowBack />
-                        </IconButton>
-                        <Stack direction="row" spacing={2} alignItems="center">
-                            <Box sx={{ 
-                                p: 1.5, 
-                                bgcolor: 'rgba(0, 243, 255, 0.1)', 
-                                borderRadius: 2, 
-                                border: '1px solid rgba(0, 243, 255, 0.3)',
-                                display: 'flex'
-                            }}>
-                                <Inventory sx={{ color: '#00f3ff', fontSize: 32 }} />
-                            </Box>
-                            <Box>
-                                <Typography variant="h3" sx={{ color: '#fff', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2 }}>
-                                    Inventario de <Box component="span" sx={{ color: '#00f3ff' }}>Activos</Box>
+                            <ArrowLeft />
+                        </button>
+                        <div className="flex flex-row items-center gap-4">
+                            <div className="flex rounded-lg border border-[#00f3ff]/30 bg-[#00f3ff]/10 p-3">
+                                <Package size={32} className="text-[#00f3ff]" />
+                            </div>
+                            <div>
+                                <Typography variant="h3" className="font-black uppercase tracking-[2px] text-white">
+                                    Inventario de <span className="text-[#00f3ff]">Activos</span>
                                 </Typography>
-                                <Typography variant="body1" sx={{ color: 'rgba(0, 243, 255, 0.6)', fontWeight: 'bold', letterSpacing: 2 }}>
+                                <Typography variant="body1" className="font-bold tracking-[2px] text-[#00f3ff]/60">
                                     {assets.length} PROTOCOLOS IDENTIFICADOS EN LA RED
                                 </Typography>
-                            </Box>
-                        </Stack>
-                    </Stack>
-                </Box>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                <Divider sx={{ mb: 6, borderColor: 'rgba(255,255,255,0.05)' }} />
+                <hr className="mb-12 border-t border-white/5" />
 
-                <Box sx={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', lg: '1fr 1fr 1fr' }, 
-                    gap: 4 
-                }}>
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                     {assets.length > 0 ? (
                         assets.map((asset, index) => (
                             <motion.div
@@ -70,60 +56,43 @@ export default function AssetsPage() {
                                 transition={{ delay: index * 0.05 }}
                             >
                                 <TechFrame color="rgba(0, 243, 255, 0.2)">
-                                    <Box sx={{ p: 4 }}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
-                                            <Avatar sx={{ 
-                                                width: 56,
-                                                height: 56,
-                                                bgcolor: 'rgba(0, 243, 255, 0.1)', 
-                                                color: '#00f3ff', 
-                                                border: '2px solid rgba(0, 243, 255, 0.3)',
-                                                fontWeight: 'bold',
-                                                fontSize: '1.5rem'
-                                            }}>
+                                    <div className="p-8">
+                                        <div className="mb-6 flex items-center justify-between">
+                                            <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-[#00f3ff]/30 bg-[#00f3ff]/10 text-2xl font-bold text-[#00f3ff]">
                                                 {asset.symbol[0]}
-                                            </Avatar>
-                                            <Box sx={{ textAlign: 'right' }}>
-                                                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontWeight: 'bold', display: 'block' }}>
+                                            </div>
+                                            <div className="text-right">
+                                                <Typography variant="caption" className="block font-bold text-white/30">
                                                     PROTOCOL_ID
                                                 </Typography>
-                                                <Typography variant="body2" sx={{ color: '#00f3ff', fontFamily: 'monospace' }}>
+                                                <Typography variant="body2" className="font-mono text-[#00f3ff]">
                                                     {asset.id.slice(0, 8)}...
                                                 </Typography>
-                                            </Box>
-                                        </Box>
+                                            </div>
+                                        </div>
 
-                                        <Typography variant="h5" sx={{ color: '#fff', fontWeight: 'bold', mb: 0.5 }}>
+                                        <Typography variant="h5" className="mb-1 font-bold text-white">
                                             {asset.name}
                                         </Typography>
-                                        <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 'bold', letterSpacing: 2 }}>
+                                        <Typography variant="overline" className="font-bold tracking-[2px] text-white/50">
                                             {asset.symbol}
                                         </Typography>
 
-                                        <Box sx={{ 
-                                            mt: 4, 
-                                            p: 2, 
-                                            bgcolor: 'rgba(255,255,255,0.02)', 
-                                            borderRadius: 2,
-                                            border: '1px solid rgba(255,255,255,0.05)',
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'baseline'
-                                        }}>
-                                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 'bold' }}>
+                                        <div className="mt-8 flex items-baseline justify-between rounded-lg border border-white/5 bg-white/[0.02] p-4">
+                                            <Typography variant="caption" className="font-bold text-white/40">
                                                 BALANCE DISPONIBLE
                                             </Typography>
-                                            <Typography variant="h5" sx={{ color: '#00f3ff', fontWeight: 'bold', fontFamily: 'monospace' }}>
+                                            <Typography variant="h5" className="font-mono font-bold text-[#00f3ff]">
                                                 {asset.quantity.toLocaleString()}
                                             </Typography>
-                                        </Box>
-                                        
-                                        <Button 
-                                            variant="outlined" 
-                                            fullWidth 
-                                            sx={{ 
-                                                mt: 3, 
-                                                borderColor: 'rgba(0, 243, 255, 0.3)', 
+                                        </div>
+
+                                        <Button
+                                            variant="outlined"
+                                            fullWidth
+                                            sx={{
+                                                mt: 3,
+                                                borderColor: 'rgba(0, 243, 255, 0.3)',
                                                 color: '#00f3ff',
                                                 '&:hover': { borderColor: '#00f3ff', bgcolor: 'rgba(0, 243, 255, 0.05)' }
                                             }}
@@ -131,27 +100,27 @@ export default function AssetsPage() {
                                         >
                                             DETALLES DEL PROTOCOLO
                                         </Button>
-                                    </Box>
+                                    </div>
                                 </TechFrame>
                             </motion.div>
                         ))
                     ) : (
-                        <Box sx={{ gridColumn: '1 / -1', py: 20, textAlign: 'center' }}>
-                            <MonetizationOn sx={{ fontSize: 80, color: 'rgba(255,255,255,0.05)', mb: 3 }} />
-                            <Typography variant="h5" sx={{ color: 'rgba(255,255,255,0.2)', fontWeight: 'bold' }}>
+                        <div className="col-span-full py-32 text-center">
+                            <Coins size={80} className="mx-auto mb-6 text-white/5" />
+                            <Typography variant="h5" className="font-bold text-white/20">
                                 No se han detectado protocolos activos en su billetera.
                             </Typography>
-                            <Button 
-                                variant="contained" 
+                            <Button
+                                variant="contained"
                                 sx={{ mt: 4, bgcolor: '#00f3ff', color: '#000', fontWeight: 'bold' }}
                                 onClick={() => router.push('/market')}
                             >
                                 ADQUIRIR ACTIVOS
                             </Button>
-                        </Box>
+                        </div>
                     )}
-                </Box>
-            </Container>
+                </div>
+            </div>
         </main>
     );
 }

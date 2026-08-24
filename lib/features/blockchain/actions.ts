@@ -8,7 +8,7 @@
 //# 1-Importar dependencias y APIs del módulo
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { getNetworksApi, getRewardsApi, claimRewardApi, getNextBlockTimeApi, getBlocksHistoryApi, getProcessingFrequenciesApi } from './api';
-import { getProfileApi } from '../auth/api'; 
+import { getUserInfoApi } from '../auth/api'; 
 import { setUserInfo, updateBalance } from '../auth/reducer';
 import { RootState } from '../../store';
 
@@ -47,20 +47,17 @@ export const claimReward = createAsyncThunk(
         try {
             const data = await claimRewardApi(id, userId);
             
-            
-             if (rewardType === 'CREDIT' && amount) {
-                 const state = getState() as RootState;
-                 const currentBalance = state.auth.userInfo?.balance || 0;
-                 dispatch(updateBalance(currentBalance + amount));
-             } else {
-                 
-                try {
-                    const userProfile = await getProfileApi();
-                    dispatch(setUserInfo(userProfile));
-                } catch (profileErr) {
-                    console.warn('Failed to refresh profile after reward claim', profileErr);
+            try {
+                const userProfile = await getUserInfoApi();
+                dispatch(setUserInfo(userProfile));
+            } catch (profileErr) {
+                console.warn('Failed to refresh profile after reward claim', profileErr);
+                if (rewardType === 'CREDIT' && amount) {
+                    const state = getState() as RootState;
+                    const currentBalance = state.auth.userInfo?.balance || 0;
+                    dispatch(updateBalance(currentBalance + amount));
                 }
-             }
+            }
 
             return data;
         } catch (err: unknown) {

@@ -3,248 +3,24 @@
 'use client';
 
 import React from 'react';
-import { Box, Container, Typography, Stack, Chip } from '@mui/material';
-import {
-  Rocket, BarChart2, ShoppingCart, Blocks
-} from 'lucide-react';
-import Link from 'next/link';
+import { Typography } from '../components/ui/Typography';
+import { Rocket, BarChart2, ShoppingCart, Blocks } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Background } from '../components/layout/Background';
 import { Footer } from '../components/layout/Footer';
-import { Modal } from '../components/ui/Modal';
 import { Button } from '../components/ui/Button';
 import { openModal } from '../lib/features/uiSlice';
 import { useAppDispatch, useAppSelector } from '../lib/hooks';
 import { RootState } from '../lib/store';
-
-//# Componente de sección individual
-interface HomeSectionProps {
-  id: string;
-  accentColor: string;
-  tag: string;
-  Icon: React.FC<{ size?: number; color?: string }>;
-  title: string;
-  titleHighlight?: string;
-  description: string;
-  futureLine?: string;
-  actionLabel?: string;
-  actionHref?: string;
-  onAction?: () => void;
-  reverse?: boolean;
-  children?: React.ReactNode;
-}
-
-const HomeSection = ({
-  id, accentColor, tag, Icon, title, titleHighlight, description, futureLine,
-  actionLabel, actionHref, onAction, reverse = false, children
-}: HomeSectionProps) => (
-  <Box
-    id={id}
-    component="section"
-    sx={{ position: 'relative', borderTop: `1px solid ${accentColor}12` }}
-  >
-    <Box sx={{
-      minHeight: { xs: 'auto', md: '85vh' },
-      display: 'flex',
-      alignItems: 'center',
-      py: { xs: 10, md: 14 },
-      position: 'relative',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0, left: 0, right: 0, bottom: 0,
-        background: `radial-gradient(ellipse at ${reverse ? '80%' : '20%'} 50%, ${accentColor}08 0%, transparent 65%)`,
-        pointerEvents: 'none',
-      },
-    }}>
-    <Container maxWidth="xl">
-      <Box sx={{
-        display: 'flex',
-        flexDirection: { xs: 'column', md: reverse ? 'row-reverse' : 'row' },
-        gap: { xs: 6, md: 10 },
-        alignItems: 'center',
-      }}>
-        {/* Text content */}
-        <Box sx={{ flex: 1, maxWidth: { md: 580 } }}>
-          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>
-            <Box sx={{
-              p: 1, borderRadius: '10px',
-              bgcolor: `${accentColor}12`,
-              border: `1px solid ${accentColor}25`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <Icon size={22} color={accentColor} />
-            </Box>
-            <Chip
-              label={tag}
-              size="small"
-              sx={{
-                bgcolor: `${accentColor}10`,
-                color: accentColor,
-                border: `1px solid ${accentColor}30`,
-                fontWeight: 'bold',
-                letterSpacing: 1.5,
-                fontSize: '0.6rem',
-              }}
-            />
-          </Stack>
-
-          <Typography variant="h2" sx={{
-            fontWeight: 900,
-            lineHeight: 1.05,
-            textTransform: 'uppercase',
-            mb: 2,
-            fontSize: { xs: '2.2rem', md: '3.5rem' },
-            color: 'white',
-          }}>
-            {title}{' '}
-            {titleHighlight && (
-              <Box component="span" sx={{
-                color: accentColor,
-                textShadow: `0 0 20px ${accentColor}60`,
-              }}>
-                {titleHighlight}
-              </Box>
-            )}
-          </Typography>
-
-          <Typography variant="body1" sx={{
-            color: 'rgba(255,255,255,0.65)',
-            fontSize: { xs: '1rem', md: '1.1rem' },
-            lineHeight: 1.85,
-            mb: futureLine ? 2 : 4,
-            borderLeft: `2px solid ${accentColor}30`,
-            pl: 2.5,
-          }}>
-            {description}
-          </Typography>
-
-          {futureLine && (
-            <Box sx={{
-              mb: 4, p: 2, borderRadius: 2,
-              bgcolor: `${accentColor}06`,
-              border: `1px solid ${accentColor}20`,
-            }}>
-              <Typography variant="caption" sx={{
-                color: `${accentColor}cc`,
-                fontSize: '0.8rem',
-                lineHeight: 1.7,
-                display: 'block',
-              }}>
-                🛸 {futureLine}
-              </Typography>
-            </Box>
-          )}
-
-          {(actionLabel && (actionHref || onAction)) && (
-            actionHref ? (
-              <Link href={actionHref} style={{ textDecoration: 'none' }}>
-                <Button
-                  variant="contained"
-                  size="large"
-                  glow
-                  sx={{
-                    bgcolor: accentColor,
-                    color: accentColor === '#00f3ff' || accentColor === '#00e676' ? '#000' : '#fff',
-                    fontWeight: 'bold',
-                    px: 5,
-                    py: 1.5,
-                    fontSize: '0.9rem',
-                    letterSpacing: 1.5,
-                    boxShadow: `0 0 24px ${accentColor}40`,
-                    '&:hover': {
-                      boxShadow: `0 0 40px ${accentColor}60`,
-                      transform: 'translateY(-2px)',
-                    },
-                    transition: 'all 0.25s ease',
-                  }}
-                >
-                  {actionLabel}
-                </Button>
-              </Link>
-            ) : (
-              <Button
-                variant="contained"
-                size="large"
-                glow
-                onClick={onAction}
-                sx={{
-                  bgcolor: accentColor,
-                  color: '#000',
-                  fontWeight: 'bold',
-                  px: 5,
-                  py: 1.5,
-                  fontSize: '0.9rem',
-                  letterSpacing: 1.5,
-                  boxShadow: `0 0 24px ${accentColor}40`,
-                  '&:hover': {
-                    boxShadow: `0 0 40px ${accentColor}60`,
-                    transform: 'translateY(-2px)',
-                  },
-                  transition: 'all 0.25s ease',
-                }}
-              >
-                {actionLabel}
-              </Button>
-            )
-          )}
-        </Box>
-
-        {/* Visual panel */}
-        <Box sx={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: 260,
-        }}>
-          {children ?? (
-            <Box sx={{
-              width: { xs: 240, md: 340 },
-              height: { xs: 240, md: 340 },
-              borderRadius: '50%',
-              border: `1px solid ${accentColor}20`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'relative',
-              boxShadow: `0 0 60px ${accentColor}08, inset 0 0 60px ${accentColor}04`,
-            }}>
-              <Box sx={{
-                position: 'absolute', inset: 16,
-                borderRadius: '50%',
-                border: `1px solid ${accentColor}12`,
-                animation: 'orbit 12s linear infinite',
-                '@keyframes orbit': {
-                  from: { transform: 'rotate(0deg)' },
-                  to: { transform: 'rotate(360deg)' },
-                },
-              }}>
-                <Box sx={{
-                  position: 'absolute',
-                  top: -5, left: '50%', transform: 'translateX(-50%)',
-                  width: 10, height: 10,
-                  borderRadius: '50%',
-                  bgcolor: accentColor,
-                  boxShadow: `0 0 12px ${accentColor}`,
-                }} />
-              </Box>
-              <Box sx={{
-                p: 3,
-                borderRadius: '50%',
-                bgcolor: `${accentColor}10`,
-                border: `1px solid ${accentColor}25`,
-              }}>
-                <Icon size={72} color={accentColor} />
-              </Box>
-            </Box>
-          )}
-        </Box>
-      </Box>
-    </Container>
-    </Box>
-  </Box>
-);
+import { HomeSection } from '../components/sections/HomeSection';
+import { Reveal } from '../components/ui/TextReveal';
+import { SectionScroller } from '../components/layout/SectionScroller';
+import {
+  LyncoreFeaturesGrid,
+  OperationsFeaturesGrid,
+  MarketFeaturesGrid,
+  LedgerFeaturesGrid
+} from '../components/sections/HomeSectionGrids';
 
 //# Página principal
 export default function Home() {
@@ -253,61 +29,35 @@ export default function Home() {
   const { userInfo } = useAppSelector((state: RootState) => state.auth);
 
   return (
-    <main style={{ minHeight: '100vh', position: 'relative', background: 'transparent' }}>
+    <main className="relative min-h-screen bg-transparent">
       <Background />
 
       {/* ——— HERO ——— */}
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
+      <div id="inicio" data-scroll-section="Inicio" className="relative flex min-h-screen items-center overflow-hidden">
         {/* Glowing orbs */}
-        <Box sx={{ position: 'absolute', top: '20%', left: '10%', width: 400, height: 400, borderRadius: '50%', bgcolor: '#00f3ff', filter: 'blur(120px)', opacity: 0.04 }} />
-        <Box sx={{ position: 'absolute', bottom: '20%', right: '10%', width: 300, height: 300, borderRadius: '50%', bgcolor: '#ff0055', filter: 'blur(100px)', opacity: 0.04 }} />
+        <div className="absolute top-[20%] left-[10%] h-[400px] w-[400px] rounded-full bg-[#00f3ff]/[0.04] blur-[120px]" />
+        <div className="absolute bottom-[20%] right-[10%] h-[300px] w-[300px] rounded-full bg-[#ff0055]/[0.04] blur-[100px]" />
 
-        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2, pt: 12, pb: 8 }}>
-          <Box>
-            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2.5 }}>
-              <Box sx={{ width: 32, height: 2, bgcolor: '#00f3ff', boxShadow: '0 0 10px #00f3ff' }} />
-              <Typography variant="overline" sx={{ color: '#00f3ff', fontWeight: 'bold', letterSpacing: 4, fontSize: '0.65rem' }}>
+        <div className="relative z-[2] mx-auto w-full max-w-[1536px] px-4 pt-24 pb-16 sm:px-6 lg:px-8">
+          <Reveal>
+            <div className="mb-5 flex flex-row items-center gap-2">
+              <div className="h-0.5 w-8 bg-[#00f3ff] shadow-[0_0_10px_#00f3ff]" />
+              <Typography variant="overline" className="text-[0.65rem] font-bold tracking-[4px] text-[#00f3ff]">
                 ESTADO: TRANSMISIÓN_ACTIVA
               </Typography>
-            </Stack>
+            </div>
 
-            <Typography variant="h1" sx={{
-              fontSize: { xs: '3.5rem', md: '6.5rem', lg: '8rem' },
-              fontWeight: 900,
-              lineHeight: 0.95,
-              textTransform: 'uppercase',
-              mb: 3,
-              background: 'linear-gradient(135deg, #fff 0%, #00f3ff 40%, #fff 80%)',
-              backgroundSize: '200% auto',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              animation: 'textShine 5s linear infinite',
-              '@keyframes textShine': { to: { backgroundPosition: '200% center' } },
-              filter: 'drop-shadow(0 0 20px rgba(0,243,255,0.2))',
-            }}>
+            <Typography
+              variant="h1"
+              className="mb-6 text-[3.5rem] md:text-[6.5rem] lg:text-[8rem] font-black leading-[0.95] uppercase bg-gradient-to-br from-white from-0% via-[#00f3ff] via-40% to-white to-80% bg-[length:200%_auto] bg-clip-text text-transparent [-webkit-text-fill-color:transparent] animate-[shine_5s_linear_infinite] [filter:drop-shadow(0_0_20px_rgba(0,243,255,0.2))]"
+            >
               The Lyncore
             </Typography>
 
-            <Typography variant="h4" sx={{
-              color: 'rgba(255,255,255,0.8)',
-              fontWeight: 300,
-              mb: 5,
-              maxWidth: 640,
-              lineHeight: 1.5,
-              fontSize: { xs: '1.2rem', md: '1.6rem' },
-            }}>
-              Simulador blockchain interactivo donde el{' '}
-              <Box component="span" sx={{ color: '#00f3ff', fontWeight: 700 }}>HASH</Box>{' '}
-              mueve la economía.
+            <Typography variant="h4" className="mb-10 max-w-[640px] text-[1.2rem] md:text-[1.6rem] font-light leading-[1.5] text-white/80">
+              Ledger de supervivencia y simulación blockchain en un yermo digital devastado. El{' '}
+              <span className="font-bold text-[#00f3ff]">HASH</span>{' '}
+              es tu único recurso vital.
             </Typography>
 
             {userInfo ? (
@@ -316,7 +66,7 @@ export default function Home() {
                 variant="contained"
                 size="large"
                 glow
-                onClick={() => router.push('/dashboard')}
+                onClick={() => router.push('/operaciones')}
                 startIcon={<Rocket size={20} />}
                 sx={{
                   bgcolor: '#00f3ff', color: '#000', fontWeight: 'bold',
@@ -329,7 +79,7 @@ export default function Home() {
                 Ir a Operaciones
               </Button>
             ) : (
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2.5}>
+              <div className="flex flex-col gap-5 sm:flex-row">
                 <Button
                   id="hero-register-btn"
                   variant="contained"
@@ -361,11 +111,11 @@ export default function Home() {
                 >
                   Ya tengo cuenta
                 </Button>
-              </Stack>
+              </div>
             )}
-          </Box>
-        </Container>
-      </Box>
+          </Reveal>
+        </div>
+      </div>
 
       {/* ——— BLOQUE 1: The Lyncore (Concepto) ——— */}
       <HomeSection
@@ -375,11 +125,14 @@ export default function Home() {
         Icon={Rocket}
         title="Qué es"
         titleHighlight="The Lyncore"
-        description="Un simulador blockchain interactivo donde compras y vendes activos criptográficos de forma gamificada. Las transacciones se agrupan en bloques elásticos que se sellan automáticamente al alcanzar su capacidad, expandiéndose un 25% por cada nuevo ciclo. Es un ledger real —no Web3—, diseñado para aprender las reglas de la economía descentralizada en un entorno controlado."
+        description="El último bastión del orden financiero tras el colapso fiat mundial. Un protocolo inmutable resurgido de los búnkeres geotérmicos de Guadalajara. Aquí, las transacciones se agrupan en bloques elásticos que se sellan en tiempo de crisis para preservar el ledger de sedimento. Expándelo un 25% por ciclo y asegura la soberanía de tu clan en este yermo digital."
         futureLine="Próximamente: colonización de mapas interestelares, creación de estructuras de hardware y optimización de simuladores respaldados por el motor de la plataforma."
-        actionLabel={userInfo ? "Ir a Operaciones" : "Comenzar Misión"}
-        onAction={userInfo ? () => router.push('/dashboard') : () => dispatch(openModal('register'))}
-      />
+        actionLabel="Saber más"
+        actionHref="/que-es-lyncore"
+        fullWidth={true}
+      >
+        <LyncoreFeaturesGrid />
+      </HomeSection>
 
       {/* ——— BLOQUE 2: Operaciones ——— */}
       <HomeSection
@@ -389,11 +142,13 @@ export default function Home() {
         Icon={BarChart2}
         title="Centro de"
         titleHighlight="Operaciones"
-        description="El panel de control donde gestionas el HASH acumulado localmente por tu laboratorio para inyectarlo y confirmar transacciones en la red. Audita el balance de tu Wallet personal, monitorea la temperatura de tus componentes de minería y supervisa los ciclos de inyección en tiempo real."
-        actionLabel="Ir a Operaciones"
-        actionHref="/dashboard"
-        reverse
-      />
+        description="El Centro de Operaciones es una estación espacial pequeña que está en medio de la galaxia. Cada usuario comienza con una. Está diseñado para ser tu base de operaciones personal, un centro neurálgico donde podrás gestionar todos los aspectos de tu presencia en el universo de Lyncore. Desde aquí, podrás:"
+        actionLabel="Centro de Operaciones"
+        actionHref="/operaciones"
+        fullWidth={true}
+      >
+        <OperationsFeaturesGrid />
+      </HomeSection>
 
       {/* ——— BLOQUE 3: Mercado ——— */}
       <HomeSection
@@ -403,10 +158,13 @@ export default function Home() {
         Icon={ShoppingCart}
         title="Mercado de"
         titleHighlight="Activos"
-        description="Explora el catálogo de activos criptográficos simulados disponibles para el intercambio comercial: compra activos con tus créditos, véndelos para recuperar liquidez o transfiérelos entre wallets. Cada operación consume hash de la red para su confirmación, reflejando las mecánicas reales de una blockchain."
-        actionLabel="Explorar Mercado"
+        description="La red de intercambio galáctico y mercado negro de activos. Adquiere recursos vitales y tokens energéticos con tus créditos de supervivencia, liquídalos bajo la ley de la oferta extrema o transfiérelos entre refugios seguros. Cada operación de comercio consume HASH de red, reflejando las crudas leyes del ledger."
+        actionLabel="Mercado de Activos"
         actionHref="/market"
-      />
+        fullWidth={true}
+      >
+        <MarketFeaturesGrid />
+      </HomeSection>
 
       {/* ——— BLOQUE 4: Bloques y Transacciones ——— */}
       <HomeSection
@@ -416,14 +174,16 @@ export default function Home() {
         Icon={Blocks}
         title="Ledger de"
         titleHighlight="Bloques"
-        description="Las transacciones se emiten en tiempo real y se agrupan en bloques elásticos que se sellan automáticamente (minedAt) al saturarse. Cada nuevo bloque hereda un 25% más de capacidad que el anterior, visualizando en directo cómo la red escala su ancho de banda. El Explorador de Bloques te permite auditar el historial completo del ledger."
+        description="El ledger de bloques sellados al vacío. Las operaciones del éxodo espacial se agrupan en bloques elásticos que se consolidan automáticamente bajo condiciones de radiación extrema. Cada nuevo bloque expande su capacidad un 25%, adaptándose a la demanda del yermo. Audita el registro histórico de supervivencia para evitar el hackeo del Dios Máquina."
         actionLabel="Ver Ledger de Bloques"
-        actionHref="/dashboard/blocks"
-        reverse
-      />
+        actionHref="/operaciones/blocks"
+        fullWidth={true}
+      >
+        <LedgerFeaturesGrid />
+      </HomeSection>
 
       <Footer />
-      <Modal />
+      <SectionScroller />
     </main>
   );
 }
