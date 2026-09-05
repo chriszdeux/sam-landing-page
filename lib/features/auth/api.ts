@@ -1,5 +1,7 @@
 // 1-Lógica principal y renderizado del módulo
 
+import { AxiosRequestConfig } from 'axios';
+
 import api from '../../api';
 
 import { RegistrationData } from './types';
@@ -42,8 +44,8 @@ export const getProfileApi = async () => {
   return response.data;
 };
 
-export const getUserInfoApi = async () => {
-  const response = await api.get('/users/user-info');
+export const getUserInfoApi = async (config?: AxiosRequestConfig) => {
+  const response = await api.get('/users/user-info', config);
   if (!response || !response.data) {
      if (typeof window !== 'undefined') alert("Error: No se pudo obtener información del usuario");
      throw new Error("No user info data received");
