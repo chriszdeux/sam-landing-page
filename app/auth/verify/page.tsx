@@ -19,6 +19,7 @@ import { useRouter } from 'next/navigation';
 //# 2-Obtención del despachador para emitir acciones al store
 import { useAppDispatch, useAppSelector } from '../../../lib/hooks';
 import { validateAccount, register as registerUser, login } from '../../../lib/features/auth/actions';
+import { clearRegistrationData } from '../../../lib/features/auth/reducer';
 import { CheckCircle2, Unlock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Typography } from '../../../components/ui/Typography';
@@ -84,24 +85,21 @@ export default function VerifyPage() {
 
             if (validateAccount.fulfilled.match(result)) {
 
-                const email = localStorage.getItem('pending_email');
-                const password = localStorage.getItem('pending_password');
+                // El auto-login se hace con los datos que setRegistrationData dejó en Redux
+                // (en memoria) al enviar el formulario, no con la contraseña persistida en
+                // localStorage. Si el usuario recargó o volvió más tarde ya no están, y
+                // entonces aterriza en el home para entrar por el modal de login normal:
+                // el auto-login es una comodidad, no vale persistir la contraseña por ella.
+                const email = registrationData?.email;
+                const password = registrationData?.password;
 
                 if (email && password) {
-                    const loginResult = await dispatch(login({ email, password }));
-                    if (login.fulfilled.match(loginResult)) {
-
-
-                        localStorage.removeItem('pending_email');
-                        localStorage.removeItem('pending_password');
-                        router.push('/');
-                    } else {
-
-                        router.push('/');
-                    }
-                } else {
-                    router.push('/');
+                    await dispatch(login({ email, password }));
                 }
+
+                // La contraseña deja de hacer falta en cuanto se intenta el login.
+                dispatch(clearRegistrationData());
+                router.push('/');
             } else {
 
                 setStep('verifying');

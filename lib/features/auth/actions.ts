@@ -3,7 +3,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { loginApi, registerApi, validateAccountApi, getUserInfoApi } from './api';
 import { RegistrationData } from './types';
-import api from '../../api';
+import api, { AUTH_STORAGE_KEY, clearLegacyCredentialKeys } from '../../api';
 
 export const refreshUserInfo = createAsyncThunk(
   'auth/refreshUserInfo',
@@ -54,11 +54,7 @@ export const login = createAsyncThunk(
     try {
       const data = await loginApi(credentials);
       if (data.token) {
-        localStorage.setItem('token', data.token);
-        
-        
-        const encoded = btoa(credentials.email + ':' + credentials.password);
-        localStorage.setItem('_c', encoded);
+        localStorage.setItem(AUTH_STORAGE_KEY, data.token);
       }
       return data;
     } catch (err: unknown) {
@@ -73,37 +69,36 @@ export const login = createAsyncThunk(
 
 export const checkAuth = createAsyncThunk(
   'auth/checkAuth',
-  async (_, { dispatch, rejectWithValue }) => {
-     const token = localStorage.getItem('token');
-     const encodedCreds = localStorage.getItem('_c');
-
-     if (token) {
-        
-        
-        
-        
-        if (encodedCreds) {
-            try {
-                const decoded = atob(encodedCreds);
-                const [email, password] = decoded.split(':');
-                const data = await loginApi({ email, password });
-                
-                if (data.token) {
-                    localStorage.setItem('token', data.token);
-                }
-                return data;
-            } catch (e) {
-                console.error('Auto-login failed', e);
-                
-                return rejectWithValue('Auto-login failed');
-            }
-        }
-        
-        
-        
+  async (_, { rejectWithValue }) => {
+     if (typeof window === 'undefined') {
+        return rejectWithValue('No session');
      }
-     
-     return rejectWithValue('No session');
+
+     // Limpieza de las claves heredadas que guardaban la contraseña ('_c' del auto-login en
+     // cada carga, 'pending_password' del registro). Se hace aquí porque checkAuth es lo
+     // primero que corre en el arranque (AuthLoader), con sesión o sin ella.
+     clearLegacyCredentialKeys();
+
+     const token = localStorage.getItem(AUTH_STORAGE_KEY);
+     if (!token) {
+        return rejectWithValue('No session');
+     }
+
+     try {
+        // Valida contra el backend el token que ya está guardado, en lugar de volver a
+        // loguear. skipAuthRedirect deja que el 401 se maneje aquí: en el arranque basta con
+        // limpiar y dejar al usuario deslogueado en la página que está viendo.
+        const data = await getUserInfoApi({ skipAuthRedirect: true });
+        return data;
+     } catch (err: unknown) {
+        const status = (err as { response?: { status?: number } })?.response?.status;
+        if (status === 401 || status === 403) {
+           localStorage.removeItem(AUTH_STORAGE_KEY);
+           return rejectWithValue('Session expired');
+        }
+        const message = (err as { message?: string })?.message || 'Failed to validate session';
+        return rejectWithValue(message);
+     }
   }
 );
 

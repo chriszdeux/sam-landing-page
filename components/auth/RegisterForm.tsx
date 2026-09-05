@@ -52,9 +52,6 @@ export const RegisterForm = () => {
   });
 
   const onSubmit = async (data: RegisterFormInputs) => {
-    localStorage.setItem('pending_email', data.email);
-    localStorage.setItem('pending_password', data.password);
-
     dispatch(setRegistrationData({ ...data, profileURL: '' }));
     dispatch(closeModal());
     router.push('/auth/verify');

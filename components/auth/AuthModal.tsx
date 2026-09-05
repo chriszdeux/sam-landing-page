@@ -87,8 +87,6 @@ export const AuthModal = ({ initialMode = 'login' }: AuthModalProps) => {
   };
 
   const onRegister = async (data: RegisterInputs) => {
-    localStorage.setItem('pending_email', data.email);
-    localStorage.setItem('pending_password', data.password);
     dispatch(setRegistrationData({ ...data, profileURL: '' }));
     dispatch(closeModal());
     router.push('/auth/verify');

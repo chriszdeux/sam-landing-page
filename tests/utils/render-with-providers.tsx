@@ -12,8 +12,9 @@ export function renderWithProviders(
   ui: ReactElement,
   {
     preloadedState = {},
-    // Automáticamente crea una instancia de store si no se provee una
-    store = makeStore(),
+    // Automáticamente crea una instancia de store si no se provee una. Ojo: el valor por
+    // defecto tiene que recibir preloadedState, si no se ignora en silencio.
+    store = makeStore(preloadedState),
     ...renderOptions
   }: ExtendedRenderOptions = {}
 ) {
