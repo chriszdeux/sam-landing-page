@@ -1,5 +1,17 @@
 import type { NextConfig } from "next";
 
+// Host(s) publico(s) del bucket de imagenes del backend (Cloudflare R2).
+// Configurable via NEXT_PUBLIC_IMAGE_HOSTNAME (lista separada por comas, sin
+// protocolo) para poder migrar a un dominio propio sin tocar codigo: *.r2.dev
+// es el dominio de desarrollo de Cloudflare y tiene rate limit.
+// Ojo: se lee en build time; un cambio requiere rebuild.
+const DEFAULT_IMAGE_HOSTNAMES = 'pub-2b3c8556aca3428d8484fd9df2ecf080.r2.dev';
+
+const imageHostnames = (process.env.NEXT_PUBLIC_IMAGE_HOSTNAME || DEFAULT_IMAGE_HOSTNAMES)
+  .split(',')
+  .map((hostname) => hostname.trim())
+  .filter(Boolean);
+
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
@@ -11,6 +23,9 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'placehold.co',
       },
+      // Hosts S3 muertos (cuenta AWS bloqueada, bucket perdido). Se mantienen a
+      // proposito: la BD conserva URLs viejas de S3 y quitarlos convertiria un
+      // 404 de imagen en un error de runtime de next/image.
       {
         protocol: 'https',
         hostname: 'clim-v1.s3.us-east-2.amazonaws.com',
@@ -19,6 +34,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'thelyncore.s3.us-east-2.amazonaws.com',
       },
+      ...imageHostnames.map((hostname) => ({
+        protocol: 'https' as const,
+        hostname,
+      })),
     ],
   },
   async rewrites() {

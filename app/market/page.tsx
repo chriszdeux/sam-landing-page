@@ -36,6 +36,10 @@ export default function MarketPage() {
   const router = useRouter();
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
 
+  // URLs de imagen que fallaron al cargar (p.ej. URLs viejas de S3 que dan 404):
+  // caen al avatar de letra en vez de dejar un hueco roto.
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
+
   //# 3-Obtención del despachador para emitir acciones al store
   const dispatch = useDispatch<AppDispatch>();
 
@@ -162,13 +166,14 @@ export default function MarketPage() {
                     </div>
 
                     <div className="group relative z-[1] my-4 flex h-[160px] w-[160px] items-center justify-center transition-transform duration-[400ms] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] hover:scale-110 hover:-translate-y-1 [filter:drop-shadow(0_10px_20px_rgba(0,0,0,0.3))]">
-                        {crypto.identification.image128 ? (
+                        {crypto.identification.image128 && !failedImages[crypto.id] ? (
                              <Image
                                 src={crypto.identification.image128}
                                 alt={crypto.identification.name}
                                 fill
                                 sizes="160px"
                                 style={{ objectFit: 'contain', borderRadius: '24%' }}
+                                onError={() => setFailedImages((prev) => ({ ...prev, [crypto.id]: true }))}
                             />
                         ) : (
                              <div
