@@ -8,11 +8,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { AuthState } from './types';
 import { login, register, validateAccount, checkAuth, fetchWalletDetails, addWallet, removeWallet, refreshUserInfo } from './actions';
+import { AUTH_STORAGE_KEY, clearLegacyCredentialKeys } from '../../api';
 
 //# 2-Definir estado inicial para el slice de autenticación
 const initialState: AuthState = {
   userInfo: null,
-  token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
+  token: typeof window !== 'undefined' ? localStorage.getItem(AUTH_STORAGE_KEY) : null,
   status: 'idle',
   error: null,
   walletsInfo: null,
@@ -29,8 +30,10 @@ const authSlice = createSlice({
       state.status = 'idle';
       state.error = null;
       state.walletsInfo = null;
-      localStorage.removeItem('token');
-      localStorage.removeItem('_c'); 
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+      // Claves heredadas con la contraseña: ya no se escriben, se siguen limpiando.
+      clearLegacyCredentialKeys();
+      state.registrationData = undefined;
     },
     updateBalance: (state, action) => {
         if (state.userInfo) {
@@ -59,6 +62,9 @@ const authSlice = createSlice({
     },
     setRegistrationData: (state, action) => {
         state.registrationData = action.payload;
+    },
+    clearRegistrationData: (state) => {
+        state.registrationData = undefined;
     },
     setUserInfo: (state, action) => {
         state.userInfo = action.payload;
@@ -166,6 +172,6 @@ const authSlice = createSlice({
 });
 
 //# 5-Exportar acciones y reducer por defecto
-export const { logout, updateBalance, updateWalletAssets, setRegistrationData, setUserInfo } = authSlice.actions;
+export const { logout, updateBalance, updateWalletAssets, setRegistrationData, clearRegistrationData, setUserInfo } = authSlice.actions;
 
 export default authSlice.reducer;
