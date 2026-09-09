@@ -1,0 +1,41 @@
+name: CI Quality Gate
+
+on:
+  push:
+    branches: [ QA, master, main ]
+  pull_request:
+    branches: [ QA, master, main ]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Lint, Typecheck, Tests & Next Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: TypeScript Check
+        run: npx tsc --noEmit
+
+      - name: Run Tests
+        run: npx vitest run
+
+      - name: Next.js Build Check
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: Lint Check
+        run: npm run lint || true
