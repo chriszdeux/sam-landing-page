@@ -108,9 +108,9 @@ export const MarketTable = () => {
                   <td className="px-4 py-3 text-white">
                     <div className="flex flex-row items-center gap-4">
                       <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-[#00f3ff]/10">
-                        {row.identification.image128 ? (
+                        {row.identification.logo ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={row.identification.image128} alt={row.identification.symbol} className="h-full w-full object-cover" />
+                          <img src={row.identification.logo} alt={row.identification.symbol} className="h-full w-full object-cover" />
                         ) : (
                           <Activity size={18} />
                         )}
