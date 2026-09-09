@@ -163,10 +163,10 @@ export const BlocksModule = () => {
                         <span className="absolute inset-0 flex items-center justify-center">
                             {selectedNetwork.identification.symbol[0]}
                         </span>
-                        {selectedNetwork.identification.image && (
+                        {selectedNetwork.identification.logo && (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
-                                src={selectedNetwork.identification.image}
+                                src={selectedNetwork.identification.logo}
                                 alt={selectedNetwork.identification.name}
                                 className="relative h-full w-full object-cover"
                                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}

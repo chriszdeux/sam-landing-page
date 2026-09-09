@@ -87,10 +87,10 @@ export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ ne
                         style={{ border: `2px solid ${color}` }}
                     >
                         <span className="absolute inset-0 flex items-center justify-center">{identification.symbol[0]}</span>
-                        {identification.image && (
+                        {identification.logo && (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
-                                src={identification.image}
+                                src={identification.logo}
                                 alt={identification.symbol}
                                 className="relative h-full w-full object-cover"
                                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -120,9 +120,9 @@ export const BlockchainDataDisplay: React.FC<BlockchainDataDisplayProps> = ({ ne
                      </div>
                  </div>
 
-                 {identification.image && (
+                 {identification.logo && (
                      // eslint-disable-next-line @next/next/no-img-element
-                     <img src={identification.image} alt="" className="pointer-events-none absolute -top-5 -right-5 h-[300px] w-[300px] opacity-5" />
+                     <img src={identification.logo} alt="" className="pointer-events-none absolute -top-5 -right-5 h-[300px] w-[300px] opacity-5" />
                  )}
             </div>
         </motion.div>

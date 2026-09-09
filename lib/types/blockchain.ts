@@ -15,7 +15,7 @@ export interface MiningProps {
 export interface BlockchainInfo {
   name: string;
   symbol: string;
-  image?: string;
+  logo?: string;
 }
 
 //# 2-Definir información adicional y rangos de tarifas

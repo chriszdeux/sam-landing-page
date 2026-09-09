@@ -58,9 +58,9 @@ export const MarketTableView = ({ cryptos, onTrade, onRowClick }: MarketTableVie
                       className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-[24%] bg-white/[0.03]"
                       style={{ border: `1px solid ${rowColor}40` }}
                     >
-                      {crypto.identification.image128 ? (
+                      {crypto.identification.logo ? (
                         <Image
-                          src={crypto.identification.image128}
+                          src={crypto.identification.logo}
                           alt={crypto.identification.name}
                           fill
                           sizes="36px"
