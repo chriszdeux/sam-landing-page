@@ -14,6 +14,10 @@ interface MarketTableViewProps {
 }
 
 export const MarketTableView = ({ cryptos, onTrade, onRowClick }: MarketTableViewProps) => {
+  // Imagenes que fallaron al cargar (URL vieja de S3 con 404, u objeto que no
+  // existe en R2): caen a la inicial del simbolo en vez de un hueco roto.
+  const [failedImages, setFailedImages] = React.useState<Record<string, boolean>>({});
+
   return (
     <div className="mb-8 overflow-hidden overflow-x-auto rounded-xl border border-white/10 bg-[rgba(10,10,20,0.6)] backdrop-blur-md">
       <table className="w-full min-w-[650px] border-collapse" aria-label="market table">
@@ -58,13 +62,14 @@ export const MarketTableView = ({ cryptos, onTrade, onRowClick }: MarketTableVie
                       className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-[24%] bg-white/[0.03]"
                       style={{ border: `1px solid ${rowColor}40` }}
                     >
-                      {crypto.identification.logo ? (
+                      {crypto.identification.logo && !failedImages[crypto.id] ? (
                         <Image
                           src={crypto.identification.logo}
                           alt={crypto.identification.name}
                           fill
                           sizes="36px"
                           style={{ objectFit: 'contain', borderRadius: '24%' }}
+                          onError={() => setFailedImages((prev) => ({ ...prev, [crypto.id]: true }))}
                         />
                       ) : (
                         <Typography className="text-[0.9rem] font-bold text-white">
