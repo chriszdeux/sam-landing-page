@@ -640,10 +640,10 @@ const TradeContent = () => {
 
                             <div className="mb-6 flex justify-center">
                                 <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-[24%] border-2 border-white/10 bg-white/5">
-                                    {selectedCrypto?.identification.image256 || selectedCrypto?.identification.image128 ? (
+                                    {selectedCrypto?.identification.logo ? (
                                         // eslint-disable-next-line @next/next/no-img-element
                                         <img
-                                            src={selectedCrypto?.identification.image256 || selectedCrypto?.identification.image128}
+                                            src={selectedCrypto?.identification.logo}
                                             alt={selectedCrypto?.identification.symbol || 'asset'}
                                             className="h-full w-full object-cover"
                                         />

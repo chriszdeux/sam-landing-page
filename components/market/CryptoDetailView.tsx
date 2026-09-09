@@ -99,10 +99,10 @@ export const CryptoDetailView = ({ id }: CryptoDetailViewProps) => {
                                 className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-[24%] text-lg font-bold text-white"
                                 style={{ backgroundColor: crypto.additionalInfo?.pColor || '#00f3ff' }}
                             >
-                                {crypto.identification.image256 || crypto.identification.image128 ? (
+                                {crypto.identification.logo ? (
                                     // eslint-disable-next-line @next/next/no-img-element
                                     <img
-                                        src={crypto.identification.image256 || crypto.identification.image128}
+                                        src={crypto.identification.logo}
                                         alt={crypto.identification.name}
                                         className="h-full w-full object-cover"
                                     />
