@@ -30,8 +30,7 @@ export interface Cryptocurrency {
   identification: {
     name: string;
     symbol: string;
-    image128?: string;
-    image256?: string;
+    logo?: string;
   };
   financial: Financial;
   network: {
@@ -57,8 +56,7 @@ export interface RandomCryptocurrency {
   identification: {
     name: string;
     symbol: string;
-    image128?: string;
-    image256?: string;
+    logo?: string;
   };
   financial: { 
     price: number;
