@@ -90,14 +90,22 @@ export const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom copyright */}
-        <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-white/5 pt-8 text-center">
+        {/* Bottom copyright & legal */}
+        <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-white/5 pt-8 text-center sm:text-left">
           <Typography variant="body2" className="text-white/40">
             © {new Date().getFullYear()} Lyncore Protocol. Todos los derechos reservados bajo la regla del ledger.
           </Typography>
-          <Typography variant="caption" className="font-mono text-white/20">
-            v0.2.0-apocalypse
-          </Typography>
+          <div className="flex items-center gap-6 text-xs text-white/50">
+            <Link href="/aviso-legal" className="hover:text-[#00f3ff] transition-colors">
+              Aviso Legal
+            </Link>
+            <Link href="/privacidad" className="hover:text-[#00f3ff] transition-colors">
+              Política de Privacidad
+            </Link>
+            <Typography variant="caption" className="font-mono text-white/20">
+              v0.2.0-apocalypse
+            </Typography>
+          </div>
         </div>
       </div>
     </footer>
