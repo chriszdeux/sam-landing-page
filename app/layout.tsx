@@ -22,7 +22,6 @@ const geistMono = Geist_Mono({
 
 import { EnvVariables } from "@/lib/constants/variables";
 import { CookieBanner } from "../components/legal/CookieBanner";
-import { WhatsAppButton } from "../components/ui/WhatsAppButton";
 import { AnalyticsScript } from "../components/analytics/AnalyticsScript";
 
 export const metadata: Metadata = {
@@ -127,7 +126,6 @@ export default function RootLayout({
             <ToastStack />
             {children}
             <CookieBanner />
-            <WhatsAppButton />
             <AnalyticsScript />
           </AuthLoader>
         </StoreProvider>
