@@ -21,10 +21,82 @@ const geistMono = Geist_Mono({
 });
 
 import { EnvVariables } from "@/lib/constants/variables";
+import { CookieBanner } from "../components/legal/CookieBanner";
+import { WhatsAppButton } from "../components/ui/WhatsAppButton";
+import { AnalyticsScript } from "../components/analytics/AnalyticsScript";
 
 export const metadata: Metadata = {
-  title: EnvVariables.project,
-  description: "Simulación de inversiones en criptomonedas y exploración espacial",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://lyncore.io'),
+  title: {
+    default: `${EnvVariables.project} — Ecosistema Galáctico & Simulación Cripto`,
+    template: `%s | ${EnvVariables.project}`,
+  },
+  description: "Simulación avanzada de inversiones en criptomonedas, exploración espacial y mercado galáctico descentralizado.",
+  keywords: ["criptomonedas", "simulación espacial", "blockchain", "mercado galáctico", "Lyncore", "inversión crypto"],
+  authors: [{ name: "Lyncore Team" }],
+  creator: "Lyncore",
+  publisher: "Lyncore",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "es_ES",
+    url: "https://lyncore.io",
+    siteName: "Lyncore",
+    title: `${EnvVariables.project} — Ecosistema Galáctico & Simulación Cripto`,
+    description: "Simulación de inversiones en criptomonedas, exploración espacial y mercado galáctico.",
+    images: [
+      {
+        url: "/globe.svg",
+        width: 1200,
+        height: 630,
+        alt: "Lyncore — Ecosistema Galáctico",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${EnvVariables.project} — Ecosistema Galáctico & Simulación Cripto`,
+    description: "Simulación de inversiones en criptomonedas, exploración espacial y mercado galáctico.",
+    images: ["/globe.svg"],
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
+};
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://lyncore.io/#organization",
+      name: "Lyncore",
+      url: "https://lyncore.io",
+      logo: "https://lyncore.io/favicon.ico",
+      description: "Simulación de inversiones en criptomonedas y exploración espacial en un universo galáctico interactivo.",
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://lyncore.io/#website",
+      url: "https://lyncore.io",
+      name: "Lyncore",
+      publisher: {
+        "@id": "https://lyncore.io/#organization",
+      },
+      inLanguage: "es",
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -32,27 +104,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
-  
   //# 1-Estructuración y renderizado visual del componente UI
   return (
     <html lang="es">
       <head>
-        {/* Reduced-motion del revelado de texto (data-reveal-item lo estampa
-            components/ui/Typography.tsx).
-
-            Va inline y en <head> a propósito. El HTML del servidor siempre llega
-            con los estilos inline del estado "hidden" de framer-motion, porque el
-            servidor no puede leer la media query: el texto queda oculto antes de
-            que corra JS, así que ningún hook de React puede corregirlo a tiempo.
-            Esta regla lo anula en el primer paint sin depender de que globals.css
-            ya haya cargado.
-
-            El !important de autor gana a los estilos inline y también a las
-            animaciones WAAPI en el orden de cascada, así que framer no le puede
-            pelear. El selector apunta al item y NO a `[data-reveal] *`: el
-            descendiente universal mataría el transform de cualquier cosa dentro
-            de un Reveal (spinners, hovers con scale, el fondo galáctico). */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+        {/* Reduced-motion del revelado de texto */}
         <style>{`@media (prefers-reduced-motion: reduce){[data-reveal-item]{opacity:1 !important;transform:none !important}}`}</style>
       </head>
       <body
@@ -61,11 +121,14 @@ export default function RootLayout({
       >
         <StoreProvider>
           <AuthLoader>
-              <Navbar />
-              <LabSimulationManager />
-              <Modal />
-              <ToastStack />
-              {children}
+            <Navbar />
+            <LabSimulationManager />
+            <Modal />
+            <ToastStack />
+            {children}
+            <CookieBanner />
+            <WhatsAppButton />
+            <AnalyticsScript />
           </AuthLoader>
         </StoreProvider>
       </body>
