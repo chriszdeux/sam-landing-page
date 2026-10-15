@@ -298,26 +298,27 @@ export const RepairEquipmentModal: React.FC<RepairEquipmentModalProps> = ({ open
 
         {/* Quick selection chips */}
         <div className="flex flex-wrap gap-2">
-          {[1, 3, 5, maxBlocks].map((b) => {
-            if (b > maxBlocks) return null;
-            const isFull = b === maxBlocks;
-            const isSelected = selectedBlocks === b;
-            return (
-              <button
-                key={b}
-                type="button"
-                disabled={submitting}
-                onClick={() => setSelectedBlocks(b)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
-                  isSelected
-                    ? 'border border-[#00f3ff] bg-[#00f3ff]/20 text-[#00f3ff]'
-                    : 'border border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                {isFull ? `Restaurar al 100% (${b} blq)` : `+${b * 10}%`}
-              </button>
-            );
-          })}
+          {Array.from(new Set([1, 3, 5, maxBlocks].filter((b) => b > 0 && b <= maxBlocks)))
+            .sort((a, b) => a - b)
+            .map((b) => {
+              const isFull = b === maxBlocks;
+              const isSelected = selectedBlocks === b;
+              return (
+                <button
+                  key={`quick-block-${b}`}
+                  type="button"
+                  disabled={submitting}
+                  onClick={() => setSelectedBlocks(b)}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+                    isSelected
+                      ? 'border border-[#00f3ff] bg-[#00f3ff]/20 text-[#00f3ff]'
+                      : 'border border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  {isFull ? `Restaurar al 100% (${b} blq)` : `+${b * 10}%`}
+                </button>
+              );
+            })}
         </div>
       </div>
 
