@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector, useAppStore } from '../../hooks';
 import { RootState } from '../../store';
-import { updateSimulationData, updateLocalEnergy, addHistoryPoint, updateRound, updateLastInjectionTime } from './reducer';
+import { updateSimulationData, updateLocalEnergy, addHistoryPoint, updateRound, updateLastInjectionTime, toggleLaboratoryPower } from './reducer';
 import { injectPower } from './actions';
 import { encryptData, decryptData } from '../../utils/crypto';
 import { addNotification } from '../uiSlice';
@@ -258,6 +258,16 @@ export const useLabSimulation = () => {
           stressSecondsRef.current = 0;
         }
 
+        // Lockout if structural integrity reached zero
+        if (currentLife <= 0) {
+          currentLife = 0;
+          displayedEfficiency = 0;
+          updatedHashRate = 0.0;
+          if (isPowered) {
+            dispatch(toggleLaboratoryPower());
+          }
+        }
+
         // Efficiency degradation based on dynamic maxTemperature thresholds
         const alertThreshold = globalMaxTemp * 0.90;
         if (globalTemp >= globalMaxTemp) {
@@ -343,6 +353,7 @@ export const useLabSimulation = () => {
       const lab = state.reducerLabs.currentLab;
       const isPowered = state.reducerLabs.isPoweredOn;
       if (!isPowered || !lab) return;
+      if (lab.currentLife !== undefined && lab.currentLife <= 0) return;
 
       // Prevent accumulation if injection is in progress
       if (isInjectingRef.current) return;
@@ -404,6 +415,10 @@ export const useLabSimulation = () => {
       const isPowered = state.reducerLabs.isPoweredOn;
       const network = state.blockchain.selectedNetwork;
       if (!isPowered || !lab) return;
+      if (lab.currentLife !== undefined && lab.currentLife <= 0) {
+        accumulatorStateRef.current = { energyAccumulated: 0, secondsElapsed: 0, performanceHistory: [] };
+        return;
+      }
 
       if (isInjectingRef.current) return;
 

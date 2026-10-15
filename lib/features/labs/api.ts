@@ -24,3 +24,17 @@ export const createLabApi = async (payload: { slotsCapacity?: number; userId?: s
   const response = await api.post('/labs/create', payload);
   return response.data;
 };
+
+export const repairEquipmentApi = async (labId: string, blockchainId: string, blocksToRepair: number) => {
+  const response = await api.post(`/labs/${labId}/repair`, {
+    blockchainId,
+    blocksToRepair
+  });
+  return response.data;
+};
+
+export const getRepairQuoteApi = async (labId: string, blockchainId: string) => {
+  const response = await api.get(`/labs/${labId}/repair-quote?blockchainId=${blockchainId}`);
+  return response.data;
+};
+

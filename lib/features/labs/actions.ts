@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { getLabApi, updateLabStatusApi, injectPowerApi, createLabApi } from './api';
+import { getLabApi, updateLabStatusApi, injectPowerApi, createLabApi, repairEquipmentApi } from './api';
 
 export const fetchLaboratoryInterface = createAsyncThunk(
   'labs/fetchLaboratoryInterface',
@@ -57,6 +57,22 @@ export const createLaboratory = createAsyncThunk(
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       return rejectWithValue(error.response?.data?.message || 'Failed to create laboratory');
+    }
+  }
+);
+
+export const repairLaboratory = createAsyncThunk(
+  'labs/repairLaboratory',
+  async (
+    { labId, blockchainId, blocksToRepair }: { labId: string; blockchainId: string; blocksToRepair: number },
+    { rejectWithValue }
+  ) => {
+    try {
+      const data = await repairEquipmentApi(labId, blockchainId, blocksToRepair);
+      return data;
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(error.response?.data?.message || 'Error al reparar el equipo');
     }
   }
 );

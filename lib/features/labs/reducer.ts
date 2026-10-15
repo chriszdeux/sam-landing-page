@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { LabsState, LaboratoryInterface, SlotItem } from './types';
-import { fetchLaboratoryInterface, toggleLabStatus, injectPower } from './actions';
+import { fetchLaboratoryInterface, toggleLabStatus, injectPower, repairLaboratory } from './actions';
 
 const initialState: LabsState = {
   currentLab: null,
@@ -36,6 +36,11 @@ const labsSlice = createSlice({
       }
     },
     toggleLaboratoryPower: (state) => {
+      if (state.currentLab && state.currentLab.currentLife !== undefined && state.currentLab.currentLife <= 0) {
+        state.isPoweredOn = false;
+        state.isOverclockActive = false;
+        return;
+      }
       if (state.isOverheated && !state.isPoweredOn) return;
       state.isPoweredOn = !state.isPoweredOn;
       if (!state.isPoweredOn) {
@@ -49,11 +54,21 @@ const labsSlice = createSlice({
       }
     },
     toggleOverclock: (state) => {
+      if (state.currentLab && state.currentLab.currentLife !== undefined && state.currentLab.currentLife <= 0) {
+        state.isOverclockActive = false;
+        return;
+      }
       state.isOverclockActive = !state.isOverclockActive;
     },
     updateSimulationData: (state, action: PayloadAction<Partial<LaboratoryInterface>>) => {
       if (state.currentLab) {
         state.currentLab = { ...state.currentLab, ...action.payload };
+        if (state.currentLab.currentLife !== undefined && state.currentLab.currentLife <= 0) {
+          state.isPoweredOn = false;
+          state.isOverclockActive = false;
+          state.currentLab.efficiency = 0;
+          state.currentLab.hashRate = 0;
+        }
       }
     },
     setCooldownState: (state, action: PayloadAction<boolean>) => {
@@ -140,6 +155,15 @@ const labsSlice = createSlice({
               ...labData,
               hashRate: (labData.hashRate && labData.hashRate >= 5) ? labData.hashRate : (state.currentLab.hashRate >= 5 ? state.currentLab.hashRate : 5.0)
             };
+          }
+        }
+      })
+      .addCase(repairLaboratory.fulfilled, (state, action) => {
+        if (state.currentLab && action.payload?.laboratory) {
+          const newLife = action.payload.laboratory.currentLife;
+          state.currentLab.currentLife = newLife;
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('lab_current_life', String(newLife));
           }
         }
       });

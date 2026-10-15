@@ -42,3 +42,83 @@ describe('getTargetsForEfficiency', () => {
   });
 });
 
+import reducer, { toggleLaboratoryPower, toggleOverclock, updateSimulationData } from './reducer';
+import { repairLaboratory } from './actions';
+import { LabsState } from './types';
+
+describe('Laboratorio Lockout en 0% Vida Útil y Reparación', () => {
+  const collapsedState: LabsState = {
+    currentLab: {
+      id: 'lab-1',
+      type: 'MINING',
+      lifeLimit: 100,
+      currentLife: 0,
+      maxTemperature: 80,
+      slotsCapacity: 10,
+      slots: [],
+      createdAt: new Date(),
+      hashRate: 0,
+      temperature: 25,
+      efficiency: 0,
+      energy: 0,
+    },
+    isPoweredOn: false,
+    isOverheated: false,
+    status: 'idle',
+    error: null,
+    simulationHistory: [],
+    currentRound: 1,
+    lastInjectionTime: 0,
+    isOverclockActive: false,
+    startingTemp: null,
+  };
+
+  it('no permite encender el laboratorio cuando currentLife es 0.00%', () => {
+    const nextState = reducer(collapsedState, toggleLaboratoryPower());
+    expect(nextState.isPoweredOn).toBe(false);
+  });
+
+  it('no permite activar overclock cuando currentLife es 0.00%', () => {
+    const nextState = reducer(collapsedState, toggleOverclock());
+    expect(nextState.isOverclockActive).toBe(false);
+  });
+
+  it('fuerza apagado, 0% eficiencia y 0 hashRate si updateSimulationData detecta currentLife <= 0', () => {
+    const activeState: LabsState = {
+      ...collapsedState,
+      isPoweredOn: true,
+      isOverclockActive: true,
+      currentLab: {
+        ...collapsedState.currentLab!,
+        currentLife: 10,
+        efficiency: 90,
+        hashRate: 15,
+      },
+    };
+
+    const nextState = reducer(activeState, updateSimulationData({ currentLife: 0 }));
+    expect(nextState.isPoweredOn).toBe(false);
+    expect(nextState.isOverclockActive).toBe(false);
+    expect(nextState.currentLab?.efficiency).toBe(0);
+    expect(nextState.currentLab?.hashRate).toBe(0);
+  });
+
+  it('restaura currentLife al recibir repairLaboratory.fulfilled', () => {
+    const action = {
+      type: repairLaboratory.fulfilled.type,
+      payload: {
+        ok: true,
+        laboratory: {
+          id: 'lab-1',
+          currentLife: 60,
+          blocksRepaired: 6,
+        },
+      },
+    };
+
+    const nextState = reducer(collapsedState, action as any);
+    expect(nextState.currentLab?.currentLife).toBe(60);
+  });
+});
+
+
