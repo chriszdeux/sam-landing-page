@@ -154,7 +154,9 @@ export const LabMetersPanel = React.memo(() => {
                         unit="%"
                         severity={isDormant ? 'offline' : lifeSev}
                         description={
-                            isDormant
+                            currentLife <= 0
+                                ? 'AVERÍA TOTAL: Hardware colapsado (0.00%). Inyección suspendida por falla estructural.'
+                                : isDormant
                                 ? 'Sin desgaste con el laboratorio apagado'
                                 : lifeSev === 'critical'
                                 ? 'CRÍTICO: Desgaste avanzado detectado'

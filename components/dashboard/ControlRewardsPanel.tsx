@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Power, History, Gift } from 'lucide-react';
+import { Power, History, Gift, Wrench, AlertOctagon } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../lib/hooks';
 import { toggleLaboratoryPower, toggleOverclock } from '../../lib/features/labs/reducer';
 import { TechFrame } from '../ui/TechFrame';
@@ -11,12 +11,14 @@ import { useRouter } from 'next/navigation';
 import { formatHash } from '../../lib/utils/formatHash';
 import { Typography } from '../ui/Typography';
 import { Button } from '../ui/Button';
+import { RepairEquipmentModal } from './RepairEquipmentModal';
 
 export const ControlRewardsPanel = React.memo(() => {
     const dispatch = useAppDispatch();
     const router = useRouter();
+    const [isRepairModalOpen, setIsRepairModalOpen] = useState(false);
     const { userInfo } = useAppSelector((state) => state.auth);
-    const { energy, hashAvailable, isPoweredOn, isOverheated, isOverclockActive, chronoBurstFreqTypes } = useAppSelector((state: RootState) => {
+    const { energy, hashAvailable, isPoweredOn, isOverheated, isOverclockActive, chronoBurstFreqTypes, currentLife } = useAppSelector((state: RootState) => {
         const lab = state.reducerLabs.currentLab;
         const selectedNetwork = state.blockchain.selectedNetwork;
         return {
@@ -25,7 +27,8 @@ export const ControlRewardsPanel = React.memo(() => {
             isPoweredOn: state.reducerLabs.isPoweredOn,
             isOverheated: state.reducerLabs.isOverheated,
             isOverclockActive: state.reducerLabs.isOverclockActive,
-            chronoBurstFreqTypes: state.blockchain.chronoBurstFreqTypes
+            chronoBurstFreqTypes: state.blockchain.chronoBurstFreqTypes,
+            currentLife: lab?.currentLife !== undefined ? Number(lab.currentLife) : 100
         };
     }, (prev, next) => {
         return (
@@ -34,44 +37,61 @@ export const ControlRewardsPanel = React.memo(() => {
             prev.isPoweredOn === next.isPoweredOn &&
             prev.isOverheated === next.isOverheated &&
             prev.isOverclockActive === next.isOverclockActive &&
-            prev.chronoBurstFreqTypes === next.chronoBurstFreqTypes
+            prev.chronoBurstFreqTypes === next.chronoBurstFreqTypes &&
+            prev.currentLife === next.currentLife
         );
     });
     const transactions = useAppSelector((state: RootState) => state.transactions.transactions);
 
     const isActive = isPoweredOn;
+    const isCollapsed = currentLife <= 0;
+    const isWarning = currentLife > 0 && currentLife <= 25;
+    const frameColor = isCollapsed ? '#ff1744' : isActive ? '#00e676' : isWarning ? '#ffb700' : 'rgba(255,255,255,0.1)';
 
     const recentTransactions = useMemo(() => transactions.slice(0, 5), [transactions]);
 
     const handleToggle = () => {
+        if (isCollapsed) return;
         dispatch(toggleLaboratoryPower());
     };
 
     const handleOverclockToggle = () => {
+        if (isCollapsed) return;
         dispatch(toggleOverclock());
     };
 
     return (
         <div className="flex flex-col gap-6">
             {/* Power Toggle & Energy Block */}
-            <TechFrame color={isActive ? '#00e676' : 'rgba(255,255,255,0.1)'}>
+            <TechFrame color={frameColor}>
                 <div className="p-6">
                     <div className="mb-6 flex items-center justify-between">
                         <div className="flex flex-row items-center gap-4">
                             <motion.div
-                                animate={isActive ? {
+                                animate={isCollapsed ? {
+                                    boxShadow: ['0 0 0px #ff1744', '0 0 25px #ff1744', '0 0 0px #ff1744']
+                                } : isActive ? {
                                     boxShadow: ['0 0 0px #00e676', '0 0 20px #00e676', '0 0 0px #00e676']
                                 } : {}}
-                                transition={{ repeat: Infinity, duration: 2 }}
+                                transition={{ repeat: Infinity, duration: isCollapsed ? 1.2 : 2 }}
                                 style={{ borderRadius: '50%' }}
                             >
                                 <button
-                                    onClick={handleToggle} disabled={isOverheated && !isActive}
-                                    className="rounded-full p-3 transition-all duration-300 hover:scale-105"
+                                    onClick={handleToggle}
+                                    disabled={isCollapsed || (isOverheated && !isActive)}
+                                    className="rounded-full p-3 transition-all duration-300 hover:scale-105 disabled:cursor-not-allowed"
                                     style={{
-                                        backgroundColor: isActive ? 'rgba(0, 230, 118, 0.1)' : 'rgba(255,255,255,0.05)',
-                                        color: isActive ? '#00e676' : 'rgba(255,255,255,0.3)',
-                                        border: `1px solid ${isActive ? '#00e676' : 'rgba(255,255,255,0.1)'}`,
+                                        backgroundColor: isCollapsed
+                                            ? 'rgba(255, 23, 68, 0.15)'
+                                            : isActive
+                                                ? 'rgba(0, 230, 118, 0.1)'
+                                                : 'rgba(255,255,255,0.05)',
+                                        color: isCollapsed
+                                            ? '#ff1744'
+                                            : isActive
+                                                ? '#00e676'
+                                                : 'rgba(255,255,255,0.3)',
+                                        border: `1px solid ${isCollapsed ? '#ff1744' : isActive ? '#00e676' : 'rgba(255,255,255,0.1)'}`,
                                     }}
                                 >
                                     <Power size={20} />
@@ -81,11 +101,34 @@ export const ControlRewardsPanel = React.memo(() => {
                                 <Typography variant="body1" className="font-bold text-white">
                                     LABORATORIO
                                 </Typography>
-                                <Typography variant="caption" component="p" className="font-bold" style={{ color: isActive ? '#00e676' : isOverheated ? '#ff1744' : 'rgba(255,255,255,0.5)' }}>
-                                    {isOverheated ? 'SISTEMA BLOQUEADO (COOLDOWN)' : isActive ? 'SISTEMA ACTIVO' : 'SISTEMA EN PAUSA'}
+                                <Typography
+                                    variant="caption"
+                                    component="p"
+                                    className="font-bold"
+                                    style={{
+                                        color: isCollapsed
+                                            ? '#ff1744'
+                                            : isOverheated
+                                                ? '#ff1744'
+                                                : isWarning && isActive
+                                                    ? '#ffb700'
+                                                    : isActive
+                                                        ? '#00e676'
+                                                        : 'rgba(255,255,255,0.5)'
+                                    }}
+                                >
+                                    {isCollapsed
+                                        ? '🔴 HARDWARE COLAPSADO (0.00% VIDA ÚTIL)'
+                                        : isOverheated
+                                            ? 'SISTEMA BLOQUEADO (COOLDOWN)'
+                                            : isWarning && isActive
+                                                ? 'OPERACIÓN EN RIESGO (DESGASTE SEVERO)'
+                                                : isActive
+                                                    ? 'SISTEMA ACTIVO'
+                                                    : 'SISTEMA EN PAUSA'}
                                 </Typography>
                                 <Typography variant="caption" component="p" className="mt-1 font-mono text-[0.7rem] text-white/40">
-                                    Acumulado: {formatHash(energy, chronoBurstFreqTypes)}
+                                    {isCollapsed ? 'Acumulado: 0.00 H/s (Detenido por avería)' : `Acumulado: ${formatHash(energy, chronoBurstFreqTypes)}`}
                                 </Typography>
                             </div>
                         </div>
@@ -97,26 +140,74 @@ export const ControlRewardsPanel = React.memo(() => {
                                 HASH ACUMULADO LOCAL
                             </Typography>
                             <Typography variant="h6" className="font-mono font-bold text-[#00f3ff]">
-                                {formatHash(energy, chronoBurstFreqTypes)}
+                                {isCollapsed ? '0.00 H/s' : formatHash(energy, chronoBurstFreqTypes)}
                             </Typography>
                         </div>
                     </div>
 
                     {/* Verde para activar; en marcha pasa a error porque el
-                        overclock triplica la temperatura. */}
+                        overclock triplica la temperatura; bloqueado en 0% vida. */}
                     <Button
                         variant="contained"
                         fullWidth
-                        color={isOverclockActive ? 'error' : 'success'}
-                        disabled={!isPoweredOn || isOverheated}
+                        color={isCollapsed ? 'error' : isOverclockActive ? 'error' : 'success'}
+                        disabled={isCollapsed || !isPoweredOn || isOverheated}
                         onClick={handleOverclockToggle}
                         className="mb-4"
                     >
-                        {isOverclockActive ? 'OVERCLOCK ACTIVO (3X TEMP)' : 'ACTIVAR OVERCLOCK'}
+                        {isCollapsed
+                            ? 'OVERCLOCK BLOQUEADO (EQUIPO INSERVIBLE)'
+                            : isOverclockActive
+                                ? 'OVERCLOCK ACTIVO (3X TEMP)'
+                                : 'ACTIVAR OVERCLOCK'}
                     </Button>
 
+                    {/* Banner de Emergencia Crítica si currentLife <= 0 */}
+                    {isCollapsed ? (
+                        <div className="mb-4 rounded-xl border border-[#ff1744]/40 bg-[#ff1744]/10 p-4">
+                            <div className="flex items-start gap-3">
+                                <AlertOctagon size={22} className="shrink-0 text-[#ff1744] mt-0.5" />
+                                <div>
+                                    <Typography variant="body2" className="font-bold text-[#ff1744]">
+                                        AVERÍA CRÍTICA: VIDA ÚTIL AL 0.00%
+                                    </Typography>
+                                    <Typography variant="caption" className="text-white/70 block mt-1">
+                                        El hardware ha colapsado por desgaste estructural severo. La inyección de hash y el encendido del laboratorio están estrictamente suspendidos.
+                                    </Typography>
+                                </div>
+                            </div>
+                            <Button
+                                variant="contained"
+                                fullWidth
+                                startIcon={<Wrench size={16} />}
+                                onClick={() => setIsRepairModalOpen(true)}
+                                sx={{
+                                    mt: 3,
+                                    bgcolor: '#ff1744',
+                                    color: '#fff',
+                                    fontWeight: 'bold',
+                                    boxShadow: '0 0 20px rgba(255, 23, 68, 0.4)',
+                                    '&:hover': { bgcolor: '#d50000', boxShadow: '0 0 30px rgba(255, 23, 68, 0.6)' }
+                                }}
+                            >
+                                REPARAR EQUIPO (DESDE $0.50 USD)
+                            </Button>
+                        </div>
+                    ) : currentLife < 100 ? (
+                        <button
+                            type="button"
+                            onClick={() => setIsRepairModalOpen(true)}
+                            className="mb-4 flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] py-2 text-xs font-bold text-white/80 transition hover:border-[#00f3ff]/40 hover:bg-[#00f3ff]/10 hover:text-[#00f3ff]"
+                        >
+                            <Wrench size={14} />
+                            <span>Mantenimiento Preventivo (Salud: {currentLife.toFixed(1)}%)</span>
+                        </button>
+                    ) : null}
+
                     <Typography variant="caption" component="p" className="text-center italic text-white/30">
-                        Inyección automática de Hash activa al consolidar Round 10
+                        {isCollapsed
+                            ? 'INYECCIÓN SUSPENDIDA: Hardware inutilizado por desgaste crítico'
+                            : 'Inyección automática de Hash activa al consolidar Round 10'}
                     </Typography>
                 </div>
             </TechFrame>
@@ -185,6 +276,12 @@ export const ControlRewardsPanel = React.memo(() => {
             >
                 VER RECOMPENSAS
             </Button>
+
+            {/* Modal de Reparación de Equipo */}
+            <RepairEquipmentModal
+                open={isRepairModalOpen}
+                onClose={() => setIsRepairModalOpen(false)}
+            />
         </div>
     );
 });
