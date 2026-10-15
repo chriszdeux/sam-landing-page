@@ -12,6 +12,7 @@ import { formatHash } from '../../lib/utils/formatHash';
 import { Typography } from '../ui/Typography';
 import { Button } from '../ui/Button';
 import { RepairEquipmentModal } from './RepairEquipmentModal';
+import { EnvVariables } from '../../lib/constants/variables';
 
 export const ControlRewardsPanel = React.memo(() => {
     const dispatch = useAppDispatch();
@@ -190,7 +191,7 @@ export const ControlRewardsPanel = React.memo(() => {
                                     '&:hover': { bgcolor: '#d50000', boxShadow: '0 0 30px rgba(255, 23, 68, 0.6)' }
                                 }}
                             >
-                                REPARAR EQUIPO (DESDE $0.50 USD)
+                                REPARAR EQUIPO (DESDE 1 {EnvVariables.coin1 || 'THAO'})
                             </Button>
                         </div>
                     ) : currentLife < 100 ? (

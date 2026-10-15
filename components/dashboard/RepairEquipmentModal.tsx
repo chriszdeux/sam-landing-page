@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { X, Wrench, ShieldAlert, CheckCircle2, TrendingDown, DollarSign, Cpu } from 'lucide-react';
+import { X, Wrench, ShieldAlert, Coins } from 'lucide-react';
 import { Dialog } from '../ui/Dialog';
 import { Typography } from '../ui/Typography';
 import { Button } from '../ui/Button';
@@ -10,6 +10,7 @@ import { repairLaboratory } from '../../lib/features/labs/actions';
 import { getRepairQuoteApi } from '../../lib/features/labs/api';
 import { addNotification } from '../../lib/features/uiSlice';
 import { RootState } from '../../lib/store';
+import { EnvVariables } from '../../lib/constants/variables';
 
 interface RepairEquipmentModalProps {
   open: boolean;
@@ -20,10 +21,11 @@ interface QuoteItem {
   blocks: number;
   percentRepaired: number;
   resultingLife: number;
+  currencyName?: string;
   damageRatio: number;
   wearMultiplier: number;
-  usdCostPerBlock: number;
-  totalUsdCost: number;
+  costPerBlock: number;
+  totalBaseCost: number;
   effectivePrice: number;
   totalCryptoCost: number;
 }
@@ -31,6 +33,7 @@ interface QuoteItem {
 interface QuoteData {
   labId: string;
   currentLife: number;
+  baseCurrency?: string;
   cryptoGenesis: {
     id: string;
     name: string;
@@ -56,6 +59,8 @@ export const RepairEquipmentModal: React.FC<RepairEquipmentModalProps> = ({ open
   const currentLife = lab?.currentLife !== undefined ? Number(lab.currentLife) : 100;
   const isCollapsed = currentLife <= 0;
   const maxBlocks = Math.max(1, Math.ceil(Math.max(0, 100 - currentLife) / 10));
+
+  const baseCoinName = quoteData?.baseCurrency || EnvVariables.coin1 || 'THAO';
 
   // Load live quotes from backend when opened
   useEffect(() => {
@@ -89,7 +94,7 @@ export const RepairEquipmentModal: React.FC<RepairEquipmentModalProps> = ({ open
     return () => {
       isMounted = false;
     };
-  }, [open, lab?.id, selectedNetwork?.id]);
+  }, [open, lab?.id, selectedNetwork?.id, maxBlocks]);
 
   // Active quote calculation
   const activeQuote = useMemo(() => {
@@ -101,10 +106,10 @@ export const RepairEquipmentModal: React.FC<RepairEquipmentModalProps> = ({ open
     // Client-side fallback calculation matching the backend formula
     const damageRatio = Math.max(0, Math.min(1, (100 - currentLife) / 100));
     const wearMultiplier = 1.0 + 2.0 * Math.pow(damageRatio, 2);
-    const usdCostPerBlock = 0.5 * wearMultiplier;
-    const totalUsdCost = usdCostPerBlock * selectedBlocks;
+    const costPerBlock = 1.0 * wearMultiplier;
+    const totalBaseCost = costPerBlock * selectedBlocks;
     const tokenPrice = quoteData?.cryptoGenesis?.price || 1.0;
-    const totalCryptoCost = totalUsdCost / Math.max(0.001, tokenPrice);
+    const totalCryptoCost = totalBaseCost / Math.max(0.001, tokenPrice);
     const resultingLife = Math.min(100, currentLife + selectedBlocks * 10);
 
     return {
@@ -113,8 +118,8 @@ export const RepairEquipmentModal: React.FC<RepairEquipmentModalProps> = ({ open
       resultingLife,
       damageRatio,
       wearMultiplier,
-      usdCostPerBlock,
-      totalUsdCost,
+      costPerBlock,
+      totalBaseCost,
       effectivePrice: tokenPrice,
       totalCryptoCost: Number(totalCryptoCost.toFixed(4)),
     };
@@ -197,7 +202,7 @@ export const RepairEquipmentModal: React.FC<RepairEquipmentModalProps> = ({ open
             {isCollapsed ? 'REPARACIÓN DE EMERGENCIA' : 'MANTENIMIENTO ESTRUCTURAL'}
           </Typography>
           <Typography variant="caption" className="font-mono text-xs text-white/50">
-            SISTEMA MODULAR • PROTOCOLO ANTI-VOLATILIDAD
+            SISTEMA MODULAR • PROTOCOLO ANTI-VOLATILIDAD ({baseCoinName})
           </Typography>
         </div>
       </div>
@@ -319,7 +324,7 @@ export const RepairEquipmentModal: React.FC<RepairEquipmentModalProps> = ({ open
       {/* Pricing Breakdown & Anti-Volatility Peg */}
       <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] p-4 text-xs">
         <div className="mb-3 flex items-center gap-2 border-b border-white/10 pb-2">
-          <DollarSign size={16} className="text-[#00f3ff]" />
+          <Coins size={16} className="text-[#00f3ff]" />
           <Typography variant="body2" className="font-bold text-white">
             Estructura de Precio Justo Anti-Volatilidad
           </Typography>
@@ -328,7 +333,7 @@ export const RepairEquipmentModal: React.FC<RepairEquipmentModalProps> = ({ open
         <div className="flex flex-col gap-2 font-mono">
           <div className="flex items-center justify-between text-white/70">
             <span>Benchmark base:</span>
-            <span className="text-white">$0.50 USD / bloque (10%)</span>
+            <span className="text-white">1.0 {baseCoinName} / bloque (10%)</span>
           </div>
 
           <div className="flex items-center justify-between text-white/70">
@@ -340,7 +345,7 @@ export const RepairEquipmentModal: React.FC<RepairEquipmentModalProps> = ({ open
 
           <div className="flex items-center justify-between text-white/70">
             <span>Costo por bloque resultante:</span>
-            <span className="text-white">${activeQuote.usdCostPerBlock.toFixed(2)} USD</span>
+            <span className="text-white">{activeQuote.costPerBlock.toFixed(2)} {baseCoinName}</span>
           </div>
 
           <div className="my-1 border-t border-white/10" />
@@ -352,7 +357,7 @@ export const RepairEquipmentModal: React.FC<RepairEquipmentModalProps> = ({ open
                 {activeQuote.totalCryptoCost} {genesisSymbol}
               </span>
               <span className="block text-[0.7rem] text-white/50">
-                (~${activeQuote.totalUsdCost.toFixed(2)} USD indexado)
+                (~{activeQuote.totalBaseCost.toFixed(2)} {baseCoinName} indexado)
               </span>
             </div>
           </div>
