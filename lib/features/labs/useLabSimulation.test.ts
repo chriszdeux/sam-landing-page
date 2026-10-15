@@ -61,6 +61,8 @@ describe('Laboratorio Lockout en 0% Vida Útil y Reparación', () => {
       temperature: 25,
       efficiency: 0,
       energy: 0,
+      operationStatus: 'INACTIVE',
+      pendingRewards: 0,
     },
     isPoweredOn: false,
     isOverheated: false,
